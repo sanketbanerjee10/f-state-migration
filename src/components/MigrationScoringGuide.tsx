@@ -36,7 +36,8 @@ export function MigrationScoreBadge({
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [open]);
+    return undefined;
+  }, [open, disableHover]);
 
   if (!scoreResult) return null;
 

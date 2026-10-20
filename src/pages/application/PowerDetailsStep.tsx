@@ -8,7 +8,7 @@ import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
 import { MigrationScoreBadge, VerifiedBadge, MigrationScoringGuide } from '../../components/MigrationScoringGuide';
-import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
+import { useApplicationDraft, type StepErrors, type ApplicationDraft } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function PowerDetailsStep() {
@@ -42,16 +42,17 @@ export function PowerDetailsStep() {
   //   3. The user has NOT manually edited it (i.e. it came from OCR, not keyboard input)
   // This means: if OCR missed a field (value is empty), it stays editable.
   // If the user types into an empty field, dirtyFields[key] becomes true → not locked.
+  type PowerDraftKey = 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower' | 'kills';
+
   const screenshotPresent = draft.hasScreenshot;
-  const fieldLocked = (fieldKey: keyof ApplicationDraft, value: string) =>
+  const fieldLocked = (fieldKey: PowerDraftKey, value: string) =>
     screenshotPresent && value.trim() !== '' && !draft.dirtyFields[fieldKey];
   // powerLocked is true only if ALL power fields are OCR-locked (drives section hint text)
+  const powerKeys: PowerDraftKey[] = ['structurePower', 'techPower', 'troopPower', 'heroPower', 'modVehiclePower'];
   const powerLocked =
     screenshotPresent &&
-    (
-      ['structurePower', 'techPower', 'troopPower', 'heroPower', 'modVehiclePower'] as (keyof ApplicationDraft)[]
-    ).every((k) => {
-      const v = draft[k] as string;
+    powerKeys.every((k) => {
+      const v = String(draft[k] ?? '');
       return v.trim() !== '' && !draft.dirtyFields[k];
     });
 

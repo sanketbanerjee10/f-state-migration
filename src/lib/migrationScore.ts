@@ -64,7 +64,7 @@ export function useLiveTierThresholds(): {
     query: {
       staleTime: 30 * 1000,
       refetchOnWindowFocus: true,
-    },
+    } as any,
   });
 
   const thresholds = useMemo(() => rowsToTierThresholds(rows as any), [rows]);
