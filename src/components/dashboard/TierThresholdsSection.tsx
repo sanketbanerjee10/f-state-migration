@@ -7,7 +7,7 @@ import {
   useGetAdminTierThresholds,
   useUpdateAdminTierThreshold,
   type TierThreshold,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 import { TIER_COLORS } from '../../lib/migrationScore';
 
 interface TierThresholdsSectionProps {

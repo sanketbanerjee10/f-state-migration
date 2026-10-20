@@ -1,7 +1,7 @@
 import {
   getGetAdminOverviewQueryKey,
   useGetAdminOverview,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 
 interface DashboardOverviewProps {
   enabled?: boolean;

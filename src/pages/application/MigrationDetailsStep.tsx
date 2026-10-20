@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@workspace/api-client-react';
+import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@/lib/api-client';
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';

@@ -27,7 +27,7 @@ import {
 } from '../lib/trackedApplications';
 import { MigrationScoreBadge, VerifiedBadge } from '../components/MigrationScoringGuide';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../lib/migrationScore';
-import type { AdminApplication, ApplicationPlayer } from '@workspace/api-zod';
+import type { AdminApplication, ApplicationPlayer } from '@/lib/api-client';
 
 export function ApplicationTracker() {
   const params = useParams<{ id?: string }>();

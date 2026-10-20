@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { setAuthTokenGetter } from '@workspace/api-client-react';
+import { setAuthTokenGetter } from '@/lib/api-client';
 
 let currentSessionToken: string | null = null;
 setAuthTokenGetter(() => currentSessionToken);

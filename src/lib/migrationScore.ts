@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useGetTierThresholds } from '@workspace/api-client-react';
+import { useGetTierThresholds } from '@/lib/api-client';
 
 export interface MigrationScoreResult {
   score: number;

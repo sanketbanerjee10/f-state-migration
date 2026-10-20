@@ -6,7 +6,7 @@ import {
   getListAdminAlliancesQueryKey,
   getGetAdminTierThresholdsQueryKey,
   getGetTierThresholdsQueryKey,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 import { useLeadershipSession } from '../lib/auth';
 import { AllianceManagementSection } from '../components/dashboard/AllianceManagementSection';
 import { TierThresholdsSection } from '../components/dashboard/TierThresholdsSection';

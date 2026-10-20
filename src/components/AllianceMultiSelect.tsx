@@ -1,4 +1,4 @@
-import type { Alliance } from '@workspace/api-client-react';
+import type { Alliance } from '@/lib/api-client';
 
 export function AllianceMultiSelect({ values, onChange, error, options, loading, loadError, onRetry }: {
   values: string[];

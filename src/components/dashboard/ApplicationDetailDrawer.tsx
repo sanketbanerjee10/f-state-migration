@@ -9,7 +9,7 @@ import {
   useGetAdminTierThresholds,
   useUpdateAdminApplicationStatus,
   type ApplicationStatus,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 import {
   TIER_COLORS,
   rowsToTierThresholds,

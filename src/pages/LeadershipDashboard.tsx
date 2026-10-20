@@ -7,7 +7,7 @@ import {
   getListAdminAlliancesQueryKey,
   getGetAdminTierThresholdsQueryKey,
   getGetAdminApplicationQueryKey,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 import { useLeadershipSession } from '../lib/auth';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { DashboardOverview } from '../components/dashboard/DashboardOverview';

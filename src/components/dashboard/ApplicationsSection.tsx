@@ -17,7 +17,7 @@ import {
   useListAdminApplications,
   type ApplicationStatus,
   type ListAdminApplicationsParams,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 import { TIER_COLORS } from '../../lib/migrationScore';
 
 const statuses: ApplicationStatus[] = ['Pending', 'Approved', 'Rejected'];

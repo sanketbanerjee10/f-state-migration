@@ -7,7 +7,7 @@ import {
   useListAdminAlliances,
   useUpdateAdminAlliance,
   type AdminAlliance,
-} from '@workspace/api-client-react';
+} from '@/lib/api-client';
 
 const emptyAlliance = { tag: '', name: '', displayOrder: 0 };
 

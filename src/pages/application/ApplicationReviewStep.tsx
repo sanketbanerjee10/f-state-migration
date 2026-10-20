@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { CheckCircle2, Edit2, ExternalLink, LoaderCircle, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
-import { useSubmitMigrationApplication } from '@workspace/api-client-react';
+import { useSubmitMigrationApplication } from '@/lib/api-client';
 import { FormSection } from '../../components/Field';
 import { Modal } from '../../components/Dialogs';
 import { StepLayout } from '../../components/form/StepLayout';
