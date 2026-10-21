@@ -355,7 +355,7 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
               </div>
 
               <div style={{ fontSize: 10, color: '#94a3b8' }}>
-                Base Requirement: <strong style={{ color: meta.text }}>{b.passes} passes</strong>
+                Move Requirement: <strong style={{ color: meta.text }}>{b.passes} passes</strong>
               </div>
             </div>
           );

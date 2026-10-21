@@ -3,11 +3,9 @@ import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@/lib/api-
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
-import type { MigrationTier, MigrationType } from '../../types/application';
+import type { MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
-
-const tierOptions: MigrationTier[] = ['Regular', 'Medium', 'Advanced', 'Elite'];
 
 export function MigrationDetailsStep() {
   const { draft, setDraftField, validateStep } = useApplicationDraft();
@@ -122,27 +120,6 @@ export function MigrationDetailsStep() {
             onRetry={() => void activeAlliances.refetch()}
           />
         </Field>
-
-        <Field id="tier-regular" label="Expected migration tier" error={stepErrors.tier}>
-          <div className="radio-grid" role="radiogroup" aria-label="Expected migration tier" data-testid="tier-options">
-            {tierOptions.map((tier) => (
-              <label className="radio-card" key={tier}>
-                <input
-                  type="radio"
-                  name="tier"
-                  value={tier}
-                  checked={draft.tier === tier}
-                  onChange={() => {
-                    setDraftField('tier', tier, true);
-                    setStepErrors((old) => ({ ...old, tier: '' }));
-                  }}
-                  data-testid={`tier-${tier.toLowerCase()}`}
-                />
-                {tier}
-              </label>
-            ))}
-          </div>
-        </Field>
       </FormSection>
 
       {/* ── Section 2: Reason & comments ── */}
@@ -171,16 +148,27 @@ export function MigrationDetailsStep() {
           </div>
         </Field>
 
-        <Field id="comments" label="Additional comments">
+        <Field
+          id="comments"
+          label="Additional comments"
+          error={stepErrors.comments}
+          hint="Anything else our leadership team should know? (Up to 1,000 characters)."
+        >
           <textarea
             className="control"
             id="comments"
             value={draft.comments}
             maxLength={1000}
-            onChange={(e) => setDraftField('comments', e.target.value, true)}
+            onChange={(e) => {
+              setDraftField('comments', e.target.value, true);
+              setStepErrors((old) => ({ ...old, comments: '' }));
+            }}
             placeholder="Anything else our leadership team should know?"
             data-testid="additional-comments"
           />
+          <div className="counter" aria-live="polite">
+            {draft.comments.length} / 1,000
+          </div>
         </Field>
       </FormSection>
     </StepLayout>

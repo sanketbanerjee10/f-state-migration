@@ -106,7 +106,9 @@ export function StepLayout({
       )}
 
       <form className="form-content wizard-form-content" onSubmit={handleSubmit} noValidate>
-        {children}
+        <div>
+          {children}
+        </div>
 
         {formError && (
           <p className="error-text" role="alert" style={{ marginTop: 12 }}>
@@ -118,13 +120,19 @@ export function StepLayout({
         {navigationProps && <StepNavigation {...navigationProps} />}
 
         <p className="hint wizard-privacy-note">
-          Only the details you confirm are submitted. Screenshots and recognized stats remain private in your browser.
+          Only the details you confirm are submitted. Screenshots remain private in your browser.
         </p>
       </form>
 
-      <footer className="footer-note">
-        STATE 565 · MIGRATION APPLICATION
-        <span style={{ float: 'right' }}>Made With ❤️ By Sankeyyy</span>
+      <footer className="footer-note" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span>STATE 565 · MIGRATION APPLICATION</span>
+          <span>·</span>
+          <Link href="/about" style={{ color: '#94c4f2', textDecoration: 'none' }}>
+            About 565
+          </Link>
+        </div>
+        <span>Made With ❤️ By Sankeyyy</span>
       </footer>
     </main>
   );

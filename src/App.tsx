@@ -4,6 +4,7 @@ import { LeadershipDashboard } from './pages/LeadershipDashboard';
 import { LeadershipSettings } from './pages/LeadershipSettings';
 import { ApplicationWizard } from './pages/application/ApplicationWizard';
 import { ApplicationTracker } from './pages/ApplicationTracker';
+import { About565 } from './pages/About565';
 import { ReturningUserModal } from './components/ReturningUserModal';
 
 function App() {
@@ -11,6 +12,10 @@ function App() {
     <>
       <ReturningUserModal />
       <Switch>
+        {/* About 565 public route */}
+        <Route path="/about" component={About565} />
+        <Route path="/about-565" component={About565} />
+
         {/* Public Application Tracker routes */}
         <Route path="/track/:id" component={ApplicationTracker} />
         <Route path="/track" component={ApplicationTracker} />
@@ -36,7 +41,7 @@ function App() {
         <Route>
           <main className="form-shell">
             <h1 className="form-title">Page not found</h1>
-            <p className="intro">This State 565 portal page does not exist.</p>
+            <p className="intro">This portal page does not exist.</p>
             <Link className="button" href="/">
               Return to application
             </Link>

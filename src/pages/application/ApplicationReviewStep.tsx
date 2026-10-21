@@ -113,6 +113,15 @@ export function ApplicationReviewStep() {
         Math.round(parseMagnitude(draft.highestPowerOnRecord || draft.f1) || 0)
       );
 
+      const autoCalculatedTier: MigrationTier = (() => {
+        const s = parseMagnitude(draft.structurePower) || 0;
+        const t = parseMagnitude(draft.techPower) || 0;
+        const h = parseMagnitude(draft.heroPower) || 0;
+        const v = parseMagnitude(draft.modVehiclePower) || 0;
+        const scoreRes = calculateMigrationScoreFromRaw(s, t, h, v, thresholds);
+        return (scoreRes?.tier || draft.tier || 'Regular') as MigrationTier;
+      })();
+
       const payload = {
         idempotencyKey: idempotencyRef.current,
         gameName: draft.playerName.trim(),
@@ -124,7 +133,7 @@ export function ApplicationReviewStep() {
         kills: Math.round(parseMagnitude(draft.kills) as number),
         preferredAllianceIds: anyAlliance ? [] : draft.preferredAlliances.map(Number),
         anyAlliance,
-        migrationTier: draft.tier as MigrationTier,
+        migrationTier: autoCalculatedTier,
         migrationType: effectiveMigrationType,
         groupRepresentative: effectiveMigrationType === 'Group' ? draft.representative.trim() : null,
         migrationReason: draft.reason.trim(),
@@ -398,7 +407,7 @@ export function ApplicationReviewStep() {
               {displayMigrationType === 'Group' && (
                 <div className="review-item"><span>Group Rep:</span> <strong>{draft.representative || 'Not specified'}</strong></div>
               )}
-              <div className="review-item"><span>Expected Tier:</span> <strong>{draft.tier || 'Not selected'}</strong></div>
+              <div className="review-item"><span>Migration Tier:</span> <strong>{draft.tier || 'Regular'}</strong></div>
               <div className="review-item">
                 <span>Destinations:</span>
                 <strong>{draft.preferredAlliances.includes('any') ? 'Any alliance' : `${draft.preferredAlliances.length} selected`}</strong>

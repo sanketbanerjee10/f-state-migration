@@ -1,2 +1,4 @@
 node_modules
 .replit-artifact
+.env
+.env.example

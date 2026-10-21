@@ -154,6 +154,9 @@ export function PowerDetailsStep() {
     const errors = validateStep('character');
     setStepErrors(errors);
     if (Object.keys(errors).length === 0) {
+      if (scoreResult?.tier) {
+        setDraftField('tier', scoreResult.tier, false);
+      }
       nextStep();
     }
   };

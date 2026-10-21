@@ -429,6 +429,9 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         if (draft.reason.length > 1000) {
           errors.reason = 'Keep your reason to 1,000 characters or fewer.';
         }
+        if (draft.comments.length > 1000) {
+          errors.comments = 'Keep additional comments to 1,000 characters or fewer.';
+        }
         break;
       }
 

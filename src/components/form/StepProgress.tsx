@@ -18,6 +18,22 @@ export function StepProgress() {
 
   return (
     <div className="wizard-progress-card" aria-label="Application progress">
+      {/* Progress bar */}
+      <div
+        className="wizard-progress-track"
+        role="progressbar"
+        aria-valuenow={stepNumber}
+        aria-valuemin={1}
+        aria-valuemax={totalSteps}
+        aria-label={`Progress: Step ${stepNumber} of ${totalSteps}`}
+        data-testid="step-progress-label"
+      >
+        <div
+          className="wizard-progress-bar"
+          style={{ width: `${Math.round((stepNumber / totalSteps) * 100)}%` }}
+        />
+      </div>
+      
       {/* Clickable step pills */}
       <div className="wizard-step-pills" role="tablist" aria-label="Form steps">
         {steps.map((step, index) => {
@@ -47,22 +63,6 @@ export function StepProgress() {
           ⚠️ {blockedNotice}
         </div>
       )}
-
-      {/* Progress bar */}
-      <div
-        className="wizard-progress-track"
-        role="progressbar"
-        aria-valuenow={stepNumber}
-        aria-valuemin={1}
-        aria-valuemax={totalSteps}
-        aria-label={`Progress: Step ${stepNumber} of ${totalSteps}`}
-        data-testid="step-progress-label"
-      >
-        <div
-          className="wizard-progress-bar"
-          style={{ width: `${Math.round((stepNumber / totalSteps) * 100)}%` }}
-        />
-      </div>
     </div>
   );
 }
