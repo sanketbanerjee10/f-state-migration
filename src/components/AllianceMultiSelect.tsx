@@ -19,7 +19,7 @@ export function AllianceMultiSelect({ values, onChange, error, options, loading,
     <div className="alliance-grid" role="group" aria-label="Preferred destination alliances" data-testid="alliance-options">
       <label className="alliance-choice">
         <input type="checkbox" checked={any} onChange={() => toggle('any')} data-testid="alliance-any" />
-        <span><strong>Any alliance</strong><br /><span className="hint">No specific preference</span></span>
+        <span><strong>Any alliance</strong></span>
       </label>
       {options.map(option => <label className="alliance-choice" key={option.id}>
         <input type="checkbox" checked={values.includes(String(option.id))} onChange={() => toggle(String(option.id))} data-testid={`alliance-${option.id}`} />

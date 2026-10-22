@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'wouter';
 import { Edit2, LoaderCircle, Search, X } from 'lucide-react';
 import { StepProgress } from './StepProgress';
 import { StepNavigation, type StepNavigationProps } from './StepNavigation';
 import { useApplicationDraft } from '../../hooks/useApplicationDraft';
+import { getTrackedApplications, TrackedApplicationMeta } from '../../lib/trackedApplications'
 
 export interface StepLayoutProps {
   children: ReactNode;
@@ -40,7 +41,7 @@ export function StepLayout({
           <Link
             href="/track"
             className="button button-secondary"
-            style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}
           >
             <Search size={13} /> Track Existing Applications
           </Link>
@@ -120,19 +121,19 @@ export function StepLayout({
         {navigationProps && <StepNavigation {...navigationProps} />}
 
         <p className="hint wizard-privacy-note">
-          Only the details you confirm are submitted. Screenshots remain private in your browser.
+          Only the details you confirm are submitted. <br />Screenshots remain private in your browser.
         </p>
       </form>
 
-      <footer className="footer-note" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <footer className="footer-note">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
           <span>STATE 565 · MIGRATION APPLICATION</span>
           <span>·</span>
           <Link href="/about" style={{ color: '#94c4f2', textDecoration: 'none' }}>
             About 565
           </Link>
         </div>
-        <span>Made With ❤️ By Sankeyyy</span>
+        <div style={{ textAlign: 'center' }}>Made With ❤️ By Sankeyyy</div>
       </footer>
     </main>
   );

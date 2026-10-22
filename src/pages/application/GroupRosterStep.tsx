@@ -1,11 +1,10 @@
 import { useRef, useState } from 'react';
 import {
-  CheckCircle2,
   Edit2,
   FileImage,
+  ImagePlus,
   LoaderCircle,
   Plus,
-  ShieldCheck,
   Trash2,
   Upload,
   UserPlus,
@@ -14,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Field, FormSection } from '../../components/Field';
 import { Modal } from '../../components/Dialogs';
+import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
 import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude } from '../../lib/parsers';
@@ -57,9 +57,10 @@ export function GroupRosterStep() {
   const [manualTroopPower, setManualTroopPower] = useState('');
   const [manualHeroPower, setManualHeroPower] = useState('');
   const [manualModVehiclePower, setManualModVehiclePower] = useState('');
-  const [manualKills, setManualKills] = useState('0');
+  const [manualKills, setManualKills] = useState('');
   const [manualAlliance, setManualAlliance] = useState('');
   const [manualError, setManualError] = useState('');
+  const [manualEditingMember, setManualEditingMember] = useState<GroupMember | null>(null);
 
   const multiFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,15 +92,26 @@ export function GroupRosterStep() {
       try {
         const result = await recognizeScreenshot(file);
         const extracted = result.extracted;
+        const structurePower = extracted.structurePower || '0';
+        const techPower = extracted.techPower || '0';
+        const troopPower = extracted.troopPower || '0';
+        const heroPower = extracted.heroPower || '0';
+        const modVehiclePower = extracted.modVehiclePower || '0';
+        const calculatedPower = [
+          structurePower,
+          techPower,
+          troopPower,
+          heroPower,
+          modVehiclePower,
+        ].reduce((total, power) => total + (parseMagnitude(power) || 0), 0);
 
         const requiredFields = [
           extracted.playerName,
-          extracted.highestPowerOnRecord,
-          extracted.structurePower,
-          extracted.techPower,
-          extracted.troopPower,
-          extracted.heroPower,
-          extracted.modVehiclePower,
+          structurePower,
+          techPower,
+          troopPower,
+          heroPower,
+          modVehiclePower,
         ];
         const capturedCount = requiredFields.filter((val) => Boolean(val && val.trim())).length;
         const totalRequired = requiredFields.length;
@@ -114,12 +126,12 @@ export function GroupRosterStep() {
         const newMember: GroupMember = {
           id: crypto.randomUUID(),
           playerName: extracted.playerName || `Member ${draft.groupMembers.length + idx + 1}`,
-          highestPowerOnRecord: extracted.highestPowerOnRecord || '0',
-          structurePower: extracted.structurePower || '0',
-          techPower: extracted.techPower || '0',
-          troopPower: extracted.troopPower || '0',
-          heroPower: extracted.heroPower || '0',
-          modVehiclePower: extracted.modVehiclePower || '0',
+          highestPowerOnRecord: Math.round(calculatedPower).toLocaleString('en-US'),
+          structurePower,
+          techPower,
+          troopPower,
+          heroPower,
+          modVehiclePower,
           kills: extracted.kills || '0', // kills default to 0 if not extracted
           currentAlliance: draft.currentAlliance || '', // alliance recorded same as Stage 1/2
           screenshotFileName: file.name,
@@ -145,6 +157,22 @@ export function GroupRosterStep() {
   };
 
   const openEditModal = (member: GroupMember) => {
+    if (!member.isScreenshotVerified) {
+      setManualEditingMember(member);
+      setManualName(member.playerName);
+      setManualHighestPower(member.highestPowerOnRecord);
+      setManualStructurePower(member.structurePower);
+      setManualTechPower(member.techPower);
+      setManualTroopPower(member.troopPower);
+      setManualHeroPower(member.heroPower);
+      setManualModVehiclePower(member.modVehiclePower);
+      setManualKills(member.kills);
+      setManualAlliance(member.currentAlliance);
+      setManualError('');
+      setManualModalOpen(true);
+      return;
+    }
+
     setEditingMember(member);
     setEditName(member.playerName);
     setEditKills(member.kills);
@@ -169,6 +197,7 @@ export function GroupRosterStep() {
   };
 
   const openManualModal = () => {
+    setManualEditingMember(null);
     setManualName('');
     setManualHighestPower('');
     setManualStructurePower('');
@@ -176,7 +205,7 @@ export function GroupRosterStep() {
     setManualTroopPower('');
     setManualHeroPower('');
     setManualModVehiclePower('');
-    setManualKills('0');
+    setManualKills('');
     setManualAlliance(draft.currentAlliance || '');
     setManualError('');
     setManualModalOpen(true);
@@ -187,27 +216,77 @@ export function GroupRosterStep() {
       setManualError('Player name is required.');
       return;
     }
-    if (!manualHighestPower.trim()) {
-      setManualError('Highest Power on Record is required.');
+
+    if (!manualAlliance.trim()) {
+      setManualError('Current alliance is required.');
       return;
     }
 
-    const newMember: GroupMember = {
-      id: crypto.randomUUID(),
+    const numericFields = [
+      { value: manualHighestPower, label: 'Power on Record' },
+      { value: manualStructurePower, label: 'Structure Power' },
+      { value: manualTechPower, label: 'Tech Power' },
+      { value: manualTroopPower, label: 'Troop Power' },
+      { value: manualHeroPower, label: 'Hero Power' },
+      { value: manualModVehiclePower, label: 'Mod Vehicle Power' },
+      { value: manualKills, label: 'Kills' },
+    ];
+
+    for (const field of numericFields) {
+      if (!field.value.trim()) {
+        setManualError(`${field.label} is required.`);
+        return;
+      }
+
+      const value = Number(field.value.replace(/,/g, ''));
+
+      if (!Number.isFinite(value) || value <= 0) {
+        setManualError(`${field.label} must be a valid number greater than zero.`);
+        return;
+      }
+    }
+
+    const powerOnRecord = Number(manualHighestPower.replace(/,/g, ''));
+    const componentPowerTotal = [
+      manualStructurePower,
+      manualTechPower,
+      manualTroopPower,
+      manualHeroPower,
+      manualModVehiclePower,
+    ].reduce((total, power) => total + Number(power.replace(/,/g, '')), 0);
+
+    if (powerOnRecord !== componentPowerTotal) {
+      setManualError(
+        'Power on Record must equal the sum of Structure, Tech, Troop, Hero, and Mod Vehicle Power.'
+      );
+      return;
+    }
+
+    const memberFields = {
       playerName: manualName.trim(),
       highestPowerOnRecord: manualHighestPower.trim(),
-      structurePower: manualStructurePower.trim() || '0',
-      techPower: manualTechPower.trim() || '0',
-      troopPower: manualTroopPower.trim() || '0',
-      heroPower: manualHeroPower.trim() || '0',
-      modVehiclePower: manualModVehiclePower.trim() || '0',
-      kills: manualKills.trim() || '0',
-      currentAlliance: manualAlliance.trim() || draft.currentAlliance || '',
-      isScreenshotVerified: false, // manually added member does not get the verified badge
+      structurePower: manualStructurePower.trim(),
+      techPower: manualTechPower.trim(),
+      troopPower: manualTroopPower.trim(),
+      heroPower: manualHeroPower.trim(),
+      modVehiclePower: manualModVehiclePower.trim(),
+      kills: manualKills.trim(),
+      currentAlliance: manualAlliance.trim(),
     };
 
-    addGroupMember(newMember);
+    if (manualEditingMember) {
+      updateGroupMember(manualEditingMember.id, memberFields);
+    } else {
+      const newMember: GroupMember = {
+        id: crypto.randomUUID(),
+        ...memberFields,
+        isScreenshotVerified: false,
+      };
+      addGroupMember(newMember);
+    }
+
     setManualModalOpen(false);
+    setManualEditingMember(null);
   };
 
   return (
@@ -216,24 +295,15 @@ export function GroupRosterStep() {
         onContinue: nextStep,
         onBack: prevStep,
         continueLabel: 'Continue to Review',
-        backLabel: 'Back to Preferences',
+        // backLabel: 'Back to Preferences',
         disabled: uploading,
       }}
     >
-      <FormSection number="04" title="Group member roster (bulk import or manual)">
-        <div className="group-upload-info-card">
-          <div className="group-upload-header">
-            <Users size={20} className="group-icon" />
-            <div>
-              <h3 className="group-upload-title">Group Player Roster</h3>
-              <p className="hint">
-                Upload profile/details screenshots of all the players migrating in your group to extract and verify their stats,
-                or add members manually. Kills default to 0 and alliance matches Stage 1/2.
-              </p>
-            </div>
-          </div>
+      <FormSection number="04" title="Group Roster">
+        <div className="hint">
+          Upload profile/details screenshots of all the players migrating in your group to extract and verify their stats,
+          or add members manually.
         </div>
-
         {/* Hidden multi-file input */}
         <input
           ref={multiFileInputRef}
@@ -253,7 +323,7 @@ export function GroupRosterStep() {
         {/* Upload Dropzone */}
         {!uploading && (
           <div
-            className={`upload-zone compact-upload-zone ${dragging ? 'is-dragging' : ''}`}
+            className={`upload-zone compact-upload-zone ${dragging ? 'is-dragging' : ''} flex items-center justify-between flex-wrap gap-2`}
             onClick={() => multiFileInputRef.current?.click()}
             role="button"
             tabIndex={0}
@@ -278,12 +348,14 @@ export function GroupRosterStep() {
             }}
             data-testid="group-roster-dropzone"
           >
-            <div className="upload-icon">
-              <Upload size={20} />
-            </div>
-            <div className="upload-copy">
-              <strong>Select or drop member profile screenshots</strong>
-              <span>Select multiple PNG or JPG files at once (up to 10 MB each) — or add members manually below</span>
+            <div className="flex gap-2 items-center">
+              <div className="upload-icon">
+                <Upload size={20} />
+              </div>
+              <div className="upload-copy">
+                <strong>Select or drop profile screenshots</strong>
+                <p className="hint" style={{margin: 0}}>Multiple PNG or JPG files (up to 10 MB each)</p>
+              </div>
             </div>
             <button
               type="button"
@@ -325,10 +397,9 @@ export function GroupRosterStep() {
 
         {/* Member Roster List */}
         <div style={{ marginTop: 22 }}>
-          <div className="panel-heading" style={{ marginBottom: 12 }}>
+          <div className="panel-heading" style={{ marginBottom: 12, alignItems: 'center' }}>
             <div>
-              <span className="panel-kicker">ROSTER ({draft.groupMembers.length} MEMBERS)</span>
-              <h4 style={{ margin: '3px 0 0', fontSize: 15, color: '#f1f5f9' }}>Group Members</h4>
+              <span className="panel-kicker" style={{fontSize: "12px"}}>ROSTER ({draft.groupMembers.length} MEMBERS)</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
@@ -338,22 +409,22 @@ export function GroupRosterStep() {
                 disabled={uploading}
                 data-testid="add-manual-member-btn"
               >
-                <UserPlus size={14} /> Add member manually
+                <UserPlus size={16} />
               </button>
-              <button
+              {/* <button
                 type="button"
                 className="button button-quiet button-sm"
                 onClick={() => multiFileInputRef.current?.click()}
                 disabled={uploading}
                 data-testid="add-more-members-btn"
               >
-                <Plus size={14} /> Upload screenshots
-              </button>
+                <ImagePlus size={16} />
+              </button> */}
             </div>
           </div>
 
           {draft.groupMembers.length === 0 ? (
-            <div className="empty-state compact-empty" style={{ margin: '12px 0 20px' }}>
+            <div className="empty-state compact-empty" style={{ padding: '12px 10px 20px' }}>
               <Users size={24} />
               <strong>No group members added yet</strong>
               <span>Upload profile screenshots above or add members manually to populate your group roster.</span>
@@ -396,7 +467,7 @@ export function GroupRosterStep() {
                         type="button"
                         className="button button-quiet button-sm"
                         onClick={() => openEditModal(member)}
-                        title="Edit name and kills"
+                        title={member.isScreenshotVerified ? 'Edit name and kills' : 'Edit all member details'}
                         data-testid={`edit-member-${idx}`}
                       >
                         <Edit2 size={13} />
@@ -415,7 +486,7 @@ export function GroupRosterStep() {
 
                   <div className="group-member-stats">
                     <div>
-                      <span>Highest Power:</span>
+                      <span>Power:</span>
                       <strong>{member.highestPowerOnRecord}</strong>
                     </div>
                     <div>
@@ -502,13 +573,13 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          <Field id="edit-player-kills" label="Kills" hint="Kill count (defaults to 0 or OCR value)">
-            <input
+          <Field id="edit-player-kills" label="Kills">
+            <CommaFormattedNumberInput
               className="control"
               id="edit-player-kills"
               value={editKills}
               placeholder="e.g. 5,453,196 or 0"
-              onChange={(e) => setEditKills(e.target.value)}
+              onChange={setEditKills}
               data-testid="edit-member-kills-input"
             />
           </Field>
@@ -529,7 +600,7 @@ export function GroupRosterStep() {
               POWER STATS {editingMember.isScreenshotVerified ? '(LOCKED FROM SCREENSHOT)' : '(MANUAL)'}:
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, fontSize: 12 }}>
-              <div>Highest Power: <strong>{editingMember.highestPowerOnRecord}</strong></div>
+              <div>Power: <strong>{editingMember.highestPowerOnRecord}</strong></div>
               <div>Structure Power: <strong>{editingMember.structurePower}</strong></div>
               <div>Tech Power: <strong>{editingMember.techPower}</strong></div>
               <div>Troop Power: <strong>{editingMember.troopPower}</strong></div>
@@ -543,14 +614,20 @@ export function GroupRosterStep() {
       {/* Add Manual Member Modal */}
       {manualModalOpen && (
         <Modal
-          title="Add Group Member Manually"
-          onClose={() => setManualModalOpen(false)}
+          title={manualEditingMember ? `Edit Member: ${manualEditingMember.playerName}` : 'Add Group Member Manually'}
+          onClose={() => {
+            setManualModalOpen(false);
+            setManualEditingMember(null);
+          }}
           actions={
             <>
               <button
                 type="button"
                 className="button button-quiet"
-                onClick={() => setManualModalOpen(false)}
+                onClick={() => {
+                  setManualModalOpen(false);
+                  setManualEditingMember(null);
+                }}
               >
                 Cancel
               </button>
@@ -558,25 +635,25 @@ export function GroupRosterStep() {
                 type="button"
                 className="button button-primary"
                 onClick={saveManualMember}
-                data-testid="save-manual-member"
+                data-testid={manualEditingMember ? 'save-manual-member-edit' : 'save-manual-member'}
               >
-                Add Member
+                {manualEditingMember ? 'Save changes' : 'Add Member'}
               </button>
             </>
           }
         >
           <p className="hint" style={{ marginBottom: 14 }}>
-            Manually enter a member's details without a screenshot. Note: Manually entered members will not receive the verified badge.
+            Note: Manually entered members will not receive the verified badge.
           </p>
 
           {manualError && (
-            <p className="error-text" role="alert" style={{ marginBottom: 12 }}>
+            <div className="manual-member-error" role="alert">
               {manualError}
-            </p>
+            </div>
           )}
 
           {/* Row 1: Player name (full width) */}
-          <Field id="manual-name" label="Player name" required>
+          <Field id="manual-name" label="Player Name" required>
             <input
               className="control"
               id="manual-name"
@@ -588,96 +665,97 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          {/* Row 2: Highest Power + Kills */}
-          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <Field id="manual-highest-power" label="Highest Power on Record" required>
-              <input
+          <Field id="manual-alliance" label="Current alliance" required>
+            <input
+              className="control"
+              id="manual-alliance"
+              value={manualAlliance}
+              placeholder={draft.currentAlliance || 'Alliance tag/name'}
+              onChange={(e) => setManualAlliance(e.target.value)}
+              data-testid="manual-member-alliance-input"
+            />
+          </Field>
+
+          {/* Row 2: Power + Kills */}
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="manual-highest-power" label="Power on Record" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-highest-power"
                 value={manualHighestPower}
                 placeholder="e.g. 210,000,000"
-                onChange={(e) => setManualHighestPower(e.target.value)}
+                onChange={setManualHighestPower}
                 data-testid="manual-member-power-input"
               />
             </Field>
 
-            <Field id="manual-kills" label="Kills">
-              <input
+            <Field id="manual-kills" label="Kills" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-kills"
                 value={manualKills}
                 placeholder="0"
-                onChange={(e) => setManualKills(e.target.value)}
+                onChange={setManualKills}
                 data-testid="manual-member-kills-input"
               />
             </Field>
           </div>
 
           {/* Row 3: Structure + Tech */}
-          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <Field id="manual-struct" label="Structure Power">
-              <input
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="manual-struct" label="Structure Power" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-struct"
                 value={manualStructurePower}
                 placeholder="e.g. 70,000,000"
-                onChange={(e) => setManualStructurePower(e.target.value)}
+                onChange={setManualStructurePower}
               />
             </Field>
 
-            <Field id="manual-tech" label="Tech Power">
-              <input
+            <Field id="manual-tech" label="Tech Power" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-tech"
                 value={manualTechPower}
                 placeholder="e.g. 15,000,000"
-                onChange={(e) => setManualTechPower(e.target.value)}
+                onChange={setManualTechPower}
               />
             </Field>
           </div>
 
           {/* Row 4: Troop + Hero */}
-          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <Field id="manual-troop" label="Troop Power">
-              <input
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="manual-troop" label="Troop Power" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-troop"
                 value={manualTroopPower}
                 placeholder="e.g. 50,000,000"
-                onChange={(e) => setManualTroopPower(e.target.value)}
+                onChange={setManualTroopPower}
               />
             </Field>
 
-            <Field id="manual-hero" label="Hero Power">
-              <input
+            <Field id="manual-hero" label="Hero Power" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-hero"
                 value={manualHeroPower}
                 placeholder="e.g. 45,000,000"
-                onChange={(e) => setManualHeroPower(e.target.value)}
+                onChange={setManualHeroPower}
               />
             </Field>
           </div>
 
           {/* Row 5: Mod Vehicle + Alliance */}
-          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <Field id="manual-vehicle" label="Mod Vehicle Power">
-              <input
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="manual-vehicle" label="Mod Vehicle Power" required>
+              <CommaFormattedNumberInput
                 className="control"
                 id="manual-vehicle"
                 value={manualModVehiclePower}
                 placeholder="e.g. 8,000,000"
-                onChange={(e) => setManualModVehiclePower(e.target.value)}
-              />
-            </Field>
-
-            <Field id="manual-alliance" label="Current alliance">
-              <input
-                className="control"
-                id="manual-alliance"
-                value={manualAlliance}
-                placeholder={draft.currentAlliance || 'Alliance tag/name'}
-                onChange={(e) => setManualAlliance(e.target.value)}
+                onChange={setManualModVehiclePower}
               />
             </Field>
           </div>

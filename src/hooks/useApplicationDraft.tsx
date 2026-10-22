@@ -304,41 +304,49 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
       setScreenshotFileState(file);
     }
     setDraft((prev) => {
-      const dirty = prev.dirtyFields;
+      const dirtyFields = { ...prev.dirtyFields };
       const updated: Partial<ApplicationDraft> = {
         hasScreenshot: true,
         screenshotFileName: file?.name || prev.screenshotFileName || 'screenshot.png',
       };
 
-      // Only update fields that the applicant hasn't manually edited
-      if (extracted.playerName && !dirty.playerName) {
+      if (extracted.playerName) {
         updated.playerName = extracted.playerName;
+        dirtyFields.playerName = false;
       }
-      if (extracted.highestPowerOnRecord && !dirty.highestPowerOnRecord) {
+      if (extracted.highestPowerOnRecord) {
         updated.highestPowerOnRecord = extracted.highestPowerOnRecord;
+        dirtyFields.highestPowerOnRecord = false;
       }
-      if (extracted.structurePower && !dirty.structurePower) {
+      if (extracted.structurePower) {
         updated.structurePower = extracted.structurePower;
+        dirtyFields.structurePower = false;
       }
-      if (extracted.techPower && !dirty.techPower) {
+      if (extracted.techPower) {
         updated.techPower = extracted.techPower;
+        dirtyFields.techPower = false;
       }
-      if (extracted.troopPower && !dirty.troopPower) {
+      if (extracted.troopPower) {
         updated.troopPower = extracted.troopPower;
+        dirtyFields.troopPower = false;
       }
-      if (extracted.heroPower && !dirty.heroPower) {
+      if (extracted.heroPower) {
         updated.heroPower = extracted.heroPower;
+        dirtyFields.heroPower = false;
       }
-      if (extracted.modVehiclePower && !dirty.modVehiclePower) {
+      if (extracted.modVehiclePower) {
         updated.modVehiclePower = extracted.modVehiclePower;
+        dirtyFields.modVehiclePower = false;
       }
-      if (extracted.kills && !dirty.kills) {
+      if (extracted.kills) {
         updated.kills = extracted.kills;
+        dirtyFields.kills = false;
       }
 
       return {
         ...prev,
         ...updated,
+        dirtyFields,
       };
     });
   };

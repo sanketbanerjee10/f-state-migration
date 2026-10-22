@@ -3,6 +3,7 @@ import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@/lib/api-
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
+import { getCachedActiveAlliances } from '../../lib/activeAlliancesCache';
 import type { MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
@@ -19,7 +20,12 @@ export function MigrationDetailsStep() {
   }
 
   const activeAlliances = useGetActiveAlliances({
-    query: { queryKey: getGetActiveAlliancesQueryKey() },
+    query: {
+      queryKey: getGetActiveAlliancesQueryKey(),
+      queryFn: ({ signal }) => getCachedActiveAlliances(signal),
+      staleTime: 24 * 60 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
   });
 
   const handleContinue = () => {
@@ -38,7 +44,7 @@ export function MigrationDetailsStep() {
         onContinue: handleContinue,
         onBack: prevStep,
         continueLabel: isGroup ? 'Continue to Group Roster' : 'Continue to Review',
-        backLabel: 'Back to Combat Power',
+        // backLabel: 'Back to Combat Power',
         disabled: activeAlliances.isLoading,
       }}
     >
@@ -129,7 +135,7 @@ export function MigrationDetailsStep() {
           label="Why do you want to migrate?"
           required
           error={stepErrors.reason}
-          hint="Tell us why you want to join State 565 (10–1,000 characters)."
+          // hint="Tell us why you want to join State 565 (10–1,000 characters)."
         >
           <textarea
             className="control"
@@ -152,7 +158,7 @@ export function MigrationDetailsStep() {
           id="comments"
           label="Additional comments"
           error={stepErrors.comments}
-          hint="Anything else our leadership team should know? (Up to 1,000 characters)."
+          // hint="Anything else our leadership team should know? (Up to 1,000 characters)."
         >
           <textarea
             className="control"

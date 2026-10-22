@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
@@ -28,19 +29,23 @@ export function CelebrationModal({
   isUpdate = false,
   onNewApplication,
 }: CelebrationModalProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [copiedId, setCopiedId] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
+    const audio = new Audio('/sounds/celebration.mp3');
+    audio.volume = 0.5;
 
-    // Trigger high-energy confetti celebration in background
+    audio.play().catch((error) => {
+      console.warn('Celebration audio could not be played:', error);
+    });
     const count = 200;
     const defaults = {
       origin: { y: 0.65 },
-      zIndex: 9999,
+      zIndex: 100,
     };
 
     function fire(particleRatio: number, opts: confetti.Options) {
@@ -79,248 +84,253 @@ export function CelebrationModal({
       colors: ['#f43f5e', '#fb7185'],
     });
 
-    const timeout = setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       confetti({
         particleCount: 60,
         spread: 80,
         origin: { y: 0.5 },
-        zIndex: 9999,
+        zIndex: 100,
       });
-    }, 450);
+    }, 750);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+      window.clearTimeout(timeout);
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const trackingUrl = `${window.location.origin}/track/${applicationId || applicationReference}`;
+  const trackingPath = `/track/${applicationId || applicationReference}`;
+  const trackingUrl = `${window.location.origin}${trackingPath}`;
 
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(applicationId || applicationReference);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  };
+  async function copyText(
+    value: string,
+    setCopied: (copied: boolean) => void,
+  ) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard access may be unavailable in some browser contexts.
+      setCopied(false);
+    }
+  }
 
-  const handleCopyRef = () => {
-    navigator.clipboard.writeText(applicationReference);
-    setCopiedRef(true);
-    setTimeout(() => setCopiedRef(false), 2000);
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(trackingUrl);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const handleGoToTracking = () => {
+  function handleGoToTracking() {
     onClose();
-    setLocation(`/track/${applicationId || applicationReference}`);
-  };
+    setLocation(trackingPath);
+  }
+
+  function handleNewApplication() {
+    onClose();
+    onNewApplication?.();
+  }
 
   return (
-    <div className="dialog-backdrop" style={{ zIndex: 9000 }}>
-      <section
-        className="dialog celebration-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="celebration-title"
+    <section
+      className="celebration-success relative"
+      data-testid="celebration-success"
+      aria-labelledby="celebration-title"
+      aria-describedby="celebration-description"
+      role="status"
+    >
+      <div className="celebration-success__header">
+        <div className="celebration-success__icon" aria-hidden="true">
+          {isUpdate ? <Sparkles size={30} /> : <PartyPopper size={30} />}
+        </div>
+        {/* <div style={{position: 'absolute', top: 10, left: 0}}>
+          <img src="/images/bully-maguire.gif" width="80px" />
+        </div>
+        <div style={{position: 'absolute', top: 10, right: 0}}>
+          <img src="/images/dance-dancing.gif" width="90px" />
+        </div> */}
+        <p className="celebration-success__eyebrow">
+          {isUpdate ? 'Changes saved' : 'Submission complete'}
+        </p>
+
+        <h2 id="celebration-title">
+          {isUpdate
+            ? 'Application Successfully Updated!'
+            : 'Application Submitted Successfully!'}
+        </h2>
+
+        <p
+          id="celebration-description"
+          className="celebration-success__description"
+        >
+          {isUpdate
+            ? 'Your changes have been submitted for State 565 leadership review.'
+            : 'Your migration application has been submitted for State 565 leadership review.'}
+        </p>
+      </div>
+
+      <div className="celebration-success__reference">
+        {/* Application Reference */}
+        <div className="celebration-success__data-row">
+          <div className="celebration-success__data-details">
+            <span className="celebration-success__label">
+              Application Reference
+            </span>
+            <strong className="celebration-success__data-value">
+              {applicationReference}
+            </strong>
+          </div>
+
+          <button
+            type="button"
+            className="button button-secondary celebration-success__copy"
+            onClick={() => copyText(applicationReference, setCopiedRef)}
+            aria-label="Copy application reference"
+          >
+            {copiedRef ? (
+              <CheckCircle2 size={14} />
+            ) : (
+              <Copy size={14} />
+            )}
+            {copiedRef ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+
+        {/* Application ID */}
+        {applicationId && (
+          <div className="celebration-success__data-row">
+            <div className="celebration-success__data-details">
+              <span className="celebration-success__label">
+                Application ID
+              </span>
+              <code className="celebration-success__data-value">
+                {applicationId}
+              </code>
+            </div>
+
+            <button
+              type="button"
+              className="button button-secondary celebration-success__copy"
+              onClick={() => copyText(applicationId, setCopiedId)}
+              aria-label="Copy application ID"
+            >
+              {copiedId ? (
+                <CheckCircle2 size={14} />
+              ) : (
+                <Copy size={14} />
+              )}
+              {copiedId ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+        )}
+
+        {/* Tracking Link — now inside the same box */}
+        <div className="celebration-success__data-row celebration-success__tracking-row">
+          <div className="celebration-success__data-details">
+            <span className="celebration-success__label">
+              Tracking Link
+            </span>
+            <span className="celebration-success__data-value celebration-success__tracking-url">
+              {trackingUrl}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className="button button-secondary celebration-success__copy"
+            onClick={() => copyText(trackingUrl, setCopiedLink)}
+            aria-label="Copy tracking link"
+          >
+            {copiedLink ? (
+              <CheckCircle2 size={14} />
+            ) : (
+              <Copy size={14} />
+            )}
+            {copiedLink ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      </div>
+
+      <div className="celebration-success__notice celebration-success__notice--important">
+        <div className="celebration-success__notice-title">
+          <Info size={17} />
+          <strong>Important: Save your Application ID</strong>
+        </div>
+        <p>
+          You will need your Application ID and Reference Number to access your application again. Keep them safe, as you may not be able to retrieve your application without them.
+        </p>
+      </div>
+
+      <div className="celebration-success__notice celebration-success__notice--warning">
+        <div className="celebration-success__notice-title">
+          <ShieldAlert size={17} />
+          <strong>Sharing Discretion Advisory</strong>
+        </div>
+        <p>
+          Only share your application tracking details with people you trust. Anyone with these details may be able to view or change your application.
+        </p>
+      </div>
+
+      <div
         style={{
-          maxWidth: 620,
-          border: '1px solid rgba(245, 158, 11, 0.4)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.25)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: '6px',
+          width: '100%',
+          maxWidth: '600px',
+          marginTop: '10px',
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        {[
+          '/images/bully-maguire.gif',
+          '/images/dance-dancing.gif',
+          '/images/cat-dance-cat.gif',
+          '/images/funny-man-and-dog-dancing.gif',
+        ].map((src, index) => (
           <div
+            key={src}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 64,
-              height: 64,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(139, 92, 246, 0.25))',
-              border: '2px solid rgba(245, 158, 11, 0.5)',
-              color: '#f59e0b',
-              marginBottom: 12,
+              width: '100%',
+              aspectRatio: '1 / 1',
+              overflow: 'hidden',
+              borderRadius: '5px',
+              border: '1px solid rgba(143,197,255,0.24)',
+              background: '#111827',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
             }}
           >
-            {isUpdate ? <Sparkles size={32} /> : <PartyPopper size={32} />}
+            <img
+              src={src}
+              alt={`Celebration ${index + 1}`}
+              loading="lazy"
+              style={{
+                display: 'block',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
           </div>
-          <h2 id="celebration-title" style={{ margin: '0 0 6px 0', fontSize: '1.5rem', color: '#f8fafc' }}>
-            {isUpdate ? 'Application Successfully Updated! 🚀' : 'Application Submitted! 🎉'}
-          </h2>
-          <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.95rem' }}>
-            {isUpdate
-              ? 'Your modifications have been saved and re-submitted to State 565 leadership.'
-              : 'Your migration application has been received and committed for State 565 leadership review.'}
-          </p>
-        </div>
-
-        {/* Reference & ID Box */}
-        <div
-          style={{
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            borderRadius: 8,
-            padding: '16px 18px',
-            marginBottom: 18,
-          }}
+        ))}
+      </div>
+      <div className="celebration-success__actions">
+        <button
+          type="button"
+          className="button button-primary celebration-success__track-button"
+          onClick={handleGoToTracking}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <div>
-              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>
-                Application Reference
-              </div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.05em' }}>
-                {applicationReference}
-              </div>
-            </div>
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={handleCopyRef}
-              style={{ fontSize: '0.8rem', padding: '6px 12px' }}
-            >
-              {copiedRef ? <CheckCircle2 size={14} style={{ color: '#10b981' }} /> : <Copy size={14} />}
-              {copiedRef ? 'Copied!' : 'Copy Ref'}
-            </button>
-          </div>
+          <ExternalLink size={16} />
+          View &amp; Track Application
+        </button>
 
-          {applicationId && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ minWidth: 0, marginRight: 12 }}>
-                <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>
-                  Application ID (Unique UUID)
-                </div>
-                <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', color: '#cbd5e1', wordBreak: 'break-all' }}>
-                  {applicationId}
-                </div>
-              </div>
-              <button
-                type="button"
-                className="button button-secondary"
-                onClick={handleCopyId}
-                style={{ fontSize: '0.8rem', padding: '6px 12px', flexShrink: 0 }}
-              >
-                {copiedId ? <CheckCircle2 size={14} style={{ color: '#10b981' }} /> : <Copy size={14} />}
-                {copiedId ? 'Copied!' : 'Copy ID'}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Important notice advisory */}
-        <div
-          style={{
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            borderRadius: 8,
-            padding: '12px 14px',
-            marginBottom: 16,
-            fontSize: '0.86rem',
-            lineHeight: 1.45,
-            color: '#fde68a',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, marginBottom: 4 }}>
-            <Info size={16} style={{ color: '#f59e0b' }} />
-            <span>Important: Save your Application ID</span>
-          </div>
-          <div>
-            This Application ID has been automatically saved to your browser&apos;s local storage so you can easily track it.
-            You can return at any time to inspect your status, edit details, or resubmit.
-          </div>
-        </div>
-
-        {/* Sharing discretion notice */}
-        <div
-          style={{
-            background: 'rgba(239, 68, 68, 0.08)',
-            border: '1px solid rgba(239, 68, 68, 0.25)',
-            borderRadius: 8,
-            padding: '12px 14px',
-            marginBottom: 20,
-            fontSize: '0.84rem',
-            lineHeight: 1.45,
-            color: '#fca5a5',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, marginBottom: 4 }}>
-            <ShieldAlert size={16} style={{ color: '#ef4444' }} />
-            <span>Sharing Discretion Advisory</span>
-          </div>
-          <div>
-            Please note that it is at your discretion whom you share your Application ID with. Anyone who holds this
-            ID will be able to view and edit the entire application, including player details and roster data.
-          </div>
-        </div>
-
-        {/* Direct Link Box */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            background: 'rgba(0,0,0,0.3)',
-            border: '1px dashed rgba(255,255,255,0.15)',
-            borderRadius: 6,
-            padding: '8px 12px',
-            marginBottom: 20,
-          }}
-        >
-          <span style={{ fontSize: '0.8rem', color: '#94a3b8', flexShrink: 0 }}>Tracking Link:</span>
-          <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', color: '#93c5fd', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-            {trackingUrl}
-          </span>
+        {/* {onNewApplication && (
           <button
             type="button"
-            className="button button-secondary"
-            onClick={handleCopyLink}
-            style={{ fontSize: '0.75rem', padding: '4px 8px', flexShrink: 0 }}
+            className="button button-secondary celebration-success__new-button"
+            onClick={handleNewApplication}
           >
-            {copiedLink ? 'Copied' : 'Copy'}
+            File Another Application
           </button>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button
-            type="button"
-            className="button button-primary"
-            onClick={handleGoToTracking}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 18px', fontSize: '0.95rem' }}
-          >
-            <ExternalLink size={16} />
-            View & Track Application Status
-          </button>
-
-          <div style={{ display: 'flex', gap: 10 }}>
-            {onNewApplication && (
-              <button
-                type="button"
-                className="button button-secondary"
-                onClick={() => {
-                  onClose();
-                  onNewApplication();
-                }}
-                style={{ flex: 1 }}
-              >
-                File Another Application
-              </button>
-            )}
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={onClose}
-              style={{ flex: onNewApplication ? 1 : 2 }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
+        )} */}
+      </div>
+    </section>
   );
 }

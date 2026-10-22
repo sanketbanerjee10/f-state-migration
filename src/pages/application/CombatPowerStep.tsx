@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Field, FormSection } from '../../components/Field';
+import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
 import { KNOWN_STATES } from '../../config/states';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
@@ -29,7 +30,7 @@ export function CombatPowerStep() {
         onContinue: handleContinue,
         onBack: prevStep,
         continueLabel: 'Continue to Migration Details',
-        backLabel: 'Back to Character Details',
+        // backLabel: 'Back to Character Details',
       }}
     >
       {/* ── Section 1: Current state & alliance ── */}
@@ -87,7 +88,7 @@ export function CombatPowerStep() {
       {/* ── Section 2: Arena powers ── */}
       <FormSection number="02" title="Arena formation powers">
         <p className="hint" style={{ margin: '-3px 0 12px' }}>
-          Enter your arena formation powers with no season buildings. You can use shorthand such as 12.5M.
+          Enter your arena formation powers with no season buildings. Numbers are formatted with commas as you type.
         </p>
 
         <div className="row-3">
@@ -99,16 +100,15 @@ export function CombatPowerStep() {
               required
               error={stepErrors[key]}
             >
-              <input
+              <CommaFormattedNumberInput
                 className="control"
                 id={key}
                 value={draft[key]}
-                placeholder={['e.g. 12.5M', 'e.g. 11M', 'e.g. 10M'][index]}
-                onChange={(e) => {
-                  setDraftField(key, e.target.value, true);
+                placeholder={['e.g. 12,500,000', 'e.g. 11,000,000', 'e.g. 10,000,000'][index]}
+                onChange={(value) => {
+                  setDraftField(key, value, true);
                   setStepErrors((old) => ({ ...old, [key]: '' }));
                 }}
-                inputMode="decimal"
                 data-testid={`arena-${key}`}
               />
             </Field>

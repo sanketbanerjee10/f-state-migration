@@ -29,7 +29,7 @@ export function CharacterDetailsStep() {
         onContinue: handleContinue,
         onBack: prevStep,
         continueLabel: 'Continue to Combat Stats',
-        backLabel: 'Back to Power Details',
+        // backLabel: 'Back to Power Details',
       }}
     >
       <FormSection number="02" title="Character details">

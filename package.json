@@ -78,6 +78,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
+    "partycles": "^1.2.6",
     "tesseract.js": "^7.0.0"
   }
 }

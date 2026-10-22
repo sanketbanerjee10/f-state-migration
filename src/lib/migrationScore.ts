@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { useGetTierThresholds } from '@/lib/api-client';
+import {
+  getGetTierThresholdsQueryKey,
+  getTierThresholds,
+  useGetTierThresholds,
+  type TierThreshold,
+} from '@/lib/api-client';
 
 export interface MigrationScoreResult {
   score: number;
@@ -32,6 +37,68 @@ export const DEFAULT_THRESHOLDS: TierThresholds = {
   elitePasses: 50,
 };
 
+const TIER_THRESHOLDS_CACHE_KEY = 'state565_tier_thresholds';
+const TIER_THRESHOLDS_CACHE_TTL = 3 * 24 * 60 * 60 * 1000;
+
+interface CachedTierThresholds {
+  cachedAt: number;
+  rows: TierThreshold[];
+}
+
+function isTierThreshold(value: unknown): value is TierThreshold {
+  if (typeof value !== 'object' || value === null) return false;
+  const row = value as Record<string, unknown>;
+  return (
+    typeof row.id === 'number' &&
+    ['Regular', 'Medium', 'Advanced', 'Elite'].includes(String(row.name)) &&
+    typeof row.scoreMin === 'number' &&
+    Number.isFinite(row.scoreMin) &&
+    typeof row.passesRequired === 'number' &&
+    Number.isFinite(row.passesRequired) &&
+    typeof row.updatedAt === 'string'
+  );
+}
+
+function readCachedTierThresholds(): TierThreshold[] | null {
+  try {
+    const raw = localStorage.getItem(TIER_THRESHOLDS_CACHE_KEY);
+    if (!raw) return null;
+
+    const cached: unknown = JSON.parse(raw);
+    if (typeof cached !== 'object' || cached === null) return null;
+
+    const entry = cached as Record<string, unknown>;
+    const age = Date.now() - Number(entry.cachedAt);
+    if (
+      !Number.isFinite(age) ||
+      age < 0 ||
+      age >= TIER_THRESHOLDS_CACHE_TTL ||
+      !Array.isArray(entry.rows) ||
+      !entry.rows.every(isTierThreshold)
+    ) {
+      return null;
+    }
+
+    return entry.rows;
+  } catch {
+    return null;
+  }
+}
+
+async function getCachedTierThresholds(signal?: AbortSignal): Promise<TierThreshold[]> {
+  const cachedRows = readCachedTierThresholds();
+  if (cachedRows) return cachedRows;
+
+  const rows = await getTierThresholds({ signal });
+  try {
+    const cached: CachedTierThresholds = { cachedAt: Date.now(), rows };
+    localStorage.setItem(TIER_THRESHOLDS_CACHE_KEY, JSON.stringify(cached));
+  } catch {
+    // Keep the fetched result available even when browser storage is unavailable.
+  }
+  return rows;
+}
+
 export function rowsToTierThresholds(
   rows?: Array<{ name: string; scoreMin: number; passesRequired: number }>,
 ): TierThresholds {
@@ -62,12 +129,14 @@ export function useLiveTierThresholds(): {
 } {
   const { data: rows, isLoading } = useGetTierThresholds({
     query: {
-      staleTime: 30 * 1000,
-      refetchOnWindowFocus: true,
-    } as any,
+      queryKey: getGetTierThresholdsQueryKey(),
+      queryFn: ({ signal }) => getCachedTierThresholds(signal),
+      staleTime: TIER_THRESHOLDS_CACHE_TTL,
+      refetchOnWindowFocus: false,
+    },
   });
 
-  const thresholds = useMemo(() => rowsToTierThresholds(rows as any), [rows]);
+  const thresholds = useMemo(() => rowsToTierThresholds(rows), [rows]);
   return { thresholds, isLoading };
 }
 

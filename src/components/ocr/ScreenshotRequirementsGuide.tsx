@@ -7,22 +7,22 @@ export function ScreenshotRequirementsGuide() {
 
   return (
     <div className="screenshot-guide-banner" data-testid="screenshot-requirements-guide">
-      <div className="guide-thumbnail-wrap" onClick={() => setModalOpen(true)}>
+      {/* <div className="guide-thumbnail-wrap" onClick={() => setModalOpen(true)}>
         <img
           src="/images/power-details-example.png"
           alt="Power details screenshot thumbnail"
           className="guide-thumbnail"
           loading="lazy"
         />
-      </div>
+      </div> */}
       <div className="guide-content">
         <div className="guide-heading-row">
           <HelpCircle size={16} className="guide-icon" />
           <h4 className="guide-title">Which screenshot should I upload?</h4>
         </div>
-        <p className="guide-copy">
+        {/* <p className="guide-copy">
           Upload your in-game <strong>Player Details</strong> screen. You can view an example to make sure your stats will be read properly.
-        </p>
+        </p> */}
       </div>
       <button
         type="button"
@@ -51,10 +51,6 @@ export function ScreenshotRequirementsGuide() {
           }
         >
           <div className="example-modal-body">
-            <p className="example-instructions">
-              Open your player profile in the game and tap the <strong>Details</strong> button. Make sure your stats match the layout below:
-            </p>
-
             <div className="example-grid">
               <div className="example-image-container">
                 <img
@@ -69,18 +65,13 @@ export function ScreenshotRequirementsGuide() {
                 <ul className="example-checklist">
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Player name</strong> (top of card)</span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Power beside name</strong> (shield icon)</span></li>
+                  <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Kills</strong> (skull icon stats)</span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Structure Power</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Tech Power</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Troop Power</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Hero Power</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Mod Vehicle Power</strong></span></li>
-                  <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>Highest Power on Record</strong> (combat stats)</span></li>
                 </ul>
-
-                <div className="example-note">
-                  <Info size={16} className="note-icon" />
-                  <span>Kills displayed beside the skull icon will also be extracted when recognizable.</span>
-                </div>
               </div>
             </div>
           </div>

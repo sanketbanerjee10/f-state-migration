@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { Award, CheckCircle2, FileImage, RefreshCw, ShieldCheck, Sofa, Sparkles, Trash2, Upload } from 'lucide-react';
+import { FileImage, RefreshCw, ShieldCheck, Sofa, Trash2, Upload } from 'lucide-react';
 import { Field, FormSection } from '../../components/Field';
+import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
 import { ScreenshotRequirementsGuide } from '../../components/ocr/ScreenshotRequirementsGuide';
 import { OcrProgress } from '../../components/ocr/OcrProgress';
@@ -42,7 +43,7 @@ export function PowerDetailsStep() {
   //   3. The user has NOT manually edited it (i.e. it came from OCR, not keyboard input)
   // This means: if OCR missed a field (value is empty), it stays editable.
   // If the user types into an empty field, dirtyFields[key] becomes true → not locked.
-  type PowerDraftKey = 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower' | 'kills';
+  type PowerDraftKey = 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower';
 
   const screenshotPresent = draft.hasScreenshot;
   const fieldLocked = (fieldKey: PowerDraftKey, value: string) =>
@@ -87,11 +88,8 @@ export function PowerDetailsStep() {
 
     recognizeScreenshot(file, setOcrProgress, controller.signal)
       .then((result) => {
-        // Track the required data fields from player details screenshot
-        console.log(result.extracted)
         const requiredFields = [
           result.extracted.playerName,
-          result.extracted.highestPowerOnRecord,
           result.extracted.structurePower,
           result.extracted.techPower,
           result.extracted.troopPower,
@@ -99,11 +97,10 @@ export function PowerDetailsStep() {
           result.extracted.modVehiclePower,
         ];
         const capturedCount = requiredFields.filter((val) => Boolean(val && val.trim())).length;
-        const totalRequired = requiredFields.length; // 7 core required fields
+        const totalRequired = requiredFields.length;
         const missingCount = totalRequired - capturedCount;
 
-        // Trigger error if more than 2 or 3 fields cannot be tracked (i.e. missing >= 3 or captured < 5)
-        if (missingCount >= 3 || capturedCount < 5) {
+        if (capturedCount < 5) {
           removeScreenshot();
           setOcrError(
             `Invalid image: only ${capturedCount} of ${totalRequired} required player fields could be detected. Please upload a clear Player Details screenshot or use the manual entry method below.`
@@ -193,7 +190,7 @@ export function PowerDetailsStep() {
         {/* Upload dropzone — shown before any screenshot is selected */}
         {!draft.hasScreenshot && !processing && (
           <div
-            className={`upload-zone compact-upload-zone ${dragging ? 'is-dragging' : ''}`}
+            className={`upload-zone compact-upload-zone ${dragging ? 'is-dragging' : ''} flex items-center justify-between flex-wrap`}
             data-testid="screenshot-dropzone"
             onDragOver={(e) => {
               e.preventDefault();
@@ -216,12 +213,16 @@ export function PowerDetailsStep() {
               }
             }}
           >
-            <div className="upload-icon">
-              <Upload size={20} />
-            </div>
-            <div className="upload-copy">
-              <strong>Upload a screenshot of your player details</strong>
-              <span>PNG or JPG, up to 10 MB — or fill in the fields manually below</span>
+            <div className="flex items-center gap-2">
+              <div className="upload-icon">
+                <Upload size={16} />
+              </div>
+              <div>
+                <strong style={{fontSize: 12}}>Upload a screenshot of your player details</strong>
+                <div className="upload-copy">
+                  <span>PNG or JPG, up to 10 MB</span>
+                </div>
+              </div>
             </div>
             <button
               type="button"
@@ -309,13 +310,13 @@ export function PowerDetailsStep() {
             error={stepErrors.highestPowerOnRecord}
             hint="Your actual player power"
           >
-            <input
+            <CommaFormattedNumberInput
               className="control"
               id="highestPowerOnRecord"
               value={draft.highestPowerOnRecord}
               placeholder="e.g. 281,459,207"
-              onChange={(e) => {
-                setDraftField('highestPowerOnRecord', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('highestPowerOnRecord', value, true);
                 setStepErrors((old) => ({ ...old, highestPowerOnRecord: '' }));
               }}
               data-testid="ocr-highest-power"
@@ -327,16 +328,15 @@ export function PowerDetailsStep() {
             label="Kills"
             required
             error={stepErrors.kills}
-            hint={fieldLocked('kills', draft.kills) ? 'Extracted from your screenshot' : 'From profile card skull icon'}
+            hint="From profile card skull icon"
           >
-            <input
-              className={`control${fieldLocked('kills', draft.kills) ? ' control-verified' : ''}`}
+            <CommaFormattedNumberInput
+              className="control"
               id="kills"
               value={draft.kills}
               placeholder="e.g. 5,453,196"
-              disabled={fieldLocked('kills', draft.kills)}
-              onChange={(e) => {
-                setDraftField('kills', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('kills', value, true);
                 setStepErrors((old) => ({ ...old, kills: '' }));
               }}
               data-testid="ocr-kills"
@@ -362,14 +362,14 @@ export function PowerDetailsStep() {
             required
             error={stepErrors.structurePower}
           >
-            <input
+            <CommaFormattedNumberInput
               className={`control${fieldLocked('structurePower', draft.structurePower) ? ' control-verified' : ''}`}
               id="structurePower"
               value={draft.structurePower}
               placeholder="e.g. 84,785,628"
               disabled={fieldLocked('structurePower', draft.structurePower)}
-              onChange={(e) => {
-                setDraftField('structurePower', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('structurePower', value, true);
                 setStepErrors((old) => ({ ...old, structurePower: '' }));
               }}
               data-testid="ocr-structure-power"
@@ -382,14 +382,14 @@ export function PowerDetailsStep() {
             required
             error={stepErrors.techPower}
           >
-            <input
+            <CommaFormattedNumberInput
               className={`control${fieldLocked('techPower', draft.techPower) ? ' control-verified' : ''}`}
               id="techPower"
               value={draft.techPower}
               placeholder="e.g. 19,187,725"
               disabled={fieldLocked('techPower', draft.techPower)}
-              onChange={(e) => {
-                setDraftField('techPower', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('techPower', value, true);
                 setStepErrors((old) => ({ ...old, techPower: '' }));
               }}
               data-testid="ocr-tech-power"
@@ -402,14 +402,14 @@ export function PowerDetailsStep() {
             required
             error={stepErrors.troopPower}
           >
-            <input
+            <CommaFormattedNumberInput
               className={`control${fieldLocked('troopPower', draft.troopPower) ? ' control-verified' : ''}`}
               id="troopPower"
               value={draft.troopPower}
               placeholder="e.g. 66,198,020"
               disabled={fieldLocked('troopPower', draft.troopPower)}
-              onChange={(e) => {
-                setDraftField('troopPower', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('troopPower', value, true);
                 setStepErrors((old) => ({ ...old, troopPower: '' }));
               }}
               data-testid="ocr-troop-power"
@@ -424,14 +424,14 @@ export function PowerDetailsStep() {
             required
             error={stepErrors.heroPower}
           >
-            <input
+            <CommaFormattedNumberInput
               className={`control${fieldLocked('heroPower', draft.heroPower) ? ' control-verified' : ''}`}
               id="heroPower"
               value={draft.heroPower}
               placeholder="e.g. 62,634,222"
               disabled={fieldLocked('heroPower', draft.heroPower)}
-              onChange={(e) => {
-                setDraftField('heroPower', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('heroPower', value, true);
                 setStepErrors((old) => ({ ...old, heroPower: '' }));
               }}
               data-testid="ocr-hero-power"
@@ -444,14 +444,14 @@ export function PowerDetailsStep() {
             required
             error={stepErrors.modVehiclePower}
           >
-            <input
+            <CommaFormattedNumberInput
               className={`control${fieldLocked('modVehiclePower', draft.modVehiclePower) ? ' control-verified' : ''}`}
               id="modVehiclePower"
               value={draft.modVehiclePower}
               placeholder="e.g. 9,436,786"
               disabled={fieldLocked('modVehiclePower', draft.modVehiclePower)}
-              onChange={(e) => {
-                setDraftField('modVehiclePower', e.target.value, true);
+              onChange={(value) => {
+                setDraftField('modVehiclePower', value, true);
                 setStepErrors((old) => ({ ...old, modVehiclePower: '' }));
               }}
               data-testid="ocr-mod-vehicle-power"

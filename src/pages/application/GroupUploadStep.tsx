@@ -49,7 +49,7 @@ export function GroupUploadStep() {
         showSkip: true,
         skipLabel: 'Skip this step',
         continueLabel: 'Continue to Review',
-        backLabel: 'Back to Preferences',
+        // backLabel: 'Back to Preferences',
       }}
     >
       <FormSection number="05" title="Group migration proof (optional)">

@@ -32,7 +32,7 @@ export function MigrationPreferencesStep() {
         onContinue: handleContinue,
         onBack: prevStep,
         continueLabel: isGroup ? 'Continue to Group Details' : 'Continue to Review',
-        backLabel: 'Back to Combat Stats',
+        // backLabel: 'Back to Combat Stats',
         disabled: activeAlliances.isLoading,
       }}
     >

@@ -215,8 +215,6 @@ export function ApplicationReviewStep() {
       onClose={() => {
         setCelebrationOpen(false);
         if (!success) return;
-        // Clear draft only now that the modal is dismissed (avoids wizard navigation
-        // unmounting this component before the modal fires confetti)
         clearDraft();
       }}
       applicationId={submittedApplicationId}
@@ -230,67 +228,6 @@ export function ApplicationReviewStep() {
     return (
       <main className="form-shell">
         {celebrationModal}
-        <header className="page-header">
-          <div className="eyebrow">MIGRATION SIGNUP</div>
-          <h1 className="form-title">{isUpdateSuccess ? 'Application Updated' : 'Application Submitted'}</h1>
-          <p className="intro">Thank you for applying to migrate to State 565.</p>
-        </header>
-
-        <div className="success-panel" role="status" data-testid="success-state">
-          <div className="success-mark">
-            <CheckCircle2 size={26} />
-          </div>
-          <h2>{isUpdateSuccess ? 'Application changes committed' : 'Application received'}</h2>
-          <p>
-            Your application was committed for leadership review. This application has been saved to your browser&apos;s
-            storage for easy status tracking.
-          </p>
-
-          <div className="success-warning" style={{ margin: '16px 0', fontSize: '1rem' }}>
-            <ShieldCheck size={16} style={{ verticalAlign: 'middle', marginRight: 7, color: '#60a5fa' }} />
-            Application reference: <strong data-testid="application-reference">{applicationReference}</strong>
-          </div>
-
-          <div
-            style={{
-              background: 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
-              borderRadius: 8,
-              padding: '12px 16px',
-              margin: '16px 0 24px',
-              fontSize: '0.85rem',
-              color: '#fca5a5',
-              lineHeight: 1.45,
-              textAlign: 'left',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, marginBottom: 4 }}>
-              <ShieldAlert size={16} style={{ color: '#ef4444' }} />
-              <span>Sharing Discretion Advisory</span>
-            </div>
-            It is at your discretion whom you share your Application ID or Reference with, as anyone with this
-            identifier can track the application and edit all player details.
-          </div>
-
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link
-              href={`/track/${submittedApplicationId || applicationReference}`}
-              className="button button-primary"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-            >
-              <ExternalLink size={15} /> Track Application Status & Details
-            </Link>
-
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={returnToStart}
-              data-testid="return-to-form"
-            >
-              Start a New Application
-            </button>
-          </div>
-        </div>
       </main>
     );
   }
@@ -300,8 +237,8 @@ export function ApplicationReviewStep() {
       navigationProps={{
         onContinue: handleOpenConfirm,
         onBack: prevStep,
-        continueLabel: 'Confirm and submit',
-        backLabel: isGroup ? 'Back to Group Roster' : 'Back to Migration Details',
+        continueLabel: 'Confirm',
+        // backLabel: isGroup ? 'Back to Group Roster' : 'Back to Migration Details',
         submitting,
         submitMode: true,
       }}
@@ -314,13 +251,15 @@ export function ApplicationReviewStep() {
             <h3 className="review-summary-title">
               <ShieldCheck size={18} className="review-shield-icon" />
               Complete Application Overview
-              {draft.hasScreenshot && (
-                <span className="verified-badge" data-testid="verified-badge">
-                  <CheckCircle2 size={13} /> Screenshot Verified
-                </span>
-              )}
             </h3>
-            <span className="review-summary-tag">Final Check</span>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="review-summary-tag">Final Check</div>
+              {draft.hasScreenshot && (
+                <div className="verified-badge" data-testid="verified-badge">
+                  <CheckCircle2 size={13} /> Screenshot Verified
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="review-summary-grid">
@@ -339,7 +278,7 @@ export function ApplicationReviewStep() {
               </div>
               <div className="review-item"><span>Name:</span> <strong>{draft.playerName || 'Not provided'}</strong></div>
               <div className="review-item"><span>Kills:</span> <strong>{draft.kills || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Highest Power:</span> <strong>{draft.highestPowerOnRecord || 'Not provided'}</strong></div>
+              <div className="review-item"><span>Power:</span> <strong>{draft.highestPowerOnRecord || 'Not provided'}</strong></div>
               <div className="review-item"><span>Structure Power:</span> <strong>{draft.structurePower || 'Not provided'}</strong></div>
               <div className="review-item"><span>Tech Power:</span> <strong>{draft.techPower || 'Not provided'}</strong></div>
               <div className="review-item"><span>Troop Power:</span> <strong>{draft.troopPower || 'Not provided'}</strong></div>
@@ -425,7 +364,10 @@ export function ApplicationReviewStep() {
               <div className="review-section-box" style={{ gridColumn: '1 / -1' }}>
                 <div className="review-section-title-row">
                   <strong style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Users size={14} /> 4. Group Roster ({draft.groupMembers.length} imported members)
+                    <div>
+                      4. Group Roster  
+                      <div style={{fontSize: 10}}>({draft.groupMembers.length} imported members)</div>
+                    </div> 
                   </strong>
                   <button
                     type="button"
@@ -433,7 +375,7 @@ export function ApplicationReviewStep() {
                     onClick={() => goToStep('group-roster')}
                     data-testid="edit-roster-summary"
                   >
-                    <Edit2 size={12} /> Edit roster
+                    <Edit2 size={12} /> Edit
                   </button>
                 </div>
                 {draft.groupMembers.length === 0 ? (
@@ -494,7 +436,7 @@ export function ApplicationReviewStep() {
 
       {confirmOpen && (
         <Modal
-          title="Review before continuing"
+          title="Review Before Continuing"
           onClose={() => !submitting && setConfirmOpen(false)}
           actions={
             <>
@@ -520,7 +462,7 @@ export function ApplicationReviewStep() {
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 size={15} /> Confirm and submit
+                    <CheckCircle2 size={15} /> Submit
                   </>
                 )}
               </button>
@@ -528,7 +470,6 @@ export function ApplicationReviewStep() {
           }
         >
           <p>
-            Only your confirmed application fields will be sent securely to State 565 leadership.
             Screenshots and recognized text are processed strictly in your browser and are never uploaded.
           </p>
           {draft.hasScreenshot && (
@@ -542,7 +483,11 @@ export function ApplicationReviewStep() {
             </p>
           )}
           <p style={{ marginTop: 12 }}>
-            Submit your application for State 565 leadership review?
+            By submitting, you confirm that the information provided is accurate to the best of your knowledge and understand that State 565 leadership reserves the right to reject applications containing invalid or falsified information.
+          </p>
+
+          <p style={{ marginTop: 12 }}>
+            Are you ready to submit your application for State 565 leadership review?
           </p>
         </Modal>
       )}

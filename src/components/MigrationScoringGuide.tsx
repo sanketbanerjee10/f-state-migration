@@ -285,7 +285,7 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
         <Info size={15} style={{ color: '#93c5fd' }} />
         <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>
-          Understanding Migration Scoring & Pass Brackets
+          Understanding Migration Scoring
         </span>
       </div>
 
