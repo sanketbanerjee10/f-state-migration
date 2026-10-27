@@ -1220,9 +1220,6 @@ textarea.control { min-height:100px; resize:vertical; line-height:1.5; }
   margin-top: 12px;
 }
 .screenshot-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   font-size: 12px;
   font-weight: 500;
   color: #86efac;

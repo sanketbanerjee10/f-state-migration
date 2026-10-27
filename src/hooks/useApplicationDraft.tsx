@@ -5,10 +5,24 @@ import { parseMagnitude, parseStateNumber } from '../lib/parsers';
 
 const DRAFT_STORAGE_KEY = 'state565_application_draft_v4';
 
+function calculatePowerOnRecord(
+  powers: Pick<ApplicationDraft, 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower'>,
+): string {
+  return Math.round(
+    [
+      powers.structurePower,
+      powers.techPower,
+      powers.troopPower,
+      powers.heroPower,
+      powers.modVehiclePower,
+    ].reduce((total, power) => total + (parseMagnitude(power) || 0), 0),
+  ).toLocaleString('en-US');
+}
+
 export interface ApplicationDraft {
   // Step 1: Character Details (OCR-prefillable)
   playerName: string;
-  highestPowerOnRecord: string; // actual player power
+  highestPowerOnRecord: string; // calculated total of the five power breakdown fields
   structurePower: string;
   techPower: string;
   troopPower: string;
@@ -111,11 +125,15 @@ function loadStoredDraft(): ApplicationDraft {
     const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY) || localStorage.getItem(DRAFT_STORAGE_KEY);
     if (!raw) return initialDraft;
     const parsed = JSON.parse(raw);
-    return {
+    const draft = {
       ...initialDraft,
       ...parsed,
       groupMembers: parsed.groupMembers || [],
       dirtyFields: parsed.dirtyFields || {},
+    };
+    return {
+      ...draft,
+      highestPowerOnRecord: calculatePowerOnRecord(draft),
     };
   } catch {
     return initialDraft;
@@ -155,18 +173,29 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         const applicantPlayer = data.players?.find((p: any) => p.isApplicant);
         const groupPlayers = data.players?.filter((p: any) => !p.isApplicant) || [];
         const ref = `565-${data.id.replaceAll('-', '').slice(0, 12).toUpperCase()}`;
+        const structurePower = applicantPlayer?.structurePower ? String(applicantPlayer.structurePower) : '';
+        const techPower = applicantPlayer?.techPower ? String(applicantPlayer.techPower) : '';
+        const troopPower = applicantPlayer?.troopPower ? String(applicantPlayer.troopPower) : '';
+        const heroPower = applicantPlayer?.heroPower ? String(applicantPlayer.heroPower) : '';
+        const modVehiclePower = applicantPlayer?.modVehiclePower ? String(applicantPlayer.modVehiclePower) : '';
 
         setDraft({
           ...initialDraft,
           editingApplicationId: data.id,
           editingReference: ref,
           playerName: data.gameName || '',
-          highestPowerOnRecord: applicantPlayer ? String(applicantPlayer.highestPowerOnRecord) : String(data.f1ArenaPower),
-          structurePower: applicantPlayer?.structurePower ? String(applicantPlayer.structurePower) : '',
-          techPower: applicantPlayer?.techPower ? String(applicantPlayer.techPower) : '',
-          troopPower: applicantPlayer?.troopPower ? String(applicantPlayer.troopPower) : '',
-          heroPower: applicantPlayer?.heroPower ? String(applicantPlayer.heroPower) : '',
-          modVehiclePower: applicantPlayer?.modVehiclePower ? String(applicantPlayer.modVehiclePower) : '',
+          highestPowerOnRecord: calculatePowerOnRecord({
+            structurePower,
+            techPower,
+            troopPower,
+            heroPower,
+            modVehiclePower,
+          }),
+          structurePower,
+          techPower,
+          troopPower,
+          heroPower,
+          modVehiclePower,
           kills: String(applicantPlayer?.kills ?? data.kills ?? ''),
           hasScreenshot: Boolean(applicantPlayer?.isScreenshotVerified),
           screenshotFileName: applicantPlayer?.isScreenshotVerified ? 'Verified Screenshot Record' : '',
@@ -229,13 +258,28 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
     value: ApplicationDraft[K],
     isUserEdit = true,
   ) => {
-    setDraft((prev) => ({
-      ...prev,
-      [key]: value,
-      dirtyFields: isUserEdit
-        ? { ...prev.dirtyFields, [key]: true }
-        : prev.dirtyFields,
-    }));
+    setDraft((prev) => {
+      const next = {
+        ...prev,
+        [key]: value,
+        dirtyFields: isUserEdit
+          ? { ...prev.dirtyFields, [key]: true }
+          : prev.dirtyFields,
+      };
+
+      if (
+        key === 'structurePower' ||
+        key === 'techPower' ||
+        key === 'troopPower' ||
+        key === 'heroPower' ||
+        key === 'modVehiclePower'
+      ) {
+        next.highestPowerOnRecord = calculatePowerOnRecord(next);
+        next.dirtyFields = { ...next.dirtyFields, highestPowerOnRecord: false };
+      }
+
+      return next;
+    });
   };
 
   const setScreenshotFile = (file: File | null) => {
@@ -245,6 +289,12 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         ...prev,
         hasScreenshot: true,
         screenshotFileName: file.name,
+      }));
+    } else {
+      setDraft((prev) => ({
+        ...prev,
+        hasScreenshot: false,
+        screenshotFileName: '',
       }));
     }
   };
@@ -261,12 +311,31 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
   };
 
   const removeScreenshot = () => {
-    setScreenshotFileState(null);
-    setDraft((prev) => ({
-      ...prev,
-      hasScreenshot: false,
-      screenshotFileName: '',
-    }));
+    setScreenshotFile(null);
+    setDraft((prev) => {
+      const dirtyFields = { ...prev.dirtyFields };
+      delete dirtyFields.playerName;
+      delete dirtyFields.structurePower;
+      delete dirtyFields.techPower;
+      delete dirtyFields.troopPower;
+      delete dirtyFields.heroPower;
+      delete dirtyFields.modVehiclePower;
+      delete dirtyFields.kills;
+      delete dirtyFields.highestPowerOnRecord;
+
+      return {
+        ...prev,
+        playerName: initialDraft.playerName,
+        highestPowerOnRecord: initialDraft.highestPowerOnRecord,
+        structurePower: initialDraft.structurePower,
+        techPower: initialDraft.techPower,
+        troopPower: initialDraft.troopPower,
+        heroPower: initialDraft.heroPower,
+        modVehiclePower: initialDraft.modVehiclePower,
+        kills: initialDraft.kills,
+        dirtyFields,
+      };
+    });
   };
 
   const removeGroupScreenshot = () => {
@@ -314,10 +383,6 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         updated.playerName = extracted.playerName;
         dirtyFields.playerName = false;
       }
-      if (extracted.highestPowerOnRecord) {
-        updated.highestPowerOnRecord = extracted.highestPowerOnRecord;
-        dirtyFields.highestPowerOnRecord = false;
-      }
       if (extracted.structurePower) {
         updated.structurePower = extracted.structurePower;
         dirtyFields.structurePower = false;
@@ -343,11 +408,14 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         dirtyFields.kills = false;
       }
 
-      return {
+      const next = {
         ...prev,
         ...updated,
         dirtyFields,
       };
+      next.highestPowerOnRecord = calculatePowerOnRecord(next);
+      next.dirtyFields = { ...next.dirtyFields, highestPowerOnRecord: false };
+      return next;
     });
   };
 
@@ -374,7 +442,7 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
           errors.playerName = 'Enter your in-game name.';
         }
         if (!parseMagnitude(draft.highestPowerOnRecord)) {
-          errors.highestPowerOnRecord = 'Enter your Highest Power on Record (e.g. 281,459,207 or 281M).';
+          errors.highestPowerOnRecord = 'Enter the five power breakdown values to calculate Power on Record.';
         }
         if (!parseMagnitude(draft.kills)) {
           errors.kills = 'Enter your kills value (e.g. 5,453,196 or 5.4M).';

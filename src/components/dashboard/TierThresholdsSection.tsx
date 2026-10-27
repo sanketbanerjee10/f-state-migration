@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Edit3, Sofa } from 'lucide-react';
+import { Edit3, Plus, Sofa } from 'lucide-react';
 import {
   getGetAdminTierThresholdsQueryKey,
   getGetTierThresholdsQueryKey,
+  useCreateAdminTierThreshold,
   useGetAdminTierThresholds,
   useUpdateAdminTierThreshold,
   type TierThreshold,
@@ -22,7 +23,8 @@ export function TierThresholdsSection({
   onError,
 }: TierThresholdsSectionProps) {
   const client = useQueryClient();
-  const [editingThreshold, setEditingThreshold] = useState<TierThreshold | null>(null);
+  const [editingThreshold, setEditingThreshold] = useState<TierThreshold | 'new' | null>(null);
+  const [thresholdName, setThresholdName] = useState('');
   const [thresholdScoreMin, setThresholdScoreMin] = useState('');
   const [thresholdPasses, setThresholdPasses] = useState('');
   const [thresholdError, setThresholdError] = useState('');
@@ -34,12 +36,22 @@ export function TierThresholdsSection({
     },
   });
 
+  const createThresholdMutation = useCreateAdminTierThreshold();
   const updateThresholdMutation = useUpdateAdminTierThreshold();
 
   const beginEditThreshold = (t: TierThreshold) => {
     setEditingThreshold(t);
+    setThresholdName(t.name);
     setThresholdScoreMin(String(t.scoreMin));
     setThresholdPasses(String(t.passesRequired));
+    setThresholdError('');
+  };
+
+  const beginAddThreshold = () => {
+    setEditingThreshold('new');
+    setThresholdName('');
+    setThresholdScoreMin('');
+    setThresholdPasses('');
     setThresholdError('');
   };
 
@@ -48,9 +60,14 @@ export function TierThresholdsSection({
     if (!editingThreshold) return;
     setThresholdError('');
 
+    const name = thresholdName.trim();
     const scoreVal = Number(thresholdScoreMin);
     const passVal = Number(thresholdPasses);
 
+    if (editingThreshold === 'new' && !name) {
+      setThresholdError('Tier name is required.');
+      return;
+    }
     if (isNaN(scoreVal) || scoreVal < 0) {
       setThresholdError('Minimum score must be a non-negative number.');
       return;
@@ -61,10 +78,16 @@ export function TierThresholdsSection({
     }
 
     try {
-      await updateThresholdMutation.mutateAsync({
-        name: editingThreshold.name as any,
-        data: { scoreMin: scoreVal, passesRequired: passVal },
-      });
+      if (editingThreshold === 'new') {
+        await createThresholdMutation.mutateAsync({
+          data: { name, scoreMin: scoreVal, passesRequired: passVal },
+        });
+      } else {
+        await updateThresholdMutation.mutateAsync({
+          name: editingThreshold.name,
+          data: { scoreMin: scoreVal, passesRequired: passVal },
+        });
+      }
       void client.invalidateQueries({
         queryKey: getGetAdminTierThresholdsQueryKey(),
       });
@@ -72,7 +95,11 @@ export function TierThresholdsSection({
         queryKey: getGetTierThresholdsQueryKey(),
       });
       setEditingThreshold(null);
-      onNotice?.(`Tier threshold for "${editingThreshold.name}" updated successfully.`);
+      onNotice?.(
+        editingThreshold === 'new'
+          ? `Tier threshold for "${name}" added successfully.`
+          : `Tier threshold for "${editingThreshold.name}" updated successfully.`,
+      );
     } catch (err) {
       onError?.(err);
       setThresholdError(
@@ -92,6 +119,14 @@ export function TierThresholdsSection({
               Configurable score boundaries and pass requirements evaluated for every applicant.
             </p>
           </div>
+          <button
+            className="button button-primary"
+            type="button"
+            onClick={beginAddThreshold}
+            data-testid="add-tier-threshold"
+          >
+            <Plus size={15} /> Add threshold
+          </button>
         </div>
 
         {tierThresholds.isLoading ? (
@@ -185,9 +220,27 @@ export function TierThresholdsSection({
             aria-labelledby="threshold-dialog-title"
           >
             <h2 id="threshold-dialog-title">
-              Configure {editingThreshold.name} Tier
+              {editingThreshold === 'new'
+                ? 'Add migration tier threshold'
+                : `Configure ${editingThreshold.name} Tier`}
             </h2>
             <form onSubmit={saveThreshold}>
+              {editingThreshold === 'new' && (
+                <>
+                  <label className="label" htmlFor="threshold-name">
+                    Tier Name
+                  </label>
+                  <input
+                    id="threshold-name"
+                    className="control"
+                    maxLength={40}
+                    required
+                    value={thresholdName}
+                    onChange={(e) => setThresholdName(e.target.value)}
+                    data-testid="threshold-name-input"
+                  />
+                </>
+              )}
               <label className="label" htmlFor="threshold-score">
                 Minimum Score Threshold
               </label>
@@ -226,17 +279,19 @@ export function TierThresholdsSection({
                   className="button button-quiet"
                   type="button"
                   onClick={() => setEditingThreshold(null)}
-                  data-testid="cancel-threshold-edit"
+                  data-testid="cancel-threshold"
                 >
                   Cancel
                 </button>
                 <button
                   className="button button-primary"
                   type="submit"
-                  disabled={updateThresholdMutation.isPending}
+                  disabled={createThresholdMutation.isPending || updateThresholdMutation.isPending}
                   data-testid="save-threshold"
                 >
-                  {updateThresholdMutation.isPending ? 'Saving…' : 'Save threshold'}
+                  {createThresholdMutation.isPending || updateThresholdMutation.isPending
+                    ? 'Saving…'
+                    : 'Save threshold'}
                 </button>
               </div>
             </form>

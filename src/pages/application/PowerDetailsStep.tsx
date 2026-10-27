@@ -11,6 +11,7 @@ import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } fr
 import { MigrationScoreBadge, VerifiedBadge, MigrationScoringGuide } from '../../components/MigrationScoringGuide';
 import { useApplicationDraft, type StepErrors, type ApplicationDraft } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
+import type { OcrDiagnostics } from '../../lib/ocr';
 
 export function PowerDetailsStep() {
   const {
@@ -29,6 +30,7 @@ export function PowerDetailsStep() {
   const [ocrError, setOcrError] = useState('');
   const [ocrSuccess, setOcrSuccess] = useState(draft.hasScreenshot);
   const [ocrUncertain, setOcrUncertain] = useState(false);
+  const [ocrDiagnostics, setOcrDiagnostics] = useState<OcrDiagnostics | null>(null);
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
   const [dragging, setDragging] = useState(false);
 
@@ -76,7 +78,10 @@ export function PowerDetailsStep() {
       return;
     }
 
+    abortRef.current?.abort();
+    removeScreenshot();
     setScreenshotFile(file);
+    setOcrDiagnostics(null);
     setOcrError('');
     setOcrSuccess(false);
     setOcrUncertain(false);
@@ -88,6 +93,7 @@ export function PowerDetailsStep() {
 
     recognizeScreenshot(file, setOcrProgress, controller.signal)
       .then((result) => {
+        setOcrDiagnostics(result.diagnostics);
         const requiredFields = [
           result.extracted.playerName,
           result.extracted.structurePower,
@@ -101,7 +107,7 @@ export function PowerDetailsStep() {
         const missingCount = totalRequired - capturedCount;
 
         if (capturedCount < 5) {
-          removeScreenshot();
+          setScreenshotFile(null);
           setOcrError(
             `Invalid image: only ${capturedCount} of ${totalRequired} required player fields could be detected. Please upload a clear Player Details screenshot or use the manual entry method below.`
           );
@@ -141,6 +147,7 @@ export function PowerDetailsStep() {
 
   const handleRemove = () => {
     removeScreenshot();
+    setOcrDiagnostics(null);
     setOcrSuccess(false);
     setOcrUncertain(false);
     setOcrError('');
@@ -249,14 +256,41 @@ export function PowerDetailsStep() {
           onRetry={handleReplaceClick}
         />
 
+        {import.meta.env.DEV && ocrDiagnostics && (
+          <details className="ocr-dev-tools" data-testid="ocr-dev-tools">
+            <summary>OCR developer output</summary>
+            <div className="ocr-dev-tools-grid">
+              <section>
+                <strong>Tesseract</strong>
+                <p>Confidence: {ocrDiagnostics.tesseract.confidence.toFixed(1)}</p>
+                <pre>{ocrDiagnostics.tesseract.fullText || '(no full-image text)'}</pre>
+                <p>Header reads</p>
+                <pre>{JSON.stringify(ocrDiagnostics.tesseract.headerReads, null, 2)}</pre>
+                <p>Name reads</p>
+                <pre>{JSON.stringify(ocrDiagnostics.tesseract.nameReads, null, 2)}</pre>
+              </section>
+              <section>
+                <strong>PaddleOCR</strong>
+                <p>Available: {ocrDiagnostics.paddleAvailable ? 'yes' : 'no'}</p>
+                <p>Stats read</p>
+                <pre>{ocrDiagnostics.paddle.statsText || '(no stats read)'}</pre>
+                <p>Name reads</p>
+                <pre>{JSON.stringify(ocrDiagnostics.paddle.nameReads, null, 2)}</pre>
+              </section>
+            </div>
+          </details>
+        )}
+
         {/* Replace / Remove actions after screenshot is loaded */}
         {draft.hasScreenshot && !processing && (
           <div className="screenshot-actions-bar" data-testid="screenshot-actions-bar">
-            <span className="screenshot-status-pill">
-              <ShieldCheck size={14} />
-              <span>Screenshot Verified</span>
-              <span className="verified-badge-text">— power breakdown locked from edits</span>
-            </span>
+            <div className="screenshot-status-pill">
+              <div className="flex align-center gap-1">
+                <ShieldCheck size={14} />
+                <div>Screenshot Verified</div>
+              </div>
+              <div className="verified-badge-text">Power breakdown locked</div>
+            </div>
             <div className="screenshot-action-buttons">
               <button
                 type="button"
@@ -272,7 +306,7 @@ export function PowerDetailsStep() {
                 onClick={handleRemove}
                 data-testid="remove-screenshot"
               >
-                <Trash2 size={13} /> Remove
+                <Trash2 size={13} />
               </button>
             </div>
           </div>
@@ -305,7 +339,7 @@ export function PowerDetailsStep() {
 
           <Field
             id="highestPowerOnRecord"
-            label="Highest Power on Record"
+            label="Power on Record"
             required
             error={stepErrors.highestPowerOnRecord}
             hint="Your actual player power"
@@ -314,11 +348,9 @@ export function PowerDetailsStep() {
               className="control"
               id="highestPowerOnRecord"
               value={draft.highestPowerOnRecord}
-              placeholder="e.g. 281,459,207"
-              onChange={(value) => {
-                setDraftField('highestPowerOnRecord', value, true);
-                setStepErrors((old) => ({ ...old, highestPowerOnRecord: '' }));
-              }}
+              placeholder="Calculated from the power breakdown"
+              disabled
+              onChange={() => undefined}
               data-testid="ocr-highest-power"
             />
           </Field>
@@ -520,7 +552,7 @@ export function PowerDetailsStep() {
               </div>
             </div>
 
-            <div
+            {/* <div
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
@@ -536,7 +568,7 @@ export function PowerDetailsStep() {
               {scoreResult.breakdown.eliteTechBonus > 0 && (
                 <span>Elite Tech Bonus: <strong style={{ color: '#fde047' }}>+{scoreResult.breakdown.eliteTechBonus.toFixed(2)}</strong></span>
               )}
-            </div>
+            </div> */}
           </div>
         )}
 

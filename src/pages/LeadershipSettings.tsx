@@ -39,7 +39,15 @@ export function LeadershipSettings() {
 
   if (!session) return null;
 
-  const handleSessionError = () => {
+  const handleSessionError = (error: unknown) => {
+    if (
+      typeof error !== 'object' ||
+      error === null ||
+      !('status' in error) ||
+      (error.status !== 401 && error.status !== 403)
+    ) {
+      return;
+    }
     setSessionError(true);
     void authLogout();
     setLocation('/leadership?expired=1');

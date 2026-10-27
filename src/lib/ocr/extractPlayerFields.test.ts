@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractPlayerFields } from './extractPlayerFields';
+import { cleanPlayerName, extractPlayerFields } from './extractPlayerFields';
 import { normalizeOcrNumber } from './normalizeOcrNumbers';
 
 describe('extractPlayerFields', () => {
@@ -42,7 +42,7 @@ Victory 52,949
 Defeat 6,934
 `;
 
-  it('correctly extracts all 9 fields from reference screenshot OCR output (PSM 3)', () => {
+  it('extracts player and power fields from reference screenshot OCR output (PSM 3)', () => {
     const extracted = extractPlayerFields(referenceScreenshotOcrPsm3, 85);
 
     expect(extracted.playerName).toBe('GOD Sankeyyy');
@@ -53,10 +53,10 @@ Defeat 6,934
     expect(extracted.troopPower).toBe('66,198,020');
     expect(extracted.heroPower).toBe('62,634,222');
     expect(extracted.modVehiclePower).toBe('9,436,786');
-    expect(extracted.highestPowerOnRecord).toBe('281,459,207');
+    expect(extracted.highestPowerOnRecord).toBeUndefined();
   });
 
-  it('correctly extracts all 9 fields from reference screenshot OCR output (PSM 4)', () => {
+  it('extracts player and power fields from reference screenshot OCR output (PSM 4)', () => {
     const extracted = extractPlayerFields(referenceScreenshotOcrPsm4, 88);
 
     expect(extracted.playerName).toBe('GOD Sankeyyy');
@@ -67,7 +67,7 @@ Defeat 6,934
     expect(extracted.troopPower).toBe('66,198,020');
     expect(extracted.heroPower).toBe('62,634,222');
     expect(extracted.modVehiclePower).toBe('9,436,786');
-    expect(extracted.highestPowerOnRecord).toBe('281,459,207');
+    expect(extracted.highestPowerOnRecord).toBeUndefined();
   });
 
   it('normalizes numbers with comma separators without altering value precision', () => {
@@ -75,5 +75,9 @@ Defeat 6,934
     expect(normalizeOcrNumber('242/242,381')).toBe('242,242,381');
     expect(normalizeOcrNumber('281.459.207')).toBe('281,459,207');
     expect(normalizeOcrNumber('5,453,196')).toBe('5,453,196');
+  });
+
+  it('preserves Hangul names and removes OCR-added CJK spacing', () => {
+    expect(cleanPlayerName('박 차 르')).toBe('박차르');
   });
 });

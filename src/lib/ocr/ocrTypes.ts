@@ -3,6 +3,20 @@ export interface OcrProgressInfo {
   progress: number;
 }
 
+export interface OcrDiagnostics {
+  paddleAvailable: boolean;
+  tesseract: {
+    fullText: string;
+    confidence: number;
+    headerReads: string[];
+    nameReads: Array<{ text: string; conf: number }>;
+  };
+  paddle: {
+    statsText: string;
+    nameReads: Array<{ model: string; text: string; conf: number }>;
+  };
+}
+
 export interface ExtractedPlayerFields {
   playerName?: string;
   powerBesideName?: string;
@@ -21,4 +35,5 @@ export interface OcrRecognitionResult {
   text: string;
   confidence: number;
   extracted: ExtractedPlayerFields;
+  diagnostics: OcrDiagnostics;
 }

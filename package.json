@@ -78,7 +78,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
+    "onnxruntime-web": "1.30.0",
     "partycles": "^1.2.6",
+    "ppu-paddle-ocr": "6.6.1",
     "tesseract.js": "^7.0.0"
   }
 }

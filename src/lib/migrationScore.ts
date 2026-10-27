@@ -50,7 +50,7 @@ function isTierThreshold(value: unknown): value is TierThreshold {
   const row = value as Record<string, unknown>;
   return (
     typeof row.id === 'number' &&
-    ['Regular', 'Medium', 'Advanced', 'Elite'].includes(String(row.name)) &&
+    typeof row.name === 'string' &&
     typeof row.scoreMin === 'number' &&
     Number.isFinite(row.scoreMin) &&
     typeof row.passesRequired === 'number' &&

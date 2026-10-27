@@ -285,22 +285,28 @@ export interface AdminApplicationPage {
   totalPages: number;
 }
 
-export type TierThresholdName = typeof TierThresholdName[keyof typeof TierThresholdName];
-
-
-export const TierThresholdName = {
-  Regular: 'Regular',
-  Medium: 'Medium',
-  Advanced: 'Advanced',
-  Elite: 'Elite',
-} as const;
-
 export interface TierThreshold {
   id: number;
-  name: TierThresholdName;
+  /** @maxLength 40 */
+  name: string;
   scoreMin: number;
   passesRequired: number;
   updatedAt: string;
+}
+
+export interface TierThresholdCreate {
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  name: string;
+  /** @minimum 0 */
+  scoreMin: number;
+  /**
+     * @minimum 1
+     * @maximum 1000
+     */
+  passesRequired: number;
 }
 
 export interface TierThresholdUpdate {

@@ -41,6 +41,7 @@ import type {
   RateLimitedResponse,
   ServiceUnavailableResponse,
   TierThreshold,
+  TierThresholdCreate,
   TierThresholdUpdate,
   UnauthorizedResponse
 } from './api.schemas';
@@ -1211,18 +1212,106 @@ export function useGetAdminTierThresholds<TData = Awaited<ReturnType<typeof getA
 
 
 
-export const getUpdateAdminTierThresholdUrl = (name: 'Regular' | 'Medium' | 'Advanced' | 'Elite',) => {
+export const getCreateAdminTierThresholdUrl = () => {
 
 
 
 
-  return `/api/admin/tier-thresholds/${name}`
+  return `/api/admin/tier-thresholds`
+}
+
+/**
+ * @summary Add a migration tier threshold
+ */
+export const createAdminTierThreshold = async (tierThresholdCreate: TierThresholdCreate, options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<TierThreshold>(getCreateAdminTierThresholdUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tierThresholdCreate)
+  }
+);}
+
+
+
+
+
+export const getCreateAdminTierThresholdMutationKey = () => ['createAdminTierThreshold'] as const;
+
+export const getCreateAdminTierThresholdMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdminTierThresholdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminTierThreshold>>, CreateAdminTierThresholdMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminTierThreshold(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminTierThresholdMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminTierThreshold>>>
+    export type CreateAdminTierThresholdMutationBody = BodyType<TierThresholdCreate>
+    export type CreateAdminTierThresholdMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>
+    export type CreateAdminTierThresholdMutationVariables = {data: BodyType<TierThresholdCreate>}
+
+    /**
+ * @summary Add a migration tier threshold
+ */
+export const useCreateAdminTierThreshold = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminTierThreshold>>,
+        TError,
+        CreateAdminTierThresholdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdminTierThresholdMutationOptions(options));
+    }
+
+export const getUpdateAdminTierThresholdUrl = (name: string,) => {
+
+
+
+
+  return `/api/admin/tier-thresholds/${encodeURIComponent(name)}`
 }
 
 /**
  * @summary Update a migration tier threshold
  */
-export const updateAdminTierThreshold = async (name: 'Regular' | 'Medium' | 'Advanced' | 'Elite',
+export const updateAdminTierThreshold = async (name: string,
     tierThresholdUpdate: TierThresholdUpdate, options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
@@ -1284,7 +1373,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateAdminTierThresholdMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminTierThreshold>>>
     export type UpdateAdminTierThresholdMutationBody = BodyType<TierThresholdUpdate>
     export type UpdateAdminTierThresholdMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>
-    export type UpdateAdminTierThresholdMutationVariables = {name: 'Regular' | 'Medium' | 'Advanced' | 'Elite';data: BodyType<TierThresholdUpdate>}
+    export type UpdateAdminTierThresholdMutationVariables = {name: string;data: BodyType<TierThresholdUpdate>}
 
     /**
  * @summary Update a migration tier threshold
@@ -1388,4 +1477,3 @@ export const useUpdateAdminAlliance = <TError = ErrorType<BadRequestResponse | U
       > => {
       return useMutation(getUpdateAdminAllianceMutationOptions(options));
     }
-
