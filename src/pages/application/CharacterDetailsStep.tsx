@@ -44,7 +44,7 @@ export function CharacterDetailsStep() {
             className="control"
             id="characterGameName"
             value={draft.playerName}
-            maxLength={40}
+            maxLength={30}
             placeholder="Enter your in-game name"
             onChange={(e) => {
               setDraftField('playerName', e.target.value, true);
@@ -60,20 +60,22 @@ export function CharacterDetailsStep() {
           label="Current state"
           required
           error={stepErrors.currentState}
-          hint="Enter your current state number (1–32767). State 565 is your target destination."
         >
           <input
             className="control"
             id="currentState"
+            type="text"
             value={draft.currentState}
-            max={32767}
+            maxLength={4}
             onChange={(e) => {
+              if (!/^\d{0,4}$/.test(e.target.value)) return;
               setDraftField('currentState', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentState: '' }));
             }}
-            placeholder="Search or enter a state number (e.g. 520)"
+            placeholder="Enter a state number (e.g. 565)"
             list="known-state-options"
             inputMode="numeric"
+            pattern="[0-9]*"
             data-testid="current-state"
           />
           <datalist id="known-state-options">
@@ -94,7 +96,7 @@ export function CharacterDetailsStep() {
             className="control"
             id="currentAlliance"
             value={draft.currentAlliance}
-            maxLength={24}
+            maxLength={50}
             onChange={(e) => {
               setDraftField('currentAlliance', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentAlliance: '' }));

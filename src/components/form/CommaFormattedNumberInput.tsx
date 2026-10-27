@@ -15,9 +15,23 @@ interface PendingSelection {
   endDigit: number;
 }
 
+const MAX_INPUT_VALUE = '50000000000';
+
 function formatDigits(value: string): string {
   const digits = value.replace(/\D/g, '');
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function capDigits(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  const normalizedDigits = digits.replace(/^0+(?=\d)/, '');
+  if (
+    normalizedDigits.length > MAX_INPUT_VALUE.length ||
+    (normalizedDigits.length === MAX_INPUT_VALUE.length && normalizedDigits > MAX_INPUT_VALUE)
+  ) {
+    return MAX_INPUT_VALUE;
+  }
+  return normalizedDigits;
 }
 
 function positionAfterDigits(value: string, digitCount: number): number {
@@ -75,7 +89,7 @@ export function CommaFormattedNumberInput({
         const input = event.currentTarget;
         const start = input.selectionStart ?? input.value.length;
         const end = input.selectionEnd ?? start;
-        const nextValue = formatDigits(input.value);
+        const nextValue = formatDigits(capDigits(input.value));
         pendingSelection.current = {
           startDigit: input.value.slice(0, start).replace(/\D/g, '').length,
           endDigit: input.value.slice(0, end).replace(/\D/g, '').length,

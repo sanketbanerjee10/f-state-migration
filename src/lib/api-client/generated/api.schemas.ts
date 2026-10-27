@@ -53,24 +53,69 @@ export type AdminAlliance = Alliance & {
 export interface GroupMemberInput {
   /**
      * @minLength 1
-     * @maxLength 40
+     * @maxLength 30
      */
   playerName: string;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 9999
+     */
+  currentState: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  f1ArenaPower?: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  f2ArenaPower?: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  f3ArenaPower?: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   highestPowerOnRecord: number;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   structurePower: number;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   techPower: number;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   troopPower: number;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   heroPower: number;
-  /** @minimum 0 */
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
   modVehiclePower: number;
-  /** @minimum 0 */
-  kills: number;
-  /** @maxLength 24 */
+  /**
+     * @minimum 0
+     * @maximum 1000000000000
+     * @nullable
+     */
+  kills: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
   currentAlliance: string;
   isScreenshotVerified: boolean;
 }
@@ -79,12 +124,12 @@ export interface MigrationApplicationInput {
   idempotencyKey: string;
   /**
      * @minLength 1
-     * @maxLength 40
+     * @maxLength 30
      */
   gameName: string;
   /**
      * @minimum 1
-     * @maximum 32767
+     * @maximum 9999
      */
   currentState: number;
   /**
@@ -108,10 +153,11 @@ export interface MigrationApplicationInput {
      */
   f3ArenaPower: number;
   /**
-     * @minimum 1
+     * @minimum 0
      * @maximum 1000000000000
+     * @nullable
      */
-  kills: number;
+  kills: number | null;
   /**
      * @maxItems 30
      * @items.minimum 1
@@ -130,19 +176,38 @@ export interface MigrationApplicationInput {
      * @maxLength 1000
      */
   migrationReason: string;
-  /** @minimum 0 */
-  highestPowerOnRecord?: number;
-  /** @minimum 0 */
-  structurePower?: number;
-  /** @minimum 0 */
-  techPower?: number;
-  /** @minimum 0 */
-  troopPower?: number;
-  /** @minimum 0 */
-  heroPower?: number;
-  /** @minimum 0 */
-  modVehiclePower?: number;
-  isScreenshotVerified?: boolean;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  highestPowerOnRecord: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  structurePower: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  techPower: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  troopPower: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  heroPower: number;
+  /**
+     * @minimum 1
+     * @maximum 1000000000000
+     */
+  modVehiclePower: number;
+  isScreenshotVerified: boolean;
+  /** @maxItems 99 */
   groupMembers?: GroupMemberInput[];
   /**
      * @maxLength 40
@@ -251,15 +316,19 @@ export interface ApplicationPlayer {
   applicationId: string;
   playerName: string;
   isApplicant: boolean;
+  currentState: number;
   highestPowerOnRecord: number;
   structurePower: number;
   techPower: number;
   troopPower: number;
   heroPower: number;
   modVehiclePower: number;
-  f1ArenaPower: number;
-  f2ArenaPower: number;
-  f3ArenaPower: number;
+  /** @nullable */
+  f1ArenaPower: number | null;
+  /** @nullable */
+  f2ArenaPower: number | null;
+  /** @nullable */
+  f3ArenaPower: number | null;
   kills: number;
   currentAlliance: string;
   isScreenshotVerified: boolean;

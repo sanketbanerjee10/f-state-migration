@@ -22,6 +22,10 @@ export interface MigrationApplication {
 export interface GroupMember {
   id: string;
   playerName: string;
+  currentState?: string;
+  f1ArenaPower?: string;
+  f2ArenaPower?: string;
+  f3ArenaPower?: string;
   highestPowerOnRecord: string;
   structurePower: string;
   techPower: string;
@@ -33,4 +37,3 @@ export interface GroupMember {
   screenshotFileName?: string;
   isScreenshotVerified: boolean;
 }
-

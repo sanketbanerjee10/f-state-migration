@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Edit2,
   FileImage,
@@ -16,12 +16,31 @@ import { Modal } from '../../components/Dialogs';
 import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
 import { recognizeScreenshot } from '../../lib/ocr';
-import { parseMagnitude } from '../../lib/parsers';
+import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
 import { MigrationScoreBadge, VerifiedBadge, MigrationScoringGuide } from '../../components/MigrationScoringGuide';
+import { OcrWaitingMessage } from '../../components/ocr/OcrWaitingMessage';
+import { DismissibleToast } from '../../components/DismissibleToast';
 import type { GroupMember } from '../../types/application';
 import { useApplicationDraft } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
+
+const OCR_CONCURRENCY = 2;
+const INITIAL_SECONDS_PER_BATCH = 20;
+const MAX_GROUP_MEMBERS = 99;
+
+type UploadProgress = {
+  completed: number;
+  total: number;
+  estimatedEndAt: number;
+};
+
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${seconds} sec`;
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return remainingSeconds ? `${minutes} min ${remainingSeconds} sec` : `${minutes} min`;
+}
 
 export function GroupRosterStep() {
   const {
@@ -35,23 +54,31 @@ export function GroupRosterStep() {
   const { thresholds } = useLiveTierThresholds();
 
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number; filename: string } | null>(
-    null
-  );
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [uploadError, setUploadError] = useState('');
+  const [scoreErrorToast, setScoreErrorToast] = useState('');
   const [dragging, setDragging] = useState(false);
+  const [, setClockTick] = useState(0);
 
   // Edit member modal
   const [editingMember, setEditingMember] = useState<GroupMember | null>(null);
   const [editName, setEditName] = useState('');
+  const [editState, setEditState] = useState('');
+  const [editF1Power, setEditF1Power] = useState('');
+  const [editF2Power, setEditF2Power] = useState('');
+  const [editF3Power, setEditF3Power] = useState('');
   const [editKills, setEditKills] = useState('');
   const [editAlliance, setEditAlliance] = useState('');
   const [editError, setEditError] = useState('');
+  const [editErrorScrollKey, setEditErrorScrollKey] = useState(0);
 
   // Manual add member modal
   const [manualModalOpen, setManualModalOpen] = useState(false);
   const [manualName, setManualName] = useState('');
-  const [manualHighestPower, setManualHighestPower] = useState('');
+  const [manualState, setManualState] = useState('');
+  const [manualF1Power, setManualF1Power] = useState('');
+  const [manualF2Power, setManualF2Power] = useState('');
+  const [manualF3Power, setManualF3Power] = useState('');
   const [manualStructurePower, setManualStructurePower] = useState('');
   const [manualTechPower, setManualTechPower] = useState('');
   const [manualTroopPower, setManualTroopPower] = useState('');
@@ -60,11 +87,31 @@ export function GroupRosterStep() {
   const [manualKills, setManualKills] = useState('');
   const [manualAlliance, setManualAlliance] = useState('');
   const [manualError, setManualError] = useState('');
+  const [manualErrorScrollKey, setManualErrorScrollKey] = useState(0);
   const [manualEditingMember, setManualEditingMember] = useState<GroupMember | null>(null);
+
+  const manualHighestPower = [
+    manualStructurePower,
+    manualTechPower,
+    manualTroopPower,
+    manualHeroPower,
+    manualModVehiclePower,
+  ]
+    .reduce((total, power) => total + (parseMagnitude(power) || 0), 0)
+    .toLocaleString('en-US');
+  const remainingMemberSlots = Math.max(0, MAX_GROUP_MEMBERS - draft.groupMembers.length);
 
   const multiFileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (!uploading) return;
+    const timer = window.setInterval(() => setClockTick((tick) => tick + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, [uploading]);
+
   const handleFiles = async (files: FileList | File[]) => {
+    if (uploading) return;
+
     const validFiles: File[] = [];
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
@@ -80,76 +127,150 @@ export function GroupRosterStep() {
       return;
     }
 
+    if (remainingMemberSlots === 0) {
+      setUploadError(`A group can contain at most ${MAX_GROUP_MEMBERS} players, including the applicant.`);
+      return;
+    }
+
+    const filesToProcess = validFiles.slice(0, remainingMemberSlots);
+    const skippedForCapacity = validFiles.length - filesToProcess.length;
     setUploadError('');
     setUploading(true);
 
-    const unrecognizedFiles: string[] = [];
+    const results: Array<GroupMember | null> = Array(filesToProcess.length).fill(null);
+    const unrecognizedFiles: Array<string | null> = Array(filesToProcess.length).fill(null);
+    let invalidScoreCount = 0;
+    let nextIndex = 0;
+    let completed = 0;
+    let estimatedSecondsPerBatch = INITIAL_SECONDS_PER_BATCH;
+    const startedAt = Date.now();
+    const totalBatches = Math.ceil(filesToProcess.length / OCR_CONCURRENCY);
 
-    for (let idx = 0; idx < validFiles.length; idx++) {
-      const file = validFiles[idx];
-      setUploadProgress({ current: idx + 1, total: validFiles.length, filename: file.name });
+    setUploadProgress({
+      completed: 0,
+      total: filesToProcess.length,
+      estimatedEndAt: startedAt + totalBatches * estimatedSecondsPerBatch * 1000,
+    });
 
-      try {
-        const result = await recognizeScreenshot(file);
-        const extracted = result.extracted;
-        const structurePower = extracted.structurePower || '0';
-        const techPower = extracted.techPower || '0';
-        const troopPower = extracted.troopPower || '0';
-        const heroPower = extracted.heroPower || '0';
-        const modVehiclePower = extracted.modVehiclePower || '0';
-        const calculatedPower = [
-          structurePower,
-          techPower,
-          troopPower,
-          heroPower,
-          modVehiclePower,
-        ].reduce((total, power) => total + (parseMagnitude(power) || 0), 0);
-
-        const requiredFields = [
-          extracted.playerName,
-          structurePower,
-          techPower,
-          troopPower,
-          heroPower,
-          modVehiclePower,
-        ];
-        const capturedCount = requiredFields.filter((val) => Boolean(val && val.trim())).length;
-        const totalRequired = requiredFields.length;
-        const missingCount = totalRequired - capturedCount;
-
-        // Reject if more than 2 or 3 fields cannot be tracked
-        if (missingCount >= 3 || capturedCount < 5) {
-          unrecognizedFiles.push(file.name);
-          continue;
-        }
-
-        const newMember: GroupMember = {
-          id: crypto.randomUUID(),
-          playerName: extracted.playerName || `Member ${draft.groupMembers.length + idx + 1}`,
-          highestPowerOnRecord: Math.round(calculatedPower).toLocaleString('en-US'),
-          structurePower,
-          techPower,
-          troopPower,
-          heroPower,
-          modVehiclePower,
-          kills: extracted.kills || '0', // kills default to 0 if not extracted
-          currentAlliance: draft.currentAlliance || '', // alliance recorded same as Stage 1/2
-          screenshotFileName: file.name,
-          isScreenshotVerified: true,
-        };
-
-        addGroupMember(newMember);
-      } catch (err) {
-        console.error('Failed to parse member screenshot:', err);
-        unrecognizedFiles.push(file.name);
+    const updateProgress = () => {
+      const completedBatches = Math.floor(completed / OCR_CONCURRENCY);
+      if (completedBatches > 0) {
+        estimatedSecondsPerBatch = Math.max(
+          1,
+          (Date.now() - startedAt) / 1000 / completedBatches,
+        );
       }
-    }
+      const remainingBatches = Math.ceil((filesToProcess.length - completed) / OCR_CONCURRENCY);
+      setUploadProgress({
+        completed,
+        total: filesToProcess.length,
+        estimatedEndAt: Date.now() + remainingBatches * estimatedSecondsPerBatch * 1000,
+      });
+    };
 
-    if (unrecognizedFiles.length > 0) {
-      setUploadError(
-        `Invalid image for: ${unrecognizedFiles.join(', ')}. None of the player stats could be captured. Please use the manual entry method or upload clearer Player Details screenshots.`
+    const processScreenshots = async () => {
+      while (nextIndex < filesToProcess.length) {
+        const idx = nextIndex++;
+        const file = filesToProcess[idx];
+        updateProgress();
+
+        try {
+          const result = await recognizeScreenshot(file);
+          const extracted = result.extracted;
+          const structurePower = extracted.structurePower || '0';
+          const techPower = extracted.techPower || '0';
+          const troopPower = extracted.troopPower || '0';
+          const heroPower = extracted.heroPower || '0';
+          const modVehiclePower = extracted.modVehiclePower || '0';
+          const calculatedPower = [
+            structurePower,
+            techPower,
+            troopPower,
+            heroPower,
+            modVehiclePower,
+          ].reduce((total, power) => total + (parseMagnitude(power) || 0), 0);
+
+          const powerFields = [
+            structurePower,
+            techPower,
+            troopPower,
+            heroPower,
+            modVehiclePower,
+          ];
+          const missingPower = powerFields.some((value) => parseMagnitude(value) === null);
+
+          if (missingPower) {
+            unrecognizedFiles[idx] = file.name;
+            continue;
+          }
+
+          const migrationScore = calculateMigrationScoreFromRaw(
+            parseMagnitude(structurePower) || 0,
+            parseMagnitude(techPower) || 0,
+            parseMagnitude(heroPower) || 0,
+            parseMagnitude(modVehiclePower) || 0,
+            thresholds,
+          );
+          if (!migrationScore || migrationScore.score < 10 || migrationScore.score > 1000) {
+            invalidScoreCount += 1;
+            continue;
+          }
+
+          results[idx] = {
+            id: crypto.randomUUID(),
+            playerName: extracted.playerName || `Member ${draft.groupMembers.length + idx + 1}`,
+            currentState: draft.currentState,
+            highestPowerOnRecord: Math.round(calculatedPower).toLocaleString('en-US'),
+            structurePower,
+            techPower,
+            troopPower,
+            heroPower,
+            modVehiclePower,
+            kills: extracted.kills || '0',
+            currentAlliance: draft.currentAlliance || '',
+            screenshotFileName: file.name,
+            isScreenshotVerified: true,
+          };
+        } catch (err) {
+          console.error('Failed to parse member screenshot:', err);
+          unrecognizedFiles[idx] = file.name;
+        } finally {
+          completed += 1;
+          updateProgress();
+        }
+      }
+    };
+
+    await Promise.all(
+      Array.from(
+        { length: Math.min(OCR_CONCURRENCY, filesToProcess.length) },
+        () => processScreenshots(),
+      ),
+    );
+
+    results.forEach((member) => {
+      if (member) addGroupMember(member);
+    });
+
+    if (invalidScoreCount > 0) {
+      setScoreErrorToast(
+        `${invalidScoreCount} group member${invalidScoreCount === 1 ? ' was' : 's were'} not added because the calculated migration score must be between 10 and 1000. The data may be invalid.`,
       );
     }
+
+    const failedFiles = unrecognizedFiles.filter((filename): filename is string => filename !== null);
+    const uploadMessages = [];
+    if (failedFiles.length > 0) {
+      uploadMessages.push(
+        `Could not capture all required power stats for: ${failedFiles.join(', ')}. Please use manual entry or upload clearer Player Details screenshots.`,
+      );
+    }
+    if (skippedForCapacity > 0) {
+      uploadMessages.push(
+        `${skippedForCapacity} screenshot${skippedForCapacity === 1 ? ' was' : 's were'} not processed because a group is limited to ${MAX_GROUP_MEMBERS} players, including the applicant.`,
+      );
+    }
+    if (uploadMessages.length > 0) setUploadError(uploadMessages.join(' '));
 
     setUploading(false);
     setUploadProgress(null);
@@ -160,7 +281,10 @@ export function GroupRosterStep() {
     if (!member.isScreenshotVerified) {
       setManualEditingMember(member);
       setManualName(member.playerName);
-      setManualHighestPower(member.highestPowerOnRecord);
+      setManualState(member.currentState || draft.currentState);
+      setManualF1Power(member.f1ArenaPower || '');
+      setManualF2Power(member.f2ArenaPower || '');
+      setManualF3Power(member.f3ArenaPower || '');
       setManualStructurePower(member.structurePower);
       setManualTechPower(member.techPower);
       setManualTroopPower(member.troopPower);
@@ -175,6 +299,10 @@ export function GroupRosterStep() {
 
     setEditingMember(member);
     setEditName(member.playerName);
+    setEditState(member.currentState || draft.currentState);
+    setEditF1Power(member.f1ArenaPower || '');
+    setEditF2Power(member.f2ArenaPower || '');
+    setEditF3Power(member.f3ArenaPower || '');
     setEditKills(member.kills);
     setEditAlliance(member.currentAlliance);
     setEditError('');
@@ -184,11 +312,37 @@ export function GroupRosterStep() {
     if (!editingMember) return;
     if (!editName.trim()) {
       setEditError('Player name cannot be empty.');
+      setEditErrorScrollKey((key) => key + 1);
+      return;
+    }
+    if (!editAlliance.trim()) {
+      setEditError('Current alliance is required.');
+      setEditErrorScrollKey((key) => key + 1);
+      return;
+    }
+    if (!parseStateNumber(editState)) {
+      setEditError('Enter a valid current state.');
+      setEditErrorScrollKey((key) => key + 1);
+      return;
+    }
+    const arenaPowers = [
+      { value: editF1Power, label: 'F1' },
+      { value: editF2Power, label: 'F2' },
+      { value: editF3Power, label: 'F3' },
+    ];
+    const invalidArenaPower = arenaPowers.find(({ value }) => value.trim() && !parseMagnitude(value));
+    if (invalidArenaPower) {
+      setEditError(`${invalidArenaPower.label} Arena Power must be a valid number greater than zero, or left blank.`);
+      setEditErrorScrollKey((key) => key + 1);
       return;
     }
 
     updateGroupMember(editingMember.id, {
       playerName: editName.trim(),
+      currentState: editState,
+      f1ArenaPower: editF1Power.trim(),
+      f2ArenaPower: editF2Power.trim(),
+      f3ArenaPower: editF3Power.trim(),
       kills: editKills.trim() || '0',
       currentAlliance: editAlliance.trim(),
     });
@@ -199,7 +353,10 @@ export function GroupRosterStep() {
   const openManualModal = () => {
     setManualEditingMember(null);
     setManualName('');
-    setManualHighestPower('');
+    setManualState(draft.currentState);
+    setManualF1Power('');
+    setManualF2Power('');
+    setManualF3Power('');
     setManualStructurePower('');
     setManualTechPower('');
     setManualTroopPower('');
@@ -212,29 +369,53 @@ export function GroupRosterStep() {
   };
 
   const saveManualMember = () => {
+    if (!manualEditingMember && draft.groupMembers.length >= MAX_GROUP_MEMBERS) {
+      setManualError(`A group can contain at most ${MAX_GROUP_MEMBERS} players, including the applicant.`);
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
     if (!manualName.trim()) {
       setManualError('Player name is required.');
+      setManualErrorScrollKey((key) => key + 1);
       return;
     }
 
     if (!manualAlliance.trim()) {
       setManualError('Current alliance is required.');
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
+
+    if (!parseStateNumber(manualState)) {
+      setManualError('Enter a valid current state.');
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
+
+    const arenaPowers = [
+      { value: manualF1Power, label: 'F1' },
+      { value: manualF2Power, label: 'F2' },
+      { value: manualF3Power, label: 'F3' },
+    ];
+    const invalidArenaPower = arenaPowers.find(({ value }) => value.trim() && !parseMagnitude(value));
+    if (invalidArenaPower) {
+      setManualError(`${invalidArenaPower.label} Arena Power must be a valid number greater than zero, or left blank.`);
+      setManualErrorScrollKey((key) => key + 1);
       return;
     }
 
     const numericFields = [
-      { value: manualHighestPower, label: 'Power on Record' },
       { value: manualStructurePower, label: 'Structure Power' },
       { value: manualTechPower, label: 'Tech Power' },
       { value: manualTroopPower, label: 'Troop Power' },
       { value: manualHeroPower, label: 'Hero Power' },
       { value: manualModVehiclePower, label: 'Mod Vehicle Power' },
-      { value: manualKills, label: 'Kills' },
     ];
 
     for (const field of numericFields) {
       if (!field.value.trim()) {
         setManualError(`${field.label} is required.`);
+        setManualErrorScrollKey((key) => key + 1);
         return;
       }
 
@@ -242,8 +423,15 @@ export function GroupRosterStep() {
 
       if (!Number.isFinite(value) || value <= 0) {
         setManualError(`${field.label} must be a valid number greater than zero.`);
+        setManualErrorScrollKey((key) => key + 1);
         return;
       }
+    }
+
+    if (manualKills.trim() && parseMagnitude(manualKills, true) === null) {
+      setManualError('Kills must be zero or a valid number.');
+      setManualErrorScrollKey((key) => key + 1);
+      return;
     }
 
     const powerOnRecord = Number(manualHighestPower.replace(/,/g, ''));
@@ -259,11 +447,30 @@ export function GroupRosterStep() {
       setManualError(
         'Power on Record must equal the sum of Structure, Tech, Troop, Hero, and Mod Vehicle Power.'
       );
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
+
+    const migrationScore = calculateMigrationScoreFromRaw(
+      parseMagnitude(manualStructurePower) || 0,
+      parseMagnitude(manualTechPower) || 0,
+      parseMagnitude(manualHeroPower) || 0,
+      parseMagnitude(manualModVehiclePower) || 0,
+      thresholds,
+    );
+    if (!migrationScore || migrationScore.score < 10 || migrationScore.score > 1000) {
+      setScoreErrorToast(
+        `The group member was not ${manualEditingMember ? 'updated' : 'added'} because the calculated migration score must be between 10 and 1000. The data may be invalid.`,
+      );
       return;
     }
 
     const memberFields = {
       playerName: manualName.trim(),
+      currentState: manualState,
+      f1ArenaPower: manualF1Power.trim(),
+      f2ArenaPower: manualF2Power.trim(),
+      f3ArenaPower: manualF3Power.trim(),
       highestPowerOnRecord: manualHighestPower.trim(),
       structurePower: manualStructurePower.trim(),
       techPower: manualTechPower.trim(),
@@ -290,15 +497,17 @@ export function GroupRosterStep() {
   };
 
   return (
-    <StepLayout
-      navigationProps={{
-        onContinue: nextStep,
-        onBack: prevStep,
-        continueLabel: 'Continue to Review',
-        // backLabel: 'Back to Preferences',
-        disabled: uploading,
-      }}
-    >
+    <>
+      <DismissibleToast message={scoreErrorToast} onDismiss={() => setScoreErrorToast('')} />
+      <StepLayout
+        navigationProps={{
+          onContinue: nextStep,
+          onBack: prevStep,
+          continueLabel: 'Continue to Review',
+          // backLabel: 'Back to Preferences',
+          disabled: uploading,
+        }}
+      >
       <FormSection number="04" title="Group Roster">
         <div className="hint">
           Upload profile/details screenshots of all the players migrating in your group to extract and verify their stats,
@@ -375,13 +584,25 @@ export function GroupRosterStep() {
         {uploading && uploadProgress && (
           <div className="ocr-processing-card" style={{ marginTop: 14 }}>
             <div className="ocr-processing-header">
-              <div className="ocr-waiting-message">
-                <LoaderCircle size={16} className="spin" />
-                <span>
-                  Processing screenshot {uploadProgress.current} of {uploadProgress.total}:{' '}
-                  <strong>{uploadProgress.filename}</strong>
-                </span>
+              <div className="ocr-roster-upload-status">
+                <div className="ocr-roster-processing-heading">
+                  <LoaderCircle size={18} className="spin" />
+                  <span>
+                    Processing screenshots {uploadProgress.completed} of {uploadProgress.total}
+                  </span>
+                  <span className="ocr-roster-time-remaining">
+                    {uploadProgress.estimatedEndAt <= Date.now() && uploadProgress.completed < uploadProgress.total
+                      ? 'Taking longer than estimated'
+                      : `${formatDuration(
+                          Math.max(0, Math.ceil((uploadProgress.estimatedEndAt - Date.now()) / 1000)),
+                        )}`}
+                  </span>
+                </div>
+                <OcrWaitingMessage />
               </div>
+            </div>
+            <div className="ocr-roster-progress-track" aria-hidden="true">
+              <span />
             </div>
           </div>
         )}
@@ -399,14 +620,14 @@ export function GroupRosterStep() {
         <div style={{ marginTop: 22 }}>
           <div className="panel-heading" style={{ marginBottom: 12, alignItems: 'center' }}>
             <div>
-              <span className="panel-kicker" style={{fontSize: "12px"}}>ROSTER ({draft.groupMembers.length} MEMBERS)</span>
+              <span className="panel-kicker" style={{fontSize: "12px"}}>ROSTER ({draft.groupMembers.length} / {MAX_GROUP_MEMBERS} MEMBERS — APPLICANT INCLUDED IN LIMIT)</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 type="button"
                 className="button button-quiet button-sm"
                 onClick={openManualModal}
-                disabled={uploading}
+                disabled={uploading || remainingMemberSlots === 0}
                 data-testid="add-manual-member-btn"
               >
                 <UserPlus size={16} />
@@ -467,7 +688,7 @@ export function GroupRosterStep() {
                         type="button"
                         className="button button-quiet button-sm"
                         onClick={() => openEditModal(member)}
-                        title={member.isScreenshotVerified ? 'Edit name and kills' : 'Edit all member details'}
+                        title="Edit member details"
                         data-testid={`edit-member-${idx}`}
                       >
                         <Edit2 size={13} />
@@ -486,7 +707,11 @@ export function GroupRosterStep() {
 
                   <div className="group-member-stats">
                     <div>
-                      <span>Power:</span>
+                        <span>State:</span>
+                        <strong>{member.currentState || draft.currentState || '—'}</strong>
+                      </div>
+                      <div>
+                        <span>Power:</span>
                       <strong>{member.highestPowerOnRecord}</strong>
                     </div>
                     <div>
@@ -534,6 +759,9 @@ export function GroupRosterStep() {
         <Modal
           title={`Edit Member: ${editingMember.playerName}`}
           onClose={() => setEditingMember(null)}
+          className="dialog-fixed-header"
+          showCloseButton
+          scrollBodyToTopKey={editErrorScrollKey}
           actions={
             <>
               <button
@@ -555,21 +783,45 @@ export function GroupRosterStep() {
           }
         >
           <p className="hint" style={{ marginBottom: 14 }}>
-            You can update the in-game name and kill count for this member.
+            You can update this member's name, state, arena powers, kills, and alliance.
             {editingMember.isScreenshotVerified && ' Power stats are verified from screenshot and locked.'}
           </p>
 
-          <Field id="edit-player-name" label="Player name" required error={editError}>
+          {editError && (
+            <div className="manual-member-error" role="alert">
+              {editError}
+            </div>
+          )}
+
+          <Field id="edit-player-name" label="Player name" required>
             <input
               className="control"
               id="edit-player-name"
               value={editName}
-              maxLength={40}
+              maxLength={30}
               onChange={(e) => {
                 setEditName(e.target.value);
                 setEditError('');
               }}
               data-testid="edit-member-name-input"
+            />
+          </Field>
+
+          <Field id="edit-player-state" label="Current state" required>
+            <input
+              className="control"
+              id="edit-player-state"
+              type="text"
+              value={editState}
+              maxLength={4}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onChange={(e) => {
+                if (!/^\d{0,4}$/.test(e.target.value)) return;
+                setEditState(e.target.value);
+                setEditError('');
+              }}
+              data-testid="edit-member-state-input"
             />
           </Field>
 
@@ -584,13 +836,16 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          <Field id="edit-player-alliance" label="Current alliance">
+          <Field id="edit-player-alliance" label="Current alliance" required>
             <input
               className="control"
               id="edit-player-alliance"
               value={editAlliance}
-              maxLength={24}
-              onChange={(e) => setEditAlliance(e.target.value)}
+              maxLength={50}
+              onChange={(e) => {
+                setEditAlliance(e.target.value);
+                setEditError('');
+              }}
               data-testid="edit-member-alliance-input"
             />
           </Field>
@@ -608,6 +863,48 @@ export function GroupRosterStep() {
               <div>Vehicle Power: <strong>{editingMember.modVehiclePower}</strong></div>
             </div>
           </div>
+
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="edit-player-f1" label="F1 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="edit-player-f1"
+                value={editF1Power}
+                placeholder="Leave blank if unknown"
+                onChange={(value) => {
+                  setEditF1Power(value);
+                  setEditError('');
+                }}
+                data-testid="edit-member-f1-input"
+              />
+            </Field>
+            <Field id="edit-player-f2" label="F2 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="edit-player-f2"
+                value={editF2Power}
+                placeholder="Leave blank if unknown"
+                onChange={(value) => {
+                  setEditF2Power(value);
+                  setEditError('');
+                }}
+                data-testid="edit-member-f2-input"
+              />
+            </Field>
+            <Field id="edit-player-f3" label="F3 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="edit-player-f3"
+                value={editF3Power}
+                placeholder="Leave blank if unknown"
+                onChange={(value) => {
+                  setEditF3Power(value);
+                  setEditError('');
+                }}
+                data-testid="edit-member-f3-input"
+              />
+            </Field>
+          </div>
         </Modal>
       )}
 
@@ -615,6 +912,9 @@ export function GroupRosterStep() {
       {manualModalOpen && (
         <Modal
           title={manualEditingMember ? `Edit Member: ${manualEditingMember.playerName}` : 'Add Group Member Manually'}
+          className="dialog-fixed-header"
+          showCloseButton
+          scrollBodyToTopKey={manualErrorScrollKey}
           onClose={() => {
             setManualModalOpen(false);
             setManualEditingMember(null);
@@ -643,7 +943,8 @@ export function GroupRosterStep() {
           }
         >
           <p className="hint" style={{ marginBottom: 14 }}>
-            Note: Manually entered members will not receive the verified badge.
+            The current state defaults to your state and can be changed. Arena powers are optional.
+            Manually entered members will not receive the verified badge.
           </p>
 
           {manualError && (
@@ -658,10 +959,28 @@ export function GroupRosterStep() {
               className="control"
               id="manual-name"
               value={manualName}
-              maxLength={40}
+              maxLength={30}
               placeholder="e.g. PlayerTwo"
               onChange={(e) => setManualName(e.target.value)}
               data-testid="manual-member-name-input"
+            />
+          </Field>
+
+          <Field id="manual-state" label="Current state" required>
+            <input
+              className="control"
+              id="manual-state"
+              type="text"
+              value={manualState}
+              maxLength={4}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onChange={(e) => {
+                if (!/^\d{0,4}$/.test(e.target.value)) return;
+                setManualState(e.target.value);
+                setManualError('');
+              }}
+              data-testid="manual-member-state-input"
             />
           </Field>
 
@@ -670,6 +989,7 @@ export function GroupRosterStep() {
               className="control"
               id="manual-alliance"
               value={manualAlliance}
+              maxLength={50}
               placeholder={draft.currentAlliance || 'Alliance tag/name'}
               onChange={(e) => setManualAlliance(e.target.value)}
               data-testid="manual-member-alliance-input"
@@ -684,12 +1004,13 @@ export function GroupRosterStep() {
                 id="manual-highest-power"
                 value={manualHighestPower}
                 placeholder="e.g. 210,000,000"
-                onChange={setManualHighestPower}
+                disabled
+                onChange={() => undefined}
                 data-testid="manual-member-power-input"
               />
             </Field>
 
-            <Field id="manual-kills" label="Kills" required>
+            <Field id="manual-kills" label="Kills (optional)">
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-kills"
@@ -759,8 +1080,42 @@ export function GroupRosterStep() {
               />
             </Field>
           </div>
+
+          <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
+            <Field id="manual-f1-power" label="F1 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="manual-f1-power"
+                value={manualF1Power}
+                placeholder="Leave blank if unknown"
+                onChange={setManualF1Power}
+                data-testid="manual-member-f1-input"
+              />
+            </Field>
+            <Field id="manual-f2-power" label="F2 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="manual-f2-power"
+                value={manualF2Power}
+                placeholder="Leave blank if unknown"
+                onChange={setManualF2Power}
+                data-testid="manual-member-f2-input"
+              />
+            </Field>
+            <Field id="manual-f3-power" label="F3 Arena Power (optional)">
+              <CommaFormattedNumberInput
+                className="control"
+                id="manual-f3-power"
+                value={manualF3Power}
+                placeholder="Leave blank if unknown"
+                onChange={setManualF3Power}
+                data-testid="manual-member-f3-input"
+              />
+            </Field>
+          </div>
         </Modal>
       )}
-    </StepLayout>
+      </StepLayout>
+    </>
   );
 }

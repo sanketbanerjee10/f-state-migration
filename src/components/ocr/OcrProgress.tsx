@@ -58,7 +58,7 @@ export function OcrProgress({
 
       {!processing && error && (
         <div className="ocr-feedback-banner ocr-feedback-error" role="alert">
-          <XCircle size={16} className="feedback-icon" />
+          <XCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
             <strong>We couldn't read this screenshot</strong>
             <p>{error || 'Try another image or enter the details manually below.'}</p>
@@ -66,7 +66,7 @@ export function OcrProgress({
           {onRetry && (
             <button
               type="button"
-              className="button button-sm"
+              className="button button-sm ml-auto"
               onClick={onRetry}
               data-testid="retry-ocr-btn"
             >
@@ -78,7 +78,7 @@ export function OcrProgress({
 
       {!processing && !error && success && (
         <div className="ocr-feedback-banner ocr-feedback-success" role="status">
-          <CheckCircle size={16} className="feedback-icon" />
+          <CheckCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
             <strong>Your stats are ready!</strong>
             <p>Check the details below and correct anything that doesn't look right.</p>
@@ -88,7 +88,7 @@ export function OcrProgress({
 
       {!processing && !error && uncertain && (
         <div className="ocr-feedback-banner ocr-feedback-warning" role="status">
-          <AlertCircle size={16} className="feedback-icon" />
+          <AlertCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
             <strong>Some details need your attention</strong>
             <p>We couldn't read all the numbers clearly. Please check the values below.</p>

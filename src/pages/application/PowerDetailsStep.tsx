@@ -9,6 +9,7 @@ import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
 import { MigrationScoreBadge, VerifiedBadge, MigrationScoringGuide } from '../../components/MigrationScoringGuide';
+import { DismissibleToast } from '../../components/DismissibleToast';
 import { useApplicationDraft, type StepErrors, type ApplicationDraft } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import type { OcrDiagnostics } from '../../lib/ocr';
@@ -33,6 +34,7 @@ export function PowerDetailsStep() {
   const [ocrDiagnostics, setOcrDiagnostics] = useState<OcrDiagnostics | null>(null);
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
   const [dragging, setDragging] = useState(false);
+  const [scoreErrorToast, setScoreErrorToast] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -49,14 +51,14 @@ export function PowerDetailsStep() {
 
   const screenshotPresent = draft.hasScreenshot;
   const fieldLocked = (fieldKey: PowerDraftKey, value: string) =>
-    screenshotPresent && value.trim() !== '' && !draft.dirtyFields[fieldKey];
+    screenshotPresent && parseMagnitude(value) !== null && !draft.dirtyFields[fieldKey];
   // powerLocked is true only if ALL power fields are OCR-locked (drives section hint text)
   const powerKeys: PowerDraftKey[] = ['structurePower', 'techPower', 'troopPower', 'heroPower', 'modVehiclePower'];
   const powerLocked =
     screenshotPresent &&
     powerKeys.every((k) => {
       const v = String(draft[k] ?? '');
-      return v.trim() !== '' && !draft.dirtyFields[k];
+      return parseMagnitude(v) !== null && !draft.dirtyFields[k];
     });
 
   // Calculate live migration score preview based on entered powers and DB thresholds
@@ -158,6 +160,12 @@ export function PowerDetailsStep() {
     const errors = validateStep('character');
     setStepErrors(errors);
     if (Object.keys(errors).length === 0) {
+      if (!scoreResult || scoreResult.score < 10 || scoreResult.score > 1000) {
+        setScoreErrorToast(
+          'Applicant data was not accepted because the calculated migration score must be between 10 and 1000. The data may be invalid.',
+        );
+        return;
+      }
       if (scoreResult?.tier) {
         setDraftField('tier', scoreResult.tier, false);
       }
@@ -166,13 +174,15 @@ export function PowerDetailsStep() {
   };
 
   return (
-    <StepLayout
-      navigationProps={{
-        onContinue: handleContinue,
-        continueLabel: 'Continue to Combat Power',
-        disabled: processing,
-      }}
-    >
+    <>
+      <DismissibleToast message={scoreErrorToast} onDismiss={() => setScoreErrorToast('')} />
+      <StepLayout
+        navigationProps={{
+          onContinue: handleContinue,
+          continueLabel: 'Continue to Combat Power',
+          disabled: processing,
+        }}
+      >
       {/* ── Section 1: Screenshot upload (optional) ── */}
       <FormSection number="01" title="Power details screenshot (optional)">
         <p className="hint" style={{ marginBottom: 10 }}>
@@ -256,7 +266,7 @@ export function PowerDetailsStep() {
           onRetry={handleReplaceClick}
         />
 
-        {import.meta.env.DEV && ocrDiagnostics && (
+        {/* {import.meta.env.DEV && ocrDiagnostics && (
           <details className="ocr-dev-tools" data-testid="ocr-dev-tools">
             <summary>OCR developer output</summary>
             <div className="ocr-dev-tools-grid">
@@ -279,7 +289,7 @@ export function PowerDetailsStep() {
               </section>
             </div>
           </details>
-        )}
+        )} */}
 
         {/* Replace / Remove actions after screenshot is loaded */}
         {draft.hasScreenshot && !processing && (
@@ -327,7 +337,7 @@ export function PowerDetailsStep() {
               className="control"
               id="playerName"
               value={draft.playerName}
-              maxLength={40}
+              maxLength={30}
               placeholder="e.g. GOD Sankeyyy"
               onChange={(e) => {
                 setDraftField('playerName', e.target.value, true);
@@ -348,7 +358,7 @@ export function PowerDetailsStep() {
               className="control"
               id="highestPowerOnRecord"
               value={draft.highestPowerOnRecord}
-              placeholder="Calculated from the power breakdown"
+              placeholder="Current Power"
               disabled
               onChange={() => undefined}
               data-testid="ocr-highest-power"
@@ -357,8 +367,7 @@ export function PowerDetailsStep() {
 
           <Field
             id="kills"
-            label="Kills"
-            required
+            label="Kills (optional)"
             error={stepErrors.kills}
             hint="From profile card skull icon"
           >
@@ -579,6 +588,7 @@ export function PowerDetailsStep() {
           thresholds={thresholds}
         />
       </FormSection>
-    </StepLayout>
+      </StepLayout>
+    </>
   );
 }

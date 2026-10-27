@@ -28,13 +28,16 @@ describe('Wizard navigation step configuration', () => {
 });
 
 describe('Wizard draft validation rules', () => {
-  it('validates state numbers strictly between 1 and 32767', () => {
+  it('validates state numbers between 1 and 9999', () => {
     expect(parseStateNumber('565')).toBe(565);
     expect(parseStateNumber('1')).toBe(1);
-    expect(parseStateNumber('32767')).toBe(32767);
+    expect(parseStateNumber('9999')).toBe(9999);
     expect(parseStateNumber('0')).toBeNull();
-    expect(parseStateNumber('32768')).toBeNull();
+    expect(parseStateNumber('10000')).toBeNull();
+    expect(parseStateNumber('32767')).toBeNull();
     expect(parseStateNumber('abc')).toBeNull();
+    expect(parseStateNumber('1.5')).toBeNull();
+    expect(parseStateNumber(' 565')).toBeNull();
   });
 
   it('validates arena powers and kills magnitudes with shorthand M/B/K support', () => {

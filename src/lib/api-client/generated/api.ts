@@ -1305,7 +1305,7 @@ export const getUpdateAdminTierThresholdUrl = (name: string,) => {
 
 
 
-  return `/api/admin/tier-thresholds/${encodeURIComponent(name)}`
+  return `/api/admin/tier-thresholds/${name}`
 }
 
 /**
@@ -1477,3 +1477,4 @@ export const useUpdateAdminAlliance = <TError = ErrorType<BadRequestResponse | U
       > => {
       return useMutation(getUpdateAdminAllianceMutationOptions(options));
     }
+

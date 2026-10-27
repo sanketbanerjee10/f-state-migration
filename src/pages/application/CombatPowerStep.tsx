@@ -40,20 +40,22 @@ export function CombatPowerStep() {
           label="Current state"
           required
           error={stepErrors.currentState}
-          hint="Enter your current state number (1–32767). State 565 is your target destination."
         >
           <input
             className="control"
             id="currentState"
+            type="text"
             value={draft.currentState}
-            max={32767}
+            maxLength={4}
             onChange={(e) => {
+              if (!/^\d{0,4}$/.test(e.target.value)) return;
               setDraftField('currentState', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentState: '' }));
             }}
-            placeholder="Search or enter a state number (e.g. 520)"
+            placeholder="Enter a state number (e.g. 565)"
             list="known-state-options"
             inputMode="numeric"
+            pattern="[0-9]*"
             data-testid="current-state"
           />
           <datalist id="known-state-options">
@@ -68,7 +70,6 @@ export function CombatPowerStep() {
           label="Current alliance"
           required
           error={stepErrors.currentAlliance}
-          hint="Your current alliance name or tag in your state"
         >
           <input
             className="control"
@@ -79,7 +80,7 @@ export function CombatPowerStep() {
               setDraftField('currentAlliance', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentAlliance: '' }));
             }}
-            placeholder="Your alliance name or tag"
+            placeholder="Your alliance full name"
             data-testid="current-alliance"
           />
         </Field>
@@ -104,7 +105,7 @@ export function CombatPowerStep() {
                 className="control"
                 id={key}
                 value={draft[key]}
-                placeholder={['e.g. 12,500,000', 'e.g. 11,000,000', 'e.g. 10,000,000'][index]}
+                placeholder={['e.g. 180,500,000', 'e.g. 99,183,574', 'e.g. 22,349,680'][index]}
                 onChange={(value) => {
                   setDraftField(key, value, true);
                   setStepErrors((old) => ({ ...old, [key]: '' }));

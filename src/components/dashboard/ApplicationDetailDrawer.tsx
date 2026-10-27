@@ -545,18 +545,30 @@ export function ApplicationDetailDrawer({
                             <div
                               style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
                                 gap: 4,
                                 fontSize: 11,
                                 color: '#94a3b8',
                               }}
                             >
                               <div>
+                                State:{' '}
+                                <strong style={{ color: '#e2e8f0' }}>
+                                  {p.currentState}
+                                </strong>
+                              </div>
+                              <div>
                                 Power:{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
-                                  {Number(
-                                    p.highestPowerOnRecord || p.f1ArenaPower,
-                                  ).toLocaleString()}
+                                  {Number(p.highestPowerOnRecord).toLocaleString()}
+                                </strong>
+                              </div>
+                              <div>
+                                F1:{' '}
+                                <strong style={{ color: '#e2e8f0' }}>
+                                  {p.f1ArenaPower !== null && p.f1ArenaPower > 0
+                                    ? Number(p.f1ArenaPower).toLocaleString()
+                                    : '—'}
                                 </strong>
                               </div>
                               <div>

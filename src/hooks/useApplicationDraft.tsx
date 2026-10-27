@@ -113,7 +113,7 @@ interface ApplicationDraftContextValue {
   addGroupMember: (member: GroupMember) => void;
   updateGroupMember: (id: string, updates: Partial<GroupMember>) => void;
   removeGroupMember: (id: string) => void;
-  clearDraft: () => void;
+  clearDraft: (preserveMigrationType?: boolean) => void;
   validateStep: (stepRouteOrKey: string) => StepErrors;
   validateAll: () => StepErrors;
 }
@@ -218,13 +218,17 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
           groupMembers: groupPlayers.map((gp: any) => ({
             id: gp.id || crypto.randomUUID(),
             playerName: gp.playerName,
+            currentState: String(gp.currentState ?? data.currentState ?? ''),
+            f1ArenaPower: gp.f1ArenaPower == null ? '' : String(gp.f1ArenaPower),
+            f2ArenaPower: gp.f2ArenaPower == null ? '' : String(gp.f2ArenaPower),
+            f3ArenaPower: gp.f3ArenaPower == null ? '' : String(gp.f3ArenaPower),
             highestPowerOnRecord: String(gp.highestPowerOnRecord),
             structurePower: String(gp.structurePower),
             techPower: String(gp.techPower),
             troopPower: String(gp.troopPower),
             heroPower: String(gp.heroPower),
             modVehiclePower: String(gp.modVehiclePower),
-            kills: String(gp.kills),
+            kills: String(gp.kills ?? ''),
             currentAlliance: gp.currentAlliance,
             isScreenshotVerified: Boolean(gp.isScreenshotVerified),
           })),
@@ -419,8 +423,12 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
     });
   };
 
-  const clearDraft = () => {
-    setDraft(initialDraft);
+  const clearDraft = (preserveMigrationType = false) => {
+    setDraft(
+      preserveMigrationType
+        ? { ...initialDraft, migrationType: draft.migrationType }
+        : initialDraft,
+    );
     setScreenshotFileState(null);
     setGroupScreenshotFileState(null);
     try {
@@ -444,8 +452,8 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         if (!parseMagnitude(draft.highestPowerOnRecord)) {
           errors.highestPowerOnRecord = 'Enter the five power breakdown values to calculate Power on Record.';
         }
-        if (!parseMagnitude(draft.kills)) {
-          errors.kills = 'Enter your kills value (e.g. 5,453,196 or 5.4M).';
+        if (draft.kills.trim() && parseMagnitude(draft.kills, true) === null) {
+          errors.kills = 'Enter zero or a valid kills value (e.g. 5,453,196 or 5.4M).';
         }
         // Power breakdown — required whether or not screenshot was uploaded
         if (!parseMagnitude(draft.structurePower)) {
@@ -470,7 +478,7 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
       case '/apply/combat': {
         // Step 2: Combat Power — state, alliance, arena powers
         if (!parseStateNumber(draft.currentState)) {
-          errors.currentState = 'Enter a valid state number (1–32767). State 565 is your destination.';
+          errors.currentState = 'Enter a valid state';
         }
         if (!draft.currentAlliance.trim()) {
           errors.currentAlliance = 'Enter your current alliance name or tag.';

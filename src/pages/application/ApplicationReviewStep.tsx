@@ -102,8 +102,18 @@ export function ApplicationReviewStep() {
               troopPower: Math.max(0, Math.round(parseMagnitude(m.troopPower) || 0)),
               heroPower: Math.max(0, Math.round(parseMagnitude(m.heroPower) || 0)),
               modVehiclePower: Math.max(0, Math.round(parseMagnitude(m.modVehiclePower) || 0)),
-              kills: Math.max(0, Math.round(parseMagnitude(m.kills) || 0)),
+              kills: m.kills.trim() ? Math.max(0, Math.round(parseMagnitude(m.kills, true) || 0)) : null,
               currentAlliance: (m.currentAlliance || draft.currentAlliance).trim(),
+              currentState: parseStateNumber(m.currentState || draft.currentState) as number,
+              ...(m.f1ArenaPower && parseMagnitude(m.f1ArenaPower)
+                ? { f1ArenaPower: Math.round(parseMagnitude(m.f1ArenaPower) as number) }
+                : {}),
+              ...(m.f2ArenaPower && parseMagnitude(m.f2ArenaPower)
+                ? { f2ArenaPower: Math.round(parseMagnitude(m.f2ArenaPower) as number) }
+                : {}),
+              ...(m.f3ArenaPower && parseMagnitude(m.f3ArenaPower)
+                ? { f3ArenaPower: Math.round(parseMagnitude(m.f3ArenaPower) as number) }
+                : {}),
               isScreenshotVerified: Boolean(m.isScreenshotVerified),
             }))
           : undefined;
@@ -130,7 +140,7 @@ export function ApplicationReviewStep() {
         f1ArenaPower: Math.round(parseMagnitude(draft.f1) as number),
         f2ArenaPower: Math.round(parseMagnitude(draft.f2) as number),
         f3ArenaPower: Math.round(parseMagnitude(draft.f3) as number),
-        kills: Math.round(parseMagnitude(draft.kills) as number),
+        kills: draft.kills.trim() ? Math.round(parseMagnitude(draft.kills, true) || 0) : null,
         preferredAllianceIds: anyAlliance ? [] : draft.preferredAlliances.map(Number),
         anyAlliance,
         migrationTier: autoCalculatedTier,
@@ -186,9 +196,7 @@ export function ApplicationReviewStep() {
       setSubmittedApplicationId(resolvedAppId);
       setIsUpdateSuccess(isEditing);
       idempotencyRef.current = null;
-      // NOTE: clearDraft() is deferred — called when user dismisses celebration or starts new app.
-      // Clearing here causes the wizard navigation to recompute steps (isGroup changes), which
-      // can unmount this component before the CelebrationModal ever renders.
+      clearDraft(true);
       setSuccess(true);
       setCelebrationOpen(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });

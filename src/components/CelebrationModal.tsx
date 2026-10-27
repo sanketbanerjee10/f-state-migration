@@ -147,9 +147,9 @@ export function CelebrationModal({
         <div style={{position: 'absolute', top: 10, right: 0}}>
           <img src="/images/dance-dancing.gif" width="90px" />
         </div> */}
-        <p className="celebration-success__eyebrow">
+        {/* <p className="celebration-success__eyebrow">
           {isUpdate ? 'Changes saved' : 'Submission complete'}
-        </p>
+        </p> */}
 
         <h2 id="celebration-title">
           {isUpdate
@@ -275,15 +275,14 @@ export function CelebrationModal({
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gap: '6px',
           width: '100%',
-          maxWidth: '600px',
           marginTop: '10px',
         }}
       >
         {[
-          '/images/bully-maguire.gif',
-          '/images/dance-dancing.gif',
-          '/images/cat-dance-cat.gif',
-          '/images/funny-man-and-dog-dancing.gif',
+          'https://i.ibb.co/4gtF7Jj3/bully-maguire.gif',
+          'https://i.ibb.co/wFczzZ7K/dance-dancing.gif',
+          'https://i.ibb.co/0pbyQv0b/cat-dance-cat.gif',
+          'https://i.ibb.co/rGF4KM46/funny-man-and-dog-dancing.gif',
         ].map((src, index) => (
           <div
             key={src}

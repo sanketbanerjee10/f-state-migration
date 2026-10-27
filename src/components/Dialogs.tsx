@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { Check, ShieldCheck } from 'lucide-react';
+import { Check, ShieldCheck, X } from 'lucide-react';
 
-export function Modal({ title, children, onClose, actions, className }: {
-  title: string; children: React.ReactNode; onClose: () => void; actions: React.ReactNode; className?: string;
+export function Modal({ title, children, onClose, actions, className, showCloseButton = false, scrollBodyToTopKey }: {
+  title: string; children: React.ReactNode; onClose: () => void; actions: React.ReactNode; className?: string; showCloseButton?: boolean; scrollBodyToTopKey?: number;
 }) {
   const onCloseRef = useRef(onClose);
+  const bodyRef = useRef<HTMLDivElement>(null);
   onCloseRef.current = onClose;
 
   useEffect(() => {
@@ -15,10 +16,23 @@ export function Modal({ title, children, onClose, actions, className }: {
     return () => window.removeEventListener('keydown', listener);
   }, []);
 
+  useEffect(() => {
+    if (scrollBodyToTopKey !== undefined) {
+      bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [scrollBodyToTopKey]);
+
   return <div className="dialog-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
     <section className={`dialog ${className || ''}`} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-      <h2 id="dialog-title">{title}</h2>
-      {children}
+      <div className="dialog-header">
+        <h2 id="dialog-title">{title}</h2>
+        {showCloseButton && (
+          <button type="button" className="dialog-close" onClick={onClose} aria-label="Close dialog">
+            <X size={18} aria-hidden="true" />
+          </button>
+        )}
+      </div>
+      <div ref={bodyRef} className="dialog-body">{children}</div>
       <div className="dialog-actions">
         {actions}
       </div>
