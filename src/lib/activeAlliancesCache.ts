@@ -1,4 +1,4 @@
-import { getActiveAlliances, type Alliance } from '@/lib/api-client';
+import { getActiveAlliances, getGetActiveAlliancesQueryKey, useGetActiveAlliances, type Alliance } from '@/lib/api-client';
 
 const ACTIVE_ALLIANCES_CACHE_KEY = 'state565_active_alliances';
 const ACTIVE_ALLIANCES_CACHE_TTL = 24 * 60 * 60 * 1000;
@@ -57,4 +57,16 @@ export async function getCachedActiveAlliances(signal?: AbortSignal): Promise<Al
     // Keep the fetched result available even when browser storage is unavailable.
   }
   return alliances;
+}
+
+export function useCachedActiveAlliances(enabled = true) {
+  return useGetActiveAlliances({
+    query: {
+      queryKey: getGetActiveAlliancesQueryKey(),
+      queryFn: ({ signal }) => getCachedActiveAlliances(signal),
+      enabled,
+      staleTime: ACTIVE_ALLIANCES_CACHE_TTL,
+      refetchOnWindowFocus: false,
+    },
+  });
 }

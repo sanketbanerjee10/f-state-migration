@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Edit2, ExternalLink, LoaderCircle, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useSubmitMigrationApplication } from '@/lib/api-client';
@@ -8,12 +9,14 @@ import { StepLayout } from '../../components/form/StepLayout';
 import { CelebrationModal } from '../../components/CelebrationModal';
 import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
+import { ApplicationDeletedError } from '../../lib/applicationDetailsCache';
 import { saveTrackedApplication } from '../../lib/trackedApplications';
 import type { MigrationTier, MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function ApplicationReviewStep() {
+  const { t } = useTranslation();
   const { draft, validateAll, clearDraft } = useApplicationDraft();
   const { prevStep, goToStep, isGroup } = useWizardNavigation();
   const [, setLocation] = useLocation();
@@ -125,10 +128,10 @@ export function ApplicationReviewStep() {
 
       const autoCalculatedTier: MigrationTier = (() => {
         const s = parseMagnitude(draft.structurePower) || 0;
-        const t = parseMagnitude(draft.techPower) || 0;
+        const tech = parseMagnitude(draft.techPower) || 0;
         const h = parseMagnitude(draft.heroPower) || 0;
         const v = parseMagnitude(draft.modVehiclePower) || 0;
-        const scoreRes = calculateMigrationScoreFromRaw(s, t, h, v, thresholds);
+        const scoreRes = calculateMigrationScoreFromRaw(s, tech, h, v, thresholds);
         return (scoreRes?.tier || draft.tier || 'Regular') as MigrationTier;
       })();
 
@@ -169,6 +172,7 @@ export function ApplicationReviewStep() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) {
+          if (res.status === 404) throw new ApplicationDeletedError();
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.error || 'Failed to update application');
         }
@@ -200,9 +204,13 @@ export function ApplicationReviewStep() {
       setSuccess(true);
       setCelebrationOpen(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
+    } catch (error) {
       setConfirmOpen(false);
-      setSubmitError('The application could not be submitted. Your entries are still here; please try again.');
+      setSubmitError(
+        error instanceof ApplicationDeletedError
+          ? t('wizard.review.deleted')
+          : t('wizard.review.submitFailed'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -245,7 +253,7 @@ export function ApplicationReviewStep() {
       navigationProps={{
         onContinue: handleOpenConfirm,
         onBack: prevStep,
-        continueLabel: 'Confirm',
+        continueLabel: t('wizard.review.confirm'),
         // backLabel: isGroup ? 'Back to Group Roster' : 'Back to Migration Details',
         submitting,
         submitMode: true,
@@ -253,18 +261,18 @@ export function ApplicationReviewStep() {
       formError={submitError}
     >
       {celebrationModal}
-      <FormSection number={isGroup ? '05' : '04'} title="Review application before submission">
+      <FormSection number={isGroup ? '05' : '04'} title={t('wizard.review.title')}>
         <div className="review-summary-card" data-testid="review-summary-card">
           <div className="review-summary-top">
             <h3 className="review-summary-title">
               <ShieldCheck size={18} className="review-shield-icon" />
-              Complete Application Overview
+              {t('wizard.review.overview')}
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <div className="review-summary-tag">Final Check</div>
+              <div className="review-summary-tag">{t('wizard.review.finalCheck')}</div>
               {draft.hasScreenshot && (
                 <div className="verified-badge" data-testid="verified-badge">
-                  <CheckCircle2 size={13} /> Screenshot Verified
+                  <CheckCircle2 size={13} /> {t('wizard.review.verified')}
                 </div>
               )}
             </div>
@@ -274,30 +282,30 @@ export function ApplicationReviewStep() {
             {/* Stage 1: Character Details */}
             <div className="review-section-box">
               <div className="review-section-title-row">
-                <strong>1. Character Details</strong>
+                <strong>{t('wizard.review.characterTitle')}</strong>
                 <button
                   type="button"
                   className="link-button"
                   onClick={() => goToStep('character')}
                   data-testid="edit-character-summary"
                 >
-                  <Edit2 size={12} /> Edit
+                  <Edit2 size={12} /> {t('wizard.review.edit')}
                 </button>
               </div>
-              <div className="review-item"><span>Name:</span> <strong>{draft.playerName || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Kills:</span> <strong>{draft.kills || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Power:</span> <strong>{draft.highestPowerOnRecord || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Structure Power:</span> <strong>{draft.structurePower || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Tech Power:</span> <strong>{draft.techPower || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Troop Power:</span> <strong>{draft.troopPower || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Hero Power:</span> <strong>{draft.heroPower || 'Not provided'}</strong></div>
-              <div className="review-item"><span>Vehicle Power:</span> <strong>{draft.modVehiclePower || 'Not provided'}</strong></div>
+              <div className="review-item"><span>{t('common.labels.name')}</span> <strong>{draft.playerName || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.kills')}</span> <strong>{draft.kills || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.power')}</span> <strong>{draft.highestPowerOnRecord || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.structurePower')}</span> <strong>{draft.structurePower || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.techPower')}</span> <strong>{draft.techPower || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.troopPower')}</span> <strong>{draft.troopPower || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.heroPower')}</span> <strong>{draft.heroPower || t('wizard.review.notProvided')}</strong></div>
+              <div className="review-item"><span>{t('common.labels.vehiclePower')}</span> <strong>{draft.modVehiclePower || t('wizard.review.notProvided')}</strong></div>
               {(() => {
                 const s = parseMagnitude(draft.structurePower) || 0;
-                const t = parseMagnitude(draft.techPower) || 0;
+                const tech = parseMagnitude(draft.techPower) || 0;
                 const h = parseMagnitude(draft.heroPower) || 0;
                 const v = parseMagnitude(draft.modVehiclePower) || 0;
-                const scoreRes = calculateMigrationScoreFromRaw(s, t, h, v, thresholds);
+                const scoreRes = calculateMigrationScoreFromRaw(s, tech, h, v, thresholds);
                 if (!scoreRes) return null;
                 return (
                   <div
@@ -308,9 +316,9 @@ export function ApplicationReviewStep() {
                       borderTop: '1px dashed rgba(255, 255, 255, 0.08)',
                     }}
                   >
-                    <span>Calculated Score:</span>
+                    <span>{t('wizard.review.score')}</span>
                     <strong style={{ color: TIER_COLORS[scoreRes.tier].text }}>
-                      {scoreRes.score.toFixed(2)} ({scoreRes.tier})
+                      {scoreRes.score.toFixed(2)} ({t(`wizard.preferences.tiers.${scoreRes.tier.toLowerCase()}`)})
                     </strong>
                   </div>
                 );
@@ -320,47 +328,47 @@ export function ApplicationReviewStep() {
             {/* Stage 2: Combat Power */}
             <div className="review-section-box">
               <div className="review-section-title-row">
-                <strong>2. Combat Power</strong>
+                <strong>{t('wizard.review.combatTitle')}</strong>
                 <button
                   type="button"
                   className="link-button"
                   onClick={() => goToStep('combat')}
                   data-testid="edit-combat-summary"
                 >
-                  <Edit2 size={12} /> Edit
+                  <Edit2 size={12} /> {t('wizard.review.edit')}
                 </button>
               </div>
-              <div className="review-item"><span>Current State:</span> <strong>State {draft.currentState || '—'}</strong></div>
-              <div className="review-item"><span>Current Alliance:</span> <strong>{draft.currentAlliance || '—'}</strong></div>
-              <div className="review-item"><span>F1 Arena Power:</span> <strong>{draft.f1 || '—'}</strong></div>
-              <div className="review-item"><span>F2 Arena Power:</span> <strong>{draft.f2 || '—'}</strong></div>
-              <div className="review-item"><span>F3 Arena Power:</span> <strong>{draft.f3 || '—'}</strong></div>
+              <div className="review-item"><span>{t('common.labels.state')}</span> <strong>{t('wizard.review.currentStateNumber', { state: draft.currentState || '—' })}</strong></div>
+              <div className="review-item"><span>{t('common.labels.alliance')}</span> <strong>{draft.currentAlliance || '—'}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.f1')}</span> <strong>{draft.f1 || '—'}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.f2')}</span> <strong>{draft.f2 || '—'}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.f3')}</span> <strong>{draft.f3 || '—'}</strong></div>
             </div>
 
             {/* Stage 3: Migration Details */}
             <div className="review-section-box">
               <div className="review-section-title-row">
-                <strong>3. Migration Details</strong>
+                <strong>{t('wizard.review.migrationTitle')}</strong>
                 <button
                   type="button"
                   className="link-button"
                   onClick={() => goToStep('migration')}
                   data-testid="edit-preferences-summary"
                 >
-                  <Edit2 size={12} /> Edit
+                  <Edit2 size={12} /> {t('wizard.review.edit')}
                 </button>
               </div>
-              <div className="review-item"><span>Migration Type:</span> <strong>{displayMigrationType}{displayMigrationType !== draft.migrationType && <span style={{ fontSize: 10, color: '#94a3b8', marginLeft: 6 }}>(no members added — treated as Individual)</span>}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.migrationType')}</span> <strong>{displayMigrationType === 'Group' ? t('common.labels.group') : t('common.labels.individual')}{displayMigrationType !== draft.migrationType && <span style={{ fontSize: 10, color: '#94a3b8', marginLeft: 6 }}>{t('wizard.review.individualNote')}</span>}</strong></div>
               {displayMigrationType === 'Group' && (
-                <div className="review-item"><span>Group Rep:</span> <strong>{draft.representative || 'Not specified'}</strong></div>
+                <div className="review-item"><span>{t('wizard.review.representative')}</span> <strong>{draft.representative || t('wizard.review.notSpecified')}</strong></div>
               )}
-              <div className="review-item"><span>Migration Tier:</span> <strong>{draft.tier || 'Regular'}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.tier')}</span> <strong>{t(`wizard.preferences.tiers.${(draft.tier || 'Regular').toLowerCase()}`)}</strong></div>
               <div className="review-item">
-                <span>Destinations:</span>
-                <strong>{draft.preferredAlliances.includes('any') ? 'Any alliance' : `${draft.preferredAlliances.length} selected`}</strong>
+                <span>{t('wizard.review.destinations')}</span>
+                <strong>{draft.preferredAlliances.includes('any') ? t('wizard.preferences.anyAlliance') : t('wizard.review.selected', { count: draft.preferredAlliances.length })}</strong>
               </div>
               <div className="review-item" style={{ marginTop: 6, display: 'block' }}>
-                <span style={{ display: 'block', marginBottom: 2 }}>Reason:</span>
+                <span style={{ display: 'block', marginBottom: 2 }}>{t('wizard.review.reason')}</span>
                 <p style={{ margin: 0, color: '#e2e8f0', fontSize: 11, fontStyle: 'italic', lineHeight: 1.4 }}>
                   "{draft.reason}"
                 </p>
@@ -373,8 +381,8 @@ export function ApplicationReviewStep() {
                 <div className="review-section-title-row">
                   <strong style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div>
-                      4. Group Roster  
-                      <div style={{fontSize: 10}}>({draft.groupMembers.length} imported members)</div>
+                      {t('wizard.review.rosterTitle')}
+                      <div style={{fontSize: 10}}>{t('wizard.review.importedCount', { count: draft.groupMembers.length })}</div>
                     </div> 
                   </strong>
                   <button
@@ -383,11 +391,11 @@ export function ApplicationReviewStep() {
                     onClick={() => goToStep('group-roster')}
                     data-testid="edit-roster-summary"
                   >
-                    <Edit2 size={12} /> Edit
+                    <Edit2 size={12} /> {t('wizard.review.edit')}
                   </button>
                 </div>
                 {draft.groupMembers.length === 0 ? (
-                  <p className="hint" style={{ margin: '4px 0 0' }}>No additional roster members imported.</p>
+                  <p className="hint" style={{ margin: '4px 0 0' }}>{t('wizard.review.noRoster')}</p>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8, marginTop: 8 }}>
                     {draft.groupMembers.map((m) => {
@@ -421,15 +429,15 @@ export function ApplicationReviewStep() {
                                 borderRadius: 3,
                               }}
                             >
-                              {mScore.score.toFixed(2)} · {mScore.tier}
+                              {mScore.score.toFixed(2)} · {t(`wizard.preferences.tiers.${mScore.tier.toLowerCase()}`)}
                             </span>
                           )}
                         </div>
                         <div style={{ color: '#94a3b8', marginTop: 3 }}>
-                          Power: {m.highestPowerOnRecord} · Kills: {m.kills}
+                          {t('common.labels.power')} {m.highestPowerOnRecord} · {t('common.labels.kills')} {m.kills}
                         </div>
                         <div style={{ color: '#64748b', fontSize: 10 }}>
-                          Alliance: {m.currentAlliance || draft.currentAlliance || '—'}
+                          {t('common.labels.alliance')} {m.currentAlliance || draft.currentAlliance || '—'}
                         </div>
                       </div>
                       );
@@ -444,7 +452,7 @@ export function ApplicationReviewStep() {
 
       {confirmOpen && (
         <Modal
-          title="Review Before Continuing"
+          title={t('wizard.review.beforeContinuing')}
           onClose={() => !submitting && setConfirmOpen(false)}
           actions={
             <>
@@ -455,7 +463,7 @@ export function ApplicationReviewStep() {
                 disabled={submitting}
                 data-testid="cancel-submit"
               >
-                Cancel
+                {t('common.actions.cancel')}
               </button>
               <button
                 type="button"
@@ -466,11 +474,11 @@ export function ApplicationReviewStep() {
               >
                 {submitting ? (
                   <>
-                    <LoaderCircle size={14} className="spin" /> Sending…
+                    <LoaderCircle size={14} className="spin" /> {t('common.status.sending')}
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 size={15} /> Submit
+                    <CheckCircle2 size={15} /> {t('wizard.review.submit')}
                   </>
                 )}
               </button>
@@ -478,24 +486,24 @@ export function ApplicationReviewStep() {
           }
         >
           <p>
-            Screenshots and recognized text are processed strictly in your browser and are never uploaded.
+            {t('wizard.review.privacy')}
           </p>
           {draft.hasScreenshot && (
             <p style={{ marginTop: 12, color: '#86efac', fontSize: 13 }}>
-              ✓ Your application will be marked as <strong>Screenshot Verified</strong>.
+              {t('wizard.review.verifiedExplanation')}<strong>{t('wizard.review.verified')}</strong>.
             </p>
           )}
           {isGroup && draft.groupMembers.length > 0 && (
             <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 13 }}>
-              👥 {draft.groupMembers.length} group roster members recorded with your application.
+              {t('wizard.review.membersRecorded', { count: draft.groupMembers.length })}
             </p>
           )}
           <p style={{ marginTop: 12 }}>
-            By submitting, you confirm that the information provided is accurate to the best of your knowledge and understand that State 565 leadership reserves the right to reject applications containing invalid or falsified information.
+            {t('wizard.review.terms')}
           </p>
 
           <p style={{ marginTop: 12 }}>
-            Are you ready to submit your application for State 565 leadership review?
+            {t('wizard.review.ready')}
           </p>
         </Modal>
       )}

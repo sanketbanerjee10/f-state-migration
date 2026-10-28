@@ -1,10 +1,12 @@
 import { PlusCircle, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyStateProps {
   onTrack: () => void;
 }
 
 export function EmptyState({ onTrack }: EmptyStateProps) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -22,12 +24,12 @@ export function EmptyState({ onTrack }: EmptyStateProps) {
       }}
     >
       <Search size={40} style={{ color: '#334155', marginBottom: 16 }} />
-      <h3 style={{ margin: '0 0 8px 0', color: '#f1f5f9', fontSize: '1.1rem' }}>Select an Application</h3>
+      <h3 style={{ margin: '0 0 8px 0', color: '#f1f5f9', fontSize: '1.1rem' }}>{t('components.tracker.select')}</h3>
       <p style={{ margin: '0 0 24px 0', fontSize: '0.88rem', maxWidth: 360, lineHeight: 1.5 }}>
-        Click an application from the list to view its status, player details, and score breakdown — or track a new one.
+        {t('components.tracker.emptyDescription')}
       </p>
       <button type="button" className="button button-primary" onClick={onTrack} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-        <PlusCircle size={16} /> Track Application
+        <PlusCircle size={16} /> {t('components.tracker.title')}
       </button>
     </div>
   );

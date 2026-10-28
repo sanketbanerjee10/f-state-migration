@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
+import { useTranslation } from 'react-i18next';
 
 export function StepProgress() {
   const { steps, stepNumber, totalSteps, currentIndex, goToStep } = useWizardNavigation();
+  const { t } = useTranslation();
   const [blockedNotice, setBlockedNotice] = useState<string>('');
 
   const handlePillClick = (stepParam: string) => {
@@ -11,13 +13,13 @@ export function StepProgress() {
     if (!result.success) {
       const errKeys = Object.keys(result.errors);
       const firstMsg = result.errors[errKeys[0]];
-      setBlockedNotice(firstMsg || 'Please complete the required fields in the current step before advancing.');
+      setBlockedNotice(firstMsg || t('wizard.progress.completeRequired'));
       setTimeout(() => setBlockedNotice(''), 4500);
     }
   };
 
   return (
-    <div className="wizard-progress-card" aria-label="Application progress">
+    <div className="wizard-progress-card" aria-label={t('wizard.progress.label')}>
       {/* Progress bar */}
       <div
         className="wizard-progress-track"
@@ -25,7 +27,7 @@ export function StepProgress() {
         aria-valuenow={stepNumber}
         aria-valuemin={1}
         aria-valuemax={totalSteps}
-        aria-label={`Progress: Step ${stepNumber} of ${totalSteps}`}
+        aria-label={t('wizard.progress.progress', { stepNumber, totalSteps })}
         data-testid="step-progress-label"
       >
         <div
@@ -35,7 +37,7 @@ export function StepProgress() {
       </div>
       
       {/* Clickable step pills */}
-      <div className="wizard-step-pills" role="tablist" aria-label="Form steps">
+      <div className="wizard-step-pills" role="tablist" aria-label={t('wizard.progress.stepsLabel')}>
         {steps.map((step, index) => {
           const isActive = index === currentIndex;
           const isCompleted = index < currentIndex;
@@ -45,7 +47,7 @@ export function StepProgress() {
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-label={`Step ${index + 1}: ${step.title}`}
+              aria-label={t('wizard.progress.stepLabel', { index: index + 1, title: step.title })}
               className={`wizard-step-pill-btn${isActive ? ' is-active' : ''}${isCompleted ? ' is-completed' : ''}`}
               onClick={() => handlePillClick(step.stepParam)}
               data-testid={`step-pill-${index + 1}`}

@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, LoaderCircle, Sparkles } from 'lucide-react';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
+import { useTranslation } from 'react-i18next';
 
 export interface StepNavigationProps {
   onContinue?: () => void;
@@ -20,9 +21,9 @@ export function StepNavigation({
   onContinue,
   onBack,
   onSkip,
-  continueLabel = 'Continue',
-  backLabel = 'Back',
-  skipLabel = 'Skip this step',
+  continueLabel,
+  backLabel,
+  skipLabel,
   showSkip = false,
   submitting = false,
   disabled = false,
@@ -30,6 +31,10 @@ export function StepNavigation({
   compact = false,
 }: StepNavigationProps) {
   const { isFirstStep, prevStep } = useWizardNavigation();
+  const { t } = useTranslation();
+  const translatedContinueLabel = continueLabel ?? t('wizard.navigation.continue');
+  const translatedBackLabel = backLabel ?? t('wizard.navigation.back');
+  const translatedSkipLabel = skipLabel ?? t('wizard.navigation.skip');
 
   const handleBack = () => {
     if (onBack) {
@@ -53,7 +58,7 @@ export function StepNavigation({
             disabled={submitting}
             data-testid={compact ? 'wizard-back-btn-top' : 'wizard-back-btn'}
           >
-            <ArrowLeft size={15} /> {backLabel}
+            <ArrowLeft size={15} /> {translatedBackLabel}
           </button>
         )}
       </div>
@@ -67,7 +72,7 @@ export function StepNavigation({
             disabled={submitting}
             data-testid={compact ? 'wizard-skip-btn-top' : 'wizard-skip-btn'}
           >
-            {skipLabel}
+            {translatedSkipLabel}
           </button>
         )}
 
@@ -80,15 +85,15 @@ export function StepNavigation({
         >
           {submitting ? (
             <>
-              <LoaderCircle size={15} className="spin" /> Sending…
+              <LoaderCircle size={15} className="spin" /> {t('common.status.sending')}
             </>
           ) : submitMode ? (
             <>
-              <Sparkles size={15} /> {continueLabel || 'Submit application'}
+              <Sparkles size={15} /> {continueLabel ?? t('common.actions.submitApplication')}
             </>
           ) : (
             <>
-              {continueLabel} <ArrowRight size={15} />
+              {translatedContinueLabel} <ArrowRight size={15} />
             </>
           )}
         </button>

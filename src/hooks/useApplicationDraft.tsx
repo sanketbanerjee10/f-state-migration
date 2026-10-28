@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import type { GroupMember, MigrationTier, MigrationType } from '../types/application';
 import type { ExtractedPlayerFields } from '../lib/ocr';
 import { parseMagnitude, parseStateNumber } from '../lib/parsers';
+import { isApplicationDeletedError, useApplicationDetails } from '../lib/applicationDetailsCache';
 
 const DRAFT_STORAGE_KEY = 'state565_application_draft_v4';
 
@@ -103,6 +104,8 @@ interface ApplicationDraftContextValue {
   screenshotFile: File | null;
   groupScreenshotFile: File | null;
   isLoadingEdit: boolean;
+  editApplicationDeleted: boolean;
+  editApplicationError: string;
   cancelEdit: () => void;
   setDraftField: <K extends keyof ApplicationDraft>(key: K, value: ApplicationDraft[K], isUserEdit?: boolean) => void;
   applyOcrResults: (extracted: ExtractedPlayerFields, file?: File | null) => void;
@@ -154,22 +157,19 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
   const [screenshotFile, setScreenshotFileState] = useState<File | null>(null);
   const [groupScreenshotFile, setGroupScreenshotFileState] = useState<File | null>(null);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
+  const [editApplicationDeleted, setEditApplicationDeleted] = useState(false);
+  const [editApplicationError, setEditApplicationError] = useState('');
+  const editId = new URLSearchParams(window.location.search).get('edit') || '';
+  const editApplication = useApplicationDetails(editId, Boolean(editId) && draft.editingApplicationId !== editId);
 
-  // Check URL query parameters for edit=<id>
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const editId = searchParams.get('edit');
-    if (!editId) return;
+    setIsLoadingEdit(editApplication.isFetching);
+    setEditApplicationDeleted(isApplicationDeletedError(editApplication.error));
+    setEditApplicationError(editApplication.error instanceof Error ? editApplication.error.message : '');
 
-    if (draft.editingApplicationId === editId) return;
+    const data = editApplication.data;
+    if (!data) return;
 
-    setIsLoadingEdit(true);
-    fetch(`/api/applications/${encodeURIComponent(editId)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load application');
-        return res.json();
-      })
-      .then((data) => {
         const applicantPlayer = data.players?.find((p: any) => p.isApplicant);
         const groupPlayers = data.players?.filter((p: any) => !p.isApplicant) || [];
         const ref = `565-${data.id.replaceAll('-', '').slice(0, 12).toUpperCase()}`;
@@ -236,14 +236,7 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
           groupScreenshotFileName: '',
           dirtyFields: {},
         });
-      })
-      .catch((err) => {
-        console.error('Error loading application for editing:', err);
-      })
-      .finally(() => {
-        setIsLoadingEdit(false);
-      });
-  }, [window.location.search]);
+  }, [editApplication.data, editApplication.error, editApplication.isFetching]);
 
   // Sync draft to storage on changes
   useEffect(() => {
@@ -447,29 +440,29 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
       case '/': {
         // Step 1: Character Details — screenshot is optional; manual entry is allowed
         if (!draft.playerName.trim()) {
-          errors.playerName = 'Enter your in-game name.';
+          errors.playerName = 'wizard.validation.gameName';
         }
         if (!parseMagnitude(draft.highestPowerOnRecord)) {
-          errors.highestPowerOnRecord = 'Enter the five power breakdown values to calculate Power on Record.';
+          errors.highestPowerOnRecord = 'wizard.validation.powerBreakdown';
         }
         if (draft.kills.trim() && parseMagnitude(draft.kills, true) === null) {
-          errors.kills = 'Enter zero or a valid kills value (e.g. 5,453,196 or 5.4M).';
+          errors.kills = 'wizard.validation.kills';
         }
         // Power breakdown — required whether or not screenshot was uploaded
         if (!parseMagnitude(draft.structurePower)) {
-          errors.structurePower = 'Enter Structure Power (e.g. 84,785,628 or 84M).';
+          errors.structurePower = 'wizard.validation.structure';
         }
         if (!parseMagnitude(draft.techPower)) {
-          errors.techPower = 'Enter Tech Power (e.g. 19,187,725 or 19M).';
+          errors.techPower = 'wizard.validation.tech';
         }
         if (!parseMagnitude(draft.troopPower)) {
-          errors.troopPower = 'Enter Troop Power (e.g. 66,198,020 or 66M).';
+          errors.troopPower = 'wizard.validation.troop';
         }
         if (!parseMagnitude(draft.heroPower)) {
-          errors.heroPower = 'Enter Hero Power (e.g. 62,634,222 or 62M).';
+          errors.heroPower = 'wizard.validation.hero';
         }
         if (!parseMagnitude(draft.modVehiclePower)) {
-          errors.modVehiclePower = 'Enter Mod Vehicle Power (e.g. 9,436,786 or 9M).';
+          errors.modVehiclePower = 'wizard.validation.vehicle';
         }
         break;
       }
@@ -478,19 +471,19 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
       case '/apply/combat': {
         // Step 2: Combat Power — state, alliance, arena powers
         if (!parseStateNumber(draft.currentState)) {
-          errors.currentState = 'Enter a valid state';
+          errors.currentState = 'wizard.validation.state';
         }
         if (!draft.currentAlliance.trim()) {
-          errors.currentAlliance = 'Enter your current alliance name or tag.';
+          errors.currentAlliance = 'wizard.validation.alliance';
         }
         if (!parseMagnitude(draft.f1)) {
-          errors.f1 = 'Enter a positive F1 arena power (e.g. 12.5M).';
+          errors.f1 = 'wizard.validation.f1';
         }
         if (!parseMagnitude(draft.f2)) {
-          errors.f2 = 'Enter a positive F2 arena power (e.g. 11M).';
+          errors.f2 = 'wizard.validation.f2';
         }
         if (!parseMagnitude(draft.f3)) {
-          errors.f3 = 'Enter a positive F3 arena power (e.g. 10M).';
+          errors.f3 = 'wizard.validation.f3';
         }
         break;
       }
@@ -499,22 +492,22 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
       case '/apply/migration': {
         // Step 3: Migration Details
         if (!draft.migrationType) {
-          errors.migrationType = 'Select individual or group migration.';
+          errors.migrationType = 'wizard.validation.migrationType';
         }
         if (draft.migrationType === 'Group' && !draft.representative.trim()) {
-          errors.representative = "Enter the group representative's in-game name.";
+          errors.representative = 'wizard.validation.representative';
         }
         if (!draft.preferredAlliances.length) {
-          errors.preferredAlliances = 'Choose "Any alliance" or select at least one destination.';
+          errors.preferredAlliances = 'wizard.validation.destinations';
         }
         if (draft.reason.trim().length < 10) {
-          errors.reason = 'Please write at least 10 characters explaining why you want to migrate.';
+          errors.reason = 'wizard.validation.reason';
         }
         if (draft.reason.length > 1000) {
-          errors.reason = 'Keep your reason to 1,000 characters or fewer.';
+          errors.reason = 'wizard.validation.reasonMax';
         }
         if (draft.comments.length > 1000) {
-          errors.comments = 'Keep additional comments to 1,000 characters or fewer.';
+          errors.comments = 'wizard.validation.commentsMax';
         }
         break;
       }
@@ -554,6 +547,8 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         screenshotFile,
         groupScreenshotFile,
         isLoadingEdit,
+        editApplicationDeleted,
+        editApplicationError,
         cancelEdit,
         setDraftField,
         applyOcrResults,

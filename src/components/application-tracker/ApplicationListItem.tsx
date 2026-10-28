@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { TrackedApplicationMeta } from '../../lib/trackedApplications';
 import { StatusPill } from './StatusPill';
 
@@ -10,6 +11,7 @@ interface ApplicationListItemProps {
 }
 
 export function ApplicationListItem({ item, isActive, onClick, onRemove }: ApplicationListItemProps) {
+  const { t } = useTranslation();
   return (
     <div
       onClick={onClick}
@@ -57,7 +59,7 @@ export function ApplicationListItem({ item, isActive, onClick, onRemove }: Appli
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        title="Remove from saved applications"
+        title={t('common.labels.removeSaved')}
         style={{ background: 'none', border: 'none', padding: 2, color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}
         onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
         onMouseLeave={(e) => (e.currentTarget.style.color = '#475569')}

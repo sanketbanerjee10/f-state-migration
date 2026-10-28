@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 
 interface CelebrationModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export function CelebrationModal({
   isUpdate = false,
   onNewApplication,
 }: CelebrationModalProps) {
+  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [copiedId, setCopiedId] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
@@ -153,8 +155,8 @@ export function CelebrationModal({
 
         <h2 id="celebration-title">
           {isUpdate
-            ? 'Application Successfully Updated!'
-            : 'Application Submitted Successfully!'}
+            ? t('components.celebration.updated')
+            : t('components.celebration.submitted')}
         </h2>
 
         <p
@@ -162,8 +164,8 @@ export function CelebrationModal({
           className="celebration-success__description"
         >
           {isUpdate
-            ? 'Your changes have been submitted for State 565 leadership review.'
-            : 'Your migration application has been submitted for State 565 leadership review.'}
+            ? t('components.celebration.updatedDescription')
+            : t('components.celebration.submittedDescription')}
         </p>
       </div>
 
@@ -172,7 +174,7 @@ export function CelebrationModal({
         <div className="celebration-success__data-row">
           <div className="celebration-success__data-details">
             <span className="celebration-success__label">
-              Application Reference
+              {t('components.celebration.reference')}
             </span>
             <strong className="celebration-success__data-value">
               {applicationReference}
@@ -183,14 +185,14 @@ export function CelebrationModal({
             type="button"
             className="button button-secondary celebration-success__copy"
             onClick={() => copyText(applicationReference, setCopiedRef)}
-            aria-label="Copy application reference"
+            aria-label={t('components.celebration.copyReference')}
           >
             {copiedRef ? (
               <CheckCircle2 size={14} />
             ) : (
               <Copy size={14} />
             )}
-            {copiedRef ? 'Copied!' : 'Copy'}
+            {copiedRef ? t('common.actions.copied') : t('common.actions.copy')}
           </button>
         </div>
 
@@ -199,7 +201,7 @@ export function CelebrationModal({
           <div className="celebration-success__data-row">
             <div className="celebration-success__data-details">
               <span className="celebration-success__label">
-                Application ID
+                {t('components.celebration.id')}
               </span>
               <code className="celebration-success__data-value">
                 {applicationId}
@@ -210,14 +212,14 @@ export function CelebrationModal({
               type="button"
               className="button button-secondary celebration-success__copy"
               onClick={() => copyText(applicationId, setCopiedId)}
-              aria-label="Copy application ID"
+              aria-label={t('components.celebration.copyId')}
             >
               {copiedId ? (
                 <CheckCircle2 size={14} />
               ) : (
                 <Copy size={14} />
               )}
-              {copiedId ? 'Copied!' : 'Copy'}
+              {copiedId ? t('common.actions.copied') : t('common.actions.copy')}
             </button>
           </div>
         )}
@@ -226,7 +228,7 @@ export function CelebrationModal({
         <div className="celebration-success__data-row celebration-success__tracking-row">
           <div className="celebration-success__data-details">
             <span className="celebration-success__label">
-              Tracking Link
+              {t('components.celebration.trackingLink')}
             </span>
             <span className="celebration-success__data-value celebration-success__tracking-url">
               {trackingUrl}
@@ -237,14 +239,14 @@ export function CelebrationModal({
             type="button"
             className="button button-secondary celebration-success__copy"
             onClick={() => copyText(trackingUrl, setCopiedLink)}
-            aria-label="Copy tracking link"
+            aria-label={t('components.celebration.copyLink')}
           >
             {copiedLink ? (
               <CheckCircle2 size={14} />
             ) : (
               <Copy size={14} />
             )}
-            {copiedLink ? 'Copied!' : 'Copy'}
+            {copiedLink ? t('common.actions.copied') : t('common.actions.copy')}
           </button>
         </div>
       </div>
@@ -252,20 +254,20 @@ export function CelebrationModal({
       <div className="celebration-success__notice celebration-success__notice--important">
         <div className="celebration-success__notice-title">
           <Info size={17} />
-          <strong>Important: Save your Application ID</strong>
+          <strong>{t('components.celebration.saveImportant')}</strong>
         </div>
         <p>
-          You will need your Application ID and Reference Number to access your application again. Keep them safe, as you may not be able to retrieve your application without them.
+          {t('components.celebration.saveDescription')}
         </p>
       </div>
 
       <div className="celebration-success__notice celebration-success__notice--warning">
         <div className="celebration-success__notice-title">
           <ShieldAlert size={17} />
-          <strong>Sharing Discretion Advisory</strong>
+          <strong>{t('components.celebration.discretion')}</strong>
         </div>
         <p>
-          Only share your application tracking details with people you trust. Anyone with these details may be able to view or change your application.
+          {t('components.celebration.discretionDescription')}
         </p>
       </div>
 
@@ -298,7 +300,7 @@ export function CelebrationModal({
           >
             <img
               src={src}
-              alt={`Celebration ${index + 1}`}
+              alt={t('components.celebration.imageAlt', { number: index + 1 })}
               loading="lazy"
               style={{
                 display: 'block',
@@ -317,7 +319,7 @@ export function CelebrationModal({
           onClick={handleGoToTracking}
         >
           <ExternalLink size={16} />
-          View &amp; Track Application
+          {t('components.celebration.viewTrack')}
         </button>
 
         {/* {onNewApplication && (

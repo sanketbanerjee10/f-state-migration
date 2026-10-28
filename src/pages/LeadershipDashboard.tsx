@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -15,6 +16,7 @@ import { ApplicationsSection } from '../components/dashboard/ApplicationsSection
 import { ApplicationDetailDrawer } from '../components/dashboard/ApplicationDetailDrawer';
 
 export function LeadershipDashboard() {
+  const { t } = useTranslation();
   const { session, loading, logout: authLogout } = useLeadershipSession();
   const [, setLocation] = useLocation();
   const client = useQueryClient();
@@ -34,7 +36,7 @@ export function LeadershipDashboard() {
       <main className="admin-shell">
         <div
           className="skeleton dashboard-skeleton"
-          aria-label="Checking leadership session"
+          aria-label={t('pages.leadership.checkingSession')}
         />
       </main>
     );

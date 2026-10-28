@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sofa, Info, ShieldCheck } from 'lucide-react';
 import {
   type MigrationScoreResult,
@@ -23,6 +24,7 @@ export function MigrationScoreBadge({
   showDetailsText = false,
   disableHover = false
 }: MigrationScoreBadgeProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +44,7 @@ export function MigrationScoreBadge({
   if (!scoreResult) return null;
 
   const tierMeta = TIER_COLORS[scoreResult.tier];
+  const translatedTier = t(`components.scoring.tiers.${scoreResult.tier.toLowerCase()}`);
   const iconSize = size === 'sm' ? 14 : size === 'lg' ? 20 : 16;
   const badgePadding = size === 'sm' ? '3px 6px' : '4px 8px';
 
@@ -57,8 +60,11 @@ export function MigrationScoreBadge({
           if(!disableHover) setOpen((prev) => !prev);
         }}
         onMouseEnter={() => { if(!disableHover) setOpen(true) }}
-        aria-label={`Migration score: ${scoreResult.score.toFixed(2)}, tier: ${tierMeta.label}`}
-        title={`Migration Score: ${scoreResult.score.toFixed(2)} (${tierMeta.label})${!disableHover ? ' — Click/hover for breakdown' : ''}`}
+        aria-label={t('components.scoring.aria', { score: scoreResult.score.toFixed(2), tier: translatedTier })}
+        title={t(disableHover ? 'components.scoring.tooltipSimple' : 'components.scoring.tooltip', {
+          score: scoreResult.score.toFixed(2),
+          tier: translatedTier,
+        })}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -105,7 +111,7 @@ export function MigrationScoreBadge({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontWeight: 700, color: tierMeta.text, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <Sofa size={14} color={tierMeta.iconColor} />
-              {tierMeta.label} Bracket
+              {t('components.scoring.bracket', { tier: translatedTier })}
             </span>
             <span
               style={{
@@ -115,13 +121,13 @@ export function MigrationScoreBadge({
                 color: tierMeta.text,
               }}
             >
-              {scoreResult.score.toFixed(2)} pts
+              {t('components.scoring.points', { score: scoreResult.score.toFixed(2) })}
             </span>
           </div>
 
           {playerName && (
             <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 6, fontWeight: 500 }}>
-              Player: <strong style={{ color: '#e2e8f0' }}>{playerName}</strong>
+              {t('components.scoring.player')} <strong style={{ color: '#e2e8f0' }}>{playerName}</strong>
             </div>
           )}
 
@@ -135,22 +141,22 @@ export function MigrationScoreBadge({
               marginBottom: 8,
             }}
           >
-            Estimated requirement:{' '}
-            <strong style={{ color: tierMeta.text }}>{scoreResult.passesRequired} passes</strong>
+            {t('components.scoring.requirement')}{' '}
+            <strong style={{ color: tierMeta.text }}>{t('components.scoring.passes', { passes: scoreResult.passesRequired })}</strong>
           </div>
 
           <div style={{ fontSize: 10, color: '#94a3b8', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 6 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-              <span>Base Formula:</span>
+              <span>{t('components.scoring.baseFormula')}</span>
               <strong style={{ color: '#cbd5e1' }}>{scoreResult.breakdown.baseComponent.toFixed(2)}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-              <span>Tech + Vehicle Bonus:</span>
+              <span>{t('components.scoring.techBonus')}</span>
               <strong style={{ color: '#cbd5e1' }}>+{scoreResult.breakdown.techVehicleBonus.toFixed(2)}</strong>
             </div>
             {scoreResult.breakdown.eliteTechBonus > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Elite Tech Bonus:</span>
+                <span>{t('components.scoring.eliteBonus')}</span>
                 <strong style={{ color: '#fde047' }}>+{scoreResult.breakdown.eliteTechBonus.toFixed(2)}</strong>
               </div>
             )}
@@ -164,7 +170,9 @@ export function MigrationScoreBadge({
 /**
  * Verified Badge Icon with Tooltip
  */
-export function VerifiedBadge({ tooltipText = 'Power figures verified via screenshot.' }: { tooltipText?: string }) {
+export function VerifiedBadge({ tooltipText }: { tooltipText?: string }) {
+  const { t } = useTranslation();
+  const label = tooltipText ?? t('components.scoring.verifiedPower');
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
@@ -174,7 +182,7 @@ export function VerifiedBadge({ tooltipText = 'Power figures verified via screen
       onMouseLeave={() => setShowTooltip(false)}
     >
       <span
-        aria-label="Verified via screenshot"
+        aria-label={t('components.scoring.verified')}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -210,7 +218,7 @@ export function VerifiedBadge({ tooltipText = 'Power figures verified via screen
             pointerEvents: 'none',
           }}
         >
-          {tooltipText}
+          {label}
         </div>
       )}
     </div>
@@ -228,14 +236,15 @@ interface MigrationScoringGuideProps {
 }
 
 export function MigrationScoringGuide({ currentTier, currentScore, thresholds }: MigrationScoringGuideProps) {
+  const { t: translate } = useTranslation();
   const { thresholds: liveThresholds } = useLiveTierThresholds();
-  const t = thresholds || liveThresholds || DEFAULT_THRESHOLDS;
+  const activeThresholds = thresholds || liveThresholds || DEFAULT_THRESHOLDS;
 
   let activeTier = currentTier;
   if (!activeTier && currentScore != null) {
-    if (currentScore >= t.eliteMin) activeTier = 'Elite';
-    else if (currentScore >= t.advancedMin) activeTier = 'Advanced';
-    else if (currentScore >= t.mediumMin) activeTier = 'Medium';
+    if (currentScore >= activeThresholds.eliteMin) activeTier = 'Elite';
+    else if (currentScore >= activeThresholds.advancedMin) activeTier = 'Advanced';
+    else if (currentScore >= activeThresholds.mediumMin) activeTier = 'Medium';
     else activeTier = 'Regular';
   }
 
@@ -247,27 +256,33 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
   }> = [
     {
       key: 'Regular',
-      range: `Score < ${t.mediumMin}`,
-      passes: t.regularPasses,
-      desc: `Standard migration threshold requiring ${t.regularPasses} base passes.`,
+      range: translate('components.scoring.mediumRange', { mediumMin: activeThresholds.mediumMin }),
+      passes: activeThresholds.regularPasses,
+      desc: translate('components.scoring.standard', { passes: activeThresholds.regularPasses }),
     },
     {
       key: 'Medium',
-      range: `Score ${t.mediumMin} – ${(t.advancedMin - 0.1).toFixed(1)}`,
-      passes: t.mediumPasses,
-      desc: `Intermediate bracket for active development profiles requiring ${t.mediumPasses} passes.`,
+      range: translate('components.scoring.advancedRange', {
+        mediumMin: activeThresholds.mediumMin,
+        advancedMax: (activeThresholds.advancedMin - 0.1).toFixed(1),
+      }),
+      passes: activeThresholds.mediumPasses,
+      desc: translate('components.scoring.intermediate', { passes: activeThresholds.mediumPasses }),
     },
     {
       key: 'Advanced',
-      range: `Score ${t.advancedMin} – ${(t.eliteMin - 0.1).toFixed(1)}`,
-      passes: t.advancedPasses,
-      desc: `High combat/tech efficiency tier requiring ${t.advancedPasses} passes.`,
+      range: translate('components.scoring.eliteRange', {
+        advancedMin: activeThresholds.advancedMin,
+        eliteMax: (activeThresholds.eliteMin - 0.1).toFixed(1),
+      }),
+      passes: activeThresholds.advancedPasses,
+      desc: translate('components.scoring.high', { passes: activeThresholds.advancedPasses }),
     },
     {
       key: 'Elite',
-      range: `Score ≥ ${t.eliteMin}`,
-      passes: t.elitePasses,
-      desc: `Top-tier powerhouse combat bracket requiring ${t.elitePasses} passes.`,
+      range: translate('components.scoring.highestRange', { eliteMin: activeThresholds.eliteMin }),
+      passes: activeThresholds.elitePasses,
+      desc: translate('components.scoring.top', { passes: activeThresholds.elitePasses }),
     },
   ];
 
@@ -285,13 +300,12 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
         <Info size={15} style={{ color: '#93c5fd' }} />
         <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>
-          Understanding Migration Scoring
+          {translate('components.scoring.title')}
         </span>
       </div>
 
       <p style={{ margin: '0 0 12px', fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
-        Scores are calculated from your verified structure, tech, hero, and vehicle power breakdown.
-        Higher combat efficiency places accounts in higher migration brackets requiring more passes.
+        {translate('components.scoring.description')}
       </p>
 
       {/* Grid of Brackets */}
@@ -332,7 +346,7 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
                   }}
                 >
                   <Sofa size={15} color={meta.iconColor} strokeWidth={2.4} />
-                  {meta.label}
+                  {translate(`components.scoring.tiers.${b.key.toLowerCase()}`)}
                 </span>
                 {isSelected && (
                   <span
@@ -345,7 +359,7 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
                       borderRadius: 10,
                     }}
                   >
-                    Your Bracket
+                    {translate('components.scoring.yourBracket')}
                   </span>
                 )}
               </div>
@@ -355,7 +369,8 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
               </div>
 
               <div style={{ fontSize: 10, color: '#94a3b8' }}>
-                Move Requirement: <strong style={{ color: meta.text }}>{b.passes} passes</strong>
+                {translate('components.scoring.moveRequirement')}{' '}
+                <strong style={{ color: meta.text }}>{translate('components.scoring.passes', { passes: b.passes })}</strong>
               </div>
             </div>
           );
@@ -372,7 +387,7 @@ export function MigrationScoringGuide({ currentTier, currentScore, thresholds }:
           borderTop: '1px dashed rgba(255, 255, 255, 0.06)',
         }}
       >
-        ⚠️ <strong>Note:</strong> This score is an automated estimation based on standard game power formulas and is intended as a guidance reference for your migration planning. Final pass requirements are confirmed in-game when the official migration window opens.
+        {translate('components.scoring.note')}
       </div>
     </div>
   );

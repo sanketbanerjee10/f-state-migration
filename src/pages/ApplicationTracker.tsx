@@ -8,14 +8,18 @@ import {
   type TrackedApplicationMeta,
 } from '../lib/trackedApplications';
 import type { AdminApplication } from '@/lib/api-client';
+import { isApplicationDeletedError, useApplicationDetails } from '@/lib/applicationDetailsCache';
 import { ApplicationListItem } from '../components/application-tracker/ApplicationListItem';
 import { ApplicationSidePane } from '../components/application-tracker/ApplicationSidePane';
 import { EmptyState } from '../components/application-tracker/EmptyState';
 import { PrivacyAdvisory } from '../components/application-tracker/PrivacyAdvisory';
 import { TrackModal } from '../components/application-tracker/TrackModal';
 import { getReferenceCode } from '../components/application-tracker/trackerUtils';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export function ApplicationTracker() {
+  const { t } = useTranslation();
   const params = useParams<{ id?: string }>();
   const [, setLocation] = useLocation();
 
@@ -24,8 +28,10 @@ export function ApplicationTracker() {
   const [application, setApplication] = useState<AdminApplication | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string>('');
+  const [applicationDeleted, setApplicationDeleted] = useState(false);
   const [panelOpen, setPanelOpen] = useState<boolean>(!!params.id);
   const [trackModalOpen, setTrackModalOpen] = useState(false);
+  const applicationQuery = useApplicationDetails(currentId);
 
   // Load saved applications on mount
   useEffect(() => {
@@ -40,52 +46,29 @@ export function ApplicationTracker() {
     }
   }, [params.id]);
 
-  // Fetch application details when currentId changes
   useEffect(() => {
-    if (!currentId) {
-      setApplication(null);
+    setLoading(applicationQuery.isFetching);
+    setApplicationDeleted(isApplicationDeletedError(applicationQuery.error));
+    setFetchError(applicationQuery.error instanceof Error ? applicationQuery.error.message : '');
+
+    const data = applicationQuery.data;
+    if (!data) {
+      if (!applicationQuery.isFetching) setApplication(null);
       return;
     }
 
-    let isMounted = true;
-    setLoading(true);
-    setFetchError('');
-
-    fetch(`/api/applications/${encodeURIComponent(currentId)}`)
-      .then(async (res) => {
-        if (!res.ok) {
-          if (res.status === 404) throw new Error('Application not found. Please verify the ID or reference.');
-          throw new Error('Could not load application details. Please try again.');
-        }
-        return res.json();
-      })
-      .then((data: AdminApplication) => {
-        if (!isMounted) return;
-        setApplication(data);
-
-        // Sync to local storage
-        saveTrackedApplication({
-          id: data.id,
-          reference: getReferenceCode(data.id),
-          gameName: data.gameName,
-          migrationType: data.migrationType,
-          status: data.status,
-          submittedAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
-          lastUpdated: data.updatedAt ? new Date(data.updatedAt).toISOString() : new Date().toISOString(),
-        });
-        setTrackedList(getTrackedApplications());
-      })
-      .catch((err) => {
-        if (!isMounted) return;
-        setFetchError(err instanceof Error ? err.message : 'Error fetching application.');
-        setApplication(null);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => { isMounted = false; };
-  }, [currentId]);
+    setApplication(data);
+    saveTrackedApplication({
+      id: data.id,
+      reference: getReferenceCode(data.id),
+      gameName: data.gameName,
+      migrationType: data.migrationType,
+      status: data.status,
+      submittedAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
+      lastUpdated: data.updatedAt ? new Date(data.updatedAt).toISOString() : new Date().toISOString(),
+    });
+    setTrackedList(getTrackedApplications());
+  }, [applicationQuery.data, applicationQuery.error, applicationQuery.isFetching]);
 
   const handleSelectApplication = (id: string) => {
     setCurrentId(id);
@@ -132,21 +115,24 @@ export function ApplicationTracker() {
       <header className="page-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <Link href="/" className="button button-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
-            <ArrowLeft size={14} /> Back
+            <ArrowLeft size={14} /> {t('common.actions.back')}
           </Link>
-          <button
-            type="button"
-            className="button button-primary"
-            onClick={openTrackModal}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.88rem' }}
-          >
-            <PlusCircle size={16} /> Track Application
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <LanguageSelector />
+            <button
+              type="button"
+              className="button button-primary"
+              onClick={openTrackModal}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.88rem' }}
+            >
+              <PlusCircle size={16} /> {t('components.tracker.title')}
+            </button>
+          </div>
         </div>
-        <div className="eyebrow" style={{ marginTop: 16 }}>STATE 565 MIGRATION</div>
-        <h1 className="form-title" style={{ margin: '6px 0' }}>Application Tracker</h1>
+        <div className="eyebrow" style={{ marginTop: 16 }}>{t('pages.tracker.eyebrow')}</div>
+        <h1 className="form-title" style={{ margin: '6px 0' }}>{t('pages.tracker.title')}</h1>
         <p className="intro" style={{ margin: 0 }}>
-          Inspect the live status, player details, and score breakdown for your migration submission.
+          {t('pages.tracker.description')}
         </p>
       </header>
 
@@ -165,7 +151,7 @@ export function ApplicationTracker() {
           ) : (
             <div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b', marginBottom: 8 }}>
-                Saved Applications ({trackedList.length})
+                {t('components.tracker.savedCount', { count: trackedList.length })}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {trackedList.map((item) => {
@@ -189,8 +175,10 @@ export function ApplicationTracker() {
         {/* ── Right: Side Detail Pane ── */}
         <ApplicationSidePane
           application={application}
+          applicationId={currentId}
           loading={loading}
           error={fetchError}
+          deleted={applicationDeleted}
           onClose={() => { setPanelOpen(false); setCurrentId(''); setLocation('/track'); }}
           onRemove={handleRemoveTracked}
           onTrack={openTrackModal}

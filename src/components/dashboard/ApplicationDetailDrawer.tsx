@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { ExternalLink, Maximize2, Sofa, Users, X } from 'lucide-react';
 import {
@@ -34,6 +35,7 @@ export function ApplicationDetailDrawer({
   onNotice,
   onSessionError,
 }: ApplicationDetailDrawerProps) {
+  const { t } = useTranslation();
   const client = useQueryClient();
   const [modalContent, setModalContent] = useState<{ title: string; text: string } | null>(null);
 
@@ -59,7 +61,7 @@ export function ApplicationDetailDrawer({
         id: applicationId,
         data: { status: newStatus },
       });
-      onNotice?.(`Application marked ${newStatus.toLowerCase()}.`);
+      onNotice?.(t('components.dashboard.statusUpdated', { status: newStatus.toLowerCase() }));
       void client.invalidateQueries({ queryKey: getGetAdminOverviewQueryKey() });
       void client.invalidateQueries({ queryKey: getListAdminApplicationsQueryKey() });
       void client.invalidateQueries({
@@ -71,7 +73,7 @@ export function ApplicationDetailDrawer({
         onSessionError?.();
       }
       onNotice?.(
-        error instanceof Error ? error.message : 'Failed to update status.',
+        error instanceof Error ? error.message : t('components.dashboard.statusFailed'),
       );
     }
   };
@@ -112,20 +114,20 @@ export function ApplicationDetailDrawer({
           className="detail-drawer"
           role="dialog"
           aria-modal="true"
-          aria-label="Application review"
+          aria-label={t('components.dashboard.review')}
           data-testid="application-detail"
         >
           <div className="detail-top">
             <div>
-              <span className="panel-kicker">APPLICATION REVIEW</span>
+              <span className="panel-kicker">{t('components.dashboard.reviewKicker')}</span>
               <h2>
                 {selected?.gameName ||
-                  (detail.isLoading ? 'Loading application…' : 'Application')}
+                  (detail.isLoading ? t('components.dashboard.loadingDetails') : t('components.dashboard.application'))}
               </h2>
             </div>
             <button
               className="icon-button"
-              aria-label="Close application details"
+              aria-label={t('components.tracker.closeDetails')}
               onClick={onClose}
               data-testid="close-detail"
             >
@@ -140,10 +142,10 @@ export function ApplicationDetailDrawer({
               <span>
                 {detail.error instanceof Error
                   ? detail.error.message
-                  : 'Failed to load application details.'}
+                  : t('components.dashboard.detailsFailed')}
               </span>
               <button className="button" onClick={() => void detail.refetch()}>
-                Retry
+                {t('common.actions.retry')}
               </button>
             </div>
           ) : (
@@ -153,10 +155,10 @@ export function ApplicationDetailDrawer({
                   <span
                     className={`status-pill status-${selected.status.toLowerCase()}`}
                   >
-                    {selected.status}
+                    {t(`common.status.${selected.status.toLowerCase()}`)}
                   </span>
                   <span>
-                    Submitted {new Date(selected.createdAt).toLocaleString()}
+                    {t('components.dashboard.submittedAt', { date: new Date(selected.createdAt).toLocaleString() })}
                   </span>
                 </div>
 
@@ -187,12 +189,12 @@ export function ApplicationDetailDrawer({
                         letterSpacing: '0.05em',
                       }}
                     >
-                      Application Decision
+                      {t('components.dashboard.decision')}
                     </span>
                     <span
                       className={`status-pill status-${selected.status.toLowerCase()}`}
                     >
-                      Current: {selected.status}
+                      {t('components.dashboard.currentStatus', { status: t(`common.status.${selected.status.toLowerCase()}`) })}
                     </span>
                   </div>
                   <div
@@ -219,7 +221,9 @@ export function ApplicationDetailDrawer({
                       onClick={() => void changeStatus('Approved')}
                       data-testid="accept-application-btn"
                     >
-                      {selected.status === 'Approved' ? '✓ Approved' : 'Approve'}
+                      {selected.status === 'Approved'
+                        ? t('common.actions.approved')
+                        : t('common.actions.approve')}
                     </button>
                     <button
                       type="button"
@@ -238,7 +242,9 @@ export function ApplicationDetailDrawer({
                       onClick={() => void changeStatus('Rejected')}
                       data-testid="reject-application-btn"
                     >
-                      {selected.status === 'Rejected' ? '✕ Rejected' : 'Reject'}
+                      {selected.status === 'Rejected'
+                        ? t('common.actions.rejected')
+                        : t('common.actions.reject')}
                     </button>
                     <button
                       type="button"
@@ -254,7 +260,9 @@ export function ApplicationDetailDrawer({
                       onClick={() => void changeStatus('Pending')}
                       data-testid="pending-application-btn"
                     >
-                      {selected.status === 'Pending' ? '● Pending' : 'Set to Pending'}
+                      {selected.status === 'Pending'
+                        ? t('components.dashboard.pendingStatus')
+                        : t('common.actions.pending')}
                     </button>
                   </div>
                 </div>
@@ -279,48 +287,46 @@ export function ApplicationDetailDrawer({
                       style={{ color: '#60a5fa', flexShrink: 0 }}
                     />
                     <span>
-                      <strong>Group Migration:</strong>{' '}
-                      {selected.players?.length || 1} people migrating together
-                      under representative{' '}
-                      <strong>
-                        {selected.groupRepresentative || selected.gameName}
-                      </strong>
-                      .
+                      <strong>{t('components.dashboard.groupMigration')}</strong>{' '}
+                      {t('components.dashboard.groupUnderRep', {
+                        count: selected.players?.length || 1,
+                        representative: selected.groupRepresentative || selected.gameName,
+                      })}
                     </span>
                   </div>
                 )}
 
                 <div className="detail-data">
                   <DetailItem
-                    label="Request type"
-                    value={selected.migrationType}
+                    label={t('components.dashboard.requestType')}
+                    value={t(`common.labels.${selected.migrationType.toLowerCase()}`)}
                   />
                   {selected.groupRepresentative && (
                     <DetailItem
-                      label="Group representative"
+                      label={t('components.dashboard.groupRepresentative')}
                       value={selected.groupRepresentative}
                     />
                   )}
                   <DetailItem
-                    label="Current state"
-                    value={`State ${selected.currentState}`}
+                    label={t('components.dashboard.currentState')}
+                    value={t('components.dashboard.stateNumber', { state: selected.currentState })}
                   />
                   <DetailItem
-                    label="Current alliance"
-                    value={selected.currentAlliance || 'None listed'}
+                    label={t('components.dashboard.currentAlliance')}
+                    value={selected.currentAlliance || t('components.dashboard.noneListed')}
                   />
                   <DetailItem
-                    label="Migration tier"
-                    value={selected.migrationTier}
+                    label={t('common.labels.tier')}
+                    value={t(`wizard.preferences.tiers.${selected.migrationTier.toLowerCase()}`)}
                   />
                   <DetailItem
-                    label="Preferred alliances"
+                    label={t('components.dashboard.preferenceListed')}
                     value={
                       selected.anyAlliance
-                        ? 'Any alliance'
+                        ? t('components.alliance.any')
                         : selected.preferredAlliances
                             .map((item) => `${item.tag} · ${item.name}`)
-                            .join(', ') || 'No preference listed'
+                            .join(', ') || t('components.dashboard.noPreference')
                     }
                   />
 
@@ -348,7 +354,7 @@ export function ApplicationDetailDrawer({
                         marginBottom: 6,
                       }}
                     >
-                      Player Tiers Breakdown
+                      {t('components.dashboard.tiersBreakdown')}
                     </span>
                     <div
                       style={{
@@ -358,13 +364,16 @@ export function ApplicationDetailDrawer({
                         flexWrap: 'wrap',
                       }}
                     >
-                      {activeTiers.map((t) => {
-                        const count = playerTierCounts[t];
-                        const colors = TIER_COLORS[t];
+                      {activeTiers.map((tierKey) => {
+                        const count = playerTierCounts[tierKey];
+                        const colors = TIER_COLORS[tierKey];
                         return (
                           <span
-                            key={t}
-                            title={`${count} ${colors.label} player${count > 1 ? 's' : ''}`}
+                            key={tierKey}
+                            title={t('components.dashboard.tierPlayerCount', {
+                              count,
+                              tier: t(`components.scoring.tiers.${tierKey.toLowerCase()}`),
+                            })}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -384,7 +393,7 @@ export function ApplicationDetailDrawer({
                               strokeWidth={2.4}
                             />
                             <span>
-                              {count} {colors.label}
+                              {count} {t(`components.scoring.tiers.${tierKey.toLowerCase()}`)}
                             </span>
                           </span>
                         );
@@ -394,22 +403,22 @@ export function ApplicationDetailDrawer({
 
                   {/* ── Truncated Reason for Migrating with Modal View ── */}
                   <ExpandableTextItem
-                    label="Reason for migrating"
+                    label={t('components.dashboard.reason')}
                     text={selected.migrationReason}
                     onOpenModal={(title, text) => setModalContent({ title, text })}
                   />
 
                   {selected.characterReference ? (
                     <DetailItem
-                      label="Character reference"
+                      label={t('components.dashboard.reference')}
                       value={selected.characterReference}
                     />
                   ) : null}
 
                   {/* ── Truncated Additional Comments with Modal View ── */}
                   <ExpandableTextItem
-                    label="Additional comments"
-                    text={selected.additionalComments || 'Not provided'}
+                    label={t('components.dashboard.comments')}
+                    text={selected.additionalComments || t('common.status.notProvided')}
                     onOpenModal={(title, text) => setModalContent({ title, text })}
                   />
 
@@ -435,8 +444,8 @@ export function ApplicationDetailDrawer({
                           style={{ fontSize: 11 }}
                         >
                           {selected.migrationType === 'Group'
-                            ? `GROUP ROSTER (${selected.players.length} PEOPLE)`
-                            : `APPLICANT PLAYER PROFILE`}
+                            ? t('components.dashboard.rosterCount', { count: selected.players.length })
+                            : t('components.dashboard.profile')}
                         </span>
                       </div>
                       <div style={{ display: 'grid', gap: 10 }}>
@@ -479,8 +488,8 @@ export function ApplicationDetailDrawer({
                                   }}
                                 >
                                   {p.isApplicant
-                                    ? 'Primary Applicant / Rep'
-                                    : `Group Member #${idx}`}
+                                    ? t('components.dashboard.primary')
+                                    : t('components.dashboard.memberIndex', { index: idx })}
                                 </div>
                               </div>
                               <div
@@ -537,7 +546,7 @@ export function ApplicationDetailDrawer({
                                       borderRadius: 4,
                                     }}
                                   >
-                                    Manual
+                                    {t('components.dashboard.manual')}
                                   </span>
                                 )}
                               </div>
@@ -552,19 +561,19 @@ export function ApplicationDetailDrawer({
                               }}
                             >
                               <div>
-                                State:{' '}
+                                {t('components.dashboard.detailState')}{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
                                   {p.currentState}
                                 </strong>
                               </div>
                               <div>
-                                Power:{' '}
+                                {t('components.dashboard.detailPower')}{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
                                   {Number(p.highestPowerOnRecord).toLocaleString()}
                                 </strong>
                               </div>
                               <div>
-                                F1:{' '}
+                                {t('components.dashboard.detailF1')}{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
                                   {p.f1ArenaPower !== null && p.f1ArenaPower > 0
                                     ? Number(p.f1ArenaPower).toLocaleString()
@@ -572,13 +581,13 @@ export function ApplicationDetailDrawer({
                                 </strong>
                               </div>
                               <div>
-                                Kills:{' '}
+                                {t('components.dashboard.detailKills')}{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
                                   {Number(p.kills).toLocaleString()}
                                 </strong>
                               </div>
                               <div>
-                                Alliance:{' '}
+                                {t('components.dashboard.detailAlliance')}{' '}
                                 <strong style={{ color: '#e2e8f0' }}>
                                   {p.currentAlliance ||
                                     selected.currentAlliance ||
@@ -605,31 +614,31 @@ export function ApplicationDetailDrawer({
                                 }}
                               >
                                 <span>
-                                  Struct:{' '}
+                                  {t('components.dashboard.detailStruct')}{' '}
                                   <strong style={{ color: '#cbd5e1' }}>
                                     {Number(p.structurePower).toLocaleString()}
                                   </strong>
                                 </span>
                                 <span>
-                                  Tech:{' '}
+                                  {t('components.dashboard.detailTech')}{' '}
                                   <strong style={{ color: '#cbd5e1' }}>
                                     {Number(p.techPower).toLocaleString()}
                                   </strong>
                                 </span>
                                 <span>
-                                  Troop:{' '}
+                                  {t('components.dashboard.detailTroop')}{' '}
                                   <strong style={{ color: '#cbd5e1' }}>
                                     {Number(p.troopPower).toLocaleString()}
                                   </strong>
                                 </span>
                                 <span>
-                                  Hero:{' '}
+                                  {t('components.dashboard.detailHero')}{' '}
                                   <strong style={{ color: '#cbd5e1' }}>
                                     {Number(p.heroPower).toLocaleString()}
                                   </strong>
                                 </span>
                                 <span>
-                                  Vehicle:{' '}
+                                  {t('components.dashboard.detailVehicle')}{' '}
                                   <strong style={{ color: '#cbd5e1' }}>
                                     {Number(p.modVehiclePower).toLocaleString()}
                                   </strong>
@@ -659,7 +668,7 @@ export function ApplicationDetailDrawer({
               className="button button-primary"
               onClick={() => setModalContent(null)}
             >
-              Close
+              {t('common.actions.close')}
             </button>
           }
         >
@@ -706,6 +715,7 @@ function ExpandableTextItem({
   onOpenModal: (title: string, text: string) => void;
   maxPreviewChars?: number;
 }) {
+  const { t } = useTranslation();
   const isLong = text.length > maxPreviewChars || text.includes('\n');
   const preview = isLong ? `${text.slice(0, maxPreviewChars).trim()}…` : text;
 
@@ -719,7 +729,7 @@ function ExpandableTextItem({
       onClick={() => {
         if (isLong) onOpenModal(label, text);
       }}
-      title={isLong ? 'Click to view full text in modal' : undefined}
+      title={isLong ? t('components.dashboard.expandHint') : undefined}
     >
       <div
         style={{
@@ -751,7 +761,7 @@ function ExpandableTextItem({
               onOpenModal(label, text);
             }}
           >
-            <Maximize2 size={11} /> Expand
+            <Maximize2 size={11} /> {t('components.dashboard.expand')}
           </button>
         )}
       </div>

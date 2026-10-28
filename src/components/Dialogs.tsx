@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Check, ShieldCheck, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Modal({ title, children, onClose, actions, className, showCloseButton = false, scrollBodyToTopKey }: {
   title: string; children: React.ReactNode; onClose: () => void; actions: React.ReactNode; className?: string; showCloseButton?: boolean; scrollBodyToTopKey?: number;
 }) {
+  const { t } = useTranslation();
   const onCloseRef = useRef(onClose);
   const bodyRef = useRef<HTMLDivElement>(null);
   onCloseRef.current = onClose;
@@ -27,7 +29,7 @@ export function Modal({ title, children, onClose, actions, className, showCloseB
       <div className="dialog-header">
         <h2 id="dialog-title">{title}</h2>
         {showCloseButton && (
-          <button type="button" className="dialog-close" onClick={onClose} aria-label="Close dialog">
+          <button type="button" className="dialog-close" onClick={onClose} aria-label={t('common.actions.closeDialog')}>
             <X size={18} aria-hidden="true" />
           </button>
         )}
@@ -41,11 +43,12 @@ export function Modal({ title, children, onClose, actions, className, showCloseB
 }
 
 export function SuccessState({ onReturn, reference }: { onReturn: () => void; reference: string }) {
+  const { t } = useTranslation();
   return <div className="success-panel" role="status" data-testid="success-state">
     <div className="success-mark"><Check size={22} /></div>
-    <h2>Application received</h2>
-    <p>Your application was committed for leadership review. Keep this reference for your records.</p>
-    <div className="success-warning"><ShieldCheck size={14} style={{ verticalAlign: 'middle', marginRight: 7 }} />Application reference: <strong data-testid="application-reference">{reference}</strong></div>
-    <button type="button" className="button button-primary" onClick={onReturn} data-testid="return-to-form">Return to form</button>
+    <h2>{t('components.dialogs.received')}</h2>
+    <p>{t('components.dialogs.receivedDescription')}</p>
+    <div className="success-warning"><ShieldCheck size={14} style={{ verticalAlign: 'middle', marginRight: 7 }} />{t('components.dialogs.reference')} <strong data-testid="application-reference">{reference}</strong></div>
+    <button type="button" className="button button-primary" onClick={onReturn} data-testid="return-to-form">{t('common.actions.returnToForm')}</button>
   </div>;
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowDown,
   ArrowUp,
@@ -35,6 +36,7 @@ export function ApplicationsSection({
   onSelectApplication,
   onError,
 }: ApplicationsSectionProps) {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
   const [query, setQuery] = useState('');
@@ -102,7 +104,7 @@ export function ApplicationsSection({
     setExportError('');
     try {
       const { data } = await exportQuery.refetch();
-      if (!data) throw new Error('The export returned no file.');
+      if (!data) throw new Error(t('components.dashboard.exportNoFile'));
       const blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -113,7 +115,7 @@ export function ApplicationsSection({
     } catch (error) {
       onError?.(error);
       setExportError(
-        error instanceof Error ? error.message : 'The export could not be completed.',
+        error instanceof Error ? error.message : t('components.dashboard.exportFailed'),
       );
     }
   };
@@ -124,8 +126,8 @@ export function ApplicationsSection({
     <section className="admin-panel applications-panel">
       <div className="panel-heading">
         <div>
-          <span className="panel-kicker">INBOX</span>
-          <h2>Applications</h2>
+          <span className="panel-kicker">{t('components.dashboard.inbox')}</span>
+          <h2>{t('common.navigation.applications')}</h2>
         </div>
         <button
           className="button"
@@ -135,7 +137,7 @@ export function ApplicationsSection({
           data-testid="export-csv"
         >
           <Download size={15} />
-          {exportQuery.isFetching ? 'Preparing…' : 'Export filtered CSV'}
+          {exportQuery.isFetching ? t('components.dashboard.preparing') : t('components.dashboard.export')}
         </button>
       </div>
 
@@ -149,22 +151,22 @@ export function ApplicationsSection({
         <label className="search-field">
           <Search size={15} />
           <input
-            aria-label="Search applications by in-game name"
+            aria-label={t('components.dashboard.searchPlaceholder')}
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
               setPage(1);
             }}
-            placeholder="Search in-game name"
+            placeholder={t('components.dashboard.searchName')}
             data-testid="filter-search"
           />
         </label>
         <input
           className="control filter-control"
-          aria-label="Current state filter"
+          aria-label={t('common.labels.state')}
           type="number"
           min="1"
-          placeholder="State #"
+          placeholder={t('components.dashboard.state')}
           value={currentState}
           onChange={(event) => {
             setCurrentState(event.target.value);
@@ -174,7 +176,7 @@ export function ApplicationsSection({
         />
         <select
           className="control filter-control"
-          aria-label="Alliance filter"
+          aria-label={t('components.dashboard.alliancesFilter')}
           value={allianceId}
           onChange={(event) => {
             setAllianceId(event.target.value);
@@ -182,7 +184,7 @@ export function ApplicationsSection({
           }}
           data-testid="filter-alliance"
         >
-          <option value="">All alliances</option>
+          <option value="">{t('components.dashboard.allAlliances')}</option>
           {alliances.data?.map((alliance) => (
             <option key={alliance.id} value={alliance.id}>
               {alliance.tag} · {alliance.name}
@@ -191,7 +193,7 @@ export function ApplicationsSection({
         </select>
         <select
           className="control filter-control"
-          aria-label="Tier filter"
+          aria-label={t('components.dashboard.tierFilter')}
           value={tier}
           onChange={(event) => {
             setTier(event.target.value);
@@ -199,14 +201,16 @@ export function ApplicationsSection({
           }}
           data-testid="filter-tier"
         >
-          <option value="">All tiers</option>
+          <option value="">{t('components.dashboard.allTiers')}</option>
           {['Regular', 'Medium', 'Advanced', 'Elite'].map((item) => (
-            <option key={item}>{item}</option>
+            <option key={item} value={item}>
+              {t(`wizard.preferences.tiers.${item.toLowerCase()}`)}
+            </option>
           ))}
         </select>
         <select
           className="control filter-control"
-          aria-label="Status filter"
+          aria-label={t('components.dashboard.statusFilter')}
           value={status}
           onChange={(event) => {
             setStatus(event.target.value);
@@ -214,13 +218,15 @@ export function ApplicationsSection({
           }}
           data-testid="filter-status"
         >
-          <option value="">All statuses</option>
+          <option value="">{t('components.dashboard.allStatuses')}</option>
           {statuses.map((item) => (
-            <option key={item}>{item}</option>
+            <option key={item} value={item}>
+              {t(`common.status.${item.toLowerCase()}`)}
+            </option>
           ))}
         </select>
         <label className="sort-field">
-          Sort
+          {t('components.dashboard.sort')}
           <select
             className="control filter-control"
             value={sort}
@@ -229,25 +235,27 @@ export function ApplicationsSection({
             }
             data-testid="sort-applications"
           >
-            <option value="createdAt">Submitted</option>
-            <option value="f1ArenaPower">F1 power</option>
-            <option value="kills">Kills</option>
+            <option value="createdAt">{t('components.dashboard.sortSubmitted')}</option>
+            <option value="f1ArenaPower">{t('components.dashboard.sortF1')}</option>
+            <option value="kills">{t('components.dashboard.sortKills')}</option>
           </select>
         </label>
         <button
           className="button sort-order"
           type="button"
           onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-          aria-label={`Sort ${order === 'asc' ? 'descending' : 'ascending'}`}
+          aria-label={t('components.dashboard.sortDirection', {
+            direction: order === 'asc' ? t('components.dashboard.descending') : t('components.dashboard.ascending'),
+          })}
           data-testid="sort-direction"
         >
           {order === 'asc' ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
-          {order}
+          {order === 'asc' ? t('components.dashboard.ascending') : t('components.dashboard.descending')}
         </button>
       </div>
 
       {applications.isLoading ? (
-        <div className="table-skeleton" aria-label="Loading applications">
+        <div className="table-skeleton" aria-label={t('components.dashboard.loadingApps')}>
           {[1, 2, 3, 4].map((item) => (
             <div className="skeleton table-row-skeleton" key={item} />
           ))}
@@ -257,35 +265,35 @@ export function ApplicationsSection({
           <span>
             {applications.error instanceof Error
               ? applications.error.message
-              : 'Failed to load applications.'}
+              : t('components.dashboard.appsFailed')}
           </span>
           <button
             className="button"
             onClick={() => void applications.refetch()}
             data-testid="retry-applications"
           >
-            Retry
+            {t('common.actions.retry')}
           </button>
         </div>
       ) : !pageData?.items.length ? (
         <div className="empty-state" data-testid="applications-empty">
           <Users size={22} />
-          <strong>No applications match this view</strong>
-          <span>Try changing or clearing your filters.</span>
+          <strong>{t('components.dashboard.noMatches')}</strong>
+          <span>{t('components.dashboard.filterHint')}</span>
         </div>
       ) : (
         <div className="table-scroll">
           <table className="applications-table">
             <thead>
               <tr>
-                <th>Applicant / Rep</th>
-                <th>Request Type</th>
-                <th>State</th>
-                <th>Current Alliance</th>
-                <th>Tier Breakdown</th>
-                <th>Preference</th>
-                <th>Status</th>
-                <th>Submitted</th>
+                <th>{t('common.labels.applicantRep')}</th>
+                <th>{t('components.dashboard.requestType')}</th>
+                <th>{t('components.dashboard.stateColumn')}</th>
+                <th>{t('common.labels.alliance')}</th>
+                <th>{t('components.dashboard.tierBreakdown')}</th>
+                <th>{t('components.dashboard.preference')}</th>
+                <th>{t('common.labels.status')}</th>
+                <th>{t('common.labels.submitted')}</th>
               </tr>
             </thead>
             <tbody>
@@ -301,7 +309,7 @@ export function ApplicationsSection({
                     <div className="applicant-link">
                       <strong>{app.gameName}</strong>
                       {app.groupRepresentative && app.migrationType === 'Group' && (
-                        <small>Rep: {app.groupRepresentative}</small>
+                        <small>{t('components.dashboard.rep')} {app.groupRepresentative}</small>
                       )}
                     </div>
                   </td>
@@ -329,10 +337,10 @@ export function ApplicationsSection({
                       ) : (
                         <User size={11} />
                       )}
-                      {app.migrationType}
+                      {t(`common.labels.${app.migrationType.toLowerCase()}`)}
                     </span>
                   </td>
-                  <td>State {app.currentState}</td>
+                  <td>{t('components.dashboard.stateNumber', { state: app.currentState })}</td>
                   <td>{app.currentAlliance || '—'}</td>
                   <td>
                     {(() => {
@@ -372,13 +380,13 @@ export function ApplicationsSection({
                             flexWrap: 'wrap',
                           }}
                         >
-                          {activeTiers.map((t) => {
-                            const count = effectiveCounts[t] ?? 0;
-                            const colors = TIER_COLORS[t];
+                          {activeTiers.map((tierKey) => {
+                            const count = effectiveCounts[tierKey] ?? 0;
+                            const colors = TIER_COLORS[tierKey];
                             return (
                               <span
-                                key={t}
-                                title={`${count} ${colors.label} player${count > 1 ? 's' : ''}`}
+                                key={tierKey}
+                                title={t('components.dashboard.tierPlayerCount', { count, tier: t(`components.scoring.tiers.${tierKey.toLowerCase()}`) })}
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -407,12 +415,12 @@ export function ApplicationsSection({
                   </td>
                   <td>
                     {app.anyAlliance
-                      ? 'Any alliance'
+                      ? t('components.alliance.any')
                       : app.preferredAlliances.map((item) => item.tag).join(', ') || '—'}
                   </td>
                   <td>
                     <span className={`status-pill status-${app.status.toLowerCase()}`}>
-                      {app.status}
+                      {t(`common.status.${app.status.toLowerCase()}`)}
                     </span>
                   </td>
                   <td>{new Date(app.createdAt).toLocaleDateString()}</td>
@@ -426,8 +434,11 @@ export function ApplicationsSection({
       {pageData && pageData.total > 0 && (
         <div className="pagination">
           <span>
-            Showing {(page - 1) * pageData.pageSize + 1}–
-            {Math.min(page * pageData.pageSize, pageData.total)} of {pageData.total}
+            {t('components.dashboard.paginationSummary', {
+              start: (page - 1) * pageData.pageSize + 1,
+              end: Math.min(page * pageData.pageSize, pageData.total),
+              total: pageData.total,
+            })}
           </span>
           <div>
             <button
@@ -436,10 +447,13 @@ export function ApplicationsSection({
               disabled={page <= 1}
               data-testid="page-previous"
             >
-              Previous
+              {t('ui.previous')}
             </button>
             <span>
-              Page {pageData.page} of {Math.max(pageData.totalPages, 1)}
+              {t('components.dashboard.pageSummary', {
+                page: pageData.page,
+                totalPages: Math.max(pageData.totalPages, 1),
+              })}
             </span>
             <button
               className="button"
@@ -449,7 +463,7 @@ export function ApplicationsSection({
               disabled={page >= pageData.totalPages}
               data-testid="page-next"
             >
-              Next
+              {t('ui.next')}
             </button>
           </div>
         </div>

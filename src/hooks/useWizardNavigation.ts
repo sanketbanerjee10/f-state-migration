@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useLocation, useSearch } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useApplicationDraft, type StepErrors } from './useApplicationDraft';
 
 export interface WizardStepDefinition {
@@ -7,67 +8,73 @@ export interface WizardStepDefinition {
   stepParam: string;
   title: string;
   subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
 }
 
-export const BASE_STEPS: WizardStepDefinition[] = [
+type WizardStepTemplate = Omit<WizardStepDefinition, 'title' | 'subtitle'>;
+
+export const BASE_STEPS: WizardStepTemplate[] = [
   {
     key: 'character',
     stepParam: '1',
-    title: 'Character Details',
-    subtitle: 'Enter your stats or upload a screenshot to prefill',
+    titleKey: 'wizard.navigation.character',
+    subtitleKey: 'wizard.navigation.characterDescription',
   },
   {
     key: 'combat',
     stepParam: '2',
-    title: 'Combat Power',
-    subtitle: 'Enter your state, alliance, and arena formation powers',
+    titleKey: 'wizard.navigation.combat',
+    subtitleKey: 'wizard.navigation.combatDescription',
   },
   {
     key: 'migration',
     stepParam: '3',
-    title: 'Migration Details',
-    subtitle: 'Preferences, destinations, tier, and migration reason',
+    titleKey: 'wizard.navigation.migration',
+    subtitleKey: 'wizard.navigation.migrationDescription',
   },
 ];
 
-export const GROUP_ROSTER_STEP: WizardStepDefinition = {
+export const GROUP_ROSTER_STEP: WizardStepTemplate = {
   key: 'group-roster',
   stepParam: '4',
-  title: 'Group Roster',
-  subtitle: 'Bulk import profile screenshots for your group members',
+  titleKey: 'wizard.navigation.roster',
+  subtitleKey: 'wizard.navigation.rosterDescription',
 };
 
-export const REVIEW_STEP: WizardStepDefinition = {
+export const REVIEW_STEP: WizardStepTemplate = {
   key: 'review',
   stepParam: 'review', // or '5' for group, '4' for individual
-  title: 'Review & Submit',
-  subtitle: 'Confirm all application data before submitting to leadership',
+  titleKey: 'wizard.navigation.review',
+  subtitleKey: 'wizard.navigation.reviewDescription',
 };
 
 export function useWizardNavigation() {
   const [, setLocation] = useLocation();
   const searchString = useSearch();
   const { draft, validateStep } = useApplicationDraft();
+  const { t } = useTranslation();
 
   const isGroup = draft.migrationType === 'Group';
 
   const steps = useMemo<WizardStepDefinition[]>(() => {
+    const translateStep = (step: WizardStepTemplate): WizardStepDefinition => ({
+      ...step,
+      title: t(step.titleKey),
+      subtitle: t(step.subtitleKey),
+    });
     if (isGroup) {
       return [
-        BASE_STEPS[0],
-        BASE_STEPS[1],
-        BASE_STEPS[2],
-        GROUP_ROSTER_STEP,
-        { ...REVIEW_STEP, stepParam: '5' },
+        ...BASE_STEPS.map(translateStep),
+        translateStep(GROUP_ROSTER_STEP),
+        translateStep({ ...REVIEW_STEP, stepParam: '5' }),
       ];
     }
     return [
-      BASE_STEPS[0],
-      BASE_STEPS[1],
-      BASE_STEPS[2],
-      { ...REVIEW_STEP, stepParam: '4' },
+      ...BASE_STEPS.map(translateStep),
+      translateStep({ ...REVIEW_STEP, stepParam: '4' }),
     ];
-  }, [isGroup]);
+  }, [isGroup, t]);
 
   // Parse current ?step=... param
   const currentStepParam = useMemo(() => {
@@ -90,7 +97,7 @@ export function useWizardNavigation() {
   const currentStep = steps[currentIndex] || steps[0];
   const totalSteps = steps.length;
   const stepNumber = currentIndex + 1;
-  const stepProgressLabel = `Step ${stepNumber} of ${totalSteps}`;
+  const stepProgressLabel = t('wizard.navigation.stepOf', { stepNumber, totalSteps });
   const isFirstStep = currentIndex === 0;
   const isLastStep = currentIndex === totalSteps - 1;
 

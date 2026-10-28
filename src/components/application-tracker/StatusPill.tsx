@@ -1,4 +1,5 @@
 import { getStatusColors } from './trackerUtils';
+import { useTranslation } from 'react-i18next';
 
 interface StatusPillProps {
   status: string;
@@ -6,7 +7,15 @@ interface StatusPillProps {
 }
 
 export function StatusPill({ status, size = 'sm' }: StatusPillProps) {
+  const { t } = useTranslation();
   const colors = getStatusColors(status);
+  const statusLabel = status === 'Approved'
+    ? t('common.status.approved')
+    : status === 'Rejected'
+      ? t('common.status.rejected')
+      : status === 'Pending' || !status
+        ? t('common.status.pending')
+        : status;
   return (
     <span
       style={{
@@ -22,7 +31,7 @@ export function StatusPill({ status, size = 'sm' }: StatusPillProps) {
         whiteSpace: 'nowrap' as const,
       }}
     >
-      {status || 'Pending'}
+      {statusLabel}
     </span>
   );
 }

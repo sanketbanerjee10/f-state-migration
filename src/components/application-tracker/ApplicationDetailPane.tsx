@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Link } from 'wouter';
 import { Edit, Trash2, UserCheck, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { MigrationScoreBadge, VerifiedBadge } from '../MigrationScoringGuide';
 import { calculateMigrationScoreFromRaw, useLiveTierThresholds } from '../../lib/migrationScore';
 import type { AdminApplication } from '@/lib/api-client';
@@ -134,6 +135,7 @@ interface ApplicationDetailPaneProps {
 }
 
 export function ApplicationDetailPane({ application, onRemove }: ApplicationDetailPaneProps) {
+  const { t } = useTranslation();
   const { thresholds } = useLiveTierThresholds();
   const applicantPlayer = application.players?.find((p) => p.isApplicant);
   const groupPlayers = application.players?.filter((p) => !p.isApplicant) || [];
@@ -142,10 +144,17 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
 
   const statusMessage =
     application.status === 'Approved'
-      ? 'Congratulations! Your application has been approved by State 565 leadership.'
+      ? t('components.tracker.approved')
       : application.status === 'Rejected'
-      ? 'Your application was not accepted at this time.'
-      : 'Your application is currently pending review by State 565 alliance leadership.';
+      ? t('components.tracker.rejected')
+      : t('components.tracker.pending');
+  const statusLabel = application.status === 'Approved'
+    ? t('common.status.approved')
+    : application.status === 'Rejected'
+      ? t('common.status.rejected')
+      : application.status === 'Pending'
+        ? t('common.status.pending')
+        : application.status;
 
   const submittedAt = application.createdAt ? new Date(application.createdAt) : null;
 
@@ -153,7 +162,7 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
     <div style={s.root}>
       {/* ── Status banner ── */}
       <section
-        aria-label="Application status"
+        aria-label={t('components.tracker.status')}
         style={{
           ...s.banner,
           background: colors.bg,
@@ -165,7 +174,7 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
           <div>
             <div style={s.statusRow}>
               <StatusIcon status={application.status} size={22} />
-              <h2 style={{ ...s.statusTitle, color: colors.text }}>{application.status}</h2>
+              <h2 style={{ ...s.statusTitle, color: colors.text }}>{statusLabel}</h2>
             </div>
             <p style={s.statusText}>{statusMessage}</p>
           </div>
@@ -175,18 +184,18 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
             className="button button-primary"
             style={s.editButton}
           >
-            <Edit size={16} aria-hidden /> Edit &amp; resubmit
+            <Edit size={16} aria-hidden /> {t('components.tracker.editResubmit')}
           </Link>
         </div>
 
         <dl style={s.meta}>
-          <Field label="Reference">
+          <Field label={t('components.tracker.reference')}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: c.accent }}>
               {referenceCode}
               <CopyButton value={referenceCode} />
             </span>
           </Field>
-          <Field label="Application ID">
+          <Field label={t('components.tracker.applicationId')}>
             <span
               style={{
                 display: 'inline-flex',
@@ -202,13 +211,13 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
               <CopyButton value={application.id} />
             </span>
           </Field>
-          <Field label="Submitted">
+          <Field label={t('components.tracker.submitted')}>
             {submittedAt ? (
               <time dateTime={submittedAt.toISOString()} style={{ fontWeight: 500, color: c.body }}>
                 {submittedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
               </time>
             ) : (
-              <span style={{ fontWeight: 500, color: c.muted }}>Not available</span>
+              <span style={{ fontWeight: 500, color: c.muted }}>{t('common.status.notAvailable')}</span>
             )}
           </Field>
         </dl>
@@ -247,11 +256,11 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
         />
 
         <div style={s.statStrip}>
-          <StatCell label="Current state" value={`State #${application.currentState}`} />
-          <StatCell label="Alliance" value={application.currentAlliance || 'None'} />
-          <StatCell label="Kills" value={formatNumber(application.kills)} />
+          <StatCell label={t('components.tracker.currentState')} value={t('components.tracker.stateNumber', { state: application.currentState })} />
+          <StatCell label={t('components.tracker.alliance')} value={application.currentAlliance || t('components.tracker.none')} />
+          <StatCell label={t('common.labels.kills')} value={formatNumber(application.kills)} />
           <StatCell
-            label="Highest power"
+            label={t('components.tracker.highestPower')}
             value={
               applicantPlayer
                 ? formatPowerInM(applicantPlayer.highestPowerOnRecord)
@@ -262,14 +271,14 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
 
         {applicantPlayer && (
           <div style={s.subSection}>
-            <h4 style={s.subHeading}>Power breakdown</h4>
+            <h4 style={s.subHeading}>{t('components.tracker.breakdown')}</h4>
             <div style={s.powerGrid}>
-              <PowerStatCard label="Structure" value={formatPowerInM(applicantPlayer.structurePower)} />
-              <PowerStatCard label="Tech" value={formatPowerInM(applicantPlayer.techPower)} />
-              <PowerStatCard label="Troop" value={formatPowerInM(applicantPlayer.troopPower)} />
-              <PowerStatCard label="Hero" value={formatPowerInM(applicantPlayer.heroPower)} />
-              <PowerStatCard label="Vehicle" value={formatPowerInM(applicantPlayer.modVehiclePower)} />
-              <PowerStatCard label="F1 Arena" value={formatPowerInM(application.f1ArenaPower)} />
+              <PowerStatCard label={t('components.tracker.structure')} value={formatPowerInM(applicantPlayer.structurePower)} />
+              <PowerStatCard label={t('components.tracker.tech')} value={formatPowerInM(applicantPlayer.techPower)} />
+              <PowerStatCard label={t('components.tracker.troop')} value={formatPowerInM(applicantPlayer.troopPower)} />
+              <PowerStatCard label={t('components.tracker.hero')} value={formatPowerInM(applicantPlayer.heroPower)} />
+              <PowerStatCard label={t('components.tracker.vehicle')} value={formatPowerInM(applicantPlayer.modVehiclePower)} />
+              <PowerStatCard label={t('components.tracker.f1')} value={formatPowerInM(application.f1ArenaPower)} />
             </div>
           </div>
         )}
@@ -280,16 +289,16 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
         <SectionCard>
           <CardHeading
             icon={<Users size={18} style={{ color: c.group }} aria-hidden />}
-            title="Group roster"
+            title={t('components.tracker.roster')}
             aside={
               <span style={s.cardAside}>
-                {groupPlayers.length} additional {groupPlayers.length === 1 ? 'member' : 'members'}
+                {t(groupPlayers.length === 1 ? 'components.tracker.additionalMember_one' : 'components.tracker.additionalMember_other', { count: groupPlayers.length })}
               </span>
             }
           />
 
           {groupPlayers.length === 0 ? (
-            <p style={s.empty}>No additional group members are attached to this application.</p>
+            <p style={s.empty}>{t('components.tracker.noAdditional')}</p>
           ) : (
             <ul style={s.rosterList}>
               {groupPlayers.map((member, index) => {
@@ -314,10 +323,10 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
                     </div>
 
                     <dl style={s.rosterStats}>
-                      <RosterStat label="Kills" value={formatNumber(member.kills)} />
-                      <RosterStat label="Power" value={formatPowerInM(member.highestPowerOnRecord)} />
-                      <RosterStat label="Tech" value={formatPowerInM(member.techPower)} />
-                      <RosterStat label="Vehicle" value={formatPowerInM(member.modVehiclePower)} />
+                      <RosterStat label={t('common.labels.kills')} value={formatNumber(member.kills)} />
+                      <RosterStat label={t('common.labels.power')} value={formatPowerInM(member.highestPowerOnRecord)} />
+                      <RosterStat label={t('components.tracker.tech')} value={formatPowerInM(member.techPower)} />
+                      <RosterStat label={t('components.tracker.vehicle')} value={formatPowerInM(member.modVehiclePower)} />
                     </dl>
 
                     <MigrationScoreBadge
@@ -336,33 +345,33 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
 
       {/* ── Preferences & background ── */}
       <SectionCard>
-        <h3 style={{ ...s.cardTitle, marginBottom: 16 }}>Migration preferences</h3>
+        <h3 style={{ ...s.cardTitle, marginBottom: 16 }}>{t('components.tracker.preferences')}</h3>
 
         <dl style={s.fieldGrid}>
-          <Field label="Migration type">
-            {application.migrationType}
+          <Field label={t('components.tracker.migrationType')}>
+            {application.migrationType === 'Group' ? t('common.labels.group') : t('common.labels.individual')}
             {application.groupRepresentative && (
               <span style={{ display: 'block', marginTop: 2, fontSize: fs.small, fontWeight: 400, color: c.muted }}>
-                Representative: {application.groupRepresentative}
+                {t('components.tracker.representative')} {application.groupRepresentative}
               </span>
             )}
           </Field>
-          <Field label="Declared tier">{application.migrationTier}</Field>
-          <Field label="Preferred alliances">
+          <Field label={t('components.tracker.tier')}>{application.migrationTier}</Field>
+          <Field label={t('components.tracker.preferredAlliances')}>
             {application.anyAlliance
-              ? 'Any active State 565 alliance'
-              : application.preferredAlliances?.map((a) => `${a.tag} (${a.name})`).join(', ') || 'None specified'}
+              ? t('components.tracker.anyAlliance')
+              : application.preferredAlliances?.map((a) => `${a.tag} (${a.name})`).join(', ') || t('components.tracker.noneSpecified')}
           </Field>
         </dl>
 
         <div style={{ ...s.subSection, ...s.proseBlock }}>
           <div>
-            <h4 style={s.subHeading}>Reason for migrating</h4>
-            <p style={s.prose}>{application.migrationReason || 'None provided'}</p>
+            <h4 style={s.subHeading}>{t('components.tracker.reason')}</h4>
+            <p style={s.prose}>{application.migrationReason || t('components.tracker.noneProvided')}</p>
           </div>
           {application.additionalComments && (
             <div>
-              <h4 style={s.subHeading}>Additional comments</h4>
+              <h4 style={s.subHeading}>{t('components.tracker.comments')}</h4>
               <p style={s.prose}>{application.additionalComments}</p>
             </div>
           )}
@@ -372,7 +381,7 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
       {/* ── Footer ── */}
       <div style={s.footer}>
         <button type="button" className="button button-secondary" onClick={onRemove} style={s.removeButton}>
-          <Trash2 size={15} aria-hidden /> Remove from saved
+          <Trash2 size={15} aria-hidden /> {t('common.labels.removeSavedShort')}
         </button>
       </div>
     </div>

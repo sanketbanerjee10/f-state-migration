@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field, FormSection } from '../../components/Field';
 import { StepLayout } from '../../components/form/StepLayout';
 import { KNOWN_STATES } from '../../config/states';
@@ -6,6 +7,7 @@ import { useApplicationDraft, type StepErrors } from '../../hooks/useApplication
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function CharacterDetailsStep() {
+  const { t } = useTranslation();
   const { draft, setDraftField, validateStep } = useApplicationDraft();
   const { nextStep, prevStep } = useWizardNavigation();
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
@@ -28,24 +30,24 @@ export function CharacterDetailsStep() {
       navigationProps={{
         onContinue: handleContinue,
         onBack: prevStep,
-        continueLabel: 'Continue to Combat Stats',
+        continueLabel: t('wizard.character.continue'),
         // backLabel: 'Back to Power Details',
       }}
     >
-      <FormSection number="02" title="Character details">
+      <FormSection number="02" title={t('wizard.character.title')}>
         <Field
           id="characterGameName"
-          label="Name in the game"
+          label={t('wizard.character.nameLabel')}
           required
           error={stepErrors.playerName}
-          hint="Pre-filled from your screenshot. You can correct it here if needed."
+          hint={t('wizard.character.nameHint')}
         >
           <input
             className="control"
             id="characterGameName"
             value={draft.playerName}
             maxLength={30}
-            placeholder="Enter your in-game name"
+            placeholder={t('wizard.character.namePlaceholder')}
             onChange={(e) => {
               setDraftField('playerName', e.target.value, true);
               setStepErrors((old) => ({ ...old, playerName: '' }));
@@ -57,7 +59,7 @@ export function CharacterDetailsStep() {
 
         <Field
           id="currentState"
-          label="Current state"
+          label={t('wizard.character.stateLabel')}
           required
           error={stepErrors.currentState}
         >
@@ -72,7 +74,7 @@ export function CharacterDetailsStep() {
               setDraftField('currentState', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentState: '' }));
             }}
-            placeholder="Enter a state number (e.g. 565)"
+            placeholder={t('wizard.character.statePlaceholder')}
             list="known-state-options"
             inputMode="numeric"
             pattern="[0-9]*"
@@ -87,10 +89,10 @@ export function CharacterDetailsStep() {
 
         <Field
           id="currentAlliance"
-          label="Current alliance"
+          label={t('wizard.character.allianceLabel')}
           required
           error={stepErrors.currentAlliance}
-          hint="Your current alliance name or tag in your state"
+          hint={t('wizard.character.allianceHint')}
         >
           <input
             className="control"
@@ -101,7 +103,7 @@ export function CharacterDetailsStep() {
               setDraftField('currentAlliance', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentAlliance: '' }));
             }}
-            placeholder="Your alliance name or tag"
+            placeholder={t('wizard.character.alliancePlaceholder')}
             data-testid="current-alliance"
           />
         </Field>

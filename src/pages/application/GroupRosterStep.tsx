@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Edit2,
   FileImage,
@@ -35,14 +37,17 @@ type UploadProgress = {
   estimatedEndAt: number;
 };
 
-function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds} sec`;
+function formatDuration(seconds: number, t: TFunction): string {
+  if (seconds < 60) return t('wizard.roster.durationSeconds', { count: seconds });
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return remainingSeconds ? `${minutes} min ${remainingSeconds} sec` : `${minutes} min`;
+  return remainingSeconds
+    ? t('wizard.roster.durationMinutesSeconds', { minutes, seconds: remainingSeconds })
+    : t('wizard.roster.durationMinutes', { minutes });
 }
 
 export function GroupRosterStep() {
+  const { t } = useTranslation();
   const {
     draft,
     addGroupMember,
@@ -123,12 +128,12 @@ export function GroupRosterStep() {
     }
 
     if (validFiles.length === 0) {
-      setUploadError('Please select valid PNG or JPG screenshots under 10 MB.');
+      setUploadError(t('wizard.roster.invalidFiles'));
       return;
     }
 
     if (remainingMemberSlots === 0) {
-      setUploadError(`A group can contain at most ${MAX_GROUP_MEMBERS} players, including the applicant.`);
+      setUploadError(t('wizard.roster.maxPlayers', { max: MAX_GROUP_MEMBERS }));
       return;
     }
 
@@ -254,7 +259,7 @@ export function GroupRosterStep() {
 
     if (invalidScoreCount > 0) {
       setScoreErrorToast(
-        `${invalidScoreCount} group member${invalidScoreCount === 1 ? ' was' : 's were'} not added because the calculated migration score must be between 10 and 1000. The data may be invalid.`,
+        t(invalidScoreCount === 1 ? 'wizard.roster.membersNotAdded_one' : 'wizard.roster.membersNotAdded_other', { count: invalidScoreCount }),
       );
     }
 
@@ -262,12 +267,12 @@ export function GroupRosterStep() {
     const uploadMessages = [];
     if (failedFiles.length > 0) {
       uploadMessages.push(
-        `Could not capture all required power stats for: ${failedFiles.join(', ')}. Please use manual entry or upload clearer Player Details screenshots.`,
+        t('wizard.roster.failedFiles', { failedFiles: failedFiles.join(', ') }),
       );
     }
     if (skippedForCapacity > 0) {
       uploadMessages.push(
-        `${skippedForCapacity} screenshot${skippedForCapacity === 1 ? ' was' : 's were'} not processed because a group is limited to ${MAX_GROUP_MEMBERS} players, including the applicant.`,
+        t(skippedForCapacity === 1 ? 'wizard.roster.screenshotsNotProcessed_one' : 'wizard.roster.screenshotsNotProcessed_other', { count: skippedForCapacity, max: MAX_GROUP_MEMBERS }),
       );
     }
     if (uploadMessages.length > 0) setUploadError(uploadMessages.join(' '));
@@ -311,17 +316,17 @@ export function GroupRosterStep() {
   const saveEditModal = () => {
     if (!editingMember) return;
     if (!editName.trim()) {
-      setEditError('Player name cannot be empty.');
+      setEditError(t('wizard.roster.nameRequired'));
       setEditErrorScrollKey((key) => key + 1);
       return;
     }
     if (!editAlliance.trim()) {
-      setEditError('Current alliance is required.');
+      setEditError(t('wizard.roster.allianceRequired'));
       setEditErrorScrollKey((key) => key + 1);
       return;
     }
     if (!parseStateNumber(editState)) {
-      setEditError('Enter a valid current state.');
+      setEditError(t('wizard.roster.stateRequired'));
       setEditErrorScrollKey((key) => key + 1);
       return;
     }
@@ -332,7 +337,7 @@ export function GroupRosterStep() {
     ];
     const invalidArenaPower = arenaPowers.find(({ value }) => value.trim() && !parseMagnitude(value));
     if (invalidArenaPower) {
-      setEditError(`${invalidArenaPower.label} Arena Power must be a valid number greater than zero, or left blank.`);
+      setEditError(t('wizard.roster.arenaInvalid', { label: invalidArenaPower.label }));
       setEditErrorScrollKey((key) => key + 1);
       return;
     }
@@ -370,24 +375,24 @@ export function GroupRosterStep() {
 
   const saveManualMember = () => {
     if (!manualEditingMember && draft.groupMembers.length >= MAX_GROUP_MEMBERS) {
-      setManualError(`A group can contain at most ${MAX_GROUP_MEMBERS} players, including the applicant.`);
+      setManualError(t('wizard.roster.maxPlayers', { max: MAX_GROUP_MEMBERS }));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
     if (!manualName.trim()) {
-      setManualError('Player name is required.');
+      setManualError(t('wizard.roster.playerNameRequired'));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
 
     if (!manualAlliance.trim()) {
-      setManualError('Current alliance is required.');
+      setManualError(t('wizard.roster.allianceRequired'));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
 
     if (!parseStateNumber(manualState)) {
-      setManualError('Enter a valid current state.');
+      setManualError(t('wizard.roster.stateRequired'));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
@@ -399,7 +404,7 @@ export function GroupRosterStep() {
     ];
     const invalidArenaPower = arenaPowers.find(({ value }) => value.trim() && !parseMagnitude(value));
     if (invalidArenaPower) {
-      setManualError(`${invalidArenaPower.label} Arena Power must be a valid number greater than zero, or left blank.`);
+      setManualError(t('wizard.roster.arenaInvalid', { label: invalidArenaPower.label }));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
@@ -414,7 +419,7 @@ export function GroupRosterStep() {
 
     for (const field of numericFields) {
       if (!field.value.trim()) {
-        setManualError(`${field.label} is required.`);
+        setManualError(t('wizard.roster.fieldRequired', { label: field.label }));
         setManualErrorScrollKey((key) => key + 1);
         return;
       }
@@ -422,14 +427,14 @@ export function GroupRosterStep() {
       const value = Number(field.value.replace(/,/g, ''));
 
       if (!Number.isFinite(value) || value <= 0) {
-        setManualError(`${field.label} must be a valid number greater than zero.`);
+        setManualError(t('wizard.roster.fieldInvalid', { label: field.label }));
         setManualErrorScrollKey((key) => key + 1);
         return;
       }
     }
 
     if (manualKills.trim() && parseMagnitude(manualKills, true) === null) {
-      setManualError('Kills must be zero or a valid number.');
+      setManualError(t('wizard.roster.killsInvalid'));
       setManualErrorScrollKey((key) => key + 1);
       return;
     }
@@ -445,7 +450,7 @@ export function GroupRosterStep() {
 
     if (powerOnRecord !== componentPowerTotal) {
       setManualError(
-        'Power on Record must equal the sum of Structure, Tech, Troop, Hero, and Mod Vehicle Power.'
+        t('wizard.roster.powerMustEqualSum')
       );
       setManualErrorScrollKey((key) => key + 1);
       return;
@@ -460,7 +465,7 @@ export function GroupRosterStep() {
     );
     if (!migrationScore || migrationScore.score < 10 || migrationScore.score > 1000) {
       setScoreErrorToast(
-        `The group member was not ${manualEditingMember ? 'updated' : 'added'} because the calculated migration score must be between 10 and 1000. The data may be invalid.`,
+        t(manualEditingMember ? 'wizard.roster.memberNotUpdatedInvalidScore' : 'wizard.roster.memberNotAddedInvalidScore'),
       );
       return;
     }
@@ -503,15 +508,14 @@ export function GroupRosterStep() {
         navigationProps={{
           onContinue: nextStep,
           onBack: prevStep,
-          continueLabel: 'Continue to Review',
+          continueLabel: t('wizard.groupUpload.continue'),
           // backLabel: 'Back to Preferences',
           disabled: uploading,
         }}
       >
-      <FormSection number="04" title="Group Roster">
+      <FormSection number="04" title={t('wizard.navigation.roster')}>
         <div className="hint">
-          Upload profile/details screenshots of all the players migrating in your group to extract and verify their stats,
-          or add members manually.
+          {t('wizard.roster.intro')}
         </div>
         {/* Hidden multi-file input */}
         <input
@@ -520,7 +524,7 @@ export function GroupRosterStep() {
           type="file"
           multiple
           accept="image/png,image/jpeg,.jpg,.jpeg,.png"
-          aria-label="Bulk upload player screenshots"
+          aria-label={t('wizard.roster.bulkUpload')}
           onChange={(e) => {
             if (e.target.files && e.target.files.length > 0) {
               handleFiles(e.target.files);
@@ -562,8 +566,8 @@ export function GroupRosterStep() {
                 <Upload size={20} />
               </div>
               <div className="upload-copy">
-                <strong>Select or drop profile screenshots</strong>
-                <p className="hint" style={{margin: 0}}>Multiple PNG or JPG files (up to 10 MB each)</p>
+                <strong>{t('wizard.roster.dropPrompt')}</strong>
+                <p className="hint" style={{margin: 0}}>{t('wizard.roster.formats')}</p>
               </div>
             </div>
             <button
@@ -575,7 +579,7 @@ export function GroupRosterStep() {
               }}
               data-testid="choose-group-roster-files"
             >
-              <FileImage size={14} /> Browse images
+              <FileImage size={14} /> {t('wizard.roster.browse')}
             </button>
           </div>
         )}
@@ -588,14 +592,15 @@ export function GroupRosterStep() {
                 <div className="ocr-roster-processing-heading">
                   <LoaderCircle size={18} className="spin" />
                   <span>
-                    Processing screenshots {uploadProgress.completed} of {uploadProgress.total}
+                    {t('wizard.roster.processing', { completed: uploadProgress.completed, total: uploadProgress.total })}
                   </span>
                   <span className="ocr-roster-time-remaining">
                     {uploadProgress.estimatedEndAt <= Date.now() && uploadProgress.completed < uploadProgress.total
-                      ? 'Taking longer than estimated'
-                      : `${formatDuration(
+                      ? t('wizard.roster.takingLonger')
+                      : formatDuration(
                           Math.max(0, Math.ceil((uploadProgress.estimatedEndAt - Date.now()) / 1000)),
-                        )}`}
+                          t,
+                        )}
                   </span>
                 </div>
                 <OcrWaitingMessage />
@@ -610,7 +615,7 @@ export function GroupRosterStep() {
         {uploadError && (
           <div className="ocr-feedback-banner ocr-feedback-error" role="alert" style={{ marginTop: 12 }}>
             <div className="feedback-content">
-              <strong>Invalid Image / Recognition Error</strong>
+              <strong>{t('wizard.roster.uploadErrorTitle')}</strong>
               <p>{uploadError}</p>
             </div>
           </div>
@@ -620,7 +625,7 @@ export function GroupRosterStep() {
         <div style={{ marginTop: 22 }}>
           <div className="panel-heading" style={{ marginBottom: 12, alignItems: 'center' }}>
             <div>
-              <span className="panel-kicker" style={{fontSize: "12px"}}>ROSTER ({draft.groupMembers.length} / {MAX_GROUP_MEMBERS} MEMBERS — APPLICANT INCLUDED IN LIMIT)</span>
+              <span className="panel-kicker" style={{fontSize: "12px"}}>{t('wizard.roster.rosterCount', { count: draft.groupMembers.length, max: MAX_GROUP_MEMBERS })}</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
@@ -629,6 +634,8 @@ export function GroupRosterStep() {
                 onClick={openManualModal}
                 disabled={uploading || remainingMemberSlots === 0}
                 data-testid="add-manual-member-btn"
+                aria-label={t('wizard.roster.addMemberTitle')}
+                title={t('wizard.roster.addMemberTitle')}
               >
                 <UserPlus size={16} />
               </button>
@@ -647,8 +654,8 @@ export function GroupRosterStep() {
           {draft.groupMembers.length === 0 ? (
             <div className="empty-state compact-empty" style={{ padding: '12px 10px 20px' }}>
               <Users size={24} />
-              <strong>No group members added yet</strong>
-              <span>Upload profile screenshots above or add members manually to populate your group roster.</span>
+              <strong>{t('wizard.roster.emptyTitle')}</strong>
+              <span>{t('wizard.roster.emptyDescription')}</span>
             </div>
           ) : (
             <div className="group-members-grid" data-testid="group-members-list">
@@ -676,7 +683,7 @@ export function GroupRosterStep() {
                             borderRadius: 4,
                           }}
                         >
-                          Manual
+                          {t('wizard.roster.manual')}
                         </span>
                       )}
                       {mScore && (
@@ -688,7 +695,8 @@ export function GroupRosterStep() {
                         type="button"
                         className="button button-quiet button-sm"
                         onClick={() => openEditModal(member)}
-                        title="Edit member details"
+                        title={t('wizard.roster.editMemberDetails')}
+                        aria-label={t('wizard.roster.editMemberDetails')}
                         data-testid={`edit-member-${idx}`}
                       >
                         <Edit2 size={13} />
@@ -697,7 +705,8 @@ export function GroupRosterStep() {
                         type="button"
                         className="button button-quiet button-sm button-danger-text"
                         onClick={() => removeGroupMember(member.id)}
-                        title="Remove member"
+                        title={t('wizard.roster.removeMember')}
+                        aria-label={t('wizard.roster.removeMember')}
                         data-testid={`remove-member-${idx}`}
                       >
                         <Trash2 size={13} />
@@ -707,38 +716,38 @@ export function GroupRosterStep() {
 
                   <div className="group-member-stats">
                     <div>
-                        <span>State:</span>
+                        <span>{t('wizard.roster.stateLabel')}</span>
                         <strong>{member.currentState || draft.currentState || '—'}</strong>
                       </div>
                       <div>
-                        <span>Power:</span>
+                        <span>{t('wizard.roster.power')}</span>
                       <strong>{member.highestPowerOnRecord}</strong>
                     </div>
                     <div>
-                      <span>Kills:</span>
+                      <span>{t('wizard.roster.killsLabel')}</span>
                       <strong>{member.kills}</strong>
                     </div>
                     <div>
-                      <span>Alliance:</span>
+                      <span>{t('wizard.roster.allianceLabel')}</span>
                       <strong>{member.currentAlliance || draft.currentAlliance || '—'}</strong>
                     </div>
                   </div>
 
                   <div className="group-member-breakdown">
                     <span>
-                      Struct: <strong>{member.structurePower}</strong>
+                      {t('wizard.roster.structureShort')} <strong>{member.structurePower}</strong>
                     </span>
                     <span>
-                      Tech: <strong>{member.techPower}</strong>
+                      {t('wizard.roster.techShort')} <strong>{member.techPower}</strong>
                     </span>
                     <span>
-                      Troop: <strong>{member.troopPower}</strong>
+                      {t('wizard.roster.troopShort')} <strong>{member.troopPower}</strong>
                     </span>
                     <span>
-                      Hero: <strong>{member.heroPower}</strong>
+                      {t('wizard.roster.heroShort')} <strong>{member.heroPower}</strong>
                     </span>
                     <span>
-                      Vehicle: <strong>{member.modVehiclePower}</strong>
+                      {t('wizard.roster.vehicleShort')} <strong>{member.modVehiclePower}</strong>
                     </span>
                   </div>
                 </div>
@@ -757,7 +766,7 @@ export function GroupRosterStep() {
       {/* Edit Member Modal */}
       {editingMember && (
         <Modal
-          title={`Edit Member: ${editingMember.playerName}`}
+          title={t('wizard.roster.editMember', { name: editingMember.playerName })}
           onClose={() => setEditingMember(null)}
           className="dialog-fixed-header"
           showCloseButton
@@ -769,7 +778,7 @@ export function GroupRosterStep() {
                 className="button button-quiet"
                 onClick={() => setEditingMember(null)}
               >
-                Cancel
+                {t('common.actions.cancel')}
               </button>
               <button
                 type="button"
@@ -777,14 +786,14 @@ export function GroupRosterStep() {
                 onClick={saveEditModal}
                 data-testid="save-member-edit"
               >
-                Save changes
+                {t('wizard.roster.saveChanges')}
               </button>
             </>
           }
         >
           <p className="hint" style={{ marginBottom: 14 }}>
-            You can update this member's name, state, arena powers, kills, and alliance.
-            {editingMember.isScreenshotVerified && ' Power stats are verified from screenshot and locked.'}
+            {t('wizard.roster.editHint')}
+            {editingMember.isScreenshotVerified && ` ${t('wizard.roster.editLockedHint')}`}
           </p>
 
           {editError && (
@@ -793,7 +802,7 @@ export function GroupRosterStep() {
             </div>
           )}
 
-          <Field id="edit-player-name" label="Player name" required>
+          <Field id="edit-player-name" label={t('wizard.roster.playerName')} required>
             <input
               className="control"
               id="edit-player-name"
@@ -807,7 +816,7 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          <Field id="edit-player-state" label="Current state" required>
+          <Field id="edit-player-state" label={t('wizard.roster.stateLabel')} required>
             <input
               className="control"
               id="edit-player-state"
@@ -825,18 +834,18 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          <Field id="edit-player-kills" label="Kills">
+          <Field id="edit-player-kills" label={t('wizard.roster.killsLabel')}>
             <CommaFormattedNumberInput
               className="control"
               id="edit-player-kills"
               value={editKills}
-              placeholder="e.g. 5,453,196 or 0"
+              placeholder={t('wizard.roster.killsPlaceholder')}
               onChange={setEditKills}
               data-testid="edit-member-kills-input"
             />
           </Field>
 
-          <Field id="edit-player-alliance" label="Current alliance" required>
+          <Field id="edit-player-alliance" label={t('wizard.roster.allianceLabel')} required>
             <input
               className="control"
               id="edit-player-alliance"
@@ -852,25 +861,25 @@ export function GroupRosterStep() {
 
           <div style={{ marginTop: 14, padding: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>
             <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>
-              POWER STATS {editingMember.isScreenshotVerified ? '(LOCKED FROM SCREENSHOT)' : '(MANUAL)'}:
+              {editingMember.isScreenshotVerified ? t('wizard.roster.lockedStats') : t('wizard.roster.manualStats')}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, fontSize: 12 }}>
-              <div>Power: <strong>{editingMember.highestPowerOnRecord}</strong></div>
-              <div>Structure Power: <strong>{editingMember.structurePower}</strong></div>
-              <div>Tech Power: <strong>{editingMember.techPower}</strong></div>
-              <div>Troop Power: <strong>{editingMember.troopPower}</strong></div>
-              <div>Hero Power: <strong>{editingMember.heroPower}</strong></div>
-              <div>Vehicle Power: <strong>{editingMember.modVehiclePower}</strong></div>
+              <div>{t('wizard.roster.power')} <strong>{editingMember.highestPowerOnRecord}</strong></div>
+              <div>{t('wizard.roster.structure')} <strong>{editingMember.structurePower}</strong></div>
+              <div>{t('wizard.roster.tech')} <strong>{editingMember.techPower}</strong></div>
+              <div>{t('wizard.roster.troop')} <strong>{editingMember.troopPower}</strong></div>
+              <div>{t('wizard.roster.hero')} <strong>{editingMember.heroPower}</strong></div>
+              <div>{t('wizard.roster.vehicle')} <strong>{editingMember.modVehiclePower}</strong></div>
             </div>
           </div>
 
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="edit-player-f1" label="F1 Arena Power (optional)">
+            <Field id="edit-player-f1" label={t('wizard.roster.arenaPowerOptional', { label: 'F1' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="edit-player-f1"
                 value={editF1Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={(value) => {
                   setEditF1Power(value);
                   setEditError('');
@@ -878,12 +887,12 @@ export function GroupRosterStep() {
                 data-testid="edit-member-f1-input"
               />
             </Field>
-            <Field id="edit-player-f2" label="F2 Arena Power (optional)">
+            <Field id="edit-player-f2" label={t('wizard.roster.arenaPowerOptional', { label: 'F2' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="edit-player-f2"
                 value={editF2Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={(value) => {
                   setEditF2Power(value);
                   setEditError('');
@@ -891,12 +900,12 @@ export function GroupRosterStep() {
                 data-testid="edit-member-f2-input"
               />
             </Field>
-            <Field id="edit-player-f3" label="F3 Arena Power (optional)">
+            <Field id="edit-player-f3" label={t('wizard.roster.arenaPowerOptional', { label: 'F3' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="edit-player-f3"
                 value={editF3Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={(value) => {
                   setEditF3Power(value);
                   setEditError('');
@@ -911,7 +920,7 @@ export function GroupRosterStep() {
       {/* Add Manual Member Modal */}
       {manualModalOpen && (
         <Modal
-          title={manualEditingMember ? `Edit Member: ${manualEditingMember.playerName}` : 'Add Group Member Manually'}
+          title={manualEditingMember ? t('wizard.roster.editMember', { name: manualEditingMember.playerName }) : t('wizard.roster.addMemberTitle')}
           className="dialog-fixed-header"
           showCloseButton
           scrollBodyToTopKey={manualErrorScrollKey}
@@ -929,7 +938,7 @@ export function GroupRosterStep() {
                   setManualEditingMember(null);
                 }}
               >
-                Cancel
+                {t('common.actions.cancel')}
               </button>
               <button
                 type="button"
@@ -937,14 +946,13 @@ export function GroupRosterStep() {
                 onClick={saveManualMember}
                 data-testid={manualEditingMember ? 'save-manual-member-edit' : 'save-manual-member'}
               >
-                {manualEditingMember ? 'Save changes' : 'Add Member'}
+                {manualEditingMember ? t('wizard.roster.saveChanges') : t('wizard.roster.addMember')}
               </button>
             </>
           }
         >
           <p className="hint" style={{ marginBottom: 14 }}>
-            The current state defaults to your state and can be changed. Arena powers are optional.
-            Manually entered members will not receive the verified badge.
+            {t('wizard.roster.manualHint')}
           </p>
 
           {manualError && (
@@ -954,19 +962,19 @@ export function GroupRosterStep() {
           )}
 
           {/* Row 1: Player name (full width) */}
-          <Field id="manual-name" label="Player Name" required>
+          <Field id="manual-name" label={t('wizard.roster.playerName')} required>
             <input
               className="control"
               id="manual-name"
               value={manualName}
               maxLength={30}
-              placeholder="e.g. PlayerTwo"
+              placeholder={t('wizard.roster.playerPlaceholder')}
               onChange={(e) => setManualName(e.target.value)}
               data-testid="manual-member-name-input"
             />
           </Field>
 
-          <Field id="manual-state" label="Current state" required>
+          <Field id="manual-state" label={t('wizard.roster.stateLabel')} required>
             <input
               className="control"
               id="manual-state"
@@ -984,13 +992,13 @@ export function GroupRosterStep() {
             />
           </Field>
 
-          <Field id="manual-alliance" label="Current alliance" required>
+          <Field id="manual-alliance" label={t('wizard.roster.allianceLabel')} required>
             <input
               className="control"
               id="manual-alliance"
               value={manualAlliance}
               maxLength={50}
-              placeholder={draft.currentAlliance || 'Alliance tag/name'}
+              placeholder={draft.currentAlliance || t('wizard.roster.allianceTag')}
               onChange={(e) => setManualAlliance(e.target.value)}
               data-testid="manual-member-alliance-input"
             />
@@ -998,24 +1006,24 @@ export function GroupRosterStep() {
 
           {/* Row 2: Power + Kills */}
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="manual-highest-power" label="Power on Record" required>
+            <Field id="manual-highest-power" label={t('wizard.roster.powerRecord')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-highest-power"
                 value={manualHighestPower}
-                placeholder="e.g. 210,000,000"
+                placeholder={t('wizard.roster.powerPlaceholder')}
                 disabled
                 onChange={() => undefined}
                 data-testid="manual-member-power-input"
               />
             </Field>
 
-            <Field id="manual-kills" label="Kills (optional)">
+            <Field id="manual-kills" label={t('wizard.roster.killsOptional')}>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-kills"
                 value={manualKills}
-                placeholder="0"
+                placeholder={t('wizard.roster.zeroPlaceholder')}
                 onChange={setManualKills}
                 data-testid="manual-member-kills-input"
               />
@@ -1024,22 +1032,22 @@ export function GroupRosterStep() {
 
           {/* Row 3: Structure + Tech */}
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="manual-struct" label="Structure Power" required>
+            <Field id="manual-struct" label={t('wizard.roster.structureLabel')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-struct"
                 value={manualStructurePower}
-                placeholder="e.g. 70,000,000"
+                placeholder={t('wizard.roster.structurePlaceholder')}
                 onChange={setManualStructurePower}
               />
             </Field>
 
-            <Field id="manual-tech" label="Tech Power" required>
+            <Field id="manual-tech" label={t('wizard.roster.techLabel')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-tech"
                 value={manualTechPower}
-                placeholder="e.g. 15,000,000"
+                placeholder={t('wizard.roster.techPlaceholder')}
                 onChange={setManualTechPower}
               />
             </Field>
@@ -1047,22 +1055,22 @@ export function GroupRosterStep() {
 
           {/* Row 4: Troop + Hero */}
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="manual-troop" label="Troop Power" required>
+            <Field id="manual-troop" label={t('wizard.roster.troopLabel')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-troop"
                 value={manualTroopPower}
-                placeholder="e.g. 50,000,000"
+                placeholder={t('wizard.roster.troopPlaceholder')}
                 onChange={setManualTroopPower}
               />
             </Field>
 
-            <Field id="manual-hero" label="Hero Power" required>
+            <Field id="manual-hero" label={t('wizard.roster.heroLabel')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-hero"
                 value={manualHeroPower}
-                placeholder="e.g. 45,000,000"
+                placeholder={t('wizard.roster.heroPlaceholder')}
                 onChange={setManualHeroPower}
               />
             </Field>
@@ -1070,44 +1078,44 @@ export function GroupRosterStep() {
 
           {/* Row 5: Mod Vehicle + Alliance */}
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="manual-vehicle" label="Mod Vehicle Power" required>
+            <Field id="manual-vehicle" label={t('wizard.roster.vehicleLabel')} required>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-vehicle"
                 value={manualModVehiclePower}
-                placeholder="e.g. 8,000,000"
+                placeholder={t('wizard.roster.vehiclePlaceholder')}
                 onChange={setManualModVehiclePower}
               />
             </Field>
           </div>
 
           <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
-            <Field id="manual-f1-power" label="F1 Arena Power (optional)">
+            <Field id="manual-f1-power" label={t('wizard.roster.arenaPowerOptional', { label: 'F1' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-f1-power"
                 value={manualF1Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={setManualF1Power}
                 data-testid="manual-member-f1-input"
               />
             </Field>
-            <Field id="manual-f2-power" label="F2 Arena Power (optional)">
+            <Field id="manual-f2-power" label={t('wizard.roster.arenaPowerOptional', { label: 'F2' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-f2-power"
                 value={manualF2Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={setManualF2Power}
                 data-testid="manual-member-f2-input"
               />
             </Field>
-            <Field id="manual-f3-power" label="F3 Arena Power (optional)">
+            <Field id="manual-f3-power" label={t('wizard.roster.arenaPowerOptional', { label: 'F3' })}>
               <CommaFormattedNumberInput
                 className="control"
                 id="manual-f3-power"
                 value={manualF3Power}
-                placeholder="Leave blank if unknown"
+                placeholder={t('wizard.roster.unknown')}
                 onChange={setManualF3Power}
                 data-testid="manual-member-f3-input"
               />

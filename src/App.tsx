@@ -6,8 +6,11 @@ import { ApplicationWizard } from './pages/application/ApplicationWizard';
 import { ApplicationTracker } from './pages/ApplicationTracker';
 import { About565 } from './pages/About565';
 import { ReturningUserModal } from './components/ReturningUserModal';
+import { useTranslation } from 'react-i18next';
 
 function App() {
+  const { t } = useTranslation();
+
   return (
     <>
       <ReturningUserModal />
@@ -40,10 +43,10 @@ function App() {
         {/* 404 fallback */}
         <Route>
           <main className="form-shell">
-            <h1 className="form-title">Page not found</h1>
-            <p className="intro">This portal page does not exist.</p>
+            <h1 className="form-title">{t('pages.notFound.title')}</h1>
+            <p className="intro">{t('pages.notFound.description')}</p>
             <Link className="button" href="/">
-              Return to application
+              {t('common.actions.returnToApplication')}
             </Link>
           </main>
         </Route>

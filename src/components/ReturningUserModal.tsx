@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ExternalLink, FilePlus, FileText, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   getTrackedApplications,
   isWelcomePromptDismissed,
@@ -9,6 +10,7 @@ import {
 } from '../lib/trackedApplications';
 
 export function ReturningUserModal() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [tracked, setTracked] = useState<TrackedApplicationMeta[]>([]);
   const [, setLocation] = useLocation();
@@ -73,17 +75,17 @@ export function ReturningUserModal() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
           <div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#60a5fa' }}>
-              Welcome Back!
+              {t('components.returning.welcome')}
             </div>
             <h2 id="welcome-modal-title" style={{ margin: '4px 0 0 0', fontSize: '1.35rem', color: '#f8fafc' }}>
-              Saved Applications Found
+              {t('components.returning.found')}
             </h2>
           </div>
           <button
             type="button"
             className="button button-secondary"
             onClick={handleClose}
-            aria-label="Close"
+            aria-label={t('common.actions.close')}
             style={{ paddingBlock: 6, paddingInline: 10, minWidth: 'auto', borderRadius: '10px' }}
           >
             <X size={16} />
@@ -91,8 +93,10 @@ export function ReturningUserModal() {
         </div>
 
         <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: '0 0 16px 0', lineHeight: 1.45 }}>
-          We found {tracked.length} existing migration {tracked.length === 1 ? 'application' : 'applications'}.
-          Would you like to view and track your existing application, or file a new request?
+          {t('components.returning.foundDescription', {
+            count: tracked.length,
+            applicationNoun: tracked.length === 1 ? 'application' : 'applications',
+          })}
         </p>
 
         {/* List of tracked applications */}
@@ -123,12 +127,12 @@ export function ReturningUserModal() {
             >
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '0.92rem' }}>
-                  {app.gameName || 'Unnamed Player'}
+                  {app.gameName || t('components.returning.unnamed')}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', gap: 8 }}>
                   <span>{app.reference}</span>
                   <span>•</span>
-                  <span>{app.migrationType || 'Individual'}</span>
+                  <span>{app.migrationType === 'Group' ? t('common.labels.group') : t('common.labels.individual')}</span>
                 </div>
               </div>
 
@@ -160,7 +164,11 @@ export function ReturningUserModal() {
                     }`,
                   }}
                 >
-                  {app.status || 'Pending'}
+                  {app.status === 'Approved'
+                    ? t('components.returning.approved')
+                    : app.status === 'Rejected'
+                      ? t('components.returning.rejected')
+                      : t('components.returning.pending')}
                 </span>
                 <ExternalLink size={14} style={{ color: '#94a3b8' }} />
               </div>
@@ -177,7 +185,7 @@ export function ReturningUserModal() {
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
             <FileText size={16} />
-            View & Track My Applications
+            {t('components.returning.viewTrack')}
           </button>
           <button
             type="button"
@@ -186,7 +194,7 @@ export function ReturningUserModal() {
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
             <FilePlus size={16} />
-            File a New Request
+            {t('components.returning.newRequest')}
           </button>
         </div>
       </section>

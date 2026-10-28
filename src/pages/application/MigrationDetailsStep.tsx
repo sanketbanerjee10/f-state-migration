@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@/lib/api-client';
+import { useTranslation } from 'react-i18next';
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
-import { getCachedActiveAlliances } from '../../lib/activeAlliancesCache';
+import { useCachedActiveAlliances } from '../../lib/activeAlliancesCache';
 import type { MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function MigrationDetailsStep() {
+  const { t } = useTranslation();
   const { draft, setDraftField, validateStep } = useApplicationDraft();
   const { nextStep, prevStep, isGroup } = useWizardNavigation();
 
@@ -19,14 +20,7 @@ export function MigrationDetailsStep() {
     setDraftField('representative', draft.playerName.trim(), false);
   }
 
-  const activeAlliances = useGetActiveAlliances({
-    query: {
-      queryKey: getGetActiveAlliancesQueryKey(),
-      queryFn: ({ signal }) => getCachedActiveAlliances(signal),
-      staleTime: 24 * 60 * 60 * 1000,
-      refetchOnWindowFocus: false,
-    },
-  });
+  const activeAlliances = useCachedActiveAlliances();
 
   const handleContinue = () => {
     const localErrors = validateStep('migration');
@@ -43,19 +37,19 @@ export function MigrationDetailsStep() {
       navigationProps={{
         onContinue: handleContinue,
         onBack: prevStep,
-        continueLabel: isGroup ? 'Continue to Group Roster' : 'Continue to Review',
+        continueLabel: isGroup ? t('wizard.preferences.continueRoster') : t('wizard.preferences.continueReview'),
         // backLabel: 'Back to Combat Power',
         disabled: activeAlliances.isLoading,
       }}
     >
       {/* ── Section 1: Migration type & preferences ── */}
-      <FormSection number="01" title="Migration preferences">
+      <FormSection number="01" title={t('wizard.preferences.title')}>
         <Field
           id="migrationType"
-          label="Migration Type"
+          label={t('wizard.preferences.type')}
           required
           error={stepErrors.migrationType}
-          hint="Select whether you are applying alone or representing a group migrating together."
+          hint={t('wizard.preferences.typeDescription')}
         >
           <div style={{ display: 'flex', gap: 8 }}>
             {(['Individual', 'Group'] as MigrationType[]).map((type) => (
@@ -73,7 +67,7 @@ export function MigrationDetailsStep() {
                   setStepErrors((old) => ({ ...old, migrationType: '' }));
                 }}
               >
-                {type}
+                {type === 'Group' ? t('common.labels.group') : t('common.labels.individual')}
               </button>
             ))}
           </div>
@@ -82,10 +76,10 @@ export function MigrationDetailsStep() {
         {draft.migrationType === 'Group' && (
           <Field
             id="representative"
-            label="Group representative"
+            label={t('wizard.preferences.representative')}
             required
             error={stepErrors.representative}
-            hint="The in-game name of the primary contact or coordinator for your group."
+            hint={t('wizard.preferences.representativeHint')}
           >
             <input
               className="control"
@@ -96,7 +90,7 @@ export function MigrationDetailsStep() {
                 setDraftField('representative', e.target.value, true);
                 setStepErrors((old) => ({ ...old, representative: '' }));
               }}
-              placeholder="Enter the representative's in-game name"
+              placeholder={t('wizard.preferences.representativePlaceholder')}
               data-testid="group-representative"
             />
           </Field>
@@ -104,10 +98,10 @@ export function MigrationDetailsStep() {
 
         <Field
           id="alliance-options"
-          label="Alliances you'd like to migrate to"
+          label={t('wizard.preferences.alliances')}
           required
           error={stepErrors.preferredAlliances}
-          hint="Choose 'Any alliance' or select one or more specific destination alliances in State 565."
+          hint={t('wizard.preferences.alliancesHint')}
         >
           <AllianceMultiSelect
             values={draft.preferredAlliances}
@@ -120,7 +114,7 @@ export function MigrationDetailsStep() {
             loading={activeAlliances.isLoading}
             loadError={
               activeAlliances.isError
-                ? 'Active alliance options could not be loaded. Please retry before continuing.'
+                ? t('wizard.preferences.loadError')
                 : undefined
             }
             onRetry={() => void activeAlliances.refetch()}
@@ -129,10 +123,10 @@ export function MigrationDetailsStep() {
       </FormSection>
 
       {/* ── Section 2: Reason & comments ── */}
-      <FormSection number="02" title="Why do you want to join State 565?">
+      <FormSection number="02" title={t('wizard.preferences.reason')}>
         <Field
           id="reason"
-          label="Why do you want to migrate?"
+          label={t('wizard.preferences.reasonAlternate')}
           required
           error={stepErrors.reason}
           // hint="Tell us why you want to join State 565 (10–1,000 characters)."
@@ -142,7 +136,7 @@ export function MigrationDetailsStep() {
             id="reason"
             value={draft.reason}
             maxLength={1000}
-            placeholder="Tell us what goals, friendships, or playstyle bring you to State 565..."
+            placeholder={t('wizard.preferences.reasonPlaceholder')}
             onChange={(e) => {
               setDraftField('reason', e.target.value, true);
               setStepErrors((old) => ({ ...old, reason: '' }));
@@ -150,13 +144,13 @@ export function MigrationDetailsStep() {
             data-testid="migration-reason"
           />
           <div className="counter" aria-live="polite">
-            {draft.reason.length} / 1,000
+            {t('wizard.preferences.counter', { count: draft.reason.length })}
           </div>
         </Field>
 
         <Field
           id="comments"
-          label="Additional comments"
+          label={t('wizard.preferences.comments')}
           error={stepErrors.comments}
           // hint="Anything else our leadership team should know? (Up to 1,000 characters)."
         >
@@ -169,11 +163,11 @@ export function MigrationDetailsStep() {
               setDraftField('comments', e.target.value, true);
               setStepErrors((old) => ({ ...old, comments: '' }));
             }}
-            placeholder="Anything else our leadership team should know?"
+            placeholder={t('wizard.preferences.commentsHint')}
             data-testid="additional-comments"
           />
           <div className="counter" aria-live="polite">
-            {draft.comments.length} / 1,000
+            {t('wizard.preferences.counter', { count: draft.comments.length })}
           </div>
         </Field>
       </FormSection>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, KeyRound, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { useLeadershipSession } from '../lib/auth';
 
 export function LeadershipLogin() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { session, loading, exchangeToken } = useLeadershipSession();
   const [tokenInput, setTokenInput] = useState('');
@@ -18,7 +20,7 @@ export function LeadershipLogin() {
   if (loading) {
     return (
       <main className="auth-shell">
-        <div className="skeleton auth-skeleton" aria-label="Checking leadership session" />
+        <div className="skeleton auth-skeleton" aria-label={t('pages.leadership.checkingSession')} />
       </main>
     );
   }
@@ -38,32 +40,32 @@ export function LeadershipLogin() {
     if (result.success) {
       setLocation('/leadership/dashboard');
     } else {
-      setError(result.error || 'Access token could not be verified. Check your link or key and try again.');
+      setError(result.error || t('pages.leadership.tokenVerifyError'));
     }
   };
 
   return (
     <main className="auth-shell" data-testid="leadership-login">
       <Link href="/" className="back-link" data-testid="link-public-application">
-        <ArrowLeft size={15} /> Return to application
+        <ArrowLeft size={15} /> {t('pages.leadership.loginReturn')}
       </Link>
       <section className="auth-card">
         <div className="auth-mark">
           <ShieldCheck size={22} />
         </div>
-        <p className="eyebrow">STATE 565 / LEADERSHIP</p>
-        <h1>Review access</h1>
+        <p className="eyebrow">{t('pages.leadership.loginEyebrow')}</p>
+        <h1>{t('pages.leadership.reviewAccess')}</h1>
         <p className="auth-copy">
-          Access the leadership review dashboard using your private access link or secret UUID credential. No signup or account creation required.
+          {t('pages.leadership.loginDescription')}
         </p>
         {expired && (
           <div className="notice-error" role="status" data-testid="session-expired-message">
-            Your leadership session ended. Use your private link or enter your access token again to continue reviewing applications.
+            {t('pages.leadership.loginExpired')}
           </div>
         )}
         <form onSubmit={handleTokenSubmit}>
           <label className="label" htmlFor="leadership-token">
-            Leadership access token or UUID
+            {t('pages.leadership.tokenLabel')}
           </label>
           <input
             className="control auth-control"
@@ -72,7 +74,7 @@ export function LeadershipLogin() {
             autoComplete="off"
             value={tokenInput}
             onChange={(event) => setTokenInput(event.target.value)}
-            placeholder="Paste your secret UUID or token"
+            placeholder={t('pages.leadership.tokenPlaceholder')}
             required
             data-testid="leadership-token-input"
           />
@@ -89,17 +91,17 @@ export function LeadershipLogin() {
           >
             {pending ? (
               <>
-                <LoaderCircle size={15} className="spin" /> Verifying…
+                <LoaderCircle size={15} className="spin" /> {t('pages.leadership.verifying')}
               </>
             ) : (
               <>
-                <KeyRound size={15} /> Authenticate
+                <KeyRound size={15} /> {t('pages.leadership.authenticate')}
               </>
             )}
           </button>
         </form>
         <p className="privacy-note">
-          Leadership access only. Sessions expire automatically and can be revoked by state administration.
+          {t('pages.leadership.loginPrivacy')}
         </p>
       </section>
     </main>

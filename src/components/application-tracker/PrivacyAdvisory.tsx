@@ -1,6 +1,8 @@
 import { ShieldAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function PrivacyAdvisory() {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -15,9 +17,9 @@ export function PrivacyAdvisory() {
     >
       <div className="flex items-center gap-2 mb-2">
         <ShieldAlert size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
-        <strong>Tracking &amp; Privacy Advisory</strong>
+        <strong>{t('components.tracker.privacyTitle')}</strong>
       </div>
-      Only share your application tracking details with people you trust. Anyone with these details may be able to view or change your application.
+      {t('components.tracker.privacyDescription')}
     </div>
   );
 }

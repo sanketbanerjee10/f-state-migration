@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import {
@@ -22,6 +23,7 @@ export function AllianceManagementSection({
   onNotice,
   onError,
 }: AllianceManagementSectionProps) {
+  const { t } = useTranslation();
   const client = useQueryClient();
   const [allianceEdit, setAllianceEdit] = useState<AdminAlliance | null | 'new'>(null);
   const [allianceForm, setAllianceForm] = useState(emptyAlliance);
@@ -64,12 +66,12 @@ export function AllianceManagementSection({
         });
       }
       setAllianceEdit(null);
-      onNotice?.(allianceEdit === 'new' ? 'Alliance added.' : 'Alliance updated.');
+      onNotice?.(t(allianceEdit === 'new' ? 'components.dashboard.allianceAdded' : 'components.dashboard.allianceUpdated'));
       void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
     } catch (error) {
       onError?.(error);
       setFormError(
-        error instanceof Error ? error.message : 'The request could not be completed.',
+        error instanceof Error ? error.message : t('components.dashboard.requestFailed'),
       );
     }
   };
@@ -80,12 +82,17 @@ export function AllianceManagementSection({
         id: alliance.id,
         data: { isActive: !alliance.isActive },
       });
-      onNotice?.(`${alliance.tag} ${alliance.isActive ? 'deactivated' : 'activated'}.`);
+      onNotice?.(
+        t('components.dashboard.allianceAction', {
+          tag: alliance.tag,
+          action: t(alliance.isActive ? 'components.dashboard.deactivated' : 'components.dashboard.activated'),
+        }),
+      );
       void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
     } catch (error) {
       onError?.(error);
       onNotice?.(
-        error instanceof Error ? error.message : 'The request could not be completed.',
+        error instanceof Error ? error.message : t('components.dashboard.requestFailed'),
       );
     }
   };
@@ -95,16 +102,16 @@ export function AllianceManagementSection({
       <section className="admin-panel alliance-panel" style={{ marginTop: 24 }}>
         <div className="panel-heading">
           <div>
-            <span className="panel-kicker">DESTINATIONS</span>
-            <h2>Alliance management</h2>
-            <p>Active destinations appear on the public application.</p>
+            <span className="panel-kicker">{t('components.dashboard.destinations')}</span>
+            <h2>{t('components.dashboard.allianceManagement')}</h2>
+            <p>{t('components.dashboard.publicHint')}</p>
           </div>
           <button
             className="button button-primary"
             onClick={() => beginAlliance()}
             data-testid="add-alliance"
           >
-            <Plus size={15} /> Add alliance
+            <Plus size={15} /> {t('components.dashboard.addAlliance')}
           </button>
         </div>
 
@@ -115,15 +122,15 @@ export function AllianceManagementSection({
             <span>
               {alliances.error instanceof Error
                 ? alliances.error.message
-                : 'Failed to load alliances.'}
+                : t('components.dashboard.alliancesFailed')}
             </span>
             <button className="button" onClick={() => void alliances.refetch()} data-testid="retry-admin-alliances">
-              Retry
+              {t('common.actions.retry')}
             </button>
           </div>
         ) : !alliances.data?.length ? (
           <div className="empty-state compact-empty">
-            No destination alliances configured yet.
+            {t('components.dashboard.noAlliances')}
           </div>
         ) : (
           <div className="alliance-admin-list">
@@ -138,19 +145,19 @@ export function AllianceManagementSection({
                     <span>{item.tag}</span> {item.name}
                   </strong>
                   <small>
-                    Display order {item.displayOrder} ·{' '}
-                    {item.isActive ? 'Shown on application' : 'Hidden from application'}
+                    {t('components.dashboard.displayOrderOnly', { n: item.displayOrder })} ·{' '}
+                    {t(item.isActive ? 'components.dashboard.shown' : 'components.dashboard.hidden')}
                   </small>
                 </div>
                 <span className={`alliance-state ${item.isActive ? 'is-active' : ''}`}>
-                  {item.isActive ? 'Active' : 'Inactive'}
+                  {t(item.isActive ? 'common.status.active' : 'common.status.inactive')}
                 </span>
                 <button
                   className="button"
                   onClick={() => beginAlliance(item)}
                   data-testid={`edit-alliance-${item.id}`}
                 >
-                  Edit
+                  {t('common.actions.edit')}
                 </button>
                 <button
                   className={`button ${item.isActive ? 'button-danger' : ''}`}
@@ -158,7 +165,7 @@ export function AllianceManagementSection({
                   disabled={updateAlliance.isPending}
                   data-testid={`${item.isActive ? 'deactivate' : 'activate'}-alliance-${item.id}`}
                 >
-                  {item.isActive ? 'Deactivate' : 'Activate'}
+                  {t(item.isActive ? 'common.actions.deactivate' : 'common.actions.activate')}
                 </button>
               </article>
             ))}
@@ -182,12 +189,12 @@ export function AllianceManagementSection({
           >
             <h2 id="alliance-dialog-title">
               {allianceEdit === 'new'
-                ? 'Add destination alliance'
-                : `Edit ${allianceEdit.tag}`}
+                ? t('components.dashboard.addDestination')
+                : t('components.dashboard.editAlliance', { tag: allianceEdit.tag })}
             </h2>
             <form onSubmit={saveAlliance}>
               <label className="label" htmlFor="alliance-tag">
-                Tag
+                {t('components.dashboard.tag')}
               </label>
               <input
                 id="alliance-tag"
@@ -204,7 +211,7 @@ export function AllianceManagementSection({
                 data-testid="alliance-tag-input"
               />
               <label className="label auth-label" htmlFor="alliance-name">
-                Alliance name
+                {t('components.dashboard.allianceName')}
               </label>
               <input
                 id="alliance-name"
@@ -221,7 +228,7 @@ export function AllianceManagementSection({
                 data-testid="alliance-name-input"
               />
               <label className="label auth-label" htmlFor="alliance-order">
-                Display order
+                {t('components.dashboard.displayOrderLabel')}
               </label>
               <input
                 id="alliance-order"
@@ -251,7 +258,7 @@ export function AllianceManagementSection({
                   onClick={() => setAllianceEdit(null)}
                   data-testid="cancel-alliance-edit"
                 >
-                  Cancel
+                  {t('common.actions.cancel')}
                 </button>
                 <button
                   className="button button-primary"
@@ -260,8 +267,8 @@ export function AllianceManagementSection({
                   data-testid="save-alliance"
                 >
                   {createAlliance.isPending || updateAlliance.isPending
-                    ? 'Saving…'
-                    : 'Save alliance'}
+                    ? t('common.actions.saving')
+                    : t('components.dashboard.saveAlliance')}
                 </button>
               </div>
             </form>

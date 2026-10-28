@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { getGetActiveAlliancesQueryKey, useGetActiveAlliances } from '@/lib/api-client';
+import { useTranslation } from 'react-i18next';
+import { useCachedActiveAlliances } from '../../lib/activeAlliancesCache';
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
@@ -10,13 +11,12 @@ import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 const tierOptions: MigrationTier[] = ['Regular', 'Medium', 'Advanced', 'Elite'];
 
 export function MigrationPreferencesStep() {
+  const { t } = useTranslation();
   const { draft, setDraftField, validateStep } = useApplicationDraft();
   const { nextStep, prevStep, isGroup } = useWizardNavigation();
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
 
-  const activeAlliances = useGetActiveAlliances({
-    query: { queryKey: getGetActiveAlliancesQueryKey() },
-  });
+  const activeAlliances = useCachedActiveAlliances();
 
   const handleContinue = () => {
     const errors = validateStep('/apply/preferences');
@@ -31,18 +31,18 @@ export function MigrationPreferencesStep() {
       navigationProps={{
         onContinue: handleContinue,
         onBack: prevStep,
-        continueLabel: isGroup ? 'Continue to Group Details' : 'Continue to Review',
+        continueLabel: isGroup ? t('wizard.preferences.continueDetails') : t('wizard.preferences.continueReview'),
         // backLabel: 'Back to Combat Stats',
         disabled: activeAlliances.isLoading,
       }}
     >
-      <FormSection number="04" title="Migration preferences">
+      <FormSection number="04" title={t('wizard.preferences.title')}>
         <Field
           id="migrationType"
-          label="Individual or group migration?"
+          label={t('wizard.preferences.typeQuestion')}
           required
           error={stepErrors.migrationType}
-          hint="Select whether you are applying alone or representing a group migrating together."
+          hint={t('wizard.preferences.typeDescription')}
         >
           <select
             className="control"
@@ -54,19 +54,19 @@ export function MigrationPreferencesStep() {
             }}
             data-testid="migration-type"
           >
-            <option value="">Choose an option</option>
-            <option value="Individual">Individual</option>
-            <option value="Group">Group</option>
+            <option value="">{t('wizard.preferences.chooseOption')}</option>
+            <option value="Individual">{t('common.labels.individual')}</option>
+            <option value="Group">{t('common.labels.group')}</option>
           </select>
         </Field>
 
         {draft.migrationType === 'Group' && (
           <Field
             id="representative"
-            label="Group representative"
+            label={t('wizard.preferences.representative')}
             required
             error={stepErrors.representative}
-            hint="The in-game name of the primary contact or coordinator for your group."
+            hint={t('wizard.preferences.representativeHint')}
           >
             <input
               className="control"
@@ -77,7 +77,7 @@ export function MigrationPreferencesStep() {
                 setDraftField('representative', e.target.value, true);
                 setStepErrors((old) => ({ ...old, representative: '' }));
               }}
-              placeholder="Enter the representative's in-game name"
+              placeholder={t('wizard.preferences.representativePlaceholder')}
               data-testid="group-representative"
             />
           </Field>
@@ -85,10 +85,10 @@ export function MigrationPreferencesStep() {
 
         <Field
           id="alliance-options"
-          label="Alliances you'd like to migrate to"
+          label={t('wizard.preferences.alliances')}
           required
           error={stepErrors.preferredAlliances}
-          hint="Choose 'Any alliance' or select one or more specific destination alliances in State 565."
+          hint={t('wizard.preferences.alliancesHint')}
         >
           <AllianceMultiSelect
             values={draft.preferredAlliances}
@@ -101,15 +101,15 @@ export function MigrationPreferencesStep() {
             loading={activeAlliances.isLoading}
             loadError={
               activeAlliances.isError
-                ? 'Active alliance options could not be loaded. Please retry before continuing.'
+                ? t('wizard.preferences.loadError')
                 : undefined
             }
             onRetry={() => void activeAlliances.refetch()}
           />
         </Field>
 
-        <Field id="tier-regular" label="Expected migration tier" required error={stepErrors.tier}>
-          <div className="radio-grid" role="radiogroup" aria-label="Expected migration tier" data-testid="tier-options">
+        <Field id="tier-regular" label={t('wizard.preferences.tier')} required error={stepErrors.tier}>
+          <div className="radio-grid" role="radiogroup" aria-label={t('wizard.preferences.tier')} data-testid="tier-options">
             {tierOptions.map((tier) => (
               <label className="radio-card" key={tier}>
                 <input
@@ -123,7 +123,7 @@ export function MigrationPreferencesStep() {
                   }}
                   data-testid={`tier-${tier.toLowerCase()}`}
                 />
-                {tier}
+                {t(`wizard.preferences.tiers.${tier.toLowerCase()}`)}
               </label>
             ))}
           </div>

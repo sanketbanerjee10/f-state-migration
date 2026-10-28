@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field, FormSection } from '../../components/Field';
 import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
@@ -7,6 +8,7 @@ import { useApplicationDraft, type StepErrors } from '../../hooks/useApplication
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function CombatPowerStep() {
+  const { t } = useTranslation();
   const { draft, setDraftField, validateStep } = useApplicationDraft();
   const { nextStep, prevStep } = useWizardNavigation();
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
@@ -29,15 +31,15 @@ export function CombatPowerStep() {
       navigationProps={{
         onContinue: handleContinue,
         onBack: prevStep,
-        continueLabel: 'Continue to Migration Details',
+        continueLabel: t('wizard.combat.continue'),
         // backLabel: 'Back to Character Details',
       }}
     >
       {/* ── Section 1: Current state & alliance ── */}
-      <FormSection number="01" title="Current location">
+      <FormSection number="01" title={t('wizard.combat.location')}>
         <Field
           id="currentState"
-          label="Current state"
+          label={t('wizard.combat.stateLabel')}
           required
           error={stepErrors.currentState}
         >
@@ -52,7 +54,7 @@ export function CombatPowerStep() {
               setDraftField('currentState', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentState: '' }));
             }}
-            placeholder="Enter a state number (e.g. 565)"
+            placeholder={t('wizard.combat.statePlaceholder')}
             list="known-state-options"
             inputMode="numeric"
             pattern="[0-9]*"
@@ -67,7 +69,7 @@ export function CombatPowerStep() {
 
         <Field
           id="currentAlliance"
-          label="Current alliance"
+          label={t('wizard.combat.allianceLabel')}
           required
           error={stepErrors.currentAlliance}
         >
@@ -80,16 +82,16 @@ export function CombatPowerStep() {
               setDraftField('currentAlliance', e.target.value, true);
               setStepErrors((old) => ({ ...old, currentAlliance: '' }));
             }}
-            placeholder="Your alliance full name"
+            placeholder={t('wizard.combat.allianceHint')}
             data-testid="current-alliance"
           />
         </Field>
       </FormSection>
 
       {/* ── Section 2: Arena powers ── */}
-      <FormSection number="02" title="Arena formation powers">
+      <FormSection number="02" title={t('wizard.combat.arenaTitle')}>
         <p className="hint" style={{ margin: '-3px 0 12px' }}>
-          Enter your arena formation powers with no season buildings. Numbers are formatted with commas as you type.
+          {t('wizard.combat.arenaHint')}
         </p>
 
         <div className="row-3">
@@ -97,7 +99,7 @@ export function CombatPowerStep() {
             <Field
               key={key}
               id={key}
-              label={`F${index + 1} arena power`}
+              label={t('wizard.combat.formation', { number: index + 1 })}
               required
               error={stepErrors[key]}
             >
@@ -105,7 +107,7 @@ export function CombatPowerStep() {
                 className="control"
                 id={key}
                 value={draft[key]}
-                placeholder={['e.g. 180,500,000', 'e.g. 99,183,574', 'e.g. 22,349,680'][index]}
+                placeholder={t(`wizard.combat.f${index + 1}Placeholder`)}
                 onChange={(value) => {
                   setDraftField(key, value, true);
                   setStepErrors((old) => ({ ...old, [key]: '' }));

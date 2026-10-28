@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FileImage, RefreshCw, ShieldCheck, Sofa, Trash2, Upload } from 'lucide-react';
 import { Field, FormSection } from '../../components/Field';
 import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
@@ -15,6 +16,7 @@ import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import type { OcrDiagnostics } from '../../lib/ocr';
 
 export function PowerDetailsStep() {
+  const { t } = useTranslation();
   const {
     draft,
     setDraftField,
@@ -72,11 +74,11 @@ export function PowerDetailsStep() {
     if (!file) return;
 
     if (!['image/png', 'image/jpeg'].includes(file.type) && !/\.(png|jpe?g)$/i.test(file.name)) {
-      setOcrError('Please upload a PNG or JPG/JPEG image.');
+      setOcrError(t('wizard.power.invalidType'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setOcrError('The image is over the 10 MB limit. Please choose a smaller image.');
+      setOcrError(t('wizard.power.tooLarge'));
       return;
     }
 
@@ -88,7 +90,7 @@ export function PowerDetailsStep() {
     setOcrSuccess(false);
     setOcrUncertain(false);
     setProcessing(true);
-    setOcrProgress({ status: 'Reading your screenshot…', progress: 0 });
+    setOcrProgress({ status: t('wizard.power.reading'), progress: 0 });
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -111,7 +113,7 @@ export function PowerDetailsStep() {
         if (capturedCount < 5) {
           setScreenshotFile(null);
           setOcrError(
-            `Invalid image: only ${capturedCount} of ${totalRequired} required player fields could be detected. Please upload a clear Player Details screenshot or use the manual entry method below.`
+            t('wizard.power.invalidFields', { capturedCount, totalRequired })
           );
           setOcrUncertain(false);
           setOcrSuccess(false);
@@ -126,7 +128,7 @@ export function PowerDetailsStep() {
       })
       .catch((error) => {
         if ((error as Error)?.name !== 'AbortError') {
-          setOcrError("We couldn't read this screenshot. Try another image or enter the details manually.");
+          setOcrError(t('wizard.power.readFailed'));
         }
       })
       .finally(() => {
@@ -140,7 +142,7 @@ export function PowerDetailsStep() {
     abortRef.current?.abort();
     setProcessing(false);
     setOcrProgress(null);
-    setOcrError('Recognition cancelled. You can enter your details manually below.');
+    setOcrError(t('wizard.power.cancelled'));
   };
 
   const handleReplaceClick = () => {
@@ -162,7 +164,7 @@ export function PowerDetailsStep() {
     if (Object.keys(errors).length === 0) {
       if (!scoreResult || scoreResult.score < 10 || scoreResult.score > 1000) {
         setScoreErrorToast(
-          'Applicant data was not accepted because the calculated migration score must be between 10 and 1000. The data may be invalid.',
+          t('wizard.power.invalidScore'),
         );
         return;
       }
@@ -179,14 +181,14 @@ export function PowerDetailsStep() {
       <StepLayout
         navigationProps={{
           onContinue: handleContinue,
-          continueLabel: 'Continue to Combat Power',
+          continueLabel: t('wizard.power.continue'),
           disabled: processing,
         }}
       >
       {/* ── Section 1: Screenshot upload (optional) ── */}
-      <FormSection number="01" title="Power details screenshot (optional)">
+      <FormSection number="01" title={t('wizard.power.screenshotOptional')}>
         <p className="hint" style={{ marginBottom: 10 }}>
-          Upload a screenshot to automatically prefill the fields below — or skip this and enter them manually.
+          {t('wizard.power.intro')}
         </p>
 
         {!draft.hasScreenshot && <ScreenshotRequirementsGuide />}
@@ -196,7 +198,7 @@ export function PowerDetailsStep() {
           hidden
           type="file"
           accept="image/png,image/jpeg,.jpg,.jpeg,.png"
-          aria-label="Power details screenshot"
+          aria-label={t('wizard.power.title')}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) processFile(file);
@@ -235,9 +237,9 @@ export function PowerDetailsStep() {
                 <Upload size={16} />
               </div>
               <div>
-                <strong style={{fontSize: 12}}>Upload a screenshot of your player details</strong>
+                <strong style={{fontSize: 12}}>{t('wizard.power.uploadPrompt')}</strong>
                 <div className="upload-copy">
-                  <span>PNG or JPG, up to 10 MB</span>
+                  <span>{t('wizard.power.formats')}</span>
                 </div>
               </div>
             </div>
@@ -250,7 +252,7 @@ export function PowerDetailsStep() {
               }}
               data-testid="choose-screenshot"
             >
-              <FileImage size={14} /> Choose image
+              <FileImage size={14} /> {t('wizard.power.choose')}
             </button>
           </div>
         )}
@@ -297,9 +299,9 @@ export function PowerDetailsStep() {
             <div className="screenshot-status-pill">
               <div className="flex align-center gap-1">
                 <ShieldCheck size={14} />
-                <div>Screenshot Verified</div>
+                <div>{t('wizard.power.verified')}</div>
               </div>
-              <div className="verified-badge-text">Power breakdown locked</div>
+              <div className="verified-badge-text">{t('wizard.power.locked')}</div>
             </div>
             <div className="screenshot-action-buttons">
               <button
@@ -308,13 +310,14 @@ export function PowerDetailsStep() {
                 onClick={handleReplaceClick}
                 data-testid="replace-screenshot"
               >
-                <RefreshCw size={13} /> Replace
+                <RefreshCw size={13} /> {t('wizard.power.replace')}
               </button>
               <button
                 type="button"
                 className="button button-quiet button-sm button-danger-text"
                 onClick={handleRemove}
                 data-testid="remove-screenshot"
+                aria-label={t('common.actions.remove')}
               >
                 <Trash2 size={13} />
               </button>
@@ -324,21 +327,21 @@ export function PowerDetailsStep() {
       </FormSection>
 
       {/* ── Section 2: Character stats ── */}
-      <FormSection number="02" title="Character details">
+      <FormSection number="02" title={t('wizard.power.character')}>
         <div className="row-3">
           <Field
             id="playerName"
-            label="In-game name"
+            label={t('wizard.power.playerName')}
             required
             error={stepErrors.playerName}
-            hint="Your character name as shown in-game"
+            hint={t('wizard.power.playerHint')}
           >
             <input
               className="control"
               id="playerName"
               value={draft.playerName}
               maxLength={30}
-              placeholder="e.g. GOD Sankeyyy"
+              placeholder={t('wizard.power.playerPlaceholder')}
               onChange={(e) => {
                 setDraftField('playerName', e.target.value, true);
                 setStepErrors((old) => ({ ...old, playerName: '' }));
@@ -349,16 +352,16 @@ export function PowerDetailsStep() {
 
           <Field
             id="highestPowerOnRecord"
-            label="Power on Record"
+            label={t('wizard.power.powerRecord')}
             required
             error={stepErrors.highestPowerOnRecord}
-            hint="Your actual player power"
+            hint={t('wizard.power.powerHint')}
           >
             <CommaFormattedNumberInput
               className="control"
               id="highestPowerOnRecord"
               value={draft.highestPowerOnRecord}
-              placeholder="Current Power"
+              placeholder={t('wizard.power.currentPower')}
               disabled
               onChange={() => undefined}
               data-testid="ocr-highest-power"
@@ -367,15 +370,15 @@ export function PowerDetailsStep() {
 
           <Field
             id="kills"
-            label="Kills (optional)"
+            label={t('wizard.power.killsOptional')}
             error={stepErrors.kills}
-            hint="From profile card skull icon"
+            hint={t('wizard.power.killsHint')}
           >
             <CommaFormattedNumberInput
               className="control"
               id="kills"
               value={draft.kills}
-              placeholder="e.g. 5,453,196"
+              placeholder={t('wizard.power.killsPlaceholder')}
               onChange={(value) => {
                 setDraftField('kills', value, true);
                 setStepErrors((old) => ({ ...old, kills: '' }));
@@ -387,19 +390,19 @@ export function PowerDetailsStep() {
       </FormSection>
 
       {/* ── Section 3: Power breakdown ── */}
-      <FormSection number="03" title="Power breakdown">
+      <FormSection number="03" title={t('wizard.power.breakdown')}>
         <p className="hint" style={{ marginBottom: 12 }}>
           {screenshotPresent
             ? powerLocked
-              ? 'These values were extracted from your screenshot and are locked. Remove the screenshot above to edit them.'
-              : 'Some values were extracted from your screenshot. Fields that could not be read are still editable — please fill them in.'
-            : 'Enter each power category from your player details screen. All fields are required.'}
+              ? t('wizard.power.lockedHint')
+              : t('wizard.power.partialHint')
+            : t('wizard.power.requiredHint')}
         </p>
 
         <div className="row-3">
           <Field
             id="structurePower"
-            label="Structure Power"
+            label={t('wizard.power.structure')}
             required
             error={stepErrors.structurePower}
           >
@@ -407,7 +410,7 @@ export function PowerDetailsStep() {
               className={`control${fieldLocked('structurePower', draft.structurePower) ? ' control-verified' : ''}`}
               id="structurePower"
               value={draft.structurePower}
-              placeholder="e.g. 84,785,628"
+              placeholder={t('wizard.power.structurePlaceholder')}
               disabled={fieldLocked('structurePower', draft.structurePower)}
               onChange={(value) => {
                 setDraftField('structurePower', value, true);
@@ -419,7 +422,7 @@ export function PowerDetailsStep() {
 
           <Field
             id="techPower"
-            label="Tech Power"
+            label={t('wizard.power.tech')}
             required
             error={stepErrors.techPower}
           >
@@ -427,7 +430,7 @@ export function PowerDetailsStep() {
               className={`control${fieldLocked('techPower', draft.techPower) ? ' control-verified' : ''}`}
               id="techPower"
               value={draft.techPower}
-              placeholder="e.g. 19,187,725"
+              placeholder={t('wizard.power.techPlaceholder')}
               disabled={fieldLocked('techPower', draft.techPower)}
               onChange={(value) => {
                 setDraftField('techPower', value, true);
@@ -439,7 +442,7 @@ export function PowerDetailsStep() {
 
           <Field
             id="troopPower"
-            label="Troop Power"
+            label={t('wizard.power.troop')}
             required
             error={stepErrors.troopPower}
           >
@@ -447,7 +450,7 @@ export function PowerDetailsStep() {
               className={`control${fieldLocked('troopPower', draft.troopPower) ? ' control-verified' : ''}`}
               id="troopPower"
               value={draft.troopPower}
-              placeholder="e.g. 66,198,020"
+              placeholder={t('wizard.power.troopPlaceholder')}
               disabled={fieldLocked('troopPower', draft.troopPower)}
               onChange={(value) => {
                 setDraftField('troopPower', value, true);
@@ -461,7 +464,7 @@ export function PowerDetailsStep() {
         <div className="row-3" style={{ marginTop: 12 }}>
           <Field
             id="heroPower"
-            label="Hero Power"
+            label={t('wizard.power.hero')}
             required
             error={stepErrors.heroPower}
           >
@@ -469,7 +472,7 @@ export function PowerDetailsStep() {
               className={`control${fieldLocked('heroPower', draft.heroPower) ? ' control-verified' : ''}`}
               id="heroPower"
               value={draft.heroPower}
-              placeholder="e.g. 62,634,222"
+              placeholder={t('wizard.power.heroPlaceholder')}
               disabled={fieldLocked('heroPower', draft.heroPower)}
               onChange={(value) => {
                 setDraftField('heroPower', value, true);
@@ -481,7 +484,7 @@ export function PowerDetailsStep() {
 
           <Field
             id="modVehiclePower"
-            label="Mod Vehicle Power"
+            label={t('wizard.power.vehicle')}
             required
             error={stepErrors.modVehiclePower}
           >
@@ -489,7 +492,7 @@ export function PowerDetailsStep() {
               className={`control${fieldLocked('modVehiclePower', draft.modVehiclePower) ? ' control-verified' : ''}`}
               id="modVehiclePower"
               value={draft.modVehiclePower}
-              placeholder="e.g. 9,436,786"
+              placeholder={t('wizard.power.vehiclePlaceholder')}
               disabled={fieldLocked('modVehiclePower', draft.modVehiclePower)}
               onChange={(value) => {
                 setDraftField('modVehiclePower', value, true);
@@ -519,7 +522,7 @@ export function PowerDetailsStep() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Sofa size={19} color={TIER_COLORS[scoreResult.tier].iconColor} strokeWidth={2.3} />
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>
-                  Estimated Migration Score:
+                  {t('wizard.power.estimatedScore')}
                 </span>
                 <span
                   style={{
@@ -545,7 +548,7 @@ export function PowerDetailsStep() {
                     color: TIER_COLORS[scoreResult.tier].text,
                   }}
                 >
-                  {TIER_COLORS[scoreResult.tier].label} Tier
+                  {t(`components.scoring.tiers.${scoreResult.tier.toLowerCase()}`)} {t('wizard.power.tier')}
                 </span>
                 <span
                   style={{
@@ -556,7 +559,7 @@ export function PowerDetailsStep() {
                     color: '#cbd5e1',
                   }}
                 >
-                  {scoreResult.passesRequired} passes required
+                  {t('wizard.power.passesRequired', { passes: scoreResult.passesRequired })}
                 </span>
               </div>
             </div>
@@ -572,10 +575,10 @@ export function PowerDetailsStep() {
                 borderTop: '1px dashed rgba(255, 255, 255, 0.07)',
               }}
             >
-              <span>Base: <strong style={{ color: '#94a3b8' }}>{scoreResult.breakdown.baseComponent.toFixed(2)}</strong></span>
-              <span>Tech & Vehicle Bonus: <strong style={{ color: '#94a3b8' }}>+{scoreResult.breakdown.techVehicleBonus.toFixed(2)}</strong></span>
+              <span>{t('components.scoring.powerBase')} <strong style={{ color: '#94a3b8' }}>{scoreResult.breakdown.baseComponent.toFixed(2)}</strong></span>
+              <span>{t('components.scoring.powerTechBonus')} <strong style={{ color: '#94a3b8' }}>+{scoreResult.breakdown.techVehicleBonus.toFixed(2)}</strong></span>
               {scoreResult.breakdown.eliteTechBonus > 0 && (
-                <span>Elite Tech Bonus: <strong style={{ color: '#fde047' }}>+{scoreResult.breakdown.eliteTechBonus.toFixed(2)}</strong></span>
+                <span>{t('components.scoring.eliteBonus')} <strong style={{ color: '#fde047' }}>+{scoreResult.breakdown.eliteTechBonus.toFixed(2)}</strong></span>
               )}
             </div> */}
           </div>

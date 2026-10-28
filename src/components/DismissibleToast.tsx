@@ -1,4 +1,5 @@
 import { AlertTriangle, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function DismissibleToast({
   message,
@@ -7,6 +8,7 @@ export function DismissibleToast({
   message: string;
   onDismiss: () => void;
 }) {
+  const { t } = useTranslation();
   if (!message) return null;
 
   return (
@@ -17,7 +19,7 @@ export function DismissibleToast({
         type="button"
         className="dismissible-toast-close"
         onClick={onDismiss}
-        aria-label="Dismiss message"
+        aria-label={t('components.dialogs.dismiss')}
       >
         <X size={18} aria-hidden="true" />
       </button>

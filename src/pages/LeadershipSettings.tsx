@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, RefreshCw, Sliders, Users, Sofa, ShieldCheck, LogOut, X } from 'lucide-react';
 import {
@@ -10,8 +11,10 @@ import {
 import { useLeadershipSession } from '../lib/auth';
 import { AllianceManagementSection } from '../components/dashboard/AllianceManagementSection';
 import { TierThresholdsSection } from '../components/dashboard/TierThresholdsSection';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export function LeadershipSettings() {
+  const { t } = useTranslation();
   const { session, loading, logout: authLogout } = useLeadershipSession();
   const [, setLocation] = useLocation();
   const client = useQueryClient();
@@ -31,7 +34,7 @@ export function LeadershipSettings() {
       <main className="admin-shell">
         <div
           className="skeleton dashboard-skeleton"
-          aria-label="Checking leadership session"
+          aria-label={t('pages.leadership.checkingSession')}
         />
       </main>
     );
@@ -73,20 +76,21 @@ export function LeadershipSettings() {
             <ShieldCheck size={18} />
           </span>
           <span>
-            <strong>STATE 565</strong>
-            <small>SETTINGS & CONFIGURATION</small>
+            <strong>{t('pages.leadership.state565')}</strong>
+            <small>{t('pages.leadership.settingsShort')}</small>
           </span>
         </Link>
         <div className="admin-header-actions">
+          <LanguageSelector />
           <Link
             href="/leadership/dashboard"
             className="button button-quiet"
             data-testid="nav-back-dashboard"
-            title="Return to Applications Dashboard"
+            title={t('pages.leadership.returnDashboard')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
             <ArrowLeft size={15} />
-            <span>Applications Dashboard</span>
+            <span>{t('common.navigation.applicationsDashboard')}</span>
           </Link>
           {/* <span className="signed-in" data-testid="signed-in-email">
             {session?.user?.email || 'Leadership Authorized'}
@@ -97,7 +101,7 @@ export function LeadershipSettings() {
             onClick={handleLogout}
             data-testid="logout"
           >
-            <LogOut size={15} /> Sign out
+            <LogOut size={15} /> {t('pages.leadership.signOut')}
           </button>
         </div>
       </header>
@@ -105,13 +109,13 @@ export function LeadershipSettings() {
       {/* Session Expired Banner */}
       {sessionError && (
         <div className="session-banner" role="alert" data-testid="session-expired">
-          <strong>Leadership session expired.</strong> Sign in again to continue.{' '}
+          <strong>{t('pages.leadership.sessionExpired')}</strong> {t('pages.leadership.sessionSignInAgain')}{' '}
           <button
             className="button button-quiet"
             onClick={() => setLocation('/leadership')}
             data-testid="session-login"
           >
-            Sign in
+            {t('pages.leadership.signIn')}
           </button>
         </div>
       )}
@@ -120,7 +124,7 @@ export function LeadershipSettings() {
       {notice && (
         <div className="notice-banner" role="status" data-testid="settings-notice">
           {notice}
-          <button aria-label="Dismiss notice" onClick={() => setNotice('')}>
+          <button aria-label={t('components.dashboard.dismissNotice')} onClick={() => setNotice('')}>
             <X size={14} />
           </button>
         </div>
@@ -129,9 +133,9 @@ export function LeadershipSettings() {
       {/* Heading & Controls */}
       <div className="dashboard-heading">
         <div>
-          <p className="eyebrow">PORTAL SETTINGS</p>
-          <h1>Alliance & Tier Configuration</h1>
-          <p>Configure destination alliances and migration scoring brackets.</p>
+          <p className="eyebrow">{t('pages.leadership.portalSettings')}</p>
+          <h1>{t('pages.leadership.settingsAndConfig')}</h1>
+          <p>{t('pages.leadership.settingsDescription')}</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button
@@ -140,7 +144,7 @@ export function LeadershipSettings() {
             onClick={handleRefresh}
             data-testid="refresh-settings"
           >
-            <RefreshCw size={14} /> Refresh
+            <RefreshCw size={14} /> {t('components.dashboard.refresh')}
           </button>
         </div>
       </div>
@@ -155,7 +159,7 @@ export function LeadershipSettings() {
           paddingBottom: 12,
         }}
         role="tablist"
-        aria-label="Settings navigation"
+        aria-label={t('pages.leadership.settingsNavLabel')}
       >
         <button
           type="button"
@@ -167,7 +171,7 @@ export function LeadershipSettings() {
           data-testid="tab-all-settings"
         >
           <Sliders size={14} />
-          <span>All Settings</span>
+          <span>{t('pages.leadership.allSettings')}</span>
         </button>
         <button
           type="button"
@@ -179,7 +183,7 @@ export function LeadershipSettings() {
           data-testid="tab-alliances"
         >
           <Users size={14} />
-          <span>Destination Alliances</span>
+          <span>{t('pages.leadership.destinations')}</span>
         </button>
         <button
           type="button"
@@ -191,7 +195,7 @@ export function LeadershipSettings() {
           data-testid="tab-thresholds"
         >
           <Sofa size={14} />
-          <span>Tier Scoring Thresholds</span>
+          <span>{t('pages.leadership.tierThresholds')}</span>
         </button>
       </div>
 

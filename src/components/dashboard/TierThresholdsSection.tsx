@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Edit3, Plus, Sofa } from 'lucide-react';
 import {
@@ -22,6 +23,7 @@ export function TierThresholdsSection({
   onNotice,
   onError,
 }: TierThresholdsSectionProps) {
+  const { t } = useTranslation();
   const client = useQueryClient();
   const [editingThreshold, setEditingThreshold] = useState<TierThreshold | 'new' | null>(null);
   const [thresholdName, setThresholdName] = useState('');
@@ -65,15 +67,15 @@ export function TierThresholdsSection({
     const passVal = Number(thresholdPasses);
 
     if (editingThreshold === 'new' && !name) {
-      setThresholdError('Tier name is required.');
+      setThresholdError(t('components.dashboard.tierNameRequired'));
       return;
     }
     if (isNaN(scoreVal) || scoreVal < 0) {
-      setThresholdError('Minimum score must be a non-negative number.');
+      setThresholdError(t('components.dashboard.tierMinRequired'));
       return;
     }
     if (isNaN(passVal) || passVal < 1) {
-      setThresholdError('Passes required must be at least 1.');
+      setThresholdError(t('components.dashboard.tierPassesRequired'));
       return;
     }
 
@@ -96,14 +98,15 @@ export function TierThresholdsSection({
       });
       setEditingThreshold(null);
       onNotice?.(
-        editingThreshold === 'new'
-          ? `Tier threshold for "${name}" added successfully.`
-          : `Tier threshold for "${editingThreshold.name}" updated successfully.`,
+        t('components.dashboard.tierSaved', {
+          name: editingThreshold === 'new' ? name : editingThreshold.name,
+          operation: editingThreshold === 'new' ? 'added' : 'updated',
+        }),
       );
     } catch (err) {
       onError?.(err);
       setThresholdError(
-        err instanceof Error ? err.message : 'Failed to update threshold.',
+        err instanceof Error ? err.message : t('components.dashboard.tierFailed'),
       );
     }
   };
@@ -113,10 +116,10 @@ export function TierThresholdsSection({
       <section className="admin-panel tier-thresholds-panel" style={{ marginTop: 24 }}>
         <div className="panel-heading">
           <div>
-            <span className="panel-kicker">SCORING & TIERS</span>
-            <h2>Migration Tier Thresholds</h2>
+            <span className="panel-kicker">{t('components.dashboard.scoringTiers')}</span>
+            <h2>{t('components.dashboard.tierTitle')}</h2>
             <p>
-              Configurable score boundaries and pass requirements evaluated for every applicant.
+              {t('components.dashboard.tierDescription')}
             </p>
           </div>
           <button
@@ -125,7 +128,7 @@ export function TierThresholdsSection({
             onClick={beginAddThreshold}
             data-testid="add-tier-threshold"
           >
-            <Plus size={15} /> Add threshold
+            <Plus size={15} /> {t('components.dashboard.addThreshold')}
           </button>
         </div>
 
@@ -136,10 +139,10 @@ export function TierThresholdsSection({
             <span>
               {tierThresholds.error instanceof Error
                 ? tierThresholds.error.message
-                : 'Failed to load tier thresholds.'}
+                : t('components.dashboard.thresholdFailed')}
             </span>
             <button className="button" onClick={() => void tierThresholds.refetch()}>
-              Retry
+              {t('common.actions.retry')}
             </button>
           </div>
         ) : (
@@ -147,10 +150,10 @@ export function TierThresholdsSection({
             <table className="applications-table">
               <thead>
                 <tr>
-                  <th>Tier</th>
-                  <th>Min Score Threshold</th>
-                  <th>Base Passes Required</th>
-                  <th>Actions</th>
+                  <th>{t('components.dashboard.tierColumn')}</th>
+                  <th>{t('components.dashboard.minColumn')}</th>
+                  <th>{t('components.dashboard.passesColumn')}</th>
+                  <th>{t('components.dashboard.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,15 +181,16 @@ export function TierThresholdsSection({
                           }
                           strokeWidth={2.3}
                         />
-                        {TIER_COLORS[item.name as keyof typeof TIER_COLORS]?.label ||
-                          item.name}
+                        {TIER_COLORS[item.name as keyof typeof TIER_COLORS]?.label
+                          ? t(`components.scoring.tiers.${item.name.toLowerCase()}`)
+                          : item.name}
                       </span>
                     </td>
                     <td>
-                      <strong>≥ {Number(item.scoreMin).toFixed(1)}</strong> points
+                      <strong>≥ {Number(item.scoreMin).toFixed(1)}</strong> {t('components.dashboard.points')}
                     </td>
                     <td>
-                      <strong>{item.passesRequired}</strong> migration passes
+                      <strong>{item.passesRequired}</strong> {t('components.dashboard.passes')}
                     </td>
                     <td>
                       <button
@@ -194,7 +198,7 @@ export function TierThresholdsSection({
                         onClick={() => beginEditThreshold(item)}
                         data-testid={`edit-threshold-${item.name.toLowerCase()}`}
                       >
-                        <Edit3 size={13} /> Edit threshold
+                        <Edit3 size={13} /> {t('components.dashboard.editThreshold')}
                       </button>
                     </td>
                   </tr>
@@ -221,14 +225,14 @@ export function TierThresholdsSection({
           >
             <h2 id="threshold-dialog-title">
               {editingThreshold === 'new'
-                ? 'Add migration tier threshold'
-                : `Configure ${editingThreshold.name} Tier`}
+                ? t('components.dashboard.addTierTitle')
+                : t('components.dashboard.configureTier', { name: editingThreshold.name })}
             </h2>
             <form onSubmit={saveThreshold}>
               {editingThreshold === 'new' && (
                 <>
                   <label className="label" htmlFor="threshold-name">
-                    Tier Name
+                    {t('components.dashboard.tierName')}
                   </label>
                   <input
                     id="threshold-name"
@@ -242,7 +246,7 @@ export function TierThresholdsSection({
                 </>
               )}
               <label className="label" htmlFor="threshold-score">
-                Minimum Score Threshold
+                {t('components.dashboard.minimumScore')}
               </label>
               <input
                 id="threshold-score"
@@ -256,7 +260,7 @@ export function TierThresholdsSection({
                 data-testid="threshold-score-input"
               />
               <label className="label auth-label" htmlFor="threshold-passes">
-                Base Migration Passes Required
+                {t('components.dashboard.minimumPasses')}
               </label>
               <input
                 id="threshold-passes"
@@ -281,7 +285,7 @@ export function TierThresholdsSection({
                   onClick={() => setEditingThreshold(null)}
                   data-testid="cancel-threshold"
                 >
-                  Cancel
+                  {t('common.actions.cancel')}
                 </button>
                 <button
                   className="button button-primary"
@@ -290,8 +294,8 @@ export function TierThresholdsSection({
                   data-testid="save-threshold"
                 >
                   {createThresholdMutation.isPending || updateThresholdMutation.isPending
-                    ? 'Saving…'
-                    : 'Save threshold'}
+                    ? t('common.actions.saving')
+                    : t('components.dashboard.saveThreshold')}
                 </button>
               </div>
             </form>

@@ -1,5 +1,7 @@
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { LogOut, RefreshCw, Settings, ShieldCheck, X } from 'lucide-react';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 interface DashboardHeaderProps {
   userEmail?: string;
@@ -22,6 +24,7 @@ export function DashboardHeader({
   onLoginRedirect,
   activePage = 'dashboard',
 }: DashboardHeaderProps) {
+  const { t } = useTranslation();
   return (
     <>
       <header className="admin-header">
@@ -30,27 +33,28 @@ export function DashboardHeader({
             <ShieldCheck size={18} />
           </span>
           <span>
-            <strong>STATE 565</strong>
-            <small>MIGRATION REVIEW</small>
+            <strong>{t('pages.leadership.state565')}</strong>
+            <small>{t('pages.leadership.migrationReview')}</small>
           </span>
         </Link>
         <div className="admin-header-actions">
+          <LanguageSelector />
           {activePage === 'settings' ? (
             <Link
               href="/leadership/dashboard"
               className="button button-quiet"
               data-testid="nav-dashboard"
-              title="Back to Applications Dashboard"
+              title={t('pages.leadership.returnDashboard')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              <span>Applications</span>
+              <span>{t('common.navigation.applications')}</span>
             </Link>
           ) : (
             <Link
               href="/leadership/settings"
               className="button button-quiet"
               data-testid="nav-settings"
-              title="Portal Settings (Alliances & Tier Thresholds)"
+              title={t('components.dashboard.settingsTitle')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
               <Settings size={15} />
@@ -65,20 +69,20 @@ export function DashboardHeader({
             onClick={onLogout}
             data-testid="logout"
           >
-            <LogOut size={15} /> Sign out
+            <LogOut size={15} /> {t('pages.leadership.signOut')}
           </button>
         </div>
       </header>
 
       {sessionError && (
         <div className="session-banner" role="alert" data-testid="session-expired">
-          <strong>Leadership session expired.</strong> Sign in again to continue.{' '}
+          <strong>{t('pages.leadership.sessionExpired')}</strong> {t('pages.leadership.sessionSignInAgain')}{' '}
           <button
             className="button button-quiet"
             onClick={onLoginRedirect}
             data-testid="session-login"
           >
-            Sign in
+            {t('pages.leadership.signIn')}
           </button>
         </div>
       )}
@@ -86,7 +90,7 @@ export function DashboardHeader({
       {notice && (
         <div className="notice-banner" role="status" data-testid="dashboard-notice">
           {notice}
-          <button aria-label="Dismiss notice" onClick={onDismissNotice}>
+          <button aria-label={t('components.dashboard.dismissNotice')} onClick={onDismissNotice}>
             <X size={14} />
           </button>
         </div>
@@ -94,9 +98,9 @@ export function DashboardHeader({
 
       <div className="dashboard-heading">
         <div>
-          <p className="eyebrow">LEADERSHIP WORKSPACE</p>
-          <h1>Migration applications</h1>
-          <p>Review requests and manage State 565 destinations.</p>
+          <p className="eyebrow">{t('components.dashboard.workspace')}</p>
+          <h1>{t('components.dashboard.title')}</h1>
+          <p>{t('components.dashboard.subtitle')}</p>
         </div>
         <button
           className="button"
@@ -104,7 +108,7 @@ export function DashboardHeader({
           onClick={onRefresh}
           data-testid="refresh-dashboard"
         >
-          <RefreshCw size={14} /> Refresh
+          <RefreshCw size={14} /> {t('components.dashboard.refresh')}
         </button>
       </div>
     </>

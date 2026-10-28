@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field, FormSection } from '../../components/Field';
 import { CommaFormattedNumberInput } from '../../components/form/CommaFormattedNumberInput';
 import { StepLayout } from '../../components/form/StepLayout';
@@ -6,6 +7,7 @@ import { useApplicationDraft, type StepErrors } from '../../hooks/useApplication
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function CombatStatisticsStep() {
+  const { t } = useTranslation();
   const { draft, setDraftField, validateStep } = useApplicationDraft();
   const { nextStep, prevStep } = useWizardNavigation();
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
@@ -23,17 +25,17 @@ export function CombatStatisticsStep() {
       navigationProps={{
         onContinue: handleContinue,
         onBack: prevStep,
-        continueLabel: 'Continue to Preferences',
+        continueLabel: t('wizard.statistics.continue'),
         // backLabel: 'Back to Character',
       }}
     >
-      <FormSection number="03" title="Combat statistics">
+      <FormSection number="03" title={t('wizard.statistics.title')}>
         <div className="field">
           <span className="label">
-            Arena power <span className="required" aria-hidden="true">*</span>
+            {t('wizard.statistics.arena')} <span className="required" aria-hidden="true">*</span>
           </span>
           <p className="hint" style={{ margin: '-3px 0 10px' }}>
-            Enter your arena formation powers with no season buildings. Numbers are formatted with commas as you type.
+            {t('wizard.statistics.arenaHint')}
           </p>
 
           <div className="row-3">
@@ -41,7 +43,7 @@ export function CombatStatisticsStep() {
               <Field
                 key={key}
                 id={key}
-                label={`F${index + 1} arena power`}
+                label={t('wizard.combat.formation', { number: index + 1 })}
                 required
                 error={stepErrors[key]}
               >
@@ -49,7 +51,7 @@ export function CombatStatisticsStep() {
                   className="control"
                   id={key}
                   value={draft[key]}
-                  placeholder={['e.g. 12,500,000', 'e.g. 11,000,000', 'e.g. 10,000,000'][index]}
+                  placeholder={t(`wizard.statistics.f${index + 1}Placeholder`)}
                   onChange={(value) => {
                     setDraftField(key, value, true);
                     setStepErrors((old) => ({ ...old, [key]: '' }));
@@ -63,16 +65,16 @@ export function CombatStatisticsStep() {
 
         <Field
           id="combatKills"
-          label="Kills"
+          label={t('wizard.statistics.kills')}
           required
           error={stepErrors.kills}
-          hint="Pre-filled from your details screenshot. Numbers are formatted with commas as you type."
+          hint={t('wizard.statistics.hint')}
         >
           <CommaFormattedNumberInput
             className="control"
             id="combatKills"
             value={draft.kills}
-            placeholder="e.g. 5,453,196"
+            placeholder={t('wizard.statistics.killsPlaceholder')}
             onChange={(value) => {
               setDraftField('kills', value, true);
               setStepErrors((old) => ({ ...old, kills: '' }));

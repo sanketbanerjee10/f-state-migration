@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   getGetAdminOverviewQueryKey,
   useGetAdminOverview,
@@ -8,6 +9,7 @@ interface DashboardOverviewProps {
 }
 
 export function DashboardOverview({ enabled = true }: DashboardOverviewProps) {
+  const { t } = useTranslation();
   const overview = useGetAdminOverview({
     query: {
       queryKey: getGetAdminOverviewQueryKey(),
@@ -29,7 +31,7 @@ export function DashboardOverview({ enabled = true }: DashboardOverviewProps) {
     const errorMsg =
       overview.error instanceof Error
         ? overview.error.message
-        : 'Failed to load overview metrics.';
+        : t('components.dashboard.overviewFailed');
     return (
       <div className="admin-error" role="alert" data-testid="overview-error">
         <span>{errorMsg}</span>
@@ -38,7 +40,7 @@ export function DashboardOverview({ enabled = true }: DashboardOverviewProps) {
           onClick={() => void overview.refetch()}
           data-testid="retry-overview"
         >
-          Retry
+          {t('common.actions.retry')}
         </button>
       </div>
     );
@@ -47,12 +49,12 @@ export function DashboardOverview({ enabled = true }: DashboardOverviewProps) {
   const data = overview.data;
 
   return (
-    <section className="metric-grid" aria-label="Application totals">
+    <section className="metric-grid" aria-label={t('components.dashboard.overviewTitle')}>
       {[
-        ['All applications', data?.total ?? 0, 'total'],
-        ['Awaiting review', data?.pending ?? 0, 'pending'],
-        ['Approved', data?.approved ?? 0, 'approved'],
-        ['Rejected', data?.rejected ?? 0, 'rejected'],
+        [t('components.dashboard.all'), data?.total ?? 0, 'total'],
+        [t('components.dashboard.awaiting'), data?.pending ?? 0, 'pending'],
+        [t('components.dashboard.approved'), data?.approved ?? 0, 'approved'],
+        [t('components.dashboard.rejected'), data?.rejected ?? 0, 'rejected'],
       ].map(([label, value, key]) => (
         <article
           className={`metric-card metric-${key}`}

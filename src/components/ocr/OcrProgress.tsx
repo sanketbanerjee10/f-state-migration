@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { OcrWaitingMessage } from './OcrWaitingMessage';
 
 export interface OcrProgressProps {
@@ -25,6 +26,7 @@ export function OcrProgress({
   onRetry,
   diagnostics,
 }: OcrProgressProps) {
+  const { t } = useTranslation();
   if (!processing && !error && !success && !uncertain) {
     return null;
   }
@@ -43,7 +45,7 @@ export function OcrProgress({
               onClick={onCancel}
               data-testid="cancel-ocr-btn"
             >
-              Cancel
+              {t('common.actions.cancel')}
             </button>
           </div>
 
@@ -60,8 +62,8 @@ export function OcrProgress({
         <div className="ocr-feedback-banner ocr-feedback-error" role="alert">
           <XCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
-            <strong>We couldn't read this screenshot</strong>
-            <p>{error || 'Try another image or enter the details manually below.'}</p>
+            <strong>{t('components.ocr.couldNotRead')}</strong>
+            <p>{error || t('components.ocr.readFailed')}</p>
           </div>
           {onRetry && (
             <button
@@ -70,7 +72,7 @@ export function OcrProgress({
               onClick={onRetry}
               data-testid="retry-ocr-btn"
             >
-              <RefreshCw size={13} /> Retry
+              <RefreshCw size={13} /> {t('common.actions.retry')}
             </button>
           )}
         </div>
@@ -80,8 +82,8 @@ export function OcrProgress({
         <div className="ocr-feedback-banner ocr-feedback-success" role="status">
           <CheckCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
-            <strong>Your stats are ready!</strong>
-            <p>Check the details below and correct anything that doesn't look right.</p>
+            <strong>{t('components.ocr.statsReady')}</strong>
+            <p>{t('components.ocr.verify')}</p>
           </div>
         </div>
       )}
@@ -90,8 +92,8 @@ export function OcrProgress({
         <div className="ocr-feedback-banner ocr-feedback-warning" role="status">
           <AlertCircle size={18} className="feedback-icon" />
           <div className="feedback-content">
-            <strong>Some details need your attention</strong>
-            <p>We couldn't read all the numbers clearly. Please check the values below.</p>
+            <strong>{t('components.ocr.attention')}</strong>
+            <p>{t('components.ocr.checkNumbers')}</p>
           </div>
         </div>
       )}

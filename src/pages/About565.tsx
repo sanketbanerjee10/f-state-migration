@@ -1,5 +1,7 @@
 
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,30 +21,26 @@ import {
 const achievements = [
   {
     number: '01',
-    title: 'Undefeated in SVS',
-    description:
-      'The only state among 561–576 to remain undefeated in State vs. State, according to our record.',
+    titleKey: 'achievements.svsTitle',
+    descriptionKey: 'achievements.svsDescription',
     icon: ShieldCheck,
   },
   {
     number: '02',
-    title: 'Two victories over 563',
-    description:
-      'We faced State 563 twice and came away victorious on both occasions.',
+    titleKey: 'achievements.563Title',
+    descriptionKey: 'achievements.563Description',
     icon: Swords,
   },
   {
     number: '03',
-    title: 'Volcano War · Hard Mode',
-    description:
-      'Our first Volcano War victory came in Hard Mode, facing three states at once.',
+    titleKey: 'achievements.hardTitle',
+    descriptionKey: 'achievements.hardDescription',
     icon: Trophy,
   },
   {
     number: '04',
-    title: 'Volcano War · 2v2',
-    description:
-      'In our second Volcano War, we fought alongside State 567 against State 571 and dominated the battle together.',
+    titleKey: 'achievements.twoVtwoTitle',
+    descriptionKey: 'achievements.twoVtwoDescription',
     icon: Flag,
   },
 ];
@@ -50,27 +48,23 @@ const achievements = [
 const principles = [
   {
     icon: TrendingUp,
-    title: 'Always improving',
-    description:
-      'We were once strong enough to win through raw power alone. As others caught up, we learned to plan, coordinate, and fight smarter.',
+    titleKey: 'principles.improveTitle',
+    descriptionKey: 'principles.improveDescription',
   },
   {
     icon: Clock,
-    title: 'Real life comes first',
-    description:
-      'We are not online around the clock. We have work, families, responsibilities, and lives outside the game. When events begin, we show up.',
+    titleKey: 'principles.realLifeTitle',
+    descriptionKey: 'principles.realLifeDescription',
   },
   {
     icon: MessageCircle,
-    title: 'Banter with respect',
-    description:
-      'We joke, tease, and compete. But there is a difference between having fun and making someone feel unwelcome. We believe that difference matters.',
+    titleKey: 'principles.banterTitle',
+    descriptionKey: 'principles.banterDescription',
   },
   {
     icon: Heart,
-    title: 'People over rankings',
-    description:
-      'We want to win, but never at the cost of the community. No event or ranking is worth making people miserable in a game meant to be enjoyed.',
+    titleKey: 'principles.peopleTitle',
+    descriptionKey: 'principles.peopleDescription',
   },
 ];
 
@@ -97,44 +91,45 @@ function ImagePlaceholder({
 }
 
 export function About565() {
+  const { t } = useTranslation();
   return (
     <main className="form-shell about565" data-testid="about-565-page">
       {/* Top navigation */}
       <div className="about-topbar">
         <div className="about-eyebrow">
-          STATE 565 <span style={{ color: '#657486' }}>/ ABOUT US</span>
+          {t('pages.about565.state')} <span style={{ color: '#657486' }}>/ {t('pages.about565.aboutUs')}</span>
         </div>
 
-        <Link
-          href="/"
-          className="button button-secondary about-back-link"
-        >
-          <ArrowLeft size={13} />
-          Back to Application
-        </Link>
+        <div className="about-topbar-actions">
+          <LanguageSelector />
+          <Link
+            href="/"
+            className="button button-secondary about-back-link"
+          >
+            <ArrowLeft size={13} />
+            {t('common.navigation.backToApplication')}
+          </Link>
+        </div>
       </div>
 
       {/* Hero */}
       <section className="about-hero">
         <div className="about-hero-grid">
           <div>
-            <div className="about-eyebrow">OUR STATE · OUR STORY</div>
+            <div className="about-eyebrow">{t('pages.about565.eyebrow')}</div>
             <h1>
-              Strong in battle.
+              {t('pages.about565.heroLead')}
               <br />
-              <span>Human at heart.</span>
+              <span>{t('pages.about565.heroTitle')}</span>
             </h1>
 
             <p className="about-hero-copy">
-              We've built our name through victories, adapted when the
-              challenge changed, and kept moving forward. We're proud of
-              our strength, honest about our imperfections, and here to
-              enjoy the game together.
+              {t('pages.about565.heroCopy')}
             </p>
 
             <div className="about-hero-note">
               <ShieldCheck size={18} />
-              <span>Competitive by nature. Respectful by choice.</span>
+              <span>{t('pages.about565.heroSubtitle')}</span>
             </div>
           </div>
 
@@ -149,11 +144,10 @@ export function About565() {
       {/* Achievements */}
       <section className="about-section">
         <div className="about-section-heading">
-          <div className="about-section-kicker">Our track record</div>
-          <h2>We've earned our place.</h2>
+          <div className="about-section-kicker">{t('pages.about565.trackRecord')}</div>
+          <h2>{t('pages.about565.trackRecordSubtitle')}</h2>
           <p>
-            Our history gives us something to be proud of. It also reminds
-            us that staying strong means continuing to adapt.
+            {t('pages.about565.trackRecordCopy')}
           </p>
         </div>
 
@@ -172,8 +166,8 @@ export function About565() {
                   </span>
                 </div>
 
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
+                <h3>{t(`pages.about565.${item.titleKey}`)}</h3>
+                <p>{t(`pages.about565.${item.descriptionKey}`)}</p>
               </article>
             );
           })}
@@ -191,31 +185,24 @@ export function About565() {
       {/* Our story */}
       <section className="about-section">
         <div className="about-section-heading">
-          <div className="about-section-kicker">The story behind the wins</div>
-          <h2>Strong enough to adapt.</h2>
+          <div className="about-section-kicker">{t('pages.about565.storyKicker')}</div>
+          <h2>{t('pages.about565.storyTitle')}</h2>
         </div>
 
         <div className="about-story">
           <div className="about-story-copy">
-            <h3>Power got us here. Strategy keeps us growing.</h3>
+            <h3>{t('pages.about565.storyCopy')}</h3>
 
             <p>
-              For a long time, we were strong enough to bulldoze our way
-              through events. Planning wasn't always necessary when our
-              power spoke for itself.
+              {t('pages.about565.storyParagraphOne')}
             </p>
 
             <p>
-              Then other states started catching up. We had to think
-              differently, coordinate better, and learn to use our
-              strengths more carefully. So we did — and the wins kept
-              coming.
+              {t('pages.about565.storyParagraphTwo')}
             </p>
 
             <p>
-              We're not perfectly organized, and we don't always get
-              things right. We simply believe that yesterday's success
-              should never stop us from improving today.
+              {t('pages.about565.storyParagraphThree')}
             </p>
           </div>
 
@@ -229,12 +216,10 @@ export function About565() {
       {/* Community */}
       <section className="about-section">
         <div className="about-section-heading">
-          <div className="about-section-kicker">Life in 565</div>
-          <h2>Quiet in the calm. Active when it counts.</h2>
+          <div className="about-section-kicker">{t('pages.about565.life')}</div>
+          <h2>{t('pages.about565.lifeSubtitle')}</h2>
           <p>
-            We don't need to be online all day to care about our state.
-            Real life comes first, but when an event starts, our people
-            show up.
+            {t('pages.about565.lifeCopy')}
           </p>
         </div>
 
@@ -243,12 +228,12 @@ export function About565() {
             const Icon = item.icon;
 
             return (
-              <article className="about-principle" key={item.title}>
+              <article className="about-principle" key={item.titleKey}>
                 <div className="about-icon">
                   <Icon size={20} />
                 </div>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
+                <h3>{t(`pages.about565.${item.titleKey}`)}</h3>
+                <p>{t(`pages.about565.${item.descriptionKey}`)}</p>
               </article>
             );
           })}
@@ -258,12 +243,10 @@ export function About565() {
       {/* State rules */}
       <section className="about-section">
         <div className="about-section-heading">
-          <div className="about-section-kicker">How we operate</div>
-          <h2>Our state rules.</h2>
+          <div className="about-section-kicker">{t('pages.about565.rules')}</div>
+          <h2>{t('pages.about565.rulesTitle')}</h2>
           <p>
-            A strong state needs shared expectations. These rules help
-            us protect active players, respect alliances, and work
-            together.
+            {t('pages.about565.rulesCopy')}
           </p>
         </div>
 
@@ -273,11 +256,8 @@ export function About565() {
               <ShieldCheck size={22} />
             </div>
             <div>
-              <h3>State-wide NAP</h3>
-              <p>
-                Saturday, Sunday and Monday · No looting within State 565,
-                subject to the specific border-base rule below.
-              </p>
+              <h3>{t('pages.about565.napTitle')}</h3>
+              <p>{t('pages.about565.napSchedule')}</p>
             </div>
           </div>
 
@@ -286,58 +266,37 @@ export function About565() {
               <li>
                 <ShieldCheck size={18} />
                 <span>
-                  <strong>Protect our state.</strong> No bases in State
-                  565 may be looted during the state-wide NAP. This
-                  applies to everyone, including the top alliances and
-                  their farms.
+                  <strong>{t('pages.about565.napDescription')}</strong> {t('pages.about565.napProtectDetail')}
                 </span>
               </li>
 
               <li>
                 <Users size={18} />
                 <span>
-                  <strong>Participation matters more than power.</strong>
-                  NAP protection extends to alliances with high
-                  participation. We do not segregate alliances based
-                  on power alone.
+                  <strong>{t('pages.about565.napParticipation')}</strong> {t('pages.about565.napParticipationDetail')}
                 </span>
               </li>
 
               <li>
                 <Clock size={18} />
                 <span>
-                  <strong>Return to your hive.</strong> On Saturday,
-                  members whose bases are outside their alliance hive
-                  receive 48 hours to return. Bases still outside the
-                  hive after that period become eligible for looting
-                  under this rule, as they may have been inactive for
-                  days.
+                  <strong>{t('pages.about565.napReturn')}</strong> {t('pages.about565.napReturnDetail')}
                 </span>
               </li>
 
               <li>
                 <Handshake size={18} />
                 <span>
-                  <strong>Bases can still be defended.</strong> Alliance
-                  members may reinforce and defend a base that becomes
-                  eligible for looting. In practice, this process is
-                  rarely used against active players. It mainly helps
-                  recover resources from players who have quit the game,
-                  which can later be shared with the state.
+                  <strong>{t('pages.about565.napDetail')}</strong> {t('pages.about565.napDefenseDetail')}
                 </span>
               </li>
             </ul>
           </div>
 
           <div className="about-rule-subsection">
-            <h3>Alliances and mergers</h3>
+            <h3>{t('pages.about565.alliances')}</h3>
             <p>
-              We don't force alliances to merge. If an alliance struggles
-              because of low activity, we may recommend a merger for the
-              benefit of its members and the state. But every alliance
-              has its own leadership, friendships, and reasons for its
-              decisions. We offer advice, understand that circumstances
-              differ, and respect each alliance's choices.
+              {t('pages.about565.mergersCopy')}
             </p>
           </div>
         </div>
@@ -349,13 +308,10 @@ export function About565() {
           <Target size={27} />
         </div>
 
-        <h2>We fight to win. We never forget that it's a game.</h2>
+        <h2>{t('pages.about565.culture')}</h2>
 
         <p>
-          We're proud of our record, honest about what needs work, and
-          ready for the next challenge. Seasons end, rankings change,
-          and victories become memories. The people and experiences
-          we share are what make it worthwhile.
+          {t('pages.about565.closingCopy')}
         </p>
 
         <div
@@ -368,7 +324,7 @@ export function About565() {
             textTransform: 'uppercase',
           }}
         >
-          Welcome to State 565
+          {t('pages.about565.welcome')}
         </div>
       </section>
 
@@ -385,14 +341,14 @@ export function About565() {
             flexWrap: 'wrap',
           }}
         >
-          <span>STATE 565 · MIGRATION PORTAL</span>
+          <span>{t('pages.about565.portal')}</span>
           <span>·</span>
           <Link href="/" className="about-inline-link">
-            Application
+            {t('pages.about565.application')}
           </Link>
         </div>
 
-        <span>Made With ❤️ By Sankeyyy</span>
+        <span>{t('pages.about565.credit')}</span>
       </footer>
     </main>
   );

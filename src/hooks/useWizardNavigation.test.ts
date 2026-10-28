@@ -14,16 +14,16 @@ describe('Wizard navigation step configuration', () => {
   });
 
   it('has correct titles for base steps', () => {
-    expect(BASE_STEPS[0].title).toBe('Character Details');
-    expect(BASE_STEPS[1].title).toBe('Combat Power');
-    expect(BASE_STEPS[2].title).toBe('Migration Details');
+    expect(BASE_STEPS[0].titleKey).toBe('wizard.navigation.character');
+    expect(BASE_STEPS[1].titleKey).toBe('wizard.navigation.combat');
+    expect(BASE_STEPS[2].titleKey).toBe('wizard.navigation.migration');
   });
 
   it('defines group roster and standalone review steps', () => {
     expect(GROUP_ROSTER_STEP.key).toBe('group-roster');
-    expect(GROUP_ROSTER_STEP.title).toBe('Group Roster');
+    expect(GROUP_ROSTER_STEP.titleKey).toBe('wizard.navigation.roster');
     expect(REVIEW_STEP.key).toBe('review');
-    expect(REVIEW_STEP.title).toBe('Review & Submit');
+    expect(REVIEW_STEP.titleKey).toBe('wizard.navigation.review');
   });
 });
 
