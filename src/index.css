@@ -318,7 +318,9 @@ button { cursor: pointer; }
   gap: 7px;
 }
 .language-selector-trigger {
-  min-height: 34px;
+  box-sizing: border-box;
+  height: 39px;
+  min-height: 39px;
   padding: 5px 8px;
   border: 1px solid rgba(122, 156, 190, 0.28);
   border-radius: 7px;
@@ -328,6 +330,11 @@ button { cursor: pointer; }
   line-height: 1;
   outline: none;
   transition: border-color .15s, background .15s;
+}
+.language-selector-companion {
+  box-sizing: border-box;
+  height: 39px;
+  min-height: 39px;
 }
 .language-selector-trigger:hover,
 .language-selector-trigger[data-state='open'] {
@@ -343,12 +350,13 @@ button { cursor: pointer; }
   transform: rotate(180deg);
 }
 .language-selector-flag {
+  display: block;
   width: 18px;
   flex: 0 0 18px;
-  text-align: center;
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
-  font-size: 16px;
-  line-height: 1;
+  height: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+  box-sizing: border-box;
 }
 .language-selector-name { white-space: nowrap; }
 .language-selector-chevron {
@@ -358,7 +366,10 @@ button { cursor: pointer; }
   transition: transform .15s;
 }
 .language-selector-menu {
-  min-width: 174px;
+  width: 220px;
+  max-width: calc(100vw - 24px);
+  max-height: min(320px, var(--radix-dropdown-menu-content-available-height));
+  overflow-y: auto;
   border-color: #344354;
   background: #1b2633;
   color: #dce7f2;
@@ -367,7 +378,7 @@ button { cursor: pointer; }
 .language-selector-option {
   min-height: 38px;
   width: 100%;
-  padding: 8px 10px 8px 34px;
+  padding: 8px 10px;
   border-radius: 5px;
   color: #dce7f2;
   font-size: 13px;

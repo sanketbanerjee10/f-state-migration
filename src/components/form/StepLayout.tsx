@@ -45,7 +45,7 @@ export function StepLayout({
             <LanguageSelector />
             <Link
               href="/track"
-              className="button button-secondary"
+              className="button button-secondary language-selector-companion"
               style={{ fontSize: '0.78rem', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
               <Search size={13} /> {t('wizard.layout.trackExisting')}
