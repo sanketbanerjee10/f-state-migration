@@ -281,10 +281,10 @@ export function CelebrationModal({
         }}
       >
         {[
-          'https://i.ibb.co/4gtF7Jj3/bully-maguire.gif',
-          'https://i.ibb.co/wFczzZ7K/dance-dancing.gif',
-          'https://i.ibb.co/0pbyQv0b/cat-dance-cat.gif',
-          'https://i.ibb.co/rGF4KM46/funny-man-and-dog-dancing.gif',
+          'https://ik.imagekit.io/c1tiz3nte/bully-maguire.gif',
+          'https://ik.imagekit.io/c1tiz3nte/dance-dancing.gif',
+          'https://ik.imagekit.io/c1tiz3nte/cat-dance-cat.gif',
+          'https://ik.imagekit.io/c1tiz3nte/funny-man-and-dog-dancing.gif',
         ].map((src, index) => (
           <div
             key={src}

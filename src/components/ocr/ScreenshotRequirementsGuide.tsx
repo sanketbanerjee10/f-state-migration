@@ -56,7 +56,7 @@ export function ScreenshotRequirementsGuide() {
             <div className="example-grid">
               <div className="example-image-container">
                 <img
-                  src="/images/power-details-example.png"
+                  src="https://ik.imagekit.io/c1tiz3nte/power-details-example.png"
                   alt={t('components.ocr.exampleAlt')}
                   className="example-full-image"
                 />
