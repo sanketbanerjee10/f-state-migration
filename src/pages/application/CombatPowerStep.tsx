@@ -9,7 +9,7 @@ import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function CombatPowerStep() {
   const { t } = useTranslation();
-  const { draft, setDraftField, validateStep } = useApplicationDraft();
+  const { draft, setDraftField, validateStep, setNavigationNotice } = useApplicationDraft();
   const { nextStep, prevStep } = useWizardNavigation();
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
 
@@ -21,6 +21,7 @@ export function CombatPowerStep() {
   const handleContinue = () => {
     const errors = validateStep('combat');
     setStepErrors(errors);
+    setNavigationNotice(Object.values(errors)[0] || '');
     if (Object.keys(errors).length === 0) {
       nextStep();
     }

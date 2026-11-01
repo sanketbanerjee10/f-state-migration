@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, RefreshCw, Sliders, Users, Sofa, ShieldCheck, LogOut, X } from 'lucide-react';
+import { RefreshCw, Sliders, Users, Sofa, LogOut, X } from 'lucide-react';
 import {
   getListAdminAlliancesQueryKey,
   getGetAdminTierThresholdsQueryKey,
@@ -11,7 +11,7 @@ import {
 import { useLeadershipSession } from '../lib/auth';
 import { AllianceManagementSection } from '../components/dashboard/AllianceManagementSection';
 import { TierThresholdsSection } from '../components/dashboard/TierThresholdsSection';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { PageHeader } from '../components/PageHeader';
 
 export function LeadershipSettings() {
   const { t } = useTranslation();
@@ -69,42 +69,34 @@ export function LeadershipSettings() {
 
   return (
     <main className="admin-shell" data-testid="leadership-settings">
-      {/* Top Header */}
-      <header className="admin-header">
-        <Link href="/" className="brand-mark">
-          <span className="brand-icon">
-            <ShieldCheck size={18} />
-          </span>
-          <span>
-            <strong>{t('pages.leadership.state565')}</strong>
-            <small>{t('pages.leadership.settingsShort')}</small>
-          </span>
-        </Link>
-        <div className="admin-header-actions">
-          <LanguageSelector />
-          <Link
-            href="/leadership/dashboard"
-            className="button button-quiet"
-            data-testid="nav-back-dashboard"
-            title={t('pages.leadership.returnDashboard')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-          >
-            <ArrowLeft size={15} />
-            <span>{t('common.navigation.applicationsDashboard')}</span>
-          </Link>
-          {/* <span className="signed-in" data-testid="signed-in-email">
-            {session?.user?.email || 'Leadership Authorized'}
-          </span> */}
-          <button
-            className="button button-quiet"
-            type="button"
-            onClick={handleLogout}
-            data-testid="logout"
-          >
-            <LogOut size={15} /> {t('pages.leadership.signOut')}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        backHref="/leadership/dashboard"
+        backLabel={t('common.navigation.applicationsDashboard')}
+        backTestId="nav-back-dashboard"
+        eyebrow={t('pages.leadership.portalSettings')}
+        title={t('pages.leadership.settingsAndConfig')}
+        description={t('pages.leadership.settingsDescription')}
+        actions={
+          <>
+            <button
+              className="button button-quiet"
+              type="button"
+              onClick={handleRefresh}
+              data-testid="refresh-settings"
+            >
+              <RefreshCw size={14} /> {t('components.dashboard.refresh')}
+            </button>
+            <button
+              className="button button-quiet"
+              type="button"
+              onClick={handleLogout}
+              data-testid="logout"
+            >
+              <LogOut size={15} /> {t('pages.leadership.signOut')}
+            </button>
+          </>
+        }
+      />
 
       {/* Session Expired Banner */}
       {sessionError && (
@@ -129,25 +121,6 @@ export function LeadershipSettings() {
           </button>
         </div>
       )}
-
-      {/* Heading & Controls */}
-      <div className="dashboard-heading">
-        <div>
-          <p className="eyebrow">{t('pages.leadership.portalSettings')}</p>
-          <h1>{t('pages.leadership.settingsAndConfig')}</h1>
-          <p>{t('pages.leadership.settingsDescription')}</p>
-        </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button
-            className="button"
-            type="button"
-            onClick={handleRefresh}
-            data-testid="refresh-settings"
-          >
-            <RefreshCw size={14} /> {t('components.dashboard.refresh')}
-          </button>
-        </div>
-      </div>
 
       {/* Navigation Tabs */}
       <div

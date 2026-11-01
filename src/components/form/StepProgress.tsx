@@ -1,20 +1,20 @@
-import { useState } from 'react';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import { useTranslation } from 'react-i18next';
+import { useApplicationDraft } from '../../hooks/useApplicationDraft';
 
 export function StepProgress() {
   const { steps, stepNumber, totalSteps, currentIndex, goToStep } = useWizardNavigation();
   const { t } = useTranslation();
-  const [blockedNotice, setBlockedNotice] = useState<string>('');
+  const { navigationNotice, setNavigationNotice } = useApplicationDraft();
 
   const handlePillClick = (stepParam: string) => {
-    setBlockedNotice('');
     const result = goToStep(stepParam);
     if (!result.success) {
       const errKeys = Object.keys(result.errors);
       const firstMsg = result.errors[errKeys[0]];
-      setBlockedNotice(firstMsg || t('wizard.progress.completeRequired'));
-      setTimeout(() => setBlockedNotice(''), 4500);
+      setNavigationNotice(firstMsg || 'wizard.progress.completeRequired');
+    } else {
+      setNavigationNotice('');
     }
   };
 
@@ -60,9 +60,9 @@ export function StepProgress() {
       </div>
 
       {/* Blocked navigation message if required fields are missing */}
-      {blockedNotice && (
+      {navigationNotice && (
         <div className="wizard-validation-pill-notice" role="alert" data-testid="wizard-pill-blocked-notice">
-          ⚠️ {blockedNotice}
+          ⚠️ {t(navigationNotice)}
         </div>
       )}
     </div>

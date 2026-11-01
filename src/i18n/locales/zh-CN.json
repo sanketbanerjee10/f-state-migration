@@ -83,7 +83,7 @@
       "componentDescription": "你是否忘记将该页面添加到路由配置中？"
     },
     "tracker": {
-      "eyebrow": "565州迁州",
+      "eyebrow": "565州 / 申请追踪",
       "title": "申请追踪",
       "description": "查看你的迁州申请的实时状态、玩家详情和评分明细。"
     },
@@ -98,7 +98,7 @@
       "allSettings": "所有设置",
       "destinations": "目标联盟",
       "tierThresholds": "档位评分阈值",
-      "portalSettings": "门户设置",
+      "portalSettings": "领导团队 / 设置",
       "returnDashboard": "返回申请管理面板",
       "leadershipAuthorized": "领导团队已获授权",
       "sessionExpired": "领导团队会话已过期。",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "粘贴你的私密 UUID 或令牌",
       "tokenVerifyError": "无法验证访问令牌。请检查链接或密钥后重试。",
       "loginReturn": "返回申请页面",
-      "loginEyebrow": "565州 / 领导团队",
+      "loginEyebrow": "领导团队 / 登录",
       "loginDescription": "使用你的专属访问链接或私密 UUID 凭证进入领导团队审核面板。无需注册或创建账户。",
       "loginExpired": "你的领导团队会话已结束。请重新使用专属链接或输入访问令牌，以继续审核申请。",
       "tokenLabel": "领导团队访问令牌或 UUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "565州",
-      "aboutUs": "关于我们",
+      "aboutUs": "关于",
       "eyebrow": "我们的州 · 我们的故事",
       "heroLead": "战场上，我们实力强劲。",
       "heroTitle": "内心始终有人情味。",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "快速检查 OCR 识别结果",
+      "message": "🤖 我们的小助手很能干，但有时也会把名字和击杀数弄错！请快速检查这两项，其他内容应该都准确无误！",
+      "dismiss": "知道了"
+    },
     "layout": {
       "signup": "迁州申请",
-      "trackExisting": "追踪现有申请",
+      "trackExisting": "追踪申请",
       "editTitle": "编辑迁州申请",
       "applyTitle": "申请迁州至565州",
       "editDescription": "更新你的角色信息或战斗属性，然后重新提交给领导团队审核。",
@@ -321,9 +326,9 @@
       "playerHint": "游戏中显示的角色名称",
       "playerPlaceholder": "例如 GOD Sankeyyy",
       "powerRecord": "记录战力",
-      "powerHint": "你的实际玩家战力",
+      "powerHint": "????",
       "currentPower": "当前战力",
-      "killsOptional": "击杀数（可选）",
+      "killsOptional": "击杀数",
       "killsHint": "取自个人资料卡上的骷髅图标数据",
       "killsPlaceholder": "例如 5,453,196",
       "breakdown": "战力明细",
@@ -394,7 +399,7 @@
       "dropPrompt": "选择或拖放个人资料截图",
       "formats": "可上传多个 PNG 或 JPG 文件（每个最大10 MB）",
       "browse": "浏览图片",
-      "rosterCount": "团队名单（{{count}} / {{max}} 人 — 申请人也计入上限）",
+      "rosterCount": "团队名单（{{count}} / {{max}} 人",
       "addMemberTitle": "手动添加团队成员",
       "emptyTitle": "尚未添加团队成员",
       "emptyDescription": "上传上方的个人资料截图，或手动添加成员以建立团队名单。",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "例如 PlayerTwo",
       "allianceTag": "联盟标签/名称",
       "powerRecord": "记录战力",
-      "killsOptional": "击杀数（可选）",
+      "killsOptional": "击杀数",
       "killsPlaceholder": "例如 5,453,196 或 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "例如 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "请输入改装车辆战力（例如 9,436,786 或 900万）。",
       "state": "请输入有效的州编号",
       "alliance": "请输入你当前联盟的名称或标签。",
-      "f1": "请输入大于零的F1竞技场战力（例如1,250万）。",
-      "f2": "请输入大于零的F2竞技场战力（例如1,100万）。",
-      "f3": "请输入大于零的F3竞技场战力（例如1,000万）。",
+      "f1": "请输入大于零的F1竞技场战力。",
+      "f2": "请输入大于零的F2竞技场战力。",
+      "f3": "请输入大于零的F3竞技场战力。",
       "migrationType": "请选择个人迁州或团队迁州。",
       "representative": "请输入团队代表的游戏内名称。",
       "destinations": "请选择“任意联盟”或至少一个目标联盟。",
@@ -709,7 +714,7 @@
       "comments": "补充说明"
     },
     "dashboard": {
-      "workspace": "领导团队工作区",
+      "workspace": "领导团队 / 申请",
       "title": "迁州申请",
       "subtitle": "审核申请并管理565州的目标联盟。",
       "refresh": "刷新",

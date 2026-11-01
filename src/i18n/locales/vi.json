@@ -83,7 +83,7 @@
       "componentDescription": "Bạn quên thêm trang này vào cấu hình điều hướng phải không?"
     },
     "tracker": {
-      "eyebrow": "DI CƯ BANG 565",
+      "eyebrow": "Bang 565 / Theo dõi đơn",
       "title": "Theo dõi đơn đăng ký",
       "description": "Xem trạng thái trực tiếp, thông tin người chơi và chi tiết điểm số của đơn di cư bạn đã gửi."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Tất cả cài đặt",
       "destinations": "Liên minh đích",
       "tierThresholds": "Ngưỡng điểm theo bậc",
-      "portalSettings": "CÀI ĐẶT CỔNG THÔNG TIN",
+      "portalSettings": "Ban lãnh đạo / Cài đặt",
       "returnDashboard": "Quay lại bảng điều khiển đơn đăng ký",
       "leadershipAuthorized": "Đã xác thực ban lãnh đạo",
       "sessionExpired": "Phiên ban lãnh đạo đã hết hạn.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Dán UUID hoặc mã thông báo bí mật",
       "tokenVerifyError": "Không thể xác minh mã truy cập. Hãy kiểm tra liên kết hoặc khóa rồi thử lại.",
       "loginReturn": "Quay lại đơn đăng ký",
-      "loginEyebrow": "BANG 565 / BAN LÃNH ĐẠO",
+      "loginEyebrow": "Ban lãnh đạo / Đăng nhập",
       "loginDescription": "Truy cập bảng xét duyệt của ban lãnh đạo bằng liên kết riêng hoặc thông tin UUID bí mật. Không cần đăng ký hay tạo tài khoản.",
       "loginExpired": "Phiên ban lãnh đạo của bạn đã kết thúc. Dùng liên kết riêng hoặc nhập lại mã truy cập để tiếp tục xét duyệt đơn.",
       "tokenLabel": "Mã truy cập hoặc UUID của ban lãnh đạo",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "BANG 565",
-      "aboutUs": "VỀ CHÚNG TÔI",
+      "aboutUs": "Giới thiệu",
       "eyebrow": "BANG CỦA CHÚNG TÔI · CÂU CHUYỆN CỦA CHÚNG TÔI",
       "heroLead": "Mạnh mẽ trên chiến trường.",
       "heroTitle": "Trọn tình người.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "Kiểm tra nhanh kết quả OCR",
+      "message": "🤖 Trợ lý nhỏ của chúng tôi khá giỏi, nhưng đôi khi có thể nhầm tên và số mạng hạ! Hãy kiểm tra nhanh hai mục đó. Những thông tin còn lại sẽ chính xác!",
+      "dismiss": "Đã hiểu"
+    },
     "layout": {
-      "signup": "ĐĂNG KÝ DI CƯ",
-      "trackExisting": "Theo dõi đơn hiện có",
+      "signup": "Đơn đăng ký di cư",
+      "trackExisting": "Theo dõi đơn",
       "editTitle": "Chỉnh sửa đơn di cư",
       "applyTitle": "Đăng ký di cư đến Bang 565",
       "editDescription": "Cập nhật thông tin nhân vật hoặc chỉ số chiến đấu rồi gửi lại để ban lãnh đạo xét duyệt.",
@@ -321,9 +326,9 @@
       "playerHint": "Tên nhân vật như hiển thị trong trò chơi",
       "playerPlaceholder": "ví dụ: GOD Sankeyyy",
       "powerRecord": "Sức mạnh được ghi nhận",
-      "powerHint": "Sức mạnh thực tế của người chơi",
+      "powerHint": "T? ??ng t?nh to?n",
       "currentPower": "Sức mạnh hiện tại",
-      "killsOptional": "Số mạng hạ (không bắt buộc)",
+      "killsOptional": "Số mạng hạ",
       "killsHint": "Từ biểu tượng đầu lâu trên thẻ hồ sơ",
       "killsPlaceholder": "ví dụ: 5,453,196",
       "breakdown": "Chi tiết sức mạnh",
@@ -394,7 +399,7 @@
       "dropPrompt": "Chọn hoặc thả ảnh hồ sơ vào đây",
       "formats": "Nhiều tệp PNG hoặc JPG (tối đa 10 MB mỗi tệp)",
       "browse": "Duyệt ảnh",
-      "rosterCount": "DANH SÁCH ({{count}} / {{max}} THÀNH VIÊN — BAO GỒM NGƯỜI ĐĂNG KÝ)",
+      "rosterCount": "DANH SÁCH ({{count}} / {{max}} THÀNH VIÊN)",
       "addMemberTitle": "Thêm thành viên nhóm thủ công",
       "emptyTitle": "Chưa thêm thành viên nhóm nào",
       "emptyDescription": "Tải ảnh hồ sơ ở trên hoặc thêm thành viên thủ công để tạo danh sách nhóm.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "ví dụ: PlayerTwo",
       "allianceTag": "Thẻ/tên liên minh",
       "powerRecord": "Sức mạnh được ghi nhận",
-      "killsOptional": "Số mạng hạ (không bắt buộc)",
+      "killsOptional": "Số mạng hạ",
       "killsPlaceholder": "ví dụ: 5,453,196 hoặc 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "ví dụ: 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Nhập Sức mạnh Xe cải tiến (ví dụ: 9,436,786 hoặc 9M).",
       "state": "Nhập bang hợp lệ",
       "alliance": "Nhập tên hoặc thẻ liên minh hiện tại.",
-      "f1": "Nhập sức mạnh đấu trường F1 lớn hơn 0 (ví dụ: 12.5M).",
-      "f2": "Nhập sức mạnh đấu trường F2 lớn hơn 0 (ví dụ: 11M).",
-      "f3": "Nhập sức mạnh đấu trường F3 lớn hơn 0 (ví dụ: 10M).",
+      "f1": "Nhập sức mạnh đấu trường F1 lớn hơn 0 .",
+      "f2": "Nhập sức mạnh đấu trường F2 lớn hơn 0 .",
+      "f3": "Nhập sức mạnh đấu trường F3 lớn hơn 0 .",
       "migrationType": "Chọn di cư cá nhân hoặc theo nhóm.",
       "representative": "Nhập tên trong trò chơi của người đại diện nhóm.",
       "destinations": "Chọn \"Bất kỳ liên minh nào\" hoặc ít nhất một điểm đến.",
@@ -709,7 +714,7 @@
       "comments": "Bình luận bổ sung"
     },
     "dashboard": {
-      "workspace": "KHÔNG GIAN LÀM VIỆC CỦA BAN LÃNH ĐẠO",
+      "workspace": "Ban lãnh đạo / Hồ sơ",
       "title": "Đơn đăng ký di cư",
       "subtitle": "Xét duyệt yêu cầu và quản lý các điểm đến của Bang 565.",
       "refresh": "Làm mới",

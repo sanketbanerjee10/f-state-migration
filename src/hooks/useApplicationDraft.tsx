@@ -5,6 +5,7 @@ import { parseMagnitude, parseStateNumber } from '../lib/parsers';
 import { isApplicationDeletedError, useApplicationDetails } from '../lib/applicationDetailsCache';
 
 const DRAFT_STORAGE_KEY = 'state565_application_draft_v4';
+const OCR_ACCURACY_NOTICE_STORAGE_KEY = 'state565_ocr_accuracy_notice_shown';
 
 function calculatePowerOnRecord(
   powers: Pick<ApplicationDraft, 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower'>,
@@ -117,6 +118,11 @@ interface ApplicationDraftContextValue {
   updateGroupMember: (id: string, updates: Partial<GroupMember>) => void;
   removeGroupMember: (id: string) => void;
   clearDraft: (preserveMigrationType?: boolean) => void;
+  navigationNotice: string;
+  setNavigationNotice: (messageKey: string) => void;
+  ocrAccuracyNoticeOpen: boolean;
+  showOcrAccuracyNotice: () => void;
+  dismissOcrAccuracyNotice: () => void;
   validateStep: (stepRouteOrKey: string) => StepErrors;
   validateAll: () => StepErrors;
 }
@@ -159,8 +165,54 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
   const [editApplicationDeleted, setEditApplicationDeleted] = useState(false);
   const [editApplicationError, setEditApplicationError] = useState('');
+  const [navigationNotice, setNavigationNoticeState] = useState('');
+  const navigationNoticeTimer = useRef<number | null>(null);
+  const [ocrAccuracyNoticeOpen, setOcrAccuracyNoticeOpen] = useState(false);
+  const [ocrAccuracyNoticeShown, setOcrAccuracyNoticeShown] = useState(() => {
+    try {
+      return localStorage.getItem(OCR_ACCURACY_NOTICE_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const editId = new URLSearchParams(window.location.search).get('edit') || '';
   const editApplication = useApplicationDetails(editId, Boolean(editId) && draft.editingApplicationId !== editId);
+
+  useEffect(
+    () => () => {
+      if (navigationNoticeTimer.current !== null) {
+        window.clearTimeout(navigationNoticeTimer.current);
+      }
+    },
+    [],
+  );
+
+  const setNavigationNotice = (messageKey: string) => {
+    if (navigationNoticeTimer.current !== null) {
+      window.clearTimeout(navigationNoticeTimer.current);
+      navigationNoticeTimer.current = null;
+    }
+
+    setNavigationNoticeState(messageKey);
+    if (messageKey) {
+      navigationNoticeTimer.current = window.setTimeout(() => {
+        setNavigationNoticeState('');
+        navigationNoticeTimer.current = null;
+      }, 20_000);
+    }
+  };
+
+  const showOcrAccuracyNotice = () => {
+    if (ocrAccuracyNoticeShown) return;
+
+    setOcrAccuracyNoticeShown(true);
+    setOcrAccuracyNoticeOpen(true);
+    try {
+      localStorage.setItem(OCR_ACCURACY_NOTICE_STORAGE_KEY, 'true');
+    } catch {
+      // Keep the notice available for this session when browser storage is unavailable.
+    }
+  };
 
   useEffect(() => {
     setIsLoadingEdit(editApplication.isFetching);
@@ -560,6 +612,11 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         updateGroupMember,
         removeGroupMember,
         clearDraft,
+        navigationNotice,
+        setNavigationNotice,
+        ocrAccuracyNoticeOpen,
+        showOcrAccuracyNotice,
+        dismissOcrAccuracyNotice: () => setOcrAccuracyNoticeOpen(false),
         validateStep,
         validateAll,
       }}

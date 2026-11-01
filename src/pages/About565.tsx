@@ -1,9 +1,7 @@
 
 import { Link } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import {
-  ArrowLeft,
   ArrowRight,
   Trophy,
   Swords,
@@ -17,6 +15,7 @@ import {
   TrendingUp,
   Flag,
 } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 
 const achievements = [
   {
@@ -68,78 +67,20 @@ const principles = [
   },
 ];
 
-function ImagePlaceholder({
-  label,
-  subtitle,
-  className = '',
-}: {
-  label: string;
-  subtitle: string;
-  className?: string;
-}) {
-  return (
-    <div className={`about-image-placeholder ${className}`}>
-      <div className="about-image-placeholder-content">
-        <div className="about-image-placeholder-icon">
-          <Trophy size={25} />
-        </div>
-        <span>{label}</span>
-        <small>{subtitle}</small>
-      </div>
-    </div>
-  );
-}
-
 export function About565() {
   const { t } = useTranslation();
   return (
     <main className="form-shell about565" data-testid="about-565-page">
-      {/* Top navigation */}
-      <div className="about-topbar">
-        <div className="about-eyebrow">
-          {t('pages.about565.state')} <span style={{ color: '#657486' }}>/ {t('pages.about565.aboutUs')}</span>
-        </div>
-
-        <div className="about-topbar-actions">
-          <LanguageSelector />
-          <Link
-            href="/"
-            className="button button-secondary about-back-link"
-          >
-            <ArrowLeft size={13} />
-            {t('common.navigation.backToApplication')}
-          </Link>
-        </div>
+      <PageHeader
+        backLabel={t('common.navigation.backToApplication')}
+        eyebrow={<>{t('pages.about565.state')} <span style={{ color: '#657486' }}>/ {t('pages.about565.aboutUs')}</span></>}
+        title={<>{t('pages.about565.heroLead')}<br /><span>{t('pages.about565.heroTitle')}</span></>}
+        description={t('pages.about565.heroCopy')}
+      />
+      <div className="about-card about-hero-note">
+        <ShieldCheck size={18} />
+        <span>{t('pages.about565.heroSubtitle')}</span>
       </div>
-
-      {/* Hero */}
-      <section className="about-hero">
-        <div className="about-hero-grid">
-          <div>
-            <div className="about-eyebrow">{t('pages.about565.eyebrow')}</div>
-            <h1>
-              {t('pages.about565.heroLead')}
-              <br />
-              <span>{t('pages.about565.heroTitle')}</span>
-            </h1>
-
-            <p className="about-hero-copy">
-              {t('pages.about565.heroCopy')}
-            </p>
-
-            <div className="about-hero-note">
-              <ShieldCheck size={18} />
-              <span>{t('pages.about565.heroSubtitle')}</span>
-            </div>
-          </div>
-
-          {/* Replace this placeholder with your State 565 banner */}
-          {/* <ImagePlaceholder
-            label="State 565 — Hero Artwork"
-            subtitle="Suggested: state emblem, alliance group, or a cinematic battle banner"
-          /> */}
-        </div>
-      </section>
 
       {/* Achievements */}
       <section className="about-section">
@@ -173,13 +114,6 @@ export function About565() {
           })}
         </div>
 
-        {/* Optional image gallery for battle screenshots */}
-        <div style={{ marginTop: 14 }}>
-          {/* <ImagePlaceholder
-            label="Our Battles"
-            subtitle="Optional: add Volcano War screenshots, victory records, or a battle collage"
-          /> */}
-        </div>
       </section>
 
       {/* Our story */}

@@ -83,7 +83,7 @@
       "componentDescription": "Apakah Anda lupa menambahkan halaman ini ke sistem navigasi?"
     },
     "tracker": {
-      "eyebrow": "MIGRASI NEGARA BAGIAN 565",
+      "eyebrow": "Negara Bagian 565 / Pelacakan aplikasi",
       "title": "Pelacak Pengajuan",
       "description": "Periksa status terkini, detail pemain, dan rincian skor pengajuan migrasi Anda."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Semua Pengaturan",
       "destinations": "Aliansi Tujuan",
       "tierThresholds": "Ambang Skor tingkat",
-      "portalSettings": "PENGATURAN PORTAL",
+      "portalSettings": "Pimpinan / Pengaturan",
       "returnDashboard": "Kembali ke Dasbor Pengajuan",
       "leadershipAuthorized": "Akses Pimpinan Diizinkan",
       "sessionExpired": "Sesi pimpinan telah berakhir.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Tempel UUID rahasia atau token Anda",
       "tokenVerifyError": "Token akses tidak dapat diverifikasi. Periksa tautan atau kunci Anda, lalu coba lagi.",
       "loginReturn": "Kembali ke pengajuan",
-      "loginEyebrow": "NEGARA BAGIAN 565 / PIMPINAN",
+      "loginEyebrow": "Pimpinan / Masuk",
       "loginDescription": "Akses dasbor peninjauan pimpinan melalui tautan pribadi atau kredensial UUID rahasia Anda. Tidak perlu mendaftar atau membuat akun.",
       "loginExpired": "Sesi pimpinan Anda telah berakhir. Gunakan tautan pribadi atau masukkan kembali token akses untuk melanjutkan peninjauan pengajuan.",
       "tokenLabel": "Token akses pimpinan atau UUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "NEGARA BAGIAN 565",
-      "aboutUs": "TENTANG KAMI",
+      "aboutUs": "Tentang",
       "eyebrow": "NEGARA BAGIAN KAMI · KISAH KAMI",
       "heroLead": "Tangguh dalam pertempuran.",
       "heroTitle": "Tetap manusiawi.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "Periksa OCR sebentar",
+      "message": "🤖 Asisten kecil kami cukup pintar, tetapi terkadang bisa keliru membaca nama dan jumlah musuh yang dikalahkan! Periksa dua hal itu sebentar. Selebihnya seharusnya sudah tepat!",
+      "dismiss": "Mengerti"
+    },
     "layout": {
-      "signup": "PENDAFTARAN MIGRASI",
-      "trackExisting": "Lacak Pengajuan yang Ada",
+      "signup": "Permohonan migrasi",
+      "trackExisting": "Lacak Pengajuan",
       "editTitle": "Ubah Pengajuan Migrasi",
       "applyTitle": "Ajukan Migrasi ke Negara Bagian 565",
       "editDescription": "Perbarui detail karakter atau statistik tempur Anda, lalu kirim ulang untuk ditinjau pimpinan.",
@@ -321,9 +326,9 @@
       "playerHint": "Nama karakter Anda seperti yang ditampilkan dalam permainan.",
       "playerPlaceholder": "misalnya GOD Sankeyyy",
       "powerRecord": "Kekuatan tercatat",
-      "powerHint": "Kekuatan pemain Anda yang sebenarnya",
+      "powerHint": "Dihitung otomatis",
       "currentPower": "Kekuatan saat ini",
-      "killsOptional": "Jumlah musuh dikalahkan (opsional)",
+      "killsOptional": "Jumlah Musuh Dikalahkan",
       "killsHint": "Dari ikon tengkorak pada kartu profil",
       "killsPlaceholder": "misalnya 5,453,196",
       "breakdown": "Rincian kekuatan",
@@ -394,7 +399,7 @@
       "dropPrompt": "Pilih atau seret dan lepaskan tangkapan layar profil",
       "formats": "Beberapa berkas PNG atau JPG (maksimal 10 MB per berkas)",
       "browse": "Telusuri gambar",
-      "rosterCount": "DAFTAR ANGGOTA ({{count}} / {{max}} ANGGOTA — PEMOHON TERMASUK DALAM BATAS MAKSIMUM)",
+      "rosterCount": "DAFTAR ANGGOTA ({{count}} / {{max}} ANGGOTA)",
       "addMemberTitle": "Tambahkan anggota grup secara manual",
       "emptyTitle": "Belum ada anggota grup yang ditambahkan",
       "emptyDescription": "Unggah tangkapan layar profil di atas atau tambahkan anggota secara manual untuk mengisi daftar anggota grup.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "misalnya PlayerTwo",
       "allianceTag": "Tag atau nama aliansi",
       "powerRecord": "Kekuatan tercatat",
-      "killsOptional": "Jumlah Musuh Dikalahkan (opsional)",
+      "killsOptional": "Jumlah Musuh Dikalahkan",
       "killsPlaceholder": "misalnya 5,453,196 atau 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "misalnya 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Masukkan kekuatan kendaraan modifikasi (misalnya 9,436,786 atau 9M).",
       "state": "Masukkan negara bagian yang valid.",
       "alliance": "Masukkan nama atau tag aliansi Anda saat ini.",
-      "f1": "Masukkan kekuatan Arena F1 yang lebih dari nol (misalnya 12,5 juta).",
-      "f2": "Masukkan kekuatan Arena F2 yang lebih dari nol (misalnya 11 juta).",
-      "f3": "Masukkan kekuatan Arena F3 yang lebih dari nol (misalnya 10 juta).",
+      "f1": "Masukkan kekuatan Arena F1 yang lebih dari nol .",
+      "f2": "Masukkan kekuatan Arena F2 yang lebih dari nol .",
+      "f3": "Masukkan kekuatan Arena F3 yang lebih dari nol .",
       "migrationType": "Pilih migrasi individu atau grup.",
       "representative": "Masukkan nama dalam permainan perwakilan grup.",
       "destinations": "Pilih “Aliansi mana saja” atau setidaknya satu tujuan.",
@@ -709,7 +714,7 @@
       "comments": "Komentar tambahan"
     },
     "dashboard": {
-      "workspace": "RUANG KERJA PIMPINAN",
+      "workspace": "Pimpinan / Aplikasi",
       "title": "Pengajuan migrasi",
       "subtitle": "Tinjau permohonan dan kelola tujuan perpindahan ke Negara Bagian 565.",
       "refresh": "Muat ulang",

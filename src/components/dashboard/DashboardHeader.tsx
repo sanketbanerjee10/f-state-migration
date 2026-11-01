@@ -1,7 +1,7 @@
 import { Link } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import { LogOut, RefreshCw, Settings, ShieldCheck, X } from 'lucide-react';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { LogOut, RefreshCw, Settings, X } from 'lucide-react';
+import { PageHeader } from '../PageHeader';
 
 interface DashboardHeaderProps {
   userEmail?: string;
@@ -27,19 +27,14 @@ export function DashboardHeader({
   const { t } = useTranslation();
   return (
     <>
-      <header className="admin-header">
-        <Link href="/" className="brand-mark">
-          <span className="brand-icon">
-            <ShieldCheck size={18} />
-          </span>
-          <span>
-            <strong>{t('pages.leadership.state565')}</strong>
-            <small>{t('pages.leadership.migrationReview')}</small>
-          </span>
-        </Link>
-        <div className="admin-header-actions">
-          <LanguageSelector />
-          {activePage === 'settings' ? (
+      <PageHeader
+        backLabel={t('common.navigation.backToApplication')}
+        eyebrow={t('components.dashboard.workspace')}
+        title={t('components.dashboard.title')}
+        description={t('components.dashboard.subtitle')}
+        actions={
+          <>
+            {activePage === 'settings' ? (
             <Link
               href="/leadership/dashboard"
               className="button button-quiet"
@@ -49,30 +44,36 @@ export function DashboardHeader({
             >
               <span>{t('common.navigation.applications')}</span>
             </Link>
-          ) : (
-            <Link
-              href="/leadership/settings"
+            ) : (
+              <Link
+                href="/leadership/settings"
+                className="button button-quiet"
+                data-testid="nav-settings"
+                title={t('components.dashboard.settingsTitle')}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Settings size={15} />
+              </Link>
+            )}
+            <button
               className="button button-quiet"
-              data-testid="nav-settings"
-              title={t('components.dashboard.settingsTitle')}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              type="button"
+              onClick={onRefresh}
+              data-testid="refresh-dashboard"
             >
-              <Settings size={15} />
-            </Link>
-          )}
-          {/* <span className="signed-in" data-testid="signed-in-email">
-            {userEmail || 'Leadership Authorized'}
-          </span> */}
-          <button
-            className="button button-quiet"
-            type="button"
-            onClick={onLogout}
-            data-testid="logout"
-          >
-            <LogOut size={15} /> {t('pages.leadership.signOut')}
-          </button>
-        </div>
-      </header>
+              <RefreshCw size={14} /> {t('components.dashboard.refresh')}
+            </button>
+            <button
+              className="button button-quiet"
+              type="button"
+              onClick={onLogout}
+              data-testid="logout"
+            >
+              <LogOut size={15} /> {t('pages.leadership.signOut')}
+            </button>
+          </>
+        }
+      />
 
       {sessionError && (
         <div className="session-banner" role="alert" data-testid="session-expired">
@@ -95,22 +96,6 @@ export function DashboardHeader({
           </button>
         </div>
       )}
-
-      <div className="dashboard-heading">
-        <div>
-          <p className="eyebrow">{t('components.dashboard.workspace')}</p>
-          <h1>{t('components.dashboard.title')}</h1>
-          <p>{t('components.dashboard.subtitle')}</p>
-        </div>
-        <button
-          className="button"
-          type="button"
-          onClick={onRefresh}
-          data-testid="refresh-dashboard"
-        >
-          <RefreshCw size={14} /> {t('components.dashboard.refresh')}
-        </button>
-      </div>
     </>
   );
 }

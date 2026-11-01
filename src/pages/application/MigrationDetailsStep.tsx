@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaUser, FaUsers } from 'react-icons/fa';
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
@@ -10,7 +11,7 @@ import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
 export function MigrationDetailsStep() {
   const { t } = useTranslation();
-  const { draft, setDraftField, validateStep } = useApplicationDraft();
+  const { draft, setDraftField, validateStep, setNavigationNotice } = useApplicationDraft();
   const { nextStep, prevStep, isGroup } = useWizardNavigation();
 
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
@@ -24,6 +25,7 @@ export function MigrationDetailsStep() {
 
   const handleContinue = () => {
     const localErrors = validateStep('migration');
+    setNavigationNotice(Object.values(localErrors)[0] || '');
     if (Object.keys(localErrors).length > 0) {
       setStepErrors(localErrors);
       return;
@@ -58,7 +60,6 @@ export function MigrationDetailsStep() {
                 type="button"
                 data-testid={type === 'Individual' ? 'migration-type-individual' : 'migration-type-group'}
                 className={`button ${draft.migrationType === type ? 'button-primary' : 'button-secondary'}`}
-                style={{ flex: 1 }}
                 onClick={() => {
                   setDraftField('migrationType', type, true);
                   if (type === 'Group' && !draft.representative.trim() && draft.playerName.trim()) {
@@ -66,7 +67,9 @@ export function MigrationDetailsStep() {
                   }
                   setStepErrors((old) => ({ ...old, migrationType: '' }));
                 }}
+                style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
               >
+                {type === 'Group' ? <FaUsers size={16} aria-hidden="true" /> : <FaUser size={16} aria-hidden="true" />}
                 {type === 'Group' ? t('common.labels.group') : t('common.labels.individual')}
               </button>
             ))}

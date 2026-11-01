@@ -83,7 +83,7 @@
       "componentDescription": "Você esqueceu de adicionar a página ao roteador?"
     },
     "tracker": {
-      "eyebrow": "MIGRAÇÃO DO ESTADO 565",
+      "eyebrow": "Estado 565 / Acompanhamento de solicitações",
       "title": "Acompanhamento de candidaturas",
       "description": "Consulte o status em tempo real, os dados dos jogadores e a pontuação detalhada da sua candidatura de migração."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Todas as configurações",
       "destinations": "Alianças de destino",
       "tierThresholds": "Limites de pontuação por categoria",
-      "portalSettings": "CONFIGURAÇÕES DO PORTAL",
+      "portalSettings": "Liderança / Configurações",
       "returnDashboard": "Voltar ao painel de candidaturas",
       "leadershipAuthorized": "Acesso da liderança autorizado",
       "sessionExpired": "A sessão da liderança expirou.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Cole seu UUID secreto ou token",
       "tokenVerifyError": "Não foi possível verificar o token de acesso. Confira o link ou a chave e tente novamente.",
       "loginReturn": "Voltar à candidatura",
-      "loginEyebrow": "ESTADO 565 / LIDERANÇA",
+      "loginEyebrow": "Liderança / Entrar",
       "loginDescription": "Acesse o painel de análise da liderança pelo seu link privado ou use seu UUID de acesso. Não é necessário criar uma conta.",
       "loginExpired": "Sua sessão da liderança terminou. Use seu link privado ou informe novamente seu token de acesso para continuar analisando as candidaturas.",
       "tokenLabel": "Token de acesso da liderança ou UUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "ESTADO 565",
-      "aboutUs": "SOBRE NÓS",
+      "aboutUs": "Sobre",
       "eyebrow": "NOSSO ESTADO · NOSSA HISTÓRIA",
       "heroLead": "Fortes nas batalhas.",
       "heroTitle": "Humanos de coração.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "Confira o OCR rapidamente",
+      "message": "🤖 Nosso pequeno ajudante é muito bom, mas às vezes pode se confundir com nomes e eliminações! Confira esses dois itens rapidinho. Todo o resto deve estar certinho!",
+      "dismiss": "Entendi"
+    },
     "layout": {
-      "signup": "CADASTRO PARA MIGRAÇÃO",
-      "trackExisting": "Acompanhar candidaturas existentes",
+      "signup": "Solicitação de migração",
+      "trackExisting": "Acompanhar candidaturas",
       "editTitle": "Editar candidatura de migração",
       "applyTitle": "Candidatar-se à migração para o Estado 565",
       "editDescription": "Atualize os dados do seu personagem ou os atributos de combate e reenvie a candidatura para análise da liderança.",
@@ -321,9 +326,9 @@
       "playerHint": "O nome do seu personagem, como aparece no jogo",
       "playerPlaceholder": "ex.: GOD Sankeyyy",
       "powerRecord": "Poder registrado",
-      "powerHint": "Poder atual do jogador",
+      "powerHint": "Calculado automaticamente",
       "currentPower": "Poder atual",
-      "killsOptional": "Eliminações (opcional)",
+      "killsOptional": "Eliminações",
       "killsHint": "Consulte o ícone de caveira no cartão do perfil.",
       "killsPlaceholder": "ex.: 5,453,196",
       "breakdown": "Detalhamento do poder",
@@ -394,7 +399,7 @@
       "dropPrompt": "Selecione capturas de tela do perfil ou arraste-as para cá",
       "formats": "Vários arquivos PNG ou JPG (até 10 MB cada)",
       "browse": "Procurar imagens",
-      "rosterCount": "LISTA DE MEMBROS ({{count}} / {{max}} MEMBROS — O SOLICITANTE ESTÁ INCLUÍDO NO LIMITE)",
+      "rosterCount": "LISTA DE MEMBROS ({{count}} / {{max}} MEMBROS)",
       "addMemberTitle": "Adicionar membro do grupo manualmente",
       "emptyTitle": "Nenhum membro do grupo foi adicionado",
       "emptyDescription": "Envie capturas de tela de perfil acima ou adicione membros manualmente para preencher a lista do seu grupo.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "ex.: PlayerTwo",
       "allianceTag": "Etiqueta/nome da aliança",
       "powerRecord": "Poder registrado",
-      "killsOptional": "Eliminações (opcional)",
+      "killsOptional": "Eliminações",
       "killsPlaceholder": "ex.: 5,453,196 ou 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "ex.: 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Digite o poder de veículos modificados (por exemplo, 9.436.786 ou 9 mi).",
       "state": "Informe um estado atual válido.",
       "alliance": "Informe o nome ou a etiqueta da sua aliança atual.",
-      "f1": "Digite um valor positivo para o poder da formação F1 na Arena (por exemplo, 12,5 mi).",
-      "f2": "Digite um valor positivo para o poder da formação F2 na Arena (por exemplo, 11 mi).",
-      "f3": "Digite um valor positivo para o poder da formação F3 na Arena (por exemplo, 10 mi).",
+      "f1": "Digite um valor positivo para o poder da formação F1 na Arena .",
+      "f2": "Digite um valor positivo para o poder da formação F2 na Arena .",
+      "f3": "Digite um valor positivo para o poder da formação F3 na Arena .",
       "migrationType": "Selecione migração individual ou em grupo.",
       "representative": "Digite o nome no jogo da pessoa representante do grupo.",
       "destinations": "Escolha “Qualquer aliança” ou selecione pelo menos um destino.",
@@ -709,7 +714,7 @@
       "comments": "Comentários adicionais"
     },
     "dashboard": {
-      "workspace": "ESPAÇO DE TRABALHO DA LIDERANÇA",
+      "workspace": "Liderança / Solicitações",
       "title": "Candidaturas de migração",
       "subtitle": "Analise as candidaturas e gerencie os destinos no Estado 565.",
       "refresh": "Atualizar",

@@ -1,4 +1,5 @@
-import { Link, Route, Switch } from 'wouter';
+import { useLayoutEffect } from 'react';
+import { Link, Route, Switch, useLocation } from 'wouter';
 import { LeadershipLogin } from './pages/LeadershipLogin';
 import { LeadershipDashboard } from './pages/LeadershipDashboard';
 import { LeadershipSettings } from './pages/LeadershipSettings';
@@ -6,14 +7,21 @@ import { ApplicationWizard } from './pages/application/ApplicationWizard';
 import { ApplicationTracker } from './pages/ApplicationTracker';
 import { About565 } from './pages/About565';
 import { ReturningUserModal } from './components/ReturningUserModal';
+import { Toaster } from './components/ui/sonner';
 import { useTranslation } from 'react-i18next';
 
 function App() {
   const { t } = useTranslation();
+  const [location] = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
 
   return (
     <>
       <ReturningUserModal />
+      <Toaster position="top-right" />
       <Switch>
         {/* About 565 public route */}
         <Route path="/about" component={About565} />

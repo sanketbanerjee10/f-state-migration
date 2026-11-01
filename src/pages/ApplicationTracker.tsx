@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'wouter';
-import { ArrowLeft, PlusCircle } from 'lucide-react';
+import { useLocation, useParams } from 'wouter';
+import { PlusCircle } from 'lucide-react';
 import {
   getTrackedApplications,
   removeTrackedApplication,
@@ -15,8 +15,8 @@ import { EmptyState } from '../components/application-tracker/EmptyState';
 import { PrivacyAdvisory } from '../components/application-tracker/PrivacyAdvisory';
 import { TrackModal } from '../components/application-tracker/TrackModal';
 import { getReferenceCode } from '../components/application-tracker/trackerUtils';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
+import { PageHeader } from '../components/PageHeader';
 
 export function ApplicationTracker() {
   const { t } = useTranslation();
@@ -111,30 +111,22 @@ export function ApplicationTracker() {
   return (
     <main className="form-shell" style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-      {/* ── Page Header ── */}
-      <header className="page-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <Link href="/" className="button button-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
-            <ArrowLeft size={14} /> {t('common.actions.back')}
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <LanguageSelector />
-            <button
-              type="button"
-              className="button button-primary"
-              onClick={openTrackModal}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.88rem' }}
-            >
-              <PlusCircle size={16} /> {t('components.tracker.title')}
-            </button>
-          </div>
-        </div>
-        <div className="eyebrow" style={{ marginTop: 16 }}>{t('pages.tracker.eyebrow')}</div>
-        <h1 className="form-title" style={{ margin: '6px 0' }}>{t('pages.tracker.title')}</h1>
-        <p className="intro" style={{ margin: 0 }}>
-          {t('pages.tracker.description')}
-        </p>
-      </header>
+      <PageHeader
+        backHref="/"
+        actions={
+          <button
+            type="button"
+            className="button button-primary"
+            onClick={openTrackModal}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.88rem' }}
+          >
+            <PlusCircle size={16} /> {t('components.tracker.title')}
+          </button>
+        }
+        eyebrow={t('pages.tracker.eyebrow')}
+        title={t('pages.tracker.title')}
+        description={t('pages.tracker.description')}
+      />
 
       <PrivacyAdvisory />
 

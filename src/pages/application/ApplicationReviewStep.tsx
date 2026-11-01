@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, Edit2, ExternalLink, LoaderCircle, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
+import { CheckCircle2, ExternalLink, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useSubmitMigrationApplication } from '@/lib/api-client';
 import { FormSection } from '../../components/Field';
-import { Modal } from '../../components/Dialogs';
 import { StepLayout } from '../../components/form/StepLayout';
 import { CelebrationModal } from '../../components/CelebrationModal';
 import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
@@ -14,10 +13,13 @@ import { saveTrackedApplication } from '../../lib/trackedApplications';
 import type { MigrationTier, MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
+import { ReviewSummarySection } from './review/ReviewSummarySection';
+import { ReviewRosterMemberCard } from './review/ReviewRosterMemberCard';
+import { ReviewConfirmModal } from './review/ReviewConfirmModal';
 
 export function ApplicationReviewStep() {
   const { t } = useTranslation();
-  const { draft, validateAll, clearDraft } = useApplicationDraft();
+  const { draft, validateAll, clearDraft, setNavigationNotice } = useApplicationDraft();
   const { prevStep, goToStep, isGroup } = useWizardNavigation();
   const [, setLocation] = useLocation();
   const { thresholds } = useLiveTierThresholds();
@@ -46,6 +48,7 @@ export function ApplicationReviewStep() {
     // Validate all preceding stages
     const allErrors = validateAll();
     if (Object.keys(allErrors).length > 0) {
+      setNavigationNotice(Object.values(allErrors)[0]);
       if (
         allErrors.playerName ||
         allErrors.highestPowerOnRecord ||
@@ -71,6 +74,7 @@ export function ApplicationReviewStep() {
       return;
     }
 
+    setNavigationNotice('');
     setStepErrors({});
     setConfirmOpen(true);
   };
@@ -254,7 +258,6 @@ export function ApplicationReviewStep() {
         onContinue: handleOpenConfirm,
         onBack: prevStep,
         continueLabel: t('wizard.review.confirm'),
-        // backLabel: isGroup ? 'Back to Group Roster' : 'Back to Migration Details',
         submitting,
         submitMode: true,
       }}
@@ -279,19 +282,12 @@ export function ApplicationReviewStep() {
           </div>
 
           <div className="review-summary-grid">
-            {/* Stage 1: Character Details */}
-            <div className="review-section-box">
-              <div className="review-section-title-row">
-                <strong>{t('wizard.review.characterTitle')}</strong>
-                <button
-                  type="button"
-                  className="link-button"
-                  onClick={() => goToStep('character')}
-                  data-testid="edit-character-summary"
-                >
-                  <Edit2 size={12} /> {t('wizard.review.edit')}
-                </button>
-              </div>
+            <ReviewSummarySection
+              title={t('wizard.review.characterTitle')}
+              onEdit={() => goToStep('character')}
+              editTestId="edit-character-summary"
+              t={t}
+            >
               <div className="review-item"><span>{t('common.labels.name')}</span> <strong>{draft.playerName || t('wizard.review.notProvided')}</strong></div>
               <div className="review-item"><span>{t('common.labels.kills')}</span> <strong>{draft.kills || t('wizard.review.notProvided')}</strong></div>
               <div className="review-item"><span>{t('common.labels.power')}</span> <strong>{draft.highestPowerOnRecord || t('wizard.review.notProvided')}</strong></div>
@@ -308,14 +304,7 @@ export function ApplicationReviewStep() {
                 const scoreRes = calculateMigrationScoreFromRaw(s, tech, h, v, thresholds);
                 if (!scoreRes) return null;
                 return (
-                  <div
-                    className="review-item"
-                    style={{
-                      marginTop: 6,
-                      paddingTop: 6,
-                      borderTop: '1px dashed rgba(255, 255, 255, 0.08)',
-                    }}
-                  >
+                  <div className="review-item" style={{ marginTop: 6, paddingTop: 6, borderTop: '1px dashed rgba(255, 255, 255, 0.08)' }}>
                     <span>{t('wizard.review.score')}</span>
                     <strong style={{ color: TIER_COLORS[scoreRes.tier].text }}>
                       {scoreRes.score.toFixed(2)} ({t(`wizard.preferences.tiers.${scoreRes.tier.toLowerCase()}`)})
@@ -323,41 +312,27 @@ export function ApplicationReviewStep() {
                   </div>
                 );
               })()}
-            </div>
+            </ReviewSummarySection>
 
-            {/* Stage 2: Combat Power */}
-            <div className="review-section-box">
-              <div className="review-section-title-row">
-                <strong>{t('wizard.review.combatTitle')}</strong>
-                <button
-                  type="button"
-                  className="link-button"
-                  onClick={() => goToStep('combat')}
-                  data-testid="edit-combat-summary"
-                >
-                  <Edit2 size={12} /> {t('wizard.review.edit')}
-                </button>
-              </div>
+            <ReviewSummarySection
+              title={t('wizard.review.combatTitle')}
+              onEdit={() => goToStep('combat')}
+              editTestId="edit-combat-summary"
+              t={t}
+            >
               <div className="review-item"><span>{t('common.labels.state')}</span> <strong>{t('wizard.review.currentStateNumber', { state: draft.currentState || '—' })}</strong></div>
               <div className="review-item"><span>{t('common.labels.alliance')}</span> <strong>{draft.currentAlliance || '—'}</strong></div>
               <div className="review-item"><span>{t('wizard.review.f1')}</span> <strong>{draft.f1 || '—'}</strong></div>
               <div className="review-item"><span>{t('wizard.review.f2')}</span> <strong>{draft.f2 || '—'}</strong></div>
               <div className="review-item"><span>{t('wizard.review.f3')}</span> <strong>{draft.f3 || '—'}</strong></div>
-            </div>
+            </ReviewSummarySection>
 
-            {/* Stage 3: Migration Details */}
-            <div className="review-section-box">
-              <div className="review-section-title-row">
-                <strong>{t('wizard.review.migrationTitle')}</strong>
-                <button
-                  type="button"
-                  className="link-button"
-                  onClick={() => goToStep('migration')}
-                  data-testid="edit-preferences-summary"
-                >
-                  <Edit2 size={12} /> {t('wizard.review.edit')}
-                </button>
-              </div>
+            <ReviewSummarySection
+              title={t('wizard.review.migrationTitle')}
+              onEdit={() => goToStep('migration')}
+              editTestId="edit-preferences-summary"
+              t={t}
+            >
               <div className="review-item"><span>{t('wizard.review.migrationType')}</span> <strong>{displayMigrationType === 'Group' ? t('common.labels.group') : t('common.labels.individual')}{displayMigrationType !== draft.migrationType && <span style={{ fontSize: 10, color: '#94a3b8', marginLeft: 6 }}>{t('wizard.review.individualNote')}</span>}</strong></div>
               {displayMigrationType === 'Group' && (
                 <div className="review-item"><span>{t('wizard.review.representative')}</span> <strong>{draft.representative || t('wizard.review.notSpecified')}</strong></div>
@@ -373,139 +348,50 @@ export function ApplicationReviewStep() {
                   "{draft.reason}"
                 </p>
               </div>
-            </div>
+            </ReviewSummarySection>
 
-            {/* Stage 4 (if group): Group Roster */}
             {isGroup && (
-              <div className="review-section-box" style={{ gridColumn: '1 / -1' }}>
-                <div className="review-section-title-row">
-                  <strong style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div>
-                      {t('wizard.review.rosterTitle')}
-                      <div style={{fontSize: 10}}>{t('wizard.review.importedCount', { count: draft.groupMembers.length })}</div>
-                    </div> 
-                  </strong>
-                  <button
-                    type="button"
-                    className="link-button"
-                    onClick={() => goToStep('group-roster')}
-                    data-testid="edit-roster-summary"
-                  >
-                    <Edit2 size={12} /> {t('wizard.review.edit')}
-                  </button>
-                </div>
+              <ReviewSummarySection
+                title={t('wizard.review.rosterTitle')}
+                onEdit={() => goToStep('group-roster')}
+                editTestId="edit-roster-summary"
+                t={t}
+                fullWidth
+              >
+                <div style={{ fontSize: 10, marginBottom: 6 }}>{t('wizard.review.importedCount', { count: draft.groupMembers.length })}</div>
                 {draft.groupMembers.length === 0 ? (
                   <p className="hint" style={{ margin: '4px 0 0' }}>{t('wizard.review.noRoster')}</p>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8, marginTop: 8 }}>
-                    {draft.groupMembers.map((m) => {
-                      const ms = parseMagnitude(m.structurePower) || 0;
-                      const mt = parseMagnitude(m.techPower) || 0;
-                      const mh = parseMagnitude(m.heroPower) || 0;
-                      const mv = parseMagnitude(m.modVehiclePower) || 0;
-                      const mScore = calculateMigrationScoreFromRaw(ms, mt, mh, mv, thresholds);
-
-                      return (
-                      <div
+                    {draft.groupMembers.map((m, index) => (
+                      <ReviewRosterMemberCard
                         key={m.id}
-                        style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          padding: '8px 10px',
-                          borderRadius: 6,
-                          fontSize: 11,
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontWeight: 600, color: '#93c5fd' }}>{m.playerName}</span>
-                          {mScore && (
-                            <span
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 600,
-                                color: TIER_COLORS[mScore.tier].text,
-                                background: TIER_COLORS[mScore.tier].bg,
-                                border: `1px solid ${TIER_COLORS[mScore.tier].border}`,
-                                padding: '1px 5px',
-                                borderRadius: 3,
-                              }}
-                            >
-                              {mScore.score.toFixed(2)} · {t(`wizard.preferences.tiers.${mScore.tier.toLowerCase()}`)}
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ color: '#94a3b8', marginTop: 3 }}>
-                          {t('common.labels.power')} {m.highestPowerOnRecord} · {t('common.labels.kills')} {m.kills}
-                        </div>
-                        <div style={{ color: '#64748b', fontSize: 10 }}>
-                          {t('common.labels.alliance')} {m.currentAlliance || draft.currentAlliance || '—'}
-                        </div>
-                      </div>
-                      );
-                    })}
+                        member={m}
+                        draft={draft}
+                        index={index}
+                        t={t}
+                        thresholds={thresholds}
+                      />
+                    ))}
                   </div>
                 )}
-              </div>
+              </ReviewSummarySection>
             )}
           </div>
         </div>
       </FormSection>
 
       {confirmOpen && (
-        <Modal
-          title={t('wizard.review.beforeContinuing')}
+        <ReviewConfirmModal
+          isOpen={confirmOpen}
+          submitting={submitting}
+          t={t}
+          hasScreenshot={draft.hasScreenshot}
+          isGroup={isGroup}
+          memberCount={draft.groupMembers.length}
           onClose={() => !submitting && setConfirmOpen(false)}
-          actions={
-            <>
-              <button
-                type="button"
-                className="button button-quiet"
-                onClick={() => setConfirmOpen(false)}
-                disabled={submitting}
-                data-testid="cancel-submit"
-              >
-                {t('common.actions.cancel')}
-              </button>
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={confirmSubmit}
-                disabled={submitting}
-                data-testid="confirm-submit"
-              >
-                {submitting ? (
-                  <>
-                    <LoaderCircle size={14} className="spin" /> {t('common.status.sending')}
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={15} /> {t('wizard.review.submit')}
-                  </>
-                )}
-              </button>
-            </>
-          }
-        >
-          <p>
-            {t('wizard.review.privacy')}
-          </p>
-          {draft.hasScreenshot && (
-            <p style={{ marginTop: 12, color: '#86efac', fontSize: 13 }}>
-              {t('wizard.review.verifiedExplanation')}<strong>{t('wizard.review.verified')}</strong>.
-            </p>
-          )}
-          {isGroup && draft.groupMembers.length > 0 && (
-            <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 13 }}>
-              {t('wizard.review.membersRecorded', { count: draft.groupMembers.length })}
-            </p>
-          )}
-          <p style={{ marginTop: 12 }}>
-            {t('wizard.review.terms')}
-          </p>
-
-          <p style={{ marginTop: 12 }}>
-            {t('wizard.review.ready')}
-          </p>
-        </Modal>
+          onConfirm={confirmSubmit}
+        />
       )}
     </StepLayout>
   );

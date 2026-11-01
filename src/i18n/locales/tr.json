@@ -83,7 +83,7 @@
       "componentDescription": "Sayfayı yönlendiriciye eklemeyi mi unuttunuz?"
     },
     "tracker": {
-      "eyebrow": "565 EYALET GÖÇÜ",
+      "eyebrow": "565. Eyalet / Başvuru takibi",
       "title": "Başvuru Takipçisi",
       "description": "Göç başvurunuzun canlı durumunu, oyuncu bilgilerini ve puan dökümünü inceleyin."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Tüm ayarlar",
       "destinations": "Hedef ittifaklar",
       "tierThresholds": "Kademe puanlama eşikleri",
-      "portalSettings": "BAŞVURU SİSTEMİ AYARLARI",
+      "portalSettings": "Liderlik / Ayarlar",
       "returnDashboard": "Başvuru panosuna dön",
       "leadershipAuthorized": "Liderlik erişimi yetkilendirildi",
       "sessionExpired": "Liderlik oturumunun süresi doldu.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Gizli UUID'nizi veya erişim kodunuzu yapıştırın",
       "tokenVerifyError": "Erişim belirteci doğrulanamadı. Bağlantınızı veya anahtarınızı kontrol edip tekrar deneyin.",
       "loginReturn": "Başvuruya dön",
-      "loginEyebrow": "EYALET 565 / LİDERLİK",
+      "loginEyebrow": "Liderlik / Giriş",
       "loginDescription": "Özel erişim bağlantınızı veya gizli UUID kimlik bilginizi kullanarak liderlik inceleme paneline erişin. Kayıt olmanız veya hesap oluşturmanız gerekmez.",
       "loginExpired": "Yönetici oturumunuz sona erdi. Başvuruları incelemeye devam etmek için size özel bağlantıyı kullanın veya erişim kodunuzu yeniden girin.",
       "tokenLabel": "Liderlik erişim belirteci veya UUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "565. EYALET",
-      "aboutUs": "HAKKIMIZDA",
+      "aboutUs": "Hakkında",
       "eyebrow": "EYALETİMİZ · HİKÂYEMİZ",
       "heroLead": "Savaşta güçlüyüz.",
       "heroTitle": "Özümüzde insanız.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "OCR'ı hızlıca kontrol edin",
+      "message": "🤖 Küçük yardımcımız oldukça iyi, ancak isimleri ve öldürme sayılarını bazen yanlış okuyabiliyor! Bu iki bilgiyi hızlıca kontrol edin. Diğer her şey doğru olmalı!",
+      "dismiss": "Anladım"
+    },
     "layout": {
-      "signup": "GÖÇ BAŞVURUSU",
-      "trackExisting": "Mevcut Başvuruları Takip Et",
+      "signup": "Göç başvurusu",
+      "trackExisting": "Başvuruları Takip Et",
       "editTitle": "Göç Başvurusunu Düzenle",
       "applyTitle": "565. Eyalete Göç Başvurusu Yap",
       "editDescription": "Karakter ayrıntılarınızı veya savaş istatistiklerinizi güncelleyip yönetimin incelemesi için yeniden gönderin.",
@@ -321,9 +326,9 @@
       "playerHint": "Karakterinizin oyun içinde görünen adı",
       "playerPlaceholder": "ör. GOD Sankeyyy",
       "powerRecord": "Kayıtlardaki güç",
-      "powerHint": "Oyuncunun mevcut gücü",
+      "powerHint": "Otomatik hesaplan?r",
       "currentPower": "Mevcut Güç",
-      "killsOptional": "Öldürme sayısı (isteğe bağlı)",
+      "killsOptional": "Öldürme sayısı",
       "killsHint": "Profil kartındaki kafatası simgesinde görünen değer",
       "killsPlaceholder": "ör. 5,453,196",
       "breakdown": "Güç dökümü",
@@ -394,7 +399,7 @@
       "dropPrompt": "Profil ekran görüntülerini seçin veya buraya bırakın",
       "formats": "Birden fazla PNG veya JPG dosyası (her biri en fazla 10 MB)",
       "browse": "Görsellere göz at",
-      "rosterCount": "ÜYE LİSTESİ ({{count}} / {{max}} ÜYE — BAŞVURU SAHİBİ LİMİTE DAHİLDİR)",
+      "rosterCount": "ÜYE LİSTESİ ({{count}} / {{max}} ÜYE)",
       "addMemberTitle": "Grup üyesini elle ekle",
       "emptyTitle": "Henüz grup üyesi eklenmedi",
       "emptyDescription": "Grup kadronuzu oluşturmak için yukarıya profil ekran görüntüleri yükleyin veya üyeleri manuel ekleyin.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "ör. PlayerTwo",
       "allianceTag": "İttifak etiketi/adı",
       "powerRecord": "Kayıtlardaki güç",
-      "killsOptional": "Öldürme sayısı (isteğe bağlı)",
+      "killsOptional": "Öldürme sayısı",
       "killsPlaceholder": "ör. 5,453,196 veya 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "ör. 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Modifiye araç gücünü girin (ör. 9,436,786 veya 9M).",
       "state": "Geçerli bir eyalet numarası girin.",
       "alliance": "Mevcut ittifakınızın adını veya etiketini girin.",
-      "f1": "Pozitif bir Arena F1 gücü girin (ör. 12.5M).",
-      "f2": "Pozitif bir Arena F2 gücü girin (ör. 11M).",
-      "f3": "Pozitif bir Arena F3 gücü girin (ör. 10M).",
+      "f1": "Pozitif bir Arena F1 gücü girin .",
+      "f2": "Pozitif bir Arena F2 gücü girin .",
+      "f3": "Pozitif bir Arena F3 gücü girin .",
       "migrationType": "Bireysel veya grup göçünü seçin.",
       "representative": "Grup temsilcisinin oyun içi adını girin.",
       "destinations": "\"Herhangi bir ittifak\" seçeneğini veya en az bir hedef ittifakı seçin.",
@@ -709,7 +714,7 @@
       "comments": "Ek yorumlar"
     },
     "dashboard": {
-      "workspace": "LİDERLİK ÇALIŞMA ALANI",
+      "workspace": "Liderlik / Başvurular",
       "title": "Göç başvuruları",
       "subtitle": "Başvuruları inceleyin ve 565. Eyalet’teki hedefleri yönetin.",
       "refresh": "Yenile",

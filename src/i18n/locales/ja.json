@@ -83,7 +83,7 @@
       "componentDescription": "ページ遷移の設定にこのページを追加し忘れていませんか？"
     },
     "tracker": {
-      "eyebrow": "州 565 移民申請",
+      "eyebrow": "州565 / 申請状況",
       "title": "申請追跡",
       "description": "移民申請の最新ステータス、プレイヤー情報、スコアの内訳を確認できます。"
     },
@@ -98,7 +98,7 @@
       "allSettings": "すべての設定",
       "destinations": "移転先の同盟",
       "tierThresholds": "ティアのスコア基準",
-      "portalSettings": "ポータル設定",
+      "portalSettings": "リーダー / 設定",
       "returnDashboard": "申請ダッシュボードに戻る",
       "leadershipAuthorized": "リーダー権限を確認済み",
       "sessionExpired": "リーダーセッションの有効期限が切れました。",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "秘密のUUIDまたはトークンを貼り付け",
       "tokenVerifyError": "アクセストークンを確認できませんでした。リンクまたはキーを確認して、もう一度お試しください。",
       "loginReturn": "申請に戻る",
-      "loginEyebrow": "州 565／リーダー向け",
+      "loginEyebrow": "リーダー / ログイン",
       "loginDescription": "専用アクセスリンクまたは秘密のUUID認証情報を使って、リーダー審査ダッシュボードにアクセスできます。登録やアカウント作成は不要です。",
       "loginExpired": "リーダーセッションが終了しました。申請審査を続けるには、専用リンクを使用するか、アクセストークンを再入力してください。",
       "tokenLabel": "リーダー用アクセストークンまたはUUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "州565",
-      "aboutUs": "私たちについて",
+      "aboutUs": "概要",
       "eyebrow": "私たちの州・私たちの物語",
       "heroLead": "戦いでは強く。",
       "heroTitle": "心は人間らしく。",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "OCRの確認",
+      "message": "🤖 小さなアシスタントはかなり優秀ですが、名前やキル数を読み間違えることがあります！この2つだけ念のため確認してください。他の項目は問題ないはずです！",
+      "dismiss": "確認しました"
+    },
     "layout": {
       "signup": "移民申請",
-      "trackExisting": "既存の申請を追跡",
+      "trackExisting": "申請を追跡",
       "editTitle": "移民申請を編集",
       "applyTitle": "州565への移民を申請",
       "editDescription": "キャラクター情報や戦闘ステータスを更新し、リーダー審査に再提出します。",
@@ -321,9 +326,9 @@
       "playerHint": "ゲーム内に表示されるキャラクター名",
       "playerPlaceholder": "例：GOD Sankeyyy",
       "powerRecord": "記録上の戦力",
-      "powerHint": "実際のプレイヤー戦力",
+      "powerHint": "????",
       "currentPower": "現在の戦力",
-      "killsOptional": "キル数（任意）",
+      "killsOptional": "キル数",
       "killsHint": "プロフィールカードのドクロアイコンから取得",
       "killsPlaceholder": "例：5,453,196",
       "breakdown": "戦力の内訳",
@@ -394,7 +399,7 @@
       "dropPrompt": "プロフィール画像を選択またはドロップ",
       "formats": "複数のPNGまたはJPGファイル（各最大10MB）",
       "browse": "画像を参照",
-      "rosterCount": "メンバー名簿（{{count}} / {{max}} 人 — 申請者も上限に含まれます）",
+      "rosterCount": "メンバー名簿（{{count}} / {{max}} 人",
       "addMemberTitle": "グループメンバーを手動追加",
       "emptyTitle": "グループメンバーはまだ追加されていません",
       "emptyDescription": "上からプロフィール画像をアップロードするか、メンバーを手動追加して名簿を作成してください。",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "例：PlayerTwo",
       "allianceTag": "同盟タグ／名前",
       "powerRecord": "記録上の戦力",
-      "killsOptional": "キル数（任意）",
+      "killsOptional": "キル数",
       "killsPlaceholder": "例：5,453,196 または 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "例：210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "改造車両戦力を入力してください（例：9,436,786 または 9M）。",
       "state": "有効な州を入力してください",
       "alliance": "現在の同盟名またはタグを入力してください。",
-      "f1": "0より大きいF1アリーナ戦力を入力してください（例：12.5M）。",
-      "f2": "0より大きいF2アリーナ戦力を入力してください（例：11M）。",
-      "f3": "0より大きいF3アリーナ戦力を入力してください（例：10M）。",
+      "f1": "0より大きいF1アリーナ戦力を入力してください。",
+      "f2": "0より大きいF2アリーナ戦力を入力してください。",
+      "f3": "0より大きいF3アリーナ戦力を入力してください。",
       "migrationType": "個人またはグループの移民を選択してください。",
       "representative": "グループ代表者のゲーム内名を入力してください。",
       "destinations": "「どの同盟でも」を選ぶか、移転先を1つ以上選択してください。",
@@ -709,7 +714,7 @@
       "comments": "追加コメント"
     },
     "dashboard": {
-      "workspace": "リーダー用ワークスペース",
+      "workspace": "リーダー / 申請",
       "title": "移民申請",
       "subtitle": "申請を審査し、州565の移転先を管理します。",
       "refresh": "更新",

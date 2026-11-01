@@ -83,7 +83,7 @@
       "componentDescription": "Hast du vergessen, die Seite zum Router hinzuzufügen?"
     },
     "tracker": {
-      "eyebrow": "STAAT 565 · MIGRATION",
+      "eyebrow": "Staat 565 / Antragsverfolgung",
       "title": "Bewerbungsstatus",
       "description": "Sieh dir den aktuellen Status, die Spielerdetails und die Punkteaufschlüsselung deiner Migrationsbewerbung an."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Alle Einstellungen",
       "destinations": "Zielallianzen",
       "tierThresholds": "Punkteschwellen der Stufen",
-      "portalSettings": "PORTALEINSTELLUNGEN",
+      "portalSettings": "Führung / Einstellungen",
       "returnDashboard": "Zur Bewerbungsübersicht",
       "leadershipAuthorized": "Zugriff für die Führung bestätigt",
       "sessionExpired": "Die Führungssitzung ist abgelaufen.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Geheime UUID oder Zugriffscode einfügen",
       "tokenVerifyError": "Zugriffstoken konnte nicht überprüft werden. Prüfe deinen Link oder Schlüssel und versuche es erneut.",
       "loginReturn": "Zur Bewerbung zurückkehren",
-      "loginEyebrow": "STAAT 565 / FÜHRUNG",
+      "loginEyebrow": "Führung / Anmeldung",
       "loginDescription": "Öffne das Prüf-Dashboard der Führung über deinen privaten Zugangslink oder deine geheime UUID. Eine Registrierung oder Kontoerstellung ist nicht erforderlich.",
       "loginExpired": "Deine Sitzung für die Leitung ist abgelaufen. Verwende deinen privaten Link oder gib dein Zugriffstoken erneut ein, um die Bewerbungen weiter zu prüfen.",
       "tokenLabel": "Zugriffscode oder UUID für die Führung",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "STAAT 565",
-      "aboutUs": "ÜBER UNS",
+      "aboutUs": "Über",
       "eyebrow": "UNSER STAAT · UNSERE GESCHICHTE",
       "heroLead": "Stark im Kampf.",
       "heroTitle": "Im Herzen menschlich.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "Kurzer OCR-Check",
+      "message": "🤖 Unser kleiner Helfer ist ziemlich gut, aber bei Namen und Kills kann er sich manchmal vertun! Bitte prüfe diese beiden Angaben kurz. Alles andere sollte stimmen!",
+      "dismiss": "Verstanden"
+    },
     "layout": {
-      "signup": "MIGRATIONSBEWERBUNG",
-      "trackExisting": "Vorhandene Bewerbungen verfolgen",
+      "signup": "Migrationsantrag",
+      "trackExisting": "Bewerbungen verfolgen",
       "editTitle": "Migrationsbewerbung bearbeiten",
       "applyTitle": "Migration nach Staat 565 beantragen",
       "editDescription": "Aktualisiere deine Charakterdetails oder Kampfwerte und reiche sie erneut zur Prüfung durch die Leitung ein.",
@@ -321,9 +326,9 @@
       "playerHint": "Dein Charaktername, wie er im Spiel angezeigt wird",
       "playerPlaceholder": "z. B. GOD Sankeyyy",
       "powerRecord": "Erfasste Kampfkraft",
-      "powerHint": "Deine tatsächliche Spielerkraft",
+      "powerHint": "Automatisch berechnet",
       "currentPower": "Aktuelle Kraft",
-      "killsOptional": "Abschüsse (optional)",
+      "killsOptional": "Abschüsse",
       "killsHint": "Auf der Profilkarte neben dem Totenkopfsymbol",
       "killsPlaceholder": "z. B. 5,453,196",
       "breakdown": "Kraftaufschlüsselung",
@@ -394,7 +399,7 @@
       "dropPrompt": "Wähle Profilbilder aus oder lege sie hier ab",
       "formats": "Mehrere PNG- oder JPG-Dateien (bis zu 10 MB je Datei)",
       "browse": "Bilder durchsuchen",
-      "rosterCount": "GRUPPENLISTE ({{count}} / {{max}} MITGLIEDER – ANTRAGSTELLENDE PERSON MITGEZÄHLT)",
+      "rosterCount": "GRUPPENLISTE ({{count}} / {{max}} MITGLIEDER)",
       "addMemberTitle": "Gruppenmitglied manuell hinzufügen",
       "emptyTitle": "Noch keine Gruppenmitglieder hinzugefügt",
       "emptyDescription": "Lade oben Profilbilder hoch oder füge Mitglieder manuell hinzu, um deine Gruppenliste zu füllen.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "z. B. PlayerTwo",
       "allianceTag": "Allianzkürzel oder -name",
       "powerRecord": "Erfasste Kampfkraft",
-      "killsOptional": "Abschüsse (optional)",
+      "killsOptional": "Abschüsse",
       "killsPlaceholder": "z. B. 5,453,196 oder 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "z. B. 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Gib die Kraft modifizierter Fahrzeuge ein (z. B. 9,436,786 oder 9 Mio.).",
       "state": "Gib einen gültigen Staat ein.",
       "alliance": "Gib den Namen oder das Kürzel deiner aktuellen Allianz ein.",
-      "f1": "Gib eine positive Kraft für Arenaformation F1 ein (z. B. 12,5 Mio.).",
-      "f2": "Gib eine positive Kraft für Arenaformation F2 ein (z. B. 11 Mio.).",
-      "f3": "Gib eine positive Kraft für Arenaformation F3 ein (z. B. 10 Mio.).",
+      "f1": "Gib eine positive Kraft für Arenaformation F1 ein .",
+      "f2": "Gib eine positive Kraft für Arenaformation F2 ein .",
+      "f3": "Gib eine positive Kraft für Arenaformation F3 ein .",
       "migrationType": "Wähle Einzel- oder Gruppenmigration aus.",
       "representative": "Gib den Ingame-Namen der Gruppenvertretung ein.",
       "destinations": "Wähle „Beliebige Allianz“ oder mindestens ein Ziel aus.",
@@ -709,7 +714,7 @@
       "comments": "Zusätzliche Kommentare"
     },
     "dashboard": {
-      "workspace": "ARBEITSBEREICH DER FÜHRUNG",
+      "workspace": "Führung / Anträge",
       "title": "Migrationsbewerbungen",
       "subtitle": "Anfragen prüfen und Migrationsziele von Staat 565 verwalten.",
       "refresh": "Aktualisieren",

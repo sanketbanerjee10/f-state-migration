@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, KeyRound, LoaderCircle, ShieldCheck } from 'lucide-react';
+import { KeyRound, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { useLeadershipSession } from '../lib/auth';
+import { PageHeader } from '../components/PageHeader';
 
 export function LeadershipLogin() {
   const { t } = useTranslation();
@@ -46,18 +47,19 @@ export function LeadershipLogin() {
 
   return (
     <main className="auth-shell" data-testid="leadership-login">
-      <Link href="/" className="back-link" data-testid="link-public-application">
-        <ArrowLeft size={15} /> {t('pages.leadership.loginReturn')}
-      </Link>
+      <PageHeader
+          className="auth-page-header"
+          backLabel={t('pages.leadership.loginReturn')}
+          backTestId="link-public-application"
+          eyebrow={t('pages.leadership.loginEyebrow')}
+          title={t('pages.leadership.reviewAccess')}
+          description={t('pages.leadership.loginDescription')}
+          descriptionClassName="auth-copy"
+        />
       <section className="auth-card">
         <div className="auth-mark">
           <ShieldCheck size={22} />
         </div>
-        <p className="eyebrow">{t('pages.leadership.loginEyebrow')}</p>
-        <h1>{t('pages.leadership.reviewAccess')}</h1>
-        <p className="auth-copy">
-          {t('pages.leadership.loginDescription')}
-        </p>
         {expired && (
           <div className="notice-error" role="status" data-testid="session-expired-message">
             {t('pages.leadership.loginExpired')}

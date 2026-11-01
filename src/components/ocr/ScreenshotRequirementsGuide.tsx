@@ -65,9 +65,9 @@ export function ScreenshotRequirementsGuide() {
               <div className="example-checklist-card">
                 <h5 className="checklist-heading">{t('components.ocr.extract')}</h5>
                 <ul className="example-checklist">
-                  <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.playerName')}</strong> {t('components.ocr.topOfCard')}</span></li>
+                  {/* <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.playerName')}</strong> {t('components.ocr.topOfCard')}</span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.powerBesideName')}</strong> {t('components.ocr.shieldIcon')}</span></li>
-                  <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.kills')}</strong> {t('components.ocr.skullIconStats')}</span></li>
+                  <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.kills')}</strong> {t('components.ocr.skullIconStats')}</span></li> */}
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.structure')}</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.tech')}</strong></span></li>
                   <li><CheckCircle2 size={15} className="check-icon" /> <span><strong>{t('components.ocr.troop')}</strong></span></li>

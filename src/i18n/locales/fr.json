@@ -83,7 +83,7 @@
       "componentDescription": "Avez-vous oublié d’ajouter cette page au routeur ?"
     },
     "tracker": {
-      "eyebrow": "MIGRATION DE L’ÉTAT 565",
+      "eyebrow": "État 565 / Suivi des demandes",
       "title": "Suivi de demande",
       "description": "Consultez le statut en temps réel, les détails du joueur et le détail du score de votre demande de migration."
     },
@@ -98,7 +98,7 @@
       "allSettings": "Tous les paramètres",
       "destinations": "Alliances de destination",
       "tierThresholds": "Seuils de score des paliers",
-      "portalSettings": "PARAMÈTRES DU PORTAIL",
+      "portalSettings": "Direction / Paramètres",
       "returnDashboard": "Retour au tableau de bord des demandes",
       "leadershipAuthorized": "Accès de la direction autorisé",
       "sessionExpired": "La session de direction a expiré.",
@@ -109,7 +109,7 @@
       "tokenPlaceholder": "Collez votre UUID secret ou votre jeton",
       "tokenVerifyError": "Impossible de vérifier le jeton d’accès. Vérifiez votre lien ou votre clé et réessayez.",
       "loginReturn": "Retour à la demande",
-      "loginEyebrow": "ÉTAT 565 / DIRECTION",
+      "loginEyebrow": "Direction / Connexion",
       "loginDescription": "Accédez au tableau de bord de la direction à l’aide de votre lien privé ou de votre identifiant UUID secret. Aucune inscription ni création de compte n’est nécessaire.",
       "loginExpired": "Votre session de direction a pris fin. Utilisez votre lien privé ou saisissez à nouveau votre jeton d’accès pour continuer à examiner les demandes.",
       "tokenLabel": "Jeton d’accès de la direction ou UUID",
@@ -119,7 +119,7 @@
     },
     "about565": {
       "state": "ÉTAT 565",
-      "aboutUs": "À PROPOS",
+      "aboutUs": "À propos",
       "eyebrow": "NOTRE ÉTAT · NOTRE HISTOIRE",
       "heroLead": "Forts au combat.",
       "heroTitle": "Humains avant tout.",
@@ -187,9 +187,14 @@
     }
   },
   "wizard": {
+    "ocrNotice": {
+      "title": "Vérification rapide de l’OCR",
+      "message": "🤖 Notre petit assistant est plutôt doué, mais il peut parfois se tromper sur les noms et les éliminations ! Vérifiez rapidement ces deux éléments. Tout le reste devrait être correct !",
+      "dismiss": "Compris"
+    },
     "layout": {
-      "signup": "INSCRIPTION À LA MIGRATION",
-      "trackExisting": "Suivre les demandes existantes",
+      "signup": "Demande de migration",
+      "trackExisting": "Suivre les demandes",
       "editTitle": "Modifier la demande de migration",
       "applyTitle": "Demander à migrer vers l’État 565",
       "editDescription": "Mettez à jour les informations de votre personnage ou ses statistiques de combat, puis renvoyez votre demande à la direction pour examen.",
@@ -321,9 +326,9 @@
       "playerHint": "Votre nom de personnage tel qu'il apparaît dans le jeu",
       "playerPlaceholder": "p. ex. GOD Sankeyyy",
       "powerRecord": "Puissance totale enregistrée",
-      "powerHint": "Votre puissance actuelle de joueur",
+      "powerHint": "Calcul? automatiquement",
       "currentPower": "Puissance actuelle",
-      "killsOptional": "Éliminations (facultatif)",
+      "killsOptional": "Éliminations",
       "killsHint": "Depuis l'icône de crâne sur la carte de profil",
       "killsPlaceholder": "p. ex. 5,453,196",
       "breakdown": "Détail de la puissance",
@@ -394,7 +399,7 @@
       "dropPrompt": "Sélectionnez ou déposez les captures d’écran de profil ici",
       "formats": "Plusieurs fichiers PNG ou JPG (jusqu'à 10 Mo chacun)",
       "browse": "Parcourir les images",
-      "rosterCount": "LISTE DES MEMBRES ({{count}} / {{max}} MEMBRES — LE CANDIDAT EST INCLUS DANS LA LIMITE)",
+      "rosterCount": "LISTE DES MEMBRES ({{count}} / {{max}} MEMBRES)",
       "addMemberTitle": "Ajouter manuellement un membre du groupe",
       "emptyTitle": "Aucun membre du groupe n’a encore été ajouté",
       "emptyDescription": "Importez des captures d’écran de profil ci-dessus ou ajoutez des membres manuellement pour remplir la liste des membres de votre groupe.",
@@ -428,7 +433,7 @@
       "playerPlaceholder": "p. ex. PlayerTwo",
       "allianceTag": "Sigle ou nom de l’alliance",
       "powerRecord": "Puissance totale enregistrée",
-      "killsOptional": "Éliminations (facultatif)",
+      "killsOptional": "Éliminations",
       "killsPlaceholder": "p. ex. 5,453,196 ou 0",
       "zeroPlaceholder": "0",
       "powerPlaceholder": "p. ex. 210,000,000",
@@ -493,9 +498,9 @@
       "vehicle": "Saisissez la puissance des véhicules modifiés (p. ex. 9,436,786 ou 9M).",
       "state": "Saisissez un numéro d’État valide.",
       "alliance": "Saisissez le nom ou le sigle de votre alliance actuelle.",
-      "f1": "Saisissez une puissance d’arène F1 positive (p. ex. 12.5M).",
-      "f2": "Saisissez une puissance d’arène F2 positive (p. ex. 11M).",
-      "f3": "Saisissez une puissance d’arène F3 positive (p. ex. 10M).",
+      "f1": "Saisissez une puissance d’arène F1 positive .",
+      "f2": "Saisissez une puissance d’arène F2 positive .",
+      "f3": "Saisissez une puissance d’arène F3 positive .",
       "migrationType": "Sélectionnez une migration individuelle ou en groupe.",
       "representative": "Saisissez le nom en jeu du représentant du groupe.",
       "destinations": "Choisissez « N’importe quelle alliance » ou sélectionnez au moins une destination.",
@@ -709,7 +714,7 @@
       "comments": "Commentaires supplémentaires"
     },
     "dashboard": {
-      "workspace": "ESPACE DE TRAVAIL DE LA DIRECTION",
+      "workspace": "Direction / Demandes",
       "title": "Demandes de migration",
       "subtitle": "Examinez les demandes et gérez les destinations de l’État 565.",
       "refresh": "Actualiser",
