@@ -1,5 +1,8 @@
 node_modules
 docs
+!docs/
+docs/*
+!docs/GAME_IMPLEMENTATION_CHECKLIST.md
 .replit-artifact
 .env
 .env.example

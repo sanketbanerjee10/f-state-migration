@@ -6,6 +6,7 @@ import { LeadershipSettings } from './pages/LeadershipSettings';
 import { ApplicationWizard } from './pages/application/ApplicationWizard';
 import { ApplicationTracker } from './pages/ApplicationTracker';
 import { About565 } from './pages/About565';
+import { GamePage } from './pages/game/GamePage';
 import { ReturningUserModal } from './components/ReturningUserModal';
 import { Toaster } from './components/ui/sonner';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +27,9 @@ function App() {
         {/* About 565 public route */}
         <Route path="/about" component={About565} />
         <Route path="/about-565" component={About565} />
+
+        {/* Isolated 565 Zombie Survival entry point */}
+        <Route path="/game" component={GamePage} />
 
         {/* Public Application Tracker routes */}
         <Route path="/track/:id" component={ApplicationTracker} />
