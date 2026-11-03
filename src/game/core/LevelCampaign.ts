@@ -2,6 +2,11 @@ import { createArenaLayoutForLevel } from '../arena/ArenaSystem';
 import { getBossForWave } from '../bosses/BossSystem';
 import { STANDARD_POINTS_PER_CLEAR } from './GameConfig';
 import { getEligibleEnemyTypes } from '../waves/WaveComposition';
+import {
+  getNormalAttributeCost,
+  STANDARD_ATTRIBUTE_DEFINITIONS,
+  type StandardAttributeId,
+} from '../upgrades/ProgressionSystem';
 import type { ZombieType } from './GameState';
 
 export interface LevelDefinition {
@@ -24,6 +29,7 @@ export interface LevelCampaignProgress {
   readonly bestTimes: Record<number, number>;
   readonly bestScores: Record<number, number>;
   readonly statPoints: number;
+  readonly standardAttributeLevels: Record<StandardAttributeId, number>;
 }
 
 export const LEVEL_CAMPAIGN_STORAGE_KEY = 'state565-level-campaign-v1';
@@ -87,6 +93,12 @@ export function createDefaultLevelCampaignProgress(): LevelCampaignProgress {
     bestTimes: {},
     bestScores: {},
     statPoints: 0,
+    standardAttributeLevels: {
+      damage: 0,
+      fireRate: 0,
+      maxHealth: 0,
+      movementSpeed: 0,
+    },
   };
 }
 
@@ -116,61 +128,129 @@ function readBestValues(value: unknown): Record<number, number> {
   );
 }
 
+function readAttributeLevels(
+  value: unknown,
+  maximumSpentPoints: number,
+): Record<StandardAttributeId, number> {
+  const levels = {
+    damage: 0,
+    fireRate: 0,
+    maxHealth: 0,
+    movementSpeed: 0,
+  };
+  if (!isRecord(value)) return levels;
+
+  let spentPoints = 0;
+  for (const attribute of Object.keys(levels) as StandardAttributeId[]) {
+    const level = value[attribute];
+    const maxLevel = STANDARD_ATTRIBUTE_DEFINITIONS[attribute].maxLevel ??
+      Number.MAX_SAFE_INTEGER;
+    if (typeof level === 'number' && Number.isSafeInteger(level) && level >= 0) {
+      const requestedLevel = Math.min(level, maxLevel);
+      while (levels[attribute] < requestedLevel) {
+        const cost = getNormalAttributeCost(attribute, levels[attribute]);
+        if (spentPoints + cost > maximumSpentPoints) break;
+        spentPoints += cost;
+        levels[attribute] += 1;
+      }
+    }
+  }
+  return levels;
+}
+
+function getSpentAttributePoints(
+  levels: Record<StandardAttributeId, number>,
+): number {
+  return (Object.keys(levels) as StandardAttributeId[]).reduce(
+    (spent, attribute) => {
+      for (let level = 0; level < levels[attribute]; level += 1) {
+        spent += getNormalAttributeCost(attribute, level);
+      }
+      return spent;
+    },
+    0,
+  );
+}
+
+function getHighestUnlockedLevel(completedLevelIds: readonly number[]): number {
+  const completed = new Set(completedLevelIds);
+  let highestUnlockedLevel = 1;
+  while (
+    highestUnlockedLevel < LEVEL_CAMPAIGN_SIZE &&
+    completed.has(highestUnlockedLevel)
+  ) {
+    highestUnlockedLevel += 1;
+  }
+  return highestUnlockedLevel;
+}
+
 export function readLevelCampaignProgress(
   storage: Storage | undefined = globalThis.localStorage,
 ): LevelCampaignProgress {
   if (!storage) return createDefaultLevelCampaignProgress();
 
-  try {
-    const raw = storage.getItem(LEVEL_CAMPAIGN_STORAGE_KEY);
-    if (!raw) return createDefaultLevelCampaignProgress();
-
-    const parsed: unknown = JSON.parse(raw);
-    if (
-      !isRecord(parsed) ||
-      !Array.isArray(parsed.completedLevelIds)
-    ) {
-      return createDefaultLevelCampaignProgress();
+  const raw = storage.getItem(LEVEL_CAMPAIGN_STORAGE_KEY);
+  let parsed: unknown;
+  if (raw) {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      parsed = undefined;
     }
-
-    const completedLevelIds = [...new Set(parsed.completedLevelIds.filter(
-      (id): id is number =>
-        typeof id === 'number' &&
-        Number.isInteger(id) &&
-        id >= 1 &&
-        id <= LEVEL_CAMPAIGN_SIZE,
-    ))];
-    const rawHighestUnlocked = parsed.highestUnlockedLevel;
-    const highestUnlockedLevel = typeof rawHighestUnlocked === 'number' &&
-        Number.isInteger(rawHighestUnlocked)
-      ? rawHighestUnlocked
-      : 1;
-    const rawStatPoints = parsed.statPoints;
-    const parsedStatPoints = typeof rawStatPoints === 'number' &&
-        Number.isSafeInteger(rawStatPoints) &&
-        rawStatPoints >= 0
-      ? rawStatPoints
-      : 0;
-    const maximumEarnedStatPoints =
-      completedLevelIds.length * STANDARD_POINTS_PER_CLEAR;
-    const statPoints = parsedStatPoints <= maximumEarnedStatPoints
-      ? parsedStatPoints
-      : 0;
-
-    return {
-      schemaVersion: 1,
-      highestUnlockedLevel: Math.max(
-        1,
-        Math.min(highestUnlockedLevel, LEVEL_CAMPAIGN_SIZE),
-      ),
-      completedLevelIds,
-      bestTimes: readBestValues(parsed.bestTimes),
-      bestScores: readBestValues(parsed.bestScores),
-      statPoints,
-    };
-  } catch {
-    return createDefaultLevelCampaignProgress();
   }
+
+  const parsedRecord = isRecord(parsed) ? parsed : undefined;
+  const completedValues: readonly unknown[] = isRecord(parsed) &&
+      Array.isArray(parsed.completedLevelIds)
+    ? parsed.completedLevelIds
+    : [];
+  const hasCompletedLevelData = parsedRecord !== undefined &&
+      Array.isArray(parsedRecord.completedLevelIds);
+  const completedCandidates = new Set(completedValues.filter(
+    (id): id is number =>
+      typeof id === 'number' &&
+      Number.isInteger(id) &&
+      id >= 1 &&
+      id <= LEVEL_CAMPAIGN_SIZE,
+  ));
+  const completedLevelIds: number[] = [];
+  for (let levelId = 1; completedCandidates.has(levelId); levelId += 1) {
+    completedLevelIds.push(levelId);
+  }
+
+  const rawStatPoints = parsedRecord?.statPoints;
+  const hasValidStatPoints = typeof rawStatPoints === 'number' &&
+      Number.isSafeInteger(rawStatPoints) &&
+      rawStatPoints >= 0;
+  const parsedStatPoints = hasValidStatPoints ? rawStatPoints : 0;
+  const maximumEarnedStatPoints =
+    completedLevelIds.length * STANDARD_POINTS_PER_CLEAR;
+  const standardAttributeLevels = readAttributeLevels(
+    parsedRecord?.standardAttributeLevels,
+    maximumEarnedStatPoints,
+  );
+  const maximumAvailableStatPoints = Math.max(
+    0,
+    maximumEarnedStatPoints - getSpentAttributePoints(standardAttributeLevels),
+  );
+  const progress = !hasCompletedLevelData
+    ? createDefaultLevelCampaignProgress()
+    : {
+        schemaVersion: 1,
+        highestUnlockedLevel: getHighestUnlockedLevel(completedLevelIds),
+        completedLevelIds,
+        bestTimes: readBestValues(parsedRecord.bestTimes),
+        bestScores: readBestValues(parsedRecord.bestScores),
+        standardAttributeLevels,
+        statPoints: hasValidStatPoints
+          ? Math.min(parsedStatPoints, maximumAvailableStatPoints)
+          : maximumAvailableStatPoints,
+      };
+
+  if (raw !== JSON.stringify(progress)) {
+    saveLevelCampaignProgress(progress, storage);
+  }
+  return progress;
 }
 
 export function saveLevelCampaignProgress(
@@ -179,27 +259,37 @@ export function saveLevelCampaignProgress(
 ): void {
   if (!storage) return;
 
-  const completedLevelIds = [...new Set(progress.completedLevelIds.filter(
+  const candidates = new Set(progress.completedLevelIds.filter(
     (id) => Number.isInteger(id) && id >= 1 && id <= LEVEL_CAMPAIGN_SIZE,
-  ))];
-  const statPoints = Number.isSafeInteger(progress.statPoints) &&
-      progress.statPoints >= 0 &&
-      progress.statPoints <=
-        completedLevelIds.length * STANDARD_POINTS_PER_CLEAR
-    ? progress.statPoints
-    : 0;
+  ));
+  const completedLevelIds: number[] = [];
+  for (let levelId = 1; candidates.has(levelId); levelId += 1) {
+    completedLevelIds.push(levelId);
+  }
+  const validStatPoints = Number.isSafeInteger(progress.statPoints) &&
+      progress.statPoints >= 0;
+  const maximumEarnedStatPoints =
+    completedLevelIds.length * STANDARD_POINTS_PER_CLEAR;
+  const standardAttributeLevels = readAttributeLevels(
+    progress.standardAttributeLevels,
+    maximumEarnedStatPoints,
+  );
+  const maximumAvailableStatPoints = Math.max(
+    0,
+    maximumEarnedStatPoints - getSpentAttributePoints(standardAttributeLevels),
+  );
+  const normalizedProgress = {
+    ...progress,
+    highestUnlockedLevel: getHighestUnlockedLevel(completedLevelIds),
+    completedLevelIds,
+    standardAttributeLevels,
+    statPoints: validStatPoints
+      ? Math.min(progress.statPoints, maximumAvailableStatPoints)
+      : maximumAvailableStatPoints,
+  };
   storage.setItem(
     LEVEL_CAMPAIGN_STORAGE_KEY,
-    JSON.stringify({
-      ...progress,
-      schemaVersion: 1,
-      highestUnlockedLevel: Math.max(
-        1,
-        Math.min(progress.highestUnlockedLevel, LEVEL_CAMPAIGN_SIZE),
-      ),
-      completedLevelIds,
-      statPoints,
-    }),
+    JSON.stringify(normalizedProgress),
   );
 }
 
@@ -209,6 +299,7 @@ export function completeLevelProgress(
   score: number,
   elapsedSeconds: number,
   statPoints = progress.statPoints,
+  standardAttributeLevels = progress.standardAttributeLevels,
 ): LevelCampaignProgress {
   if (!Number.isInteger(levelId) || levelId < 1 || levelId > LEVEL_CAMPAIGN_SIZE) {
     throw new RangeError(`Level ID must be an integer between 1 and ${LEVEL_CAMPAIGN_SIZE}.`);
@@ -231,24 +322,30 @@ export function completeLevelProgress(
     bestScores[levelId] = score;
   }
 
-  const statPointBalance = Number.isSafeInteger(statPoints) && statPoints >= 0
-    ? statPoints
-    : 0;
   const maximumEarnedStatPoints =
     completed.size * STANDARD_POINTS_PER_CLEAR;
+  const normalizedAttributeLevels = readAttributeLevels(
+    standardAttributeLevels,
+    maximumEarnedStatPoints,
+  );
+  const maximumAvailableStatPoints = Math.max(
+    0,
+    maximumEarnedStatPoints - getSpentAttributePoints(normalizedAttributeLevels),
+  );
+  const statPointBalance = Number.isSafeInteger(statPoints) && statPoints >= 0
+    ? Math.min(statPoints, maximumAvailableStatPoints)
+    : maximumAvailableStatPoints;
 
   return {
     ...progress,
-    highestUnlockedLevel: Math.min(
-      LEVEL_CAMPAIGN_SIZE,
-      Math.max(progress.highestUnlockedLevel, levelId + 1),
+    highestUnlockedLevel: getHighestUnlockedLevel(
+      [...completed].sort((left, right) => left - right),
     ),
     completedLevelIds: [...completed].sort((left, right) => left - right),
     bestTimes,
     bestScores,
-    statPoints: statPointBalance <= maximumEarnedStatPoints
-      ? statPointBalance
-      : 0,
+    standardAttributeLevels: normalizedAttributeLevels,
+    statPoints: statPointBalance,
   };
 }
 

@@ -8,7 +8,7 @@ import {
   WAVE_ONE_ENEMY_BUDGET,
   ZOMBIE_BASE_STATS,
 } from './GameConfig';
-import { moveCircleInArena } from './ArenaGeometry';
+import { findCirclePositionInArena, moveCircleInArena } from './ArenaGeometry';
 import { GAME_VISUAL_CONFIG } from '../rendering/VisualConfig';
 import {
   ARENA_INTERACTION_CONFIG,
@@ -481,6 +481,7 @@ export function createGameState(
   campaignLevelId: number | null = null,
   initialStandardPoints = 0,
   levelCompletionRewardEligible = true,
+  initialStandardAttributeLevels?: Partial<Record<StandardAttributeId, number>>,
 ): GameState {
   assertArenaSize(width, height);
   if (!Number.isSafeInteger(initialStandardPoints) || initialStandardPoints < 0) {
@@ -513,13 +514,76 @@ export function createGameState(
   const initialLayout = gameMode === 'level'
     ? createArenaLayoutForLevel(initialWave)
     : createArenaLayoutForWave(initialWave);
+  const initialArenaObstacles = initialLayout.obstacles.map((obstacle) =>
+    obstacle.kind === 'barricade'
+      ? {
+          ...obstacle,
+          health: ARENA_INTERACTION_CONFIG.barricadeHealth,
+          maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
+        }
+      : { ...obstacle },
+  );
+  const initialBarrels = initialLayout.barrels.map((barrel, index) => ({
+    ...barrel,
+    radius: ARENA_INTERACTION_CONFIG.barrelRadius,
+    health: ARENA_INTERACTION_CONFIG.barrelHealth,
+    maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
+    id: `${barrel.id}-${index}`,
+  }));
+  const playerSpawn = findCirclePositionInArena(
+    player,
+    playerRadius,
+    width,
+    height,
+    getArenaCollisionObstacles(initialArenaObstacles, initialBarrels),
+  );
+  player.x = playerSpawn.x;
+  player.y = playerSpawn.y;
   const progression = createRunProgressionState();
   if (gameMode === 'level') {
+    for (const attribute of Object.keys(
+      progression.standardAttributeLevels,
+    ) as StandardAttributeId[]) {
+      const level = initialStandardAttributeLevels?.[attribute] ?? 0;
+      if (!Number.isSafeInteger(level) || level < 0) {
+        throw new RangeError('Initial attribute levels must be non-negative safe integers.');
+      }
+      progression.standardAttributeLevels[attribute] = level;
+      for (let purchasedLevel = 0; purchasedLevel < level; purchasedLevel += 1) {
+        progression.standardAttributeCosts[attribute].push(
+          getNormalAttributeCost(attribute, purchasedLevel),
+        );
+      }
+    }
+    const spentStatPoints = Object.values(
+      progression.standardAttributeCosts,
+    ).flat().reduce((total, cost) => total + cost, 0);
     progression.standard = {
-      earned: initialStandardPoints,
+      earned: initialStandardPoints + spentStatPoints,
       available: initialStandardPoints,
-      spent: 0,
+      spent: spentStatPoints,
     };
+    player.damage = getNormalAttributeValue(
+      'damage',
+      PLAYER_CONFIG.startingDamage,
+      progression.standardAttributeLevels.damage,
+    );
+    player.shotsPerSecond = getNormalAttributeValue(
+      'fireRate',
+      PLAYER_CONFIG.startingShotsPerSecond,
+      progression.standardAttributeLevels.fireRate,
+    );
+    player.maxHealth = getNormalAttributeValue(
+      'maxHealth',
+      PLAYER_CONFIG.startingHealth,
+      progression.standardAttributeLevels.maxHealth,
+    );
+    player.health = player.maxHealth;
+    player.movementSpeed = getNormalAttributeValue(
+      'movementSpeed',
+      PLAYER_CONFIG.movementSpeed,
+      progression.standardAttributeLevels.movementSpeed,
+    );
   }
   return {
     gameMode,
@@ -533,22 +597,8 @@ export function createGameState(
     projectiles: [],
     items: [],
     hazards: [],
-    arenaObstacles: initialLayout.obstacles.map((obstacle) =>
-      obstacle.kind === 'barricade'
-        ? {
-            ...obstacle,
-            health: ARENA_INTERACTION_CONFIG.barricadeHealth,
-            maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
-          }
-        : { ...obstacle },
-    ),
-    barrels: initialLayout.barrels.map((barrel, index) => ({
-      ...barrel,
-      radius: ARENA_INTERACTION_CONFIG.barrelRadius,
-      health: ARENA_INTERACTION_CONFIG.barrelHealth,
-      maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
-      id: `${barrel.id}-${index}`,
-    })),
+    arenaObstacles: initialArenaObstacles,
+    barrels: initialBarrels,
     arenaTheme: initialLayout.theme,
     impacts: [],
     damageNumbers: [],
@@ -612,10 +662,10 @@ export function createGameState(
       rareUpgradeCosts: { ...progression.rareUpgradeCosts },
       rareUpgradeUnlocked: { ...progression.rareUpgradeUnlocked },
       statAllocations: {
-        damage: 0,
-        shotsPerSecond: 0,
-        maxHealth: 0,
-        movementSpeed: 0,
+        damage: progression.standardAttributeLevels.damage,
+        shotsPerSecond: progression.standardAttributeLevels.fireRate,
+        maxHealth: progression.standardAttributeLevels.maxHealth,
+        movementSpeed: progression.standardAttributeLevels.movementSpeed,
       },
     },
     progression,

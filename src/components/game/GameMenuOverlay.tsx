@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Music2, Pause, Play } from 'lucide-react';
 import type { GameSettings } from '@/game/core/GameSettings';
 import type {
@@ -130,9 +130,11 @@ export function GameMenuOverlay({
   tutorialMode = false,
 }: GameMenuOverlayProps) {
   const [view, setView] = useState<MenuView>(initialView);
+  const [campaignProgress, setCampaignProgress] = useState(
+    readLevelCampaignProgress,
+  );
   const overlayRef = useRef<HTMLElement>(null);
   const isMainMenu = mode === 'main';
-  const campaignProgress = useMemo(() => readLevelCampaignProgress(), []);
   const levelCards = LEVEL_DEFINITIONS;
   useLayoutEffect(() => {
     if (overlayRef.current) overlayRef.current.scrollTop = 0;
@@ -156,6 +158,9 @@ export function GameMenuOverlay({
       <p>Level Mode is a campaign experience. Scores here don’t count toward the Survival leaderboard.</p>
       <p className="game-level-progress" role="status">
         Highest unlocked: Stage {campaignProgress.highestUnlockedLevel} of {LEVEL_DEFINITIONS.length}
+      </p>
+      <p className="game-level-progress" role="status">
+        Available Stat Points: {campaignProgress.statPoints}
       </p>
       <div className="game-level-grid">
         {levelCards.map((level) => {
@@ -210,6 +215,11 @@ export function GameMenuOverlay({
       </div>
     </>
   );
+
+  const openLevelSelection = () => {
+    setCampaignProgress(readLevelCampaignProgress());
+    setView('level-select');
+  };
 
   return (
     <>
@@ -277,7 +287,7 @@ export function GameMenuOverlay({
                 <button
                   className="game-menu-primary"
                   type="button"
-                  onClick={() => setView('level-select')}
+                  onClick={openLevelSelection}
                 >
                   Level Mode
                 </button>

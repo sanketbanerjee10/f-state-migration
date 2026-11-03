@@ -257,13 +257,18 @@ export function GameCanvas() {
 
   const startRun = (gameMode: GameMode = 'survival', levelId?: number) => {
     let startingStatPoints = 0;
+    let startingAttributeLevels:
+      | ReturnType<typeof readLevelCampaignProgress>['standardAttributeLevels']
+      | undefined;
     if (gameMode === 'level') {
       const progress = readLevelCampaignProgress();
       if (levelId === undefined || !canStartLevel(progress, levelId)) {
         toast.error('That campaign level is locked or unavailable.');
         return;
       }
+      saveLevelCampaignProgress(progress);
       startingStatPoints = progress.statPoints;
+      startingAttributeLevels = progress.standardAttributeLevels;
       currentCampaignRewardEligibleRef.current =
         !progress.completedLevelIds.includes(levelId);
       currentCampaignLevelIdRef.current = levelId;
@@ -278,6 +283,8 @@ export function GameCanvas() {
       gameMode,
       gameMode === 'level' ? levelId ?? null : null,
       startingStatPoints,
+      gameMode === 'level' && currentCampaignRewardEligibleRef.current,
+      startingAttributeLevels,
     );
     syncGameState();
     setTutorialStepIndex(null);
@@ -379,14 +386,16 @@ export function GameCanvas() {
 
   const restartRun = () => {
     const gameMode = currentRunGameModeRef.current;
-    const startingStatPoints = gameMode === 'level'
-      ? readLevelCampaignProgress().statPoints
-      : 0;
+    const campaignProgress = gameMode === 'level'
+      ? readLevelCampaignProgress()
+      : null;
+    const startingStatPoints = campaignProgress?.statPoints ?? 0;
     engineRef.current?.reset(
       gameMode,
       gameMode === 'level' ? currentCampaignLevelIdRef.current : null,
       startingStatPoints,
       gameMode === 'level' && currentCampaignRewardEligibleRef.current,
+      campaignProgress?.standardAttributeLevels,
     );
     previousAudioEventsRef.current = {
       impacts: new Set(),
@@ -453,6 +462,7 @@ export function GameCanvas() {
         gameState.statistics.survivalSeconds,
         gameState.statistics.standardCurrency?.available ??
           gameState.upgradePoints,
+        gameState.progression.standardAttributeLevels,
       );
       saveLevelCampaignProgress(progress);
       savedCampaignLevelIdRef.current = gameState.campaignLevelId;
@@ -479,6 +489,28 @@ export function GameCanvas() {
   const adjustStat = (attribute: RunStatAttribute, adjustment: -1 | 1) => {
     engineRef.current?.adjustStat(attribute, adjustment);
     syncGameState();
+    if (currentRunGameModeRef.current !== 'level') return;
+
+    try {
+      const progress = readLevelCampaignProgress();
+      const availablePoints =
+        engineRef.current?.getGameState()?.upgradePoints;
+      if (availablePoints !== undefined) {
+        saveLevelCampaignProgress({
+          ...progress,
+          statPoints: availablePoints,
+          standardAttributeLevels:
+            engineRef.current?.getGameState()?.progression
+              .standardAttributeLevels ?? progress.standardAttributeLevels,
+        });
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? `Campaign Stat Points could not be saved: ${error.message}`
+          : 'Campaign Stat Points could not be saved.',
+      );
+    }
   };
 
   const adjustRareUpgrade = (

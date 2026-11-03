@@ -65,6 +65,7 @@ export function findCirclePositionInArena(
     x: Math.min(Math.max(point.x, radius), Math.max(radius, width - radius)),
     y: Math.min(Math.max(point.y, radius), Math.max(radius, height - radius)),
   };
+  const requestedPosition = { ...position };
 
   for (let pass = 0; pass < obstacles.length; pass += 1) {
     const overlapping = obstacles.find((obstacle) =>
@@ -92,7 +93,35 @@ export function findCirclePositionInArena(
     position.x = candidates[0].x;
     position.y = candidates[0].y;
   }
-  return position;
+  if (!obstacles.some((obstacle) =>
+    circleOverlapsRectangle(position, radius, obstacle),
+  )) {
+    return position;
+  }
+
+  const step = Math.max(radius, 1);
+  let nearestPosition: { x: number; y: number } | undefined;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  for (let y = radius; y <= height - radius; y += step) {
+    for (let x = radius; x <= width - radius; x += step) {
+      const candidate = { x, y };
+      if (obstacles.some((obstacle) =>
+        circleOverlapsRectangle(candidate, radius, obstacle),
+      )) {
+        continue;
+      }
+
+      const distance = Math.hypot(
+        candidate.x - requestedPosition.x,
+        candidate.y - requestedPosition.y,
+      );
+      if (distance < nearestDistance) {
+        nearestPosition = candidate;
+        nearestDistance = distance;
+      }
+    }
+  }
+  return nearestPosition ?? position;
 }
 
 export function moveCircleInArena(

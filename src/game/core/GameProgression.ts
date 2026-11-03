@@ -31,7 +31,9 @@ import {
   createArenaLayoutForWave,
   createArenaObstacles,
   createExplosiveBarrels,
+  getArenaCollisionObstacles,
 } from '../arena/ArenaSystem';
+import { findCirclePositionInArena } from './ArenaGeometry';
 import {
   ARENA_TRANSITION_SECONDS,
   ARENA_INTERACTION_CONFIG,
@@ -187,6 +189,15 @@ export function prepareArenaForWave(
     maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
     id: `${barrel.id}-${index}`,
   }));
+  const playerSpawn = findCirclePositionInArena(
+    state.player,
+    state.player.radius,
+    state.arenaWidth,
+    state.arenaHeight,
+    getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+  );
+  state.player.x = playerSpawn.x;
+  state.player.y = playerSpawn.y;
   state.items = state.items.filter(
     (item) => item.type !== 'rareGold' || item.remainingSeconds > 0,
   );
