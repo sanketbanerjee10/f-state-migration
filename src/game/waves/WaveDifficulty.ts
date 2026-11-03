@@ -1,10 +1,6 @@
-export const WAVE_DIFFICULTY_CONFIG = {
-  healthIncreasePerTwoWaves: 0.1,
-  speedIncreasePerWave: 0.035,
-  maximumSpeedIncreaseWaves: 8,
-  contactDamageIncreasePerWave: 1,
-  maximumContactDamage: 30,
-} as const;
+import { WAVE_DIFFICULTY_CONFIG } from '../core/GameConfig';
+
+export { WAVE_DIFFICULTY_CONFIG } from '../core/GameConfig';
 
 export interface WaveDifficulty {
   readonly healthMultiplier: number;

@@ -1,7 +1,9 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { isLeaderboardEligibleGameMode, type GameMode } from '@/game/core/GameState';
 import { customFetch, type CustomFetchOptions } from './api-client/custom-fetch';
 
 export interface GameScoreSubmission {
+  gameMode?: GameMode;
   playerName: string;
   score: number;
   waveCleared: number;
@@ -38,10 +40,16 @@ export async function submitGameScore(
   score: GameScoreSubmission,
   options?: CustomFetchOptions,
 ): Promise<GameScoreSubmissionResponse> {
+  const { gameMode: requestedGameMode, ...eligibleScore } = score;
+  const gameMode = requestedGameMode ?? 'standard';
+  if (!isLeaderboardEligibleGameMode(gameMode)) {
+    throw new Error('Level Mode is a campaign experience. Scores here don’t count toward the Survival leaderboard.');
+  }
+
   return customFetch<GameScoreSubmissionResponse>('/api/game/scores', {
     ...options,
     method: 'POST',
-    body: JSON.stringify(score),
+    body: JSON.stringify(eligibleScore),
   });
 }
 

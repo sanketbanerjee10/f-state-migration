@@ -1,25 +1,25 @@
 import {
   GAME_VIEWPORT,
   GAME_SCORING_CONFIG,
-  PLAYER_MOVEMENT_SPEED,
-  PLAYER_STARTING_DAMAGE,
-  PLAYER_STARTING_SHOTS_PER_SECOND,
+  PLAYER_CONFIG,
+  DEV_WAVE_ENEMY_BUDGET,
+  STANDARD_ATTRIBUTE_DEFINITIONS,
+  WAVE_DIFFICULTY_CONFIG,
   WAVE_ONE_ENEMY_BUDGET,
+  ZOMBIE_BASE_STATS,
 } from './GameConfig';
 import { moveCircleInArena } from './ArenaGeometry';
 import { GAME_VISUAL_CONFIG } from '../rendering/VisualConfig';
 import {
-  createArenaObstacles,
-  createExplosiveBarrels,
+  ARENA_INTERACTION_CONFIG,
+  createArenaLayoutForWave,
+  createArenaLayoutForLevel,
   getArenaCollisionObstacles,
   type ArenaObstacleEntity,
   type ArenaThemeId,
   type ExplosiveBarrelEntity,
 } from '../arena/ArenaSystem';
-import {
-  getWaveDifficulty,
-  WAVE_DIFFICULTY_CONFIG,
-} from '../waves/WaveDifficulty';
+import { getWaveDifficulty } from '../waves/WaveDifficulty';
 import type { BossType } from '../bosses/BossSystem';
 import type {
   CurrencyAccounting,
@@ -31,15 +31,31 @@ import {
   createRunProgressionState,
   getNormalAttributeCost,
   getNormalAttributeValue,
-  STANDARD_ATTRIBUTE_DEFINITIONS,
 } from '../upgrades/ProgressionSystem';
 import {
   getWaveModifierForWave,
   type WaveModifierId,
 } from '../modifiers/WaveModifiers';
-import { DEV_WAVE_ENEMY_BUDGET } from '../waves/WaveComposition';
 
-export type GameMode = 'standard' | 'dev';
+export type GameMode = 'standard' | 'survival' | 'dev' | 'level';
+
+export function normalizeGameMode(mode: GameMode | string | null | undefined): GameMode {
+  if (mode === 'survival') return 'standard';
+  if (mode === 'level') return 'level';
+  if (mode === 'dev') return 'dev';
+  return 'standard';
+}
+
+export function isLevelMode(mode: GameMode | string | null | undefined): boolean {
+  return normalizeGameMode(mode) === 'level';
+}
+
+export function isLeaderboardEligibleGameMode(
+  mode: GameMode | string | null | undefined,
+): boolean {
+  const normalized = normalizeGameMode(mode);
+  return normalized === 'standard';
+}
 export type ZombieType =
   | 'walker'
   | 'runner'
@@ -70,14 +86,14 @@ export type GameItemType =
   | 'turret'
   | 'cursed'
   | 'rareGold';
-export type GamePhase = 'combat' | 'upgrade' | 'gameOver';
+export type GamePhase = 'combat' | 'intermission' | 'upgrade' | 'gameOver' | 'levelComplete';
 export type RunStatAttribute =
   | 'damage'
   | 'shotsPerSecond'
   | 'maxHealth'
   | 'movementSpeed';
 
-export const PLAYER_STARTING_MAX_HEALTH = 100;
+export const PLAYER_STARTING_MAX_HEALTH = PLAYER_CONFIG.startingHealth;
 
 export interface ActiveTemporaryEffect {
   readonly type:
@@ -155,6 +171,15 @@ export interface WaveProgressionState {
   bossUpgradeOpportunity: boolean;
   announcement: string;
   announcementSeconds: number;
+  transitionCountdownSeconds: number;
+  pendingWaveNumber: number;
+  lastArenaLayoutId?: string;
+}
+
+export interface ArenaTransitionSource {
+  readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
+  readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+  readonly theme: ArenaThemeId;
 }
 
 export interface RunStatOption {
@@ -315,6 +340,8 @@ export interface ItemOrbEntity {
 
 export interface GameState {
   gameMode: GameMode;
+  campaignLevelId: number | null;
+  levelCompletionRewardEligible: boolean;
   arenaWidth: number;
   arenaHeight: number;
   elapsedSeconds: number;
@@ -326,6 +353,7 @@ export interface GameState {
   arenaObstacles: ArenaObstacleEntity[];
   barrels: ExplosiveBarrelEntity[];
   arenaTheme: ArenaThemeId;
+  arenaTransitionFrom?: ArenaTransitionSource;
   impacts: ImpactEffectEntity[];
   damageNumbers: DamageNumberEntity[];
   collectionEffects: CollectionEffectEntity[];
@@ -342,6 +370,7 @@ export interface GameState {
 
 export interface GameStateSnapshot {
   readonly gameMode: GameMode;
+  readonly campaignLevelId: number | null;
   readonly arenaWidth: number;
   readonly arenaHeight: number;
   readonly elapsedSeconds: number;
@@ -353,6 +382,7 @@ export interface GameStateSnapshot {
   readonly arenaObstacles: readonly Readonly<ArenaObstacleEntity>[];
   readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
   readonly arenaTheme: ArenaThemeId;
+  readonly arenaTransitionFrom?: ArenaTransitionSource;
   readonly impacts: readonly Readonly<ImpactEffectEntity>[];
   readonly damageNumbers: readonly Readonly<DamageNumberEntity>[];
   readonly collectionEffects: readonly Readonly<CollectionEffectEntity>[];
@@ -370,66 +400,19 @@ export interface GameStateSnapshot {
   readonly zombiesKilled: number;
 }
 
-const ZOMBIE_STATS: Record<ZombieType, {
-  readonly health: number;
-  readonly movementSpeed: number;
-  readonly contactDamage: number;
-  readonly radius: number;
-}> = {
-  walker: {
-    health: 50,
-    movementSpeed: 52,
-    contactDamage: 10,
-    radius: GAME_VISUAL_CONFIG.entity.walkerRadius,
-  },
-  runner: {
-    health: 30,
-    movementSpeed: 92,
-    contactDamage: 7,
-    radius: GAME_VISUAL_CONFIG.entity.runnerRadius,
-  },
-  brute: {
-    health: 100,
-    movementSpeed: 36,
-    contactDamage: 50,
-    radius: GAME_VISUAL_CONFIG.entity.bruteRadius,
-  },
-  spitter: {
-    health: 60,
-    movementSpeed: 46,
-    contactDamage: 12,
-    radius: GAME_VISUAL_CONFIG.entity.spitterRadius,
-  },
-  swarm: {
-    health: 20,
-    movementSpeed: 104,
-    contactDamage: 6,
-    radius: GAME_VISUAL_CONFIG.entity.swarmRadius,
-  },
-  armoured: {
-    health: 82,
-    movementSpeed: 41,
-    contactDamage: 13,
-    radius: GAME_VISUAL_CONFIG.entity.armouredRadius,
-  },
-  screamer: {
-    health: 56,
-    movementSpeed: 50,
-    contactDamage: 9,
-    radius: GAME_VISUAL_CONFIG.entity.screamerRadius,
-  },
-  bloater: {
-    health: 86,
-    movementSpeed: 34,
-    contactDamage: 15,
-    radius: GAME_VISUAL_CONFIG.entity.bloaterRadius,
-  },
-  splitter: {
-    health: 46,
-    movementSpeed: 42,
-    contactDamage: 9,
-    radius: GAME_VISUAL_CONFIG.entity.splitterRadius,
-  },
+const ZOMBIE_RADIUS_KEYS: Record<
+  ZombieType,
+  keyof typeof GAME_VISUAL_CONFIG.entity
+> = {
+  walker: 'walkerRadius',
+  runner: 'runnerRadius',
+  brute: 'bruteRadius',
+  spitter: 'spitterRadius',
+  swarm: 'swarmRadius',
+  armoured: 'armouredRadius',
+  screamer: 'screamerRadius',
+  bloater: 'bloaterRadius',
+  splitter: 'splitterRadius',
 };
 
 function assertArenaSize(width: number, height: number): void {
@@ -450,7 +433,7 @@ export function createZombie(
   y: number,
   waveNumber = 1,
 ): ZombieEntity {
-  const stats = ZOMBIE_STATS[type];
+  const stats = ZOMBIE_BASE_STATS[type];
   const difficulty = getWaveDifficulty(waveNumber);
   const healthMultiplier = difficulty.healthMultiplier;
   return {
@@ -458,7 +441,7 @@ export function createZombie(
     type,
     x,
     y,
-    radius: stats.radius,
+    radius: GAME_VISUAL_CONFIG.entity[ZOMBIE_RADIUS_KEYS[type]],
     health: Math.round(stats.health * healthMultiplier),
     maxHealth: Math.round(stats.health * healthMultiplier),
     movementSpeed: stats.movementSpeed * difficulty.speedMultiplier,
@@ -495,8 +478,14 @@ export function createGameState(
   width: number = GAME_VIEWPORT.width,
   height: number = GAME_VIEWPORT.height,
   gameMode: GameMode = 'standard',
+  campaignLevelId: number | null = null,
+  initialStandardPoints = 0,
+  levelCompletionRewardEligible = true,
 ): GameState {
   assertArenaSize(width, height);
+  if (!Number.isSafeInteger(initialStandardPoints) || initialStandardPoints < 0) {
+    throw new RangeError('Initial Standard Points must be a non-negative safe integer.');
+  }
   const playerRadius = GAME_VISUAL_CONFIG.entity.playerRadius;
   const player: PlayerEntity = {
     x: width / 2,
@@ -506,9 +495,9 @@ export function createGameState(
     maxHealth: PLAYER_STARTING_MAX_HEALTH,
     aimAngle: -0.22,
     movementFactor: 0,
-    damage: PLAYER_STARTING_DAMAGE,
-    shotsPerSecond: PLAYER_STARTING_SHOTS_PER_SECOND,
-    movementSpeed: PLAYER_MOVEMENT_SPEED,
+    damage: PLAYER_CONFIG.startingDamage,
+    shotsPerSecond: PLAYER_CONFIG.startingShotsPerSecond,
+    movementSpeed: PLAYER_CONFIG.movementSpeed,
     hitFlashSeconds: 0,
     damageCooldownSeconds: 0,
     fireCooldownSeconds: 0,
@@ -520,10 +509,22 @@ export function createGameState(
     spitterPoisonDamage: 0,
     alive: true,
   };
-  const initialWave = 1;
+  const initialWave = gameMode === 'level' ? campaignLevelId ?? 1 : 1;
+  const initialLayout = gameMode === 'level'
+    ? createArenaLayoutForLevel(initialWave)
+    : createArenaLayoutForWave(initialWave);
   const progression = createRunProgressionState();
+  if (gameMode === 'level') {
+    progression.standard = {
+      earned: initialStandardPoints,
+      available: initialStandardPoints,
+      spent: 0,
+    };
+  }
   return {
     gameMode,
+    campaignLevelId: gameMode === 'level' ? initialWave : null,
+    levelCompletionRewardEligible,
     arenaWidth: width,
     arenaHeight: height,
     elapsedSeconds: 0,
@@ -532,9 +533,23 @@ export function createGameState(
     projectiles: [],
     items: [],
     hazards: [],
-    arenaObstacles: createArenaObstacles(),
-    barrels: createExplosiveBarrels(),
-    arenaTheme: 'military',
+    arenaObstacles: initialLayout.obstacles.map((obstacle) =>
+      obstacle.kind === 'barricade'
+        ? {
+            ...obstacle,
+            health: ARENA_INTERACTION_CONFIG.barricadeHealth,
+            maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
+          }
+        : { ...obstacle },
+    ),
+    barrels: initialLayout.barrels.map((barrel, index) => ({
+      ...barrel,
+      radius: ARENA_INTERACTION_CONFIG.barrelRadius,
+      health: ARENA_INTERACTION_CONFIG.barrelHealth,
+      maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
+      id: `${barrel.id}-${index}`,
+    })),
+    arenaTheme: initialLayout.theme,
     impacts: [],
     damageNumbers: [],
     collectionEffects: [],
@@ -561,6 +576,9 @@ export function createGameState(
       bossUpgradeOpportunity: false,
       announcement: 'Wave 1',
       announcementSeconds: 3,
+      transitionCountdownSeconds: 0,
+      pendingWaveNumber: initialWave,
+      lastArenaLayoutId: initialLayout.id,
     },
     statistics: {
       highestWaveReached: initialWave,
@@ -585,7 +603,7 @@ export function createGameState(
       highestShotsPerSecond: player.shotsPerSecond,
       orbsCollected: 0,
       upgradesSelected: 0,
-      upgradePoints: 0,
+      upgradePoints: progression.standard.available,
       standardCurrency: { ...progression.standard },
       rareCurrency: { ...progression.rare },
       standardAttributeLevels: { ...progression.standardAttributeLevels },
@@ -656,6 +674,7 @@ export function resizeGameState(
 export function createGameStateSnapshot(state: GameState): GameStateSnapshot {
   return {
     gameMode: state.gameMode,
+    campaignLevelId: state.campaignLevelId,
     arenaWidth: state.arenaWidth,
     arenaHeight: state.arenaHeight,
     elapsedSeconds: state.elapsedSeconds,
@@ -672,6 +691,15 @@ export function createGameStateSnapshot(state: GameState): GameStateSnapshot {
     arenaObstacles: state.arenaObstacles.map((obstacle) => ({ ...obstacle })),
     barrels: state.barrels.map((barrel) => ({ ...barrel })),
     arenaTheme: state.arenaTheme,
+    ...(state.arenaTransitionFrom
+      ? {
+          arenaTransitionFrom: {
+            obstacles: state.arenaTransitionFrom.obstacles.map((obstacle) => ({ ...obstacle })),
+            barrels: state.arenaTransitionFrom.barrels.map((barrel) => ({ ...barrel })),
+            theme: state.arenaTransitionFrom.theme,
+          },
+        }
+      : {}),
     impacts: state.impacts.map((impact) => ({ ...impact })),
     damageNumbers: state.damageNumbers.map((damage) => ({ ...damage })),
     collectionEffects: state.collectionEffects.map((effect) => ({ ...effect })),
@@ -743,7 +771,7 @@ export function getRunStatOptions(
       currentValue: player.damage,
       newValue: getNormalAttributeValue(
         'damage',
-        PLAYER_STARTING_DAMAGE,
+        PLAYER_CONFIG.startingDamage,
         nextLevel(levels.damage),
       ),
       nextLevelEffect: canIncrease(levels.damage)
@@ -760,7 +788,7 @@ export function getRunStatOptions(
       currentValue: player.shotsPerSecond,
       newValue: getNormalAttributeValue(
         'fireRate',
-        PLAYER_STARTING_SHOTS_PER_SECOND,
+        PLAYER_CONFIG.startingShotsPerSecond,
         nextLevel(levels.fireRate),
       ),
       nextLevelEffect: canIncrease(levels.fireRate)
@@ -777,7 +805,7 @@ export function getRunStatOptions(
       currentValue: player.maxHealth,
       newValue: getNormalAttributeValue(
         'maxHealth',
-        PLAYER_STARTING_MAX_HEALTH,
+        PLAYER_CONFIG.startingHealth,
         nextLevel(levels.maxHealth),
       ),
       nextLevelEffect: canIncrease(levels.maxHealth)
@@ -794,7 +822,7 @@ export function getRunStatOptions(
       currentValue: player.movementSpeed,
       newValue: getNormalAttributeValue(
         'movementSpeed',
-        PLAYER_MOVEMENT_SPEED,
+        PLAYER_CONFIG.movementSpeed,
         nextLevel(levels.movementSpeed),
       ),
       nextLevelEffect: canIncrease(levels.movementSpeed)

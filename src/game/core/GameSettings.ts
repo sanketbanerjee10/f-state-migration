@@ -7,7 +7,6 @@ export const GAME_KEY_BINDING_ACTIONS = {
   moveLeft: 'Move left',
   moveRight: 'Move right',
   useBomb: 'Use bomb',
-  useTurret: 'Place turret',
 } as const;
 
 export type GameKeyBindingAction = keyof typeof GAME_KEY_BINDING_ACTIONS;
@@ -18,7 +17,6 @@ export interface GameKeyBindings {
   readonly moveLeft: string;
   readonly moveRight: string;
   readonly useBomb: string;
-  readonly useTurret: string;
 }
 
 export const DEFAULT_GAME_KEY_BINDINGS: GameKeyBindings = {
@@ -26,8 +24,7 @@ export const DEFAULT_GAME_KEY_BINDINGS: GameKeyBindings = {
   moveDown: 'KeyS',
   moveLeft: 'KeyA',
   moveRight: 'KeyD',
-  useBomb: 'KeyQ',
-  useTurret: 'KeyE',
+  useBomb: 'Space',
 };
 
 export const LEGACY_ARROW_BINDINGS: Partial<Record<GameKeyBindingAction, string>> = {
@@ -38,7 +35,7 @@ export const LEGACY_ARROW_BINDINGS: Partial<Record<GameKeyBindingAction, string>
 };
 
 export function isSupportedGameKeyCode(code: string): boolean {
-  return /^(Key[A-Z]|Digit[0-9]|Arrow(Up|Down|Left|Right))$/.test(code);
+  return code.length > 0;
 }
 
 export function formatGameKeyCode(code: string): string {
@@ -55,7 +52,7 @@ function isGameKeyBindings(value: unknown): value is GameKeyBindings {
   return actions.every((action) =>
     typeof bindings[action] === 'string' &&
     isSupportedGameKeyCode(bindings[action]),
-  ) && new Set(actions.map((action) => bindings[action])).size === actions.length;
+  );
 }
 
 export interface GameSettings {
@@ -103,17 +100,12 @@ export function loadGameSettings(storage: Pick<Storage, 'getItem'>): GameSetting
   let keyBindings: unknown = DEFAULT_GAME_SETTINGS.keyBindings;
   if (typeof savedKeyBindings === 'object' && savedKeyBindings !== null) {
     const savedBindings = savedKeyBindings as Record<string, unknown>;
-    const usedKeys = Object.values(savedBindings).filter(
-      (code): code is string => typeof code === 'string',
-    );
-    const migratedTurretKey = (
-      ['KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'Digit1'] as const
-    ).find((code) => !usedKeys.includes(code)) ??
-      DEFAULT_GAME_KEY_BINDINGS.useTurret;
     keyBindings = {
-      ...DEFAULT_GAME_KEY_BINDINGS,
-      ...savedBindings,
-      useTurret: savedBindings.useTurret ?? migratedTurretKey,
+      moveUp: savedBindings.moveUp ?? DEFAULT_GAME_KEY_BINDINGS.moveUp,
+      moveDown: savedBindings.moveDown ?? DEFAULT_GAME_KEY_BINDINGS.moveDown,
+      moveLeft: savedBindings.moveLeft ?? DEFAULT_GAME_KEY_BINDINGS.moveLeft,
+      moveRight: savedBindings.moveRight ?? DEFAULT_GAME_KEY_BINDINGS.moveRight,
+      useBomb: savedBindings.useBomb ?? DEFAULT_GAME_KEY_BINDINGS.useBomb,
     };
   }
   if (

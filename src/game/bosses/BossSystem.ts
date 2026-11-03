@@ -16,53 +16,16 @@ import {
 } from '../waves/SpawnSystem';
 import { awardRareReward } from '../upgrades/ProgressionSystem';
 import { getArenaCollisionObstacles } from '../arena/ArenaSystem';
+import { BOSS_CONFIG, BOSS_NAMES, BOSS_TYPES } from '../core/GameConfig';
 
-export type BossType = 'charger' | 'acidQueen' | 'hordeCaller';
+export { BOSS_CONFIG, BOSS_NAMES, BOSS_TYPES } from '../core/GameConfig';
+
+export type BossType = (typeof BOSS_TYPES)[number];
 
 export interface BossDefinition {
   readonly type: BossType;
   readonly name: string;
 }
-
-export const BOSS_CONFIG = {
-  introductionSeconds: 2.5,
-  introductionTitleSeconds: 3,
-  radius: 32,
-  healthMultiplier: 18,
-  damageMultiplier: 2.8,
-  speedMultiplier: 0.72,
-  rarePointReward: 1,
-  upgradeOpportunityReward: 0,
-  maximumActiveSummons: 3,
-  maximumSummonsPerEncounter: 9,
-  summonIntervalSeconds: 6,
-  summonGroupSize: 2,
-  hordeShieldDamageMultiplier: 0,
-  chargerWindupSeconds: 0.9,
-  chargerDashSeconds: 0.5,
-  chargerDashSpeedMultiplier: 4.2,
-  chargerStunSeconds: 1.25,
-  chargerRecoverySeconds: 0.7,
-  acidQueenAttackIntervalSeconds: 3,
-  acidQueenProjectileDamage: 18,
-  acidQueenProjectileSpeed: 260,
-  acidQueenPoolDamage: 16,
-  acidQueenPoolRadius: 58,
-  acidQueenPoolDurationSeconds: 4,
-  acidQueenPoolTelegraphSeconds: 0.8,
-} as const;
-
-export const BOSS_TYPES: readonly BossType[] = [
-  'charger',
-  'acidQueen',
-  'hordeCaller',
-];
-
-const BOSS_NAMES: Readonly<Record<BossType, string>> = {
-  charger: 'The Charger',
-  acidQueen: 'Acid Queen',
-  hordeCaller: 'Horde Caller',
-};
 
 export function getBossForWave(wave: number): BossDefinition | undefined {
   if (!Number.isInteger(wave) || wave < 1) {
@@ -597,14 +560,13 @@ export function handleBossDefeat(
     0,
     state.wave.requiredBossesRemaining - 1,
   );
-  if (state.wave.bossEncounterId) {
-    awardRareReward(
-      state.progression,
-      `boss-rare-point:${state.wave.bossEncounterId}`,
-      BOSS_CONFIG.rarePointReward,
-    );
-    state.statistics.rareCurrency = { ...state.progression.rare };
-  }
+  awardRareReward(
+    state.progression,
+    `boss-rare-point:${state.wave.bossEncounterId ?? boss.id}`,
+    BOSS_CONFIG.rarePointReward *
+      (Math.random() < BOSS_CONFIG.rarePointDoubleChance ? 2 : 1),
+  );
+  state.statistics.rareCurrency = { ...state.progression.rare };
   if (BOSS_CONFIG.upgradeOpportunityReward > 0) {
     state.wave.bossUpgradeOpportunity = true;
     state.statistics.bossUpgradeOpportunities =

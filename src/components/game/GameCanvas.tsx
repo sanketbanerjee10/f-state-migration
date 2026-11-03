@@ -8,13 +8,21 @@ import {
 } from '@/game/audio/GameAudioController';
 import {
   getEnemyDisplayName,
+  notifyNewBossDiscoveries,
   notifyNewEnemyDiscoveries,
 } from '@/game/discovery/EnemyDiscovery';
+import { getBossName } from '@/game/bosses/BossSystem';
 import type {
   GameStateSnapshot,
   GameMode,
   RunStatAttribute,
 } from '@/game/core/GameState';
+import {
+  canStartLevel,
+  completeLevelProgress,
+  readLevelCampaignProgress,
+  saveLevelCampaignProgress,
+} from '@/game/core/LevelCampaign';
 import type { RareUpgradeId } from '@/game/upgrades';
 import {
   GameMusicPlayer,
@@ -63,14 +71,18 @@ export function GameCanvas() {
     isPlaying: false,
   });
   const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
-  const [turretPlacementArmed, setTurretPlacementArmed] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState<number | null>(null);
   const [tutorialActionComplete, setTutorialActionComplete] = useState(false);
   const [confirmTutorialExit, setConfirmTutorialExit] = useState(false);
+  const [openLevelSelectionOnMenu, setOpenLevelSelectionOnMenu] = useState(false);
   const tutorialBaselineRef = useRef<TutorialBaseline | null>(null);
   const tutorialExitWasPausedRef = useRef(false);
+  const currentRunGameModeRef = useRef<GameMode>('survival');
+  const currentCampaignLevelIdRef = useRef<number | null>(null);
+  const currentCampaignRewardEligibleRef = useRef(true);
+  const savedCampaignLevelIdRef = useRef<number | null>(null);
   const { settings, error: settingsError, updateSettings } = useGameSettings();
 
   useEffect(() => {
@@ -193,6 +205,19 @@ export function GameCanvas() {
             audioRef.current?.playCue('enemyDeath');
           }
 
+          notifyNewBossDiscoveries(
+            globalThis.localStorage,
+            nextState.zombies.flatMap((zombie) =>
+              zombie.isBoss && zombie.bossType ? [zombie.bossType] : [],
+            ),
+            (bossType) => {
+              toast.success(`${getBossName(bossType)} discovered`, {
+                description: 'First encounter recorded. Stay alert.',
+                duration: 3000,
+              });
+            },
+          );
+
           previousAudioEventsRef.current = {
             impacts: new Set(nextState.impacts.map((impact) => impact.id)),
             collections: new Set(
@@ -202,7 +227,6 @@ export function GameCanvas() {
           };
         }
         setGameState(nextState);
-        setTurretPlacementArmed(engine.isTurretPlacementArmed());
       }, 200);
       setGameState(engine.getGameState());
     } catch (error) {
@@ -229,13 +253,32 @@ export function GameCanvas() {
 
   const syncGameState = () => {
     setGameState(engineRef.current?.getGameState() ?? null);
-    setTurretPlacementArmed(
-      engineRef.current?.isTurretPlacementArmed() ?? false,
-    );
   };
 
-  const startRun = (gameMode: GameMode = 'standard') => {
-    engineRef.current?.reset(gameMode);
+  const startRun = (gameMode: GameMode = 'survival', levelId?: number) => {
+    let startingStatPoints = 0;
+    if (gameMode === 'level') {
+      const progress = readLevelCampaignProgress();
+      if (levelId === undefined || !canStartLevel(progress, levelId)) {
+        toast.error('That campaign level is locked or unavailable.');
+        return;
+      }
+      startingStatPoints = progress.statPoints;
+      currentCampaignRewardEligibleRef.current =
+        !progress.completedLevelIds.includes(levelId);
+      currentCampaignLevelIdRef.current = levelId;
+      savedCampaignLevelIdRef.current = null;
+    } else {
+      currentCampaignLevelIdRef.current = null;
+      currentCampaignRewardEligibleRef.current = false;
+    }
+    setOpenLevelSelectionOnMenu(false);
+    currentRunGameModeRef.current = gameMode;
+    engineRef.current?.reset(
+      gameMode,
+      gameMode === 'level' ? levelId ?? null : null,
+      startingStatPoints,
+    );
     syncGameState();
     setTutorialStepIndex(null);
     setConfirmTutorialExit(false);
@@ -283,7 +326,9 @@ export function GameCanvas() {
   const startTutorial = () => {
     const engine = engineRef.current;
     if (!engine) return;
-    engine.reset();
+    currentRunGameModeRef.current = 'survival';
+    currentCampaignLevelIdRef.current = null;
+    engine.reset('survival');
     previousAudioEventsRef.current = {
       impacts: new Set(),
       collections: new Set(),
@@ -333,7 +378,16 @@ export function GameCanvas() {
   };
 
   const restartRun = () => {
-    engineRef.current?.reset('standard');
+    const gameMode = currentRunGameModeRef.current;
+    const startingStatPoints = gameMode === 'level'
+      ? readLevelCampaignProgress().statPoints
+      : 0;
+    engineRef.current?.reset(
+      gameMode,
+      gameMode === 'level' ? currentCampaignLevelIdRef.current : null,
+      startingStatPoints,
+      gameMode === 'level' && currentCampaignRewardEligibleRef.current,
+    );
     previousAudioEventsRef.current = {
       impacts: new Set(),
       collections: new Set(),
@@ -350,7 +404,9 @@ export function GameCanvas() {
   const returnToMenu = () => {
     const engine = engineRef.current;
     if (!engine) return;
-    engine.reset();
+    currentRunGameModeRef.current = 'survival';
+    currentCampaignLevelIdRef.current = null;
+    engine.reset('survival');
     engine.pause();
     audioRef.current?.pauseGameplay();
     audioRef.current?.startMenuMusic();
@@ -370,8 +426,55 @@ export function GameCanvas() {
   };
 
   useEffect(() => {
-    if (gameState?.wave.phase === 'gameOver') audioRef.current?.pauseGameplay();
+    if (
+      gameState?.wave.phase === 'gameOver' ||
+      gameState?.wave.phase === 'levelComplete'
+    ) {
+      engineRef.current?.pause();
+      audioRef.current?.pauseGameplay();
+    }
   }, [gameState?.wave.phase]);
+
+  useEffect(() => {
+    if (
+      gameState?.wave.phase !== 'levelComplete' ||
+      gameState.gameMode !== 'level' ||
+      gameState.campaignLevelId === null ||
+      savedCampaignLevelIdRef.current === gameState.campaignLevelId
+    ) {
+      return;
+    }
+
+    try {
+      const progress = completeLevelProgress(
+        readLevelCampaignProgress(),
+        gameState.campaignLevelId,
+        gameState.score,
+        gameState.statistics.survivalSeconds,
+        gameState.statistics.standardCurrency?.available ??
+          gameState.upgradePoints,
+      );
+      saveLevelCampaignProgress(progress);
+      savedCampaignLevelIdRef.current = gameState.campaignLevelId;
+      currentCampaignRewardEligibleRef.current = false;
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? `Campaign progress could not be saved: ${error.message}`
+          : 'Campaign progress could not be saved.',
+      );
+    }
+  }, [gameState]);
+
+  const openCampaignLevelSelection = () => {
+    setOpenLevelSelectionOnMenu(true);
+    returnToMenu();
+  };
+
+  const startNextCampaignLevel = () => {
+    const levelId = currentCampaignLevelIdRef.current;
+    if (levelId !== null && levelId < 30) startRun('level', levelId + 1);
+  };
 
   const adjustStat = (attribute: RunStatAttribute, adjustment: -1 | 1) => {
     engineRef.current?.adjustStat(attribute, adjustment);
@@ -455,7 +558,7 @@ export function GameCanvas() {
           : '',
       ].filter(Boolean).join(' ')}
       tabIndex={0}
-        aria-label="565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key to use one. Collect up to five turrets, press your configured turret key, then click or tap an open spot in the arena to place one."
+        aria-label="565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key to use one. Collect up to five turrets, then right-click an open spot in the arena to place one."
         onPointerDown={(event) => event.currentTarget.focus()}
       >
         Canvas rendering is not supported by this browser.
@@ -482,8 +585,6 @@ export function GameCanvas() {
           gameState={gameState}
           density={settings.hudDensity}
           bombKey={settings.keyBindings.useBomb}
-          turretKey={settings.keyBindings.useTurret}
-          turretPlacementArmed={turretPlacementArmed}
           highlighted={
             tutorialStepIndex !== null &&
             GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'hud'
@@ -523,6 +624,7 @@ export function GameCanvas() {
           onReturnToMenu={
             tutorialStepIndex === null ? returnToMenu : requestTutorialExit
           }
+          initialView={openLevelSelectionOnMenu ? 'level-select' : 'home'}
           tutorialMode={tutorialStepIndex !== null}
           highlightPauseMenu={
             tutorialStepIndex !== null &&
@@ -534,6 +636,8 @@ export function GameCanvas() {
         <GamePhaseOverlays
           gameState={gameState}
           onPlayAgain={tutorialStepIndex === null ? playAgain : startTutorial}
+          onNextLevel={startNextCampaignLevel}
+          onLevelSelection={openCampaignLevelSelection}
           onReturnToMenu={
             tutorialStepIndex === null ? returnToMenu : requestTutorialExit
           }

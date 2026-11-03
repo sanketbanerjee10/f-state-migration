@@ -1,3 +1,25 @@
+import {
+  DEFAULT_NORMAL_ATTRIBUTE_ORDER,
+  DEFAULT_RARE_UPGRADE_ORDER,
+  INITIAL_RARE_UPGRADE_ROSTER,
+  NORMAL_ATTRIBUTE_ORDER,
+  RARE_UPGRADE_ORDER,
+  RARE_UPGRADE_EFFECT_CONFIG,
+  RARE_UPGRADE_DEFINITIONS,
+  STANDARD_ATTRIBUTE_DEFINITIONS,
+} from '../core/GameConfig';
+
+export {
+  DEFAULT_NORMAL_ATTRIBUTE_ORDER,
+  DEFAULT_RARE_UPGRADE_ORDER,
+  INITIAL_RARE_UPGRADE_ROSTER,
+  NORMAL_ATTRIBUTE_ORDER,
+  RARE_UPGRADE_ORDER,
+  RARE_UPGRADE_EFFECT_CONFIG,
+  RARE_UPGRADE_DEFINITIONS,
+  STANDARD_ATTRIBUTE_DEFINITIONS,
+} from '../core/GameConfig';
+
 export type StandardAttributeId =
   | 'damage'
   | 'fireRate'
@@ -62,203 +84,13 @@ export interface RunProgressionState {
   secondWindUsed: boolean;
 }
 
-export const RARE_UPGRADE_EFFECT_CONFIG = {
-  lifestealPercentByLevel: [0, 0.01, 0.02, 0.03, 0.04, 0.05],
-  criticalChanceByLevel: [0, 0.03, 0.06, 0.09, 0.12, 0.15],
-  criticalDamageMultiplier: 2,
-  explosiveChanceByLevel: [0, 0.03, 0.06, 0.09, 0.12, 0.15],
-  explosiveRadius: 48,
-  explosiveDamageMultiplier: 0.5,
-  orbMagnetismRadiusByLevel: [0, 60, 90, 120, 150, 180],
-  emergencyShieldThreshold: 0.25,
-  emergencyShieldCooldownSeconds: 60,
-  emergencyShieldDurationByLevel: [0, 1, 1.5, 2, 2.5, 3],
-  emergencyShieldCapacity: 60,
-  secondWindHealthPercentByLevel: [0, 0.1, 0.15, 0.2],
-} as const;
-
 export const createCurrencyAccounting = (
   earned = 0,
   available = 0,
   spent = 0,
 ): CurrencyAccounting => ({ earned, available, spent });
 
-export const STANDARD_ATTRIBUTE_DEFINITIONS: Record<
-  StandardAttributeId,
-  StandardAttributeDefinition
-> = {
-  damage: {
-    id: 'damage',
-    label: 'Damage',
-    description: 'Increase weapon damage by 10% per level.',
-    defaultCost: 1,
-    effectText: '+10% base damage',
-    perLevelValue: (baseValue, _level) => baseValue * 0.1,
-  },
-  fireRate: {
-    id: 'fireRate',
-    label: 'Fire rate',
-    description: 'Fire faster by 8% per level.',
-    defaultCost: 1,
-    effectText: '+8% base fire rate',
-    perLevelValue: (baseValue, _level) => baseValue * 0.08,
-  },
-  maxHealth: {
-    id: 'maxHealth',
-    label: 'Max health',
-    description: 'Gain 10 max health per level.',
-    defaultCost: 1,
-    effectText: '+10 max health',
-    perLevelValue: (baseValue, _level) => 10,
-  },
-  movementSpeed: {
-    id: 'movementSpeed',
-    label: 'Movement speed',
-    description: 'Move 3% faster per level.',
-    defaultCost: 1,
-    effectText: '+3% base movement speed',
-    perLevelValue: (baseValue, _level) => baseValue * 0.03,
-  },
-};
-
 export const NORMAL_ATTRIBUTE_DEFINITIONS = STANDARD_ATTRIBUTE_DEFINITIONS;
-
-export const RARE_UPGRADE_DEFINITIONS: Record<
-  RareUpgradeId,
-  RareUpgradeDefinition
-> = {
-  lifesteal: {
-    id: 'lifesteal',
-    name: 'Lifesteal',
-    rarity: 'rare',
-    description: 'Heal a portion of weapon damage dealt.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked from the start of the run.',
-    refundable: true,
-    effectText: 'Heals for 1% of eligible damage per level',
-    effectTextByLevel: [
-      'Heal 1% of eligible damage',
-      'Heal 2% of eligible damage',
-      'Heal 3% of eligible damage',
-      'Heal 4% of eligible damage',
-      'Heal 5% of eligible damage',
-    ],
-    effectType: 'healing',
-  },
-  criticalMastery: {
-    id: 'criticalMastery',
-    name: 'Critical Mastery',
-    rarity: 'rare',
-    description: 'Increase the chance for weapon hits to deal critical damage.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked from the start of the run.',
-    refundable: true,
-    effectText: '+3% critical chance per level',
-    effectTextByLevel: [
-      '+3% critical chance',
-      '+6% critical chance',
-      '+9% critical chance',
-      '+12% critical chance',
-      '+15% critical chance',
-    ],
-    effectType: 'critical',
-  },
-  explosiveRounds: {
-    id: 'explosiveRounds',
-    name: 'Explosive Rounds',
-    rarity: 'rare',
-    description: 'Rounds explode on impact for splash damage.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked from the start of the run.',
-    refundable: true,
-    effectText: '+3% impact explosion chance per level',
-    effectTextByLevel: [
-      '3% chance to explode on impact',
-      '6% chance to explode on impact',
-      '9% chance to explode on impact',
-      '12% chance to explode on impact',
-      '15% chance to explode on impact',
-    ],
-    effectType: 'projectile',
-  },
-  emergencyShield: {
-    id: 'emergencyShield',
-    name: 'Emergency Shield',
-    rarity: 'epic',
-    description: 'Creates a protective shield after taking damage.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked from the start of the run.',
-    refundable: true,
-    effectText: 'Emergency shield duration increases per level',
-    effectTextByLevel: [
-      '1s emergency shield',
-      '1.5s emergency shield',
-      '2s emergency shield',
-      '2.5s emergency shield',
-      '3s emergency shield',
-    ],
-    effectType: 'shield',
-  },
-  orbMagnetism: {
-    id: 'orbMagnetism',
-    name: 'Orb Magnetism',
-    rarity: 'rare',
-    description: 'Pull nearby orbs toward the player.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked from the start of the run.',
-    refundable: true,
-    effectText: 'Larger pull radius and magnet strength',
-    effectTextByLevel: [
-      '60px attraction radius',
-      '90px attraction radius',
-      '120px attraction radius',
-      '150px attraction radius',
-      '180px attraction radius',
-    ],
-    effectType: 'orb',
-  },
-  piercingRounds: {
-    id: 'piercingRounds',
-    name: 'Piercing Rounds',
-    rarity: 'epic',
-    description: 'Shots continue through targets and hit additional enemies.',
-    defaultCost: 1,
-    maxLevel: 5,
-    unlockText: 'Unlocked after completing wave 5.',
-    refundable: true,
-    effectText: 'Each level adds one additional target',
-    effectTextByLevel: [
-      'Pierce 1 additional enemy',
-      'Pierce 2 additional enemies',
-      'Pierce 3 additional enemies',
-      'Pierce 4 additional enemies',
-      'Pierce 5 additional enemies',
-    ],
-    effectType: 'projectile',
-  },
-  secondWind: {
-    id: 'secondWind',
-    name: 'Second Wind',
-    rarity: 'epic',
-    description: 'Restore health once per run when below a critical threshold.',
-    defaultCost: 2,
-    maxLevel: 3,
-    unlockText: 'Unlocked at wave 10 or from a boss reward.',
-    refundable: true,
-    effectText: 'Restore 10%, 15%, or 20% max HP once per run',
-    effectTextByLevel: [
-      'Restore 10% max health once per run',
-      'Restore 15% max health once per run',
-      'Restore 20% max health once per run',
-    ],
-    effectType: 'utility',
-  },
-};
 
 export function createRunProgressionState(): RunProgressionState {
   return {
@@ -362,19 +194,23 @@ export function getRarePointBalance(state: RunProgressionState): number {
 export function awardStandardWavePoint(
   state: RunProgressionState,
   eventKey: string,
+  amount = 1,
 ): boolean {
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    return false;
+  }
   if (state.rewardEventKeys.has(eventKey)) {
     return false;
   }
   if (
-    !Number.isSafeInteger(state.standard.earned + 1) ||
-    !Number.isSafeInteger(state.standard.available + 1)
+    !Number.isSafeInteger(state.standard.earned + amount) ||
+    !Number.isSafeInteger(state.standard.available + amount)
   ) {
     throw new RangeError('Standard Point accounting exceeds the supported numeric range.');
   }
 
-  state.standard.earned += 1;
-  state.standard.available += 1;
+  state.standard.earned += amount;
+  state.standard.available += amount;
   state.rewardEventKeys.add(eventKey);
   return true;
 }
@@ -632,27 +468,3 @@ export function applyRunProgressionToPlayer(
     movementSpeed: getNormalAttributeValue('movementSpeed', movementBase, state.standardAttributeLevels.movementSpeed),
   };
 }
-
-export const INITIAL_RARE_UPGRADE_ROSTER: readonly RareUpgradeId[] = [
-  'lifesteal',
-  'criticalMastery',
-  'explosiveRounds',
-  'emergencyShield',
-  'orbMagnetism',
-  'piercingRounds',
-  'secondWind',
-];
-
-export const DEFAULT_NORMAL_ATTRIBUTE_ORDER: readonly StandardAttributeId[] = [
-  'damage',
-  'fireRate',
-  'maxHealth',
-  'movementSpeed',
-];
-
-export const DEFAULT_RARE_UPGRADE_ORDER: readonly RareUpgradeId[] = [
-  ...INITIAL_RARE_UPGRADE_ROSTER,
-];
-
-export const NORMAL_ATTRIBUTE_ORDER = DEFAULT_NORMAL_ATTRIBUTE_ORDER;
-export const RARE_UPGRADE_ORDER = DEFAULT_RARE_UPGRADE_ORDER;

@@ -14,7 +14,10 @@ import { drawProjectile } from './ProjectileRenderer';
 import type { RenderActor, RenderCommand, RenderLayers } from './RenderScene';
 import { drawZombie } from './ZombieRenderer';
 import type { GameState } from '../core/GameState';
-import { WAVE_MODIFIER_CONFIG } from '../modifiers/WaveModifiers';
+import {
+  ARENA_TRANSITION_SECONDS,
+  WAVE_MODIFIER_CONFIG,
+} from '../core/GameConfig';
 
 export function createGameStateRenderLayers(state: GameState): RenderLayers {
   const { player } = state;
@@ -263,6 +266,21 @@ export function createGameStateRenderLayers(state: GameState): RenderLayers {
       obstacles: state.arenaObstacles,
       barrels: state.barrels,
       theme: state.arenaTheme,
+      ...(state.wave.phase === 'intermission' && state.arenaTransitionFrom
+        ? {
+            transition: {
+              from: state.arenaTransitionFrom,
+              progress: Math.max(
+                0,
+                Math.min(
+                  1,
+                  1 - state.wave.transitionCountdownSeconds /
+                    ARENA_TRANSITION_SECONDS,
+                ),
+              ),
+            },
+          }
+        : {}),
     },
     groundShadows,
     pickups: state.items.map((item) => ({

@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import type { GameStateSnapshot } from '@/game/core/GameState';
+import {
+  isLeaderboardEligibleGameMode,
+  type GameStateSnapshot,
+} from '@/game/core/GameState';
 import { useSubmitGameScore } from '@/lib/gameApi';
 
 interface GameScoreSubmissionProps {
@@ -11,6 +14,8 @@ export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
   const [nameError, setNameError] = useState<string | null>(null);
   const submission = useSubmitGameScore();
 
+  if (!isLeaderboardEligibleGameMode(gameState.gameMode)) return null;
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const normalizedName = playerName.trim();
@@ -21,6 +26,7 @@ export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
 
     setNameError(null);
     submission.mutate({
+      gameMode: gameState.gameMode,
       playerName: normalizedName,
       score: gameState.score,
       waveCleared: gameState.statistics.highestWaveCleared,

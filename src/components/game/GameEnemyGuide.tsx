@@ -6,10 +6,12 @@ import {
   type BossType,
 } from '@/game/bosses/BossSystem';
 import {
+  BOSS_DISCOVERY_TYPES,
   ENEMY_DISCOVERY_LABELS,
   ENEMY_DISCOVERY_TYPES,
   ENEMY_GUIDE_DETAILS,
   getEnemyDiscoveryStorage,
+  readDiscoveredBosses,
   readDiscoveredEnemies,
 } from '@/game/discovery/EnemyDiscovery';
 import { drawZombie } from '@/game/rendering/ZombieRenderer';
@@ -58,7 +60,8 @@ function GameEnemyPortrait({
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
     context.translate(canvas.width / 2, canvas.height / 2 - 4);
-    context.scale(2, 2);
+    const portraitScale = bossType ? 1 : 2;
+    context.scale(portraitScale, portraitScale);
     drawZombie(
       context,
       {
@@ -101,8 +104,14 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
   const [discoveredEnemies] = useState<Set<ZombieType>>(
     () => readDiscoveredEnemies(getEnemyDiscoveryStorage()),
   );
+  const [discoveredBosses] = useState<Set<BossType>>(
+    () => readDiscoveredBosses(getEnemyDiscoveryStorage()),
+  );
   const discoveredCount = ENEMY_DISCOVERY_TYPES.filter((type) =>
     discoveredEnemies.has(type),
+  ).length;
+  const discoveredBossCount = BOSS_DISCOVERY_TYPES.filter((type) =>
+    discoveredBosses.has(type),
   ).length;
 
   return (
@@ -143,31 +152,43 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
         })}
       </div>
       <h2 className="game-enemy-guide-section-title">Bosses</h2>
+      <p className="game-enemy-guide-progress" aria-live="polite">
+        {discoveredBossCount} / {BOSS_DISCOVERY_TYPES.length} bosses identified
+      </p>
       <div className="game-enemy-guide-grid">
         {BOSS_TYPES.map((bossType) => {
+          const discovered = discoveredBosses.has(bossType);
           const name = getBossName(bossType);
           const details = BOSS_GUIDE_DETAILS[bossType];
           const type: ZombieType = bossType === 'hordeCaller'
             ? 'screamer'
-            : 'brute';
+            : bossType === 'acidQueen'
+              ? 'spitter'
+              : 'brute';
 
           return (
             <article
-              className="game-enemy-guide-card"
+              className={`game-enemy-guide-card${discovered ? '' : ' is-locked'}`}
               key={bossType}
-              aria-label={name}
+              aria-label={discovered ? name : 'Unidentified boss'}
             >
               <GameEnemyPortrait
                 type={type}
-                discovered
+                discovered={discovered}
                 bossType={bossType}
               />
               <div className="game-enemy-guide-card-copy">
-                <h2>{name}</h2>
-                <p>{details.description}</p>
-                <p className="game-enemy-guide-ability">
-                  <strong>Ability:</strong> {details.ability}
-                </p>
+                <h2>{discovered ? name : 'Unknown'}</h2>
+                {discovered ? (
+                  <>
+                    <p>{details.description}</p>
+                    <p className="game-enemy-guide-ability">
+                      <strong>Ability:</strong> {details.ability}
+                    </p>
+                  </>
+                ) : (
+                  <p>Encounter this boss to identify it.</p>
+                )}
               </div>
             </article>
           );

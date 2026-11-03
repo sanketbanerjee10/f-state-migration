@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Music2, Pause, Play } from 'lucide-react';
 import type { GameSettings } from '@/game/core/GameSettings';
 import type {
@@ -6,6 +6,12 @@ import type {
   GameMode,
   RunStatAttribute,
 } from '@/game/core/GameState';
+import {
+  canStartLevel,
+  getEnemyDisplayNames,
+  LEVEL_DEFINITIONS,
+  readLevelCampaignProgress,
+} from '@/game/core/LevelCampaign';
 import {
   getRareUpgradeCost,
   getRareUpgradeNextEffectText,
@@ -20,7 +26,7 @@ import { GameEnemyGuide } from './GameEnemyGuide';
 import { GameOrbGuide } from './GameOrbGuide';
 import { GameLeaderboardPanel } from './GameLeaderboardPanel';
 
-type MenuView = 'home' | 'settings' | 'leaderboard' | 'enemy-guide' | 'orb-guide';
+type MenuView = 'home' | 'settings' | 'leaderboard' | 'enemy-guide' | 'orb-guide' | 'level-select';
 export type GameMenuMode = 'main' | 'pause';
 
 interface GameMenuOverlayProps {
@@ -34,7 +40,7 @@ interface GameMenuOverlayProps {
   readonly onToggleMusic: () => void;
   readonly gameState: GameStateSnapshot | null;
   readonly onSettingsChange: (settings: GameSettings) => void;
-  readonly onStart: (gameMode: GameMode) => void;
+  readonly onStart: (gameMode: GameMode, levelId?: number) => void;
   readonly onStartTutorial: () => void;
   readonly onResume: () => void;
   readonly onAdjustStat: (
@@ -47,6 +53,7 @@ interface GameMenuOverlayProps {
   ) => void;
   readonly onRestart: () => void;
   readonly onReturnToMenu: () => void;
+  readonly initialView?: 'home' | 'level-select';
   readonly highlightPauseMenu?: boolean;
   readonly tutorialMode?: boolean;
 }
@@ -118,12 +125,15 @@ export function GameMenuOverlay({
   onAdjustRareUpgrade,
   onRestart,
   onReturnToMenu,
+  initialView = 'home',
   highlightPauseMenu = false,
   tutorialMode = false,
 }: GameMenuOverlayProps) {
-  const [view, setView] = useState<MenuView>('home');
+  const [view, setView] = useState<MenuView>(initialView);
   const overlayRef = useRef<HTMLElement>(null);
   const isMainMenu = mode === 'main';
+  const campaignProgress = useMemo(() => readLevelCampaignProgress(), []);
+  const levelCards = LEVEL_DEFINITIONS;
   useLayoutEffect(() => {
     if (overlayRef.current) overlayRef.current.scrollTop = 0;
   }, [view]);
@@ -138,6 +148,68 @@ export function GameMenuOverlay({
     : isMainMenu
       ? 'game-menu-title'
       : 'game-paused-title';
+
+  const renderLevelSelection = () => (
+    <>
+      <p className="game-panel-eyebrow">Campaign</p>
+      <h1 id="game-menu-title">Level Mode</h1>
+      <p>Level Mode is a campaign experience. Scores here don’t count toward the Survival leaderboard.</p>
+      <p className="game-level-progress" role="status">
+        Highest unlocked: Stage {campaignProgress.highestUnlockedLevel} of {LEVEL_DEFINITIONS.length}
+      </p>
+      <div className="game-level-grid">
+        {levelCards.map((level) => {
+          const unlocked = canStartLevel(campaignProgress, level.id);
+          const completed = campaignProgress.completedLevelIds.includes(level.id);
+          return (
+            <button
+              key={level.id}
+              className={[
+                'game-level-card',
+                !unlocked ? 'is-locked' : '',
+                completed ? 'is-completed' : '',
+                campaignProgress.highestUnlockedLevel === level.id ? 'is-current' : '',
+                level.boss ? 'is-boss' : '',
+              ].filter(Boolean).join(' ')}
+              type="button"
+              disabled={!unlocked}
+              onClick={() => {
+                if (!unlocked) return;
+                onStart('level', level.id);
+              }}
+              aria-label={`${unlocked ? 'Start' : 'Locked'} ${level.name}, ${level.theme}, map ${level.mapName}${level.boss ? `, boss ${level.boss}` : ''}`}
+            >
+              <span className="game-level-card-heading">
+                <strong>{String(level.id).padStart(2, '0')}</strong>
+                <span>{level.boss ? 'BOSS STAGE' : completed ? 'CLEARED' : unlocked ? 'UNLOCKED' : 'LOCKED'}</span>
+              </span>
+              <span className="game-level-card-name">{level.name}</span>
+              <span className="game-level-card-map">{level.theme} · {level.mapName}</span>
+              <span className="game-level-card-enemies">
+                {level.boss ? level.boss : `Enemies: ${getEnemyDisplayNames(level).join(', ')}`}
+              </span>
+              {campaignProgress.bestTimes[level.id] !== undefined && (
+                <span className="game-level-card-record">
+                  Best {Math.floor(campaignProgress.bestTimes[level.id] / 60)}:
+                  {String(Math.floor(campaignProgress.bestTimes[level.id] % 60)).padStart(2, '0')}
+                  {' · '}Score {(campaignProgress.bestScores[level.id] ?? 0).toLocaleString()}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div className="game-menu-actions game-level-selection-actions">
+        <button
+          className="game-menu-secondary"
+          type="button"
+          onClick={() => setView('home')}
+        >
+          Back to menu
+        </button>
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -158,6 +230,7 @@ export function GameMenuOverlay({
           isMainMenu ? 'game-main-menu-overlay' : 'game-pause-overlay',
           view === 'enemy-guide' ? 'game-enemy-guide-overlay' : '',
           view === 'orb-guide' ? 'game-orb-guide-overlay' : '',
+          view === 'level-select' ? 'game-level-select-overlay' : '',
           highlightPauseMenu ? 'game-pause-overlay-highlighted' : '',
         ].filter(Boolean).join(' ')}
         role="dialog"
@@ -185,6 +258,8 @@ export function GameMenuOverlay({
             onBack={() => setView('home')}
             backLabel={isMainMenu ? 'Back to menu' : 'Back to pause menu'}
           />
+        ) : view === 'level-select' ? (
+          renderLevelSelection()
         ) : isMainMenu ? (
             <>
               <p className="game-panel-eyebrow">State 565 presents</p>
@@ -194,10 +269,17 @@ export function GameMenuOverlay({
                 <button
                   className="game-menu-primary"
                   type="button"
-                  onClick={() => onStart('standard')}
+                  onClick={() => onStart('survival')}
                   autoFocus
                 >
-                  Start run
+                  Survival Mode
+                </button>
+                <button
+                  className="game-menu-primary"
+                  type="button"
+                  onClick={() => setView('level-select')}
+                >
+                  Level Mode
                 </button>
                 {import.meta.env.DEV && (
                   <button
@@ -315,7 +397,7 @@ export function GameMenuOverlay({
                         gameState.statAllocations[option.attribute];
                       return (
                         <div
-                          className="game-pause-upgrade-row"
+                          className="game-pause-upgrade-row game-pause-stat-upgrade-row"
                           key={option.attribute}
                         >
                           <div>

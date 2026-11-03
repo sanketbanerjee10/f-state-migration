@@ -12,9 +12,15 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const basePath = process.env.BASE_PATH || '/';
+const localAudioPath = path.resolve(import.meta.dirname, '..', 'lofi');
 
 export default defineConfig({
   base: basePath,
+  define: {
+    __DEV_GAME_AUDIO_BASE_URL__: JSON.stringify(
+      `/@fs/${localAudioPath.replace(/\\/g, '/')}`,
+    ),
+  },
   plugins: [
     react(),
     tailwindcss()
@@ -43,6 +49,7 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+      allow: [path.resolve(import.meta.dirname, '..')],
     },
     proxy: {
       '/api': {

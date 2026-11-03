@@ -7,30 +7,13 @@ import {
   isEliteEligibleSpawn,
   WAVE_ELITE_INTRODUCTION,
 } from '../../waves/WaveComposition';
-import { WAVE_MODIFIER_CONFIG } from '../../modifiers/WaveModifiers';
+import {
+  ELITE_CONFIG,
+  ELITE_MODIFIERS,
+  WAVE_MODIFIER_CONFIG,
+} from '../../core/GameConfig';
 
-export const ELITE_CONFIG = {
-  spawnChance: 0.1,
-  maximumSpawnChance: 0.35,
-  fastMovementMultiplier: 1.45,
-  shieldHealthFraction: 0.65,
-  regenerationFractionPerSecond: 0.035,
-  explosionFuseSeconds: 0.7,
-  explosionRadius: 92,
-  explosionDamage: 34,
-  explosionDamagesPlayer: true,
-  explosionDamagesEnemies: true,
-  rareGoldOrbDropChance: 0.35,
-  rarePointReward: 1,
-  rarePointRewardWaves: [20, 30, 40] as readonly number[],
-} as const;
-
-const ELITE_MODIFIERS: readonly Exclude<ZombieEliteModifier, 'none'>[] = [
-  'fast',
-  'shielded',
-  'regenerating',
-  'explosive',
-];
+export { ELITE_CONFIG } from '../../core/GameConfig';
 
 export interface EliteSpawnContext extends WaveSpawnContext {}
 

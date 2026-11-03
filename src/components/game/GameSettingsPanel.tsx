@@ -36,22 +36,8 @@ export function GameSettingsPanel({
     if (capturingAction !== action) return;
     event.preventDefault();
     event.stopPropagation();
-    if (event.code === 'Escape') {
-      setCapturingAction(null);
-      setKeyBindingError(null);
-      return;
-    }
     if (!isSupportedGameKeyCode(event.code)) {
-      setKeyBindingError('Choose a letter, number, or arrow key.');
-      return;
-    }
-    const conflictingAction = Object.entries(settings.keyBindings).find(
-      ([candidate, code]) => candidate !== action && code === event.code,
-    );
-    if (conflictingAction) {
-      setKeyBindingError(
-        `${formatGameKeyCode(event.code)} is already assigned to ${GAME_KEY_BINDING_ACTIONS[conflictingAction[0] as GameKeyBindingAction]}.`,
-      );
+      setKeyBindingError('This key cannot be assigned by your browser.');
       return;
     }
     onChange({
@@ -118,7 +104,10 @@ export function GameSettingsPanel({
         </fieldset>
         <fieldset className="game-setting">
           <legend>Key bindings</legend>
-          <p>Click a button, then press a unique key to assign it.</p>
+          <p>
+            Click a button, then press any key to assign it. Click the active
+            binding again to cancel. Place turrets with right click.
+          </p>
           <div className="game-key-binding-list" role="group" aria-label="Key bindings">
             {Object.entries(GAME_KEY_BINDING_ACTIONS).map(([action, label]) => {
               const typedAction = action as GameKeyBindingAction;
@@ -130,7 +119,9 @@ export function GameSettingsPanel({
                   aria-label={`${label}: ${formatGameKeyCode(settings.keyBindings[typedAction])}`}
                   aria-pressed={capturingAction === typedAction}
                   onClick={() => {
-                    setCapturingAction(typedAction);
+                    setCapturingAction((currentAction) =>
+                      currentAction === typedAction ? null : typedAction,
+                    );
                     setKeyBindingError(null);
                   }}
                   onKeyDown={(event) => captureKey(event, typedAction)}
@@ -144,6 +135,13 @@ export function GameSettingsPanel({
                 </button>
               );
             })}
+            <div
+              className="game-setting-option game-key-binding game-key-binding-static"
+              aria-label="Place turret: Right click"
+            >
+              <span>Place turret</span>
+              <strong>Right click</strong>
+            </div>
           </div>
           {keyBindingError && (
             <p className="game-settings-error" role="status">

@@ -1,108 +1,11 @@
-export type WaveModifierId =
-  | 'doubleOrbs'
-  | 'fastWave'
-  | 'armouredInvasion'
-  | 'eliteThreat'
-  | 'contamination'
-  | 'reducedVisibility'
-  | 'overrun'
-  | 'heavyResistance';
+import {
+  WAVE_MODIFIER_CONFIG,
+  WAVE_MODIFIER_IDS,
+} from '../core/GameConfig';
+import type { WaveModifierDefinition, WaveModifierId } from '../core/GameConfig';
 
-export interface WaveModifierDefinition {
-  readonly name: string;
-  readonly description: string;
-  readonly minimumWave: number;
-  readonly selectionWeight: number;
-  readonly orbDropIntervalMultiplier?: number;
-  readonly enemySpeedMultiplier?: number;
-  readonly enemyWeightMultipliers?: Readonly<Record<string, number>>;
-  readonly eliteChanceMultiplier?: number;
-  readonly spawnIntervalMultiplier?: number;
-  readonly minimumSpawnIntervalSeconds?: number;
-  readonly visibilityRadiusMultiplier?: number;
-  readonly hazardRadiusMultiplier?: number;
-  readonly hazardDamageMultiplier?: number;
-}
-
-export const WAVE_MODIFIER_IDS: readonly WaveModifierId[] = [
-  'doubleOrbs',
-  'fastWave',
-  'armouredInvasion',
-  'eliteThreat',
-  'contamination',
-  'reducedVisibility',
-  'overrun',
-  'heavyResistance',
-];
-
-const WAVE_MODIFIER_DEFINITIONS: Readonly<
-  Record<WaveModifierId, WaveModifierDefinition>
-> = {
-  doubleOrbs: {
-    name: 'Double Orbs',
-    description: 'Orbs drop twice as often.',
-    minimumWave: 1,
-    selectionWeight: 1,
-    orbDropIntervalMultiplier: 0.5,
-  },
-  fastWave: {
-    name: 'Fast Wave',
-    description: 'Enemies move 20% faster.',
-    minimumWave: 1,
-    selectionWeight: 1,
-    enemySpeedMultiplier: 1.2,
-  },
-  armouredInvasion: {
-    name: 'Armoured Invasion',
-    description: 'Armoured enemies are more common.',
-    minimumWave: 8,
-    selectionWeight: 1,
-    enemyWeightMultipliers: { armoured: 3 },
-  },
-  eliteThreat: {
-    name: 'Elite Threat',
-    description: 'Elite enemies are more likely to appear.',
-    minimumWave: 18,
-    selectionWeight: 1,
-    eliteChanceMultiplier: 2,
-  },
-  contamination: {
-    name: 'Contamination',
-    description: 'Bloaters and their hazards are more dangerous.',
-    minimumWave: 15,
-    selectionWeight: 1,
-    enemyWeightMultipliers: { bloater: 3, splitter: 1.5 },
-    hazardRadiusMultiplier: 1.2,
-    hazardDamageMultiplier: 1.2,
-  },
-  reducedVisibility: {
-    name: 'Reduced Visibility',
-    description: 'Darkness limits how far you can see.',
-    minimumWave: 1,
-    selectionWeight: 1,
-    visibilityRadiusMultiplier: 0.68,
-  },
-  overrun: {
-    name: 'Overrun',
-    description: 'Enemies arrive more quickly.',
-    minimumWave: 1,
-    selectionWeight: 1,
-    spawnIntervalMultiplier: 0.75,
-    minimumSpawnIntervalSeconds: 0.35,
-  },
-  heavyResistance: {
-    name: 'Heavy Resistance',
-    description: 'Brutes are more common.',
-    minimumWave: 11,
-    selectionWeight: 1,
-    enemyWeightMultipliers: { brute: 3 },
-  },
-};
-
-export const WAVE_MODIFIER_CONFIG = {
-  appearanceChance: 0.6,
-  definitions: WAVE_MODIFIER_DEFINITIONS,
-} as const;
+export { WAVE_MODIFIER_CONFIG, WAVE_MODIFIER_IDS } from '../core/GameConfig';
+export type { WaveModifierDefinition, WaveModifierId } from '../core/GameConfig';
 
 function getWaveRoll(wave: number, salt: number): number {
   let seed = Math.imul(wave ^ salt, 1_103_515_245) + 12_345;

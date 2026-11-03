@@ -1,32 +1,16 @@
 import type { GameItemType, OrbRarity } from '../core/GameState';
 import {
   awardRareReward,
-  RARE_UPGRADE_EFFECT_CONFIG,
   type RareUpgradeId,
   type RunProgressionState,
 } from '../upgrades/ProgressionSystem';
+import {
+  ORB_RARITY_WEIGHTS,
+  ORB_SYSTEM_CONFIG,
+  RARE_UPGRADE_EFFECT_CONFIG,
+} from '../core/GameConfig';
 
-export const ORB_RARITY_WEIGHTS: Readonly<Record<OrbRarity, number>> = {
-  common: 65,
-  uncommon: 25,
-  rare: 8,
-  special: 2,
-};
-
-export const ORB_SYSTEM_CONFIG = {
-  magnetDurationSeconds: 10,
-  magnetAttractionRadius: 120,
-  magnetAttractionSpeed: 115,
-  turretDurationSeconds: 12,
-  turretDamage: 12,
-  turretRange: 260,
-  turretShotsPerSecond: 2,
-  cursedDurationSeconds: 10,
-  cursedDamageMultiplier: 1.5,
-  cursedEnemySpeedMultiplier: 1.2,
-  rareGoldRarePointReward: 1,
-  defaultOrbRarity: 'common' as OrbRarity,
-} as const;
+export { ORB_RARITY_WEIGHTS, ORB_SYSTEM_CONFIG } from '../core/GameConfig';
 
 export const ORB_MAGNETISM_RADIUS_BY_LEVEL =
   RARE_UPGRADE_EFFECT_CONFIG.orbMagnetismRadiusByLevel;

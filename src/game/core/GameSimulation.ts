@@ -7,42 +7,37 @@ import {
   findCirclePositionInArena,
   findNextPathWaypointInArena,
 } from './ArenaGeometry';
-import {
-  ARENA_INTERACTION_CONFIG,
-  getArenaCollisionObstacles,
-} from '../arena/ArenaSystem';
+import { getArenaCollisionObstacles } from '../arena/ArenaSystem';
 import { GAME_VISUAL_CONFIG } from '../rendering/VisualConfig';
 import { GAME_PALETTE } from '../rendering/GamePalette';
 import {
-  GAME_PROGRESSION_CONFIG,
-  ORB_DROP_SEQUENCE,
   advanceWaveProgression,
   completeWaveIfCleared,
 } from './GameProgression';
 import {
-  PLAYER_STARTING_DAMAGE,
-  PLAYER_STARTING_SHOTS_PER_SECOND,
+  ARENA_INTERACTION_CONFIG,
+  ELITE_CONFIG,
+  ENEMY_ABILITY_CONFIG,
+  GAME_COMBAT_CONFIG,
+  GAME_PROGRESSION_CONFIG,
+  ORB_DROP_SEQUENCE,
+  ORB_SYSTEM_CONFIG,
+  RARE_UPGRADE_EFFECT_CONFIG,
+  WAVE_MODIFIER_CONFIG,
 } from './GameConfig';
 import {
   createZombie,
 } from './GameState';
 import {
   absorbEliteShieldDamage,
-  ELITE_CONFIG,
   shouldDropRareGoldOrb,
   updateElite,
 } from '../enemies/elites/EliteSystem';
-import {
-  awardRareReward,
-  RARE_UPGRADE_EFFECT_CONFIG,
-} from '../upgrades/ProgressionSystem';
-import { WAVE_MODIFIER_CONFIG } from '../modifiers/WaveModifiers';
+import { awardRareReward } from '../upgrades/ProgressionSystem';
 import {
   applyRareGoldReward,
   getOrbRarity,
   isCollectibleOrb,
-  ORB_MAGNETISM_RADIUS_BY_LEVEL,
-  ORB_SYSTEM_CONFIG,
 } from '../orbs/OrbSystem';
 import {
   handleBossDefeat,
@@ -70,46 +65,11 @@ export interface GameInputState {
   readonly useBomb?: boolean;
 }
 
-export const GAME_COMBAT_CONFIG = {
-  projectileDamage: PLAYER_STARTING_DAMAGE,
-  projectileSpeed: 560,
-  projectileLifetimeSeconds: 1.5,
-  shotsPerSecond: PLAYER_STARTING_SHOTS_PER_SECOND,
-  playerHitCooldownSeconds: 0.65,
-  zombieAttackCooldownSeconds: 0.8,
-  impactDurationSeconds: 0.24,
-  damageNumberDurationSeconds: 0.65,
-  collectionEffectDurationSeconds: 0.36,
-  muzzleFlashDurationSeconds: 0.075,
-} as const;
+export { GAME_COMBAT_CONFIG } from './GameConfig';
 
-const SPITTER_CONFIG = {
-  attackCooldownSeconds: 5,
-  attackRange: 360,
-  preferredDistance: 220,
-  minimumHoldDistance: 180,
-  maximumHoldDistance: 260,
-  poisonDurationSeconds: 5,
-  poisonTickSeconds: 1,
-  poisonDamageFraction: 0.2,
-} as const;
-
-const RUNNER_DASH_CONFIG = {
-  chargeDurationSeconds: 6,
-  dashDurationSeconds: 2,
-  speedMultiplier: 2,
-} as const;
-
-const SWARM_DODGE_CONFIG = {
-  lookaheadSeconds: 0.6,
-  dodgeDurationSeconds: 0.35,
-  dodgeSpeedMultiplier: 2,
-  dodgeClearance: 20,
-  dodgeDistance: 100,
-  recoveryDurationSeconds: 2,
-  recoveryStartingSpeedMultiplier: 0.5,
-  cooldownSeconds: 3,
-} as const;
+const SPITTER_CONFIG = ENEMY_ABILITY_CONFIG.spitter;
+const RUNNER_DASH_CONFIG = ENEMY_ABILITY_CONFIG.runnerDash;
+const SWARM_DODGE_CONFIG = ENEMY_ABILITY_CONFIG.swarmDodge;
 
 function getEffect(
   state: GameState,
@@ -696,8 +656,11 @@ function collectOrb(
 function getOrbAttractionRadius(state: GameState): number {
   const magnetLevel = state.progression.rareUpgradeLevels.orbMagnetism;
   const permanentRadius =
-    ORB_MAGNETISM_RADIUS_BY_LEVEL[
-      Math.min(magnetLevel, ORB_MAGNETISM_RADIUS_BY_LEVEL.length - 1)
+    RARE_UPGRADE_EFFECT_CONFIG.orbMagnetismRadiusByLevel[
+      Math.min(
+        magnetLevel,
+        RARE_UPGRADE_EFFECT_CONFIG.orbMagnetismRadiusByLevel.length - 1,
+      )
     ] ?? 0;
   return Math.max(
     permanentRadius,
@@ -2153,26 +2116,42 @@ export function updateGameState(
   player.hitFlashSeconds = Math.max(0, player.hitFlashSeconds - deltaSeconds);
   player.muzzleFlashSeconds = Math.max(0, player.muzzleFlashSeconds - deltaSeconds);
 
-  if (state.wave.phase !== 'combat') {
+  if (
+    state.wave.phase === 'gameOver' ||
+    state.wave.phase === 'levelComplete' ||
+    state.wave.phase === 'upgrade'
+  ) {
     player.movementFactor = 0;
     return;
   }
 
   if (player.alive) {
-    movePlayer(state, input.movementX, input.movementY, deltaSeconds);
-    player.fireCooldownSeconds = Math.max(
-      0,
-      player.fireCooldownSeconds - deltaSeconds,
-    );
-    if (player.fireCooldownSeconds === 0) {
-      fireProjectile(state);
-      player.fireCooldownSeconds = 1 / getShotsPerSecond(state);
+    if (state.wave.phase === 'intermission') {
+      movePlayer(state, input.movementX, input.movementY, deltaSeconds);
+      player.fireCooldownSeconds = Math.max(
+        0,
+        player.fireCooldownSeconds - deltaSeconds,
+      );
+      if (player.fireCooldownSeconds === 0) {
+        fireProjectile(state);
+        player.fireCooldownSeconds = 1 / getShotsPerSecond(state);
+      }
+    } else {
+      movePlayer(state, input.movementX, input.movementY, deltaSeconds);
+      player.fireCooldownSeconds = Math.max(
+        0,
+        player.fireCooldownSeconds - deltaSeconds,
+      );
+      if (player.fireCooldownSeconds === 0) {
+        fireProjectile(state);
+        player.fireCooldownSeconds = 1 / getShotsPerSecond(state);
+      }
     }
   } else {
     player.movementFactor = 0;
   }
 
-  if (input.useBomb) detonateBomb(state);
+  if (input.useBomb && state.wave.phase === 'combat') detonateBomb(state);
   state.statistics.survivalSeconds += deltaSeconds;
   updateTemporaryEffects(state, deltaSeconds);
   updateSpitterPoison(state, deltaSeconds);

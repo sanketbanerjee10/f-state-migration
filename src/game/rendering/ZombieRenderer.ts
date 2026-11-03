@@ -131,20 +131,48 @@ function drawBossDetails(
     stroke: color,
     lineWidth: 3,
   });
-  drawLine(
-    context,
-    { x: boss.x - radius * 0.55, y: y - radius * 0.58 },
-    { x: boss.x - radius * 0.86, y: y - radius * 1.2 },
-    GAME_PALETTE.enemies.elite,
-    4,
-  );
-  drawLine(
-    context,
-    { x: boss.x + radius * 0.55, y: y - radius * 0.58 },
-    { x: boss.x + radius * 0.86, y: y - radius * 1.2 },
-    GAME_PALETTE.enemies.elite,
-    4,
-  );
+  if (boss.bossType === 'acidQueen') {
+    for (const side of [-1, 1]) {
+      drawCircle(
+        context,
+        boss.x + side * radius * 0.88,
+        y + radius * 0.4,
+        radius * 0.22,
+        {
+          fill: '#a6b975',
+          stroke: GAME_PALETTE.enemies.outline,
+          lineWidth: 2,
+        },
+      );
+      drawCircle(
+        context,
+        boss.x + side * radius * 0.88,
+        y + radius * 0.4,
+        radius * 0.08,
+        { fill: '#d6b77f' },
+      );
+    }
+  } else {
+    const hornColor = boss.bossType === 'hordeCaller'
+      ? GAME_PALETTE.enemies.elite
+      : color;
+    const hornSpread = boss.bossType === 'charger' ? 0.78 : 0.55;
+    const hornLength = boss.bossType === 'charger' ? 1.55 : 1.2;
+    drawLine(
+      context,
+      { x: boss.x - radius * 0.55, y: y - radius * 0.58 },
+      { x: boss.x - radius * hornSpread, y: y - radius * hornLength },
+      hornColor,
+      boss.bossType === 'charger' ? 6 : 4,
+    );
+    drawLine(
+      context,
+      { x: boss.x + radius * 0.55, y: y - radius * 0.58 },
+      { x: boss.x + radius * hornSpread, y: y - radius * hornLength },
+      hornColor,
+      boss.bossType === 'charger' ? 6 : 4,
+    );
+  }
 
   const barWidth = radius * 2.8;
   const barHeight = 7;
@@ -261,7 +289,14 @@ export function drawZombie(
   const y = zombie.y + Math.sin(elapsedSeconds * 7 + zombie.x * 0.03) * movement;
   const type = zombie.type;
   const radius = zombie.radius ?? getEnemyRadius(type);
-  const baseColor = enemies[type] ?? enemies.walker;
+  const appearanceType = zombie.isBoss && zombie.bossType === 'acidQueen'
+    ? 'spitter'
+    : zombie.isBoss && zombie.bossType === 'hordeCaller'
+      ? 'screamer'
+      : type;
+  const baseColor = zombie.isBoss && zombie.bossType === 'acidQueen'
+    ? '#a6b975'
+    : enemies[appearanceType] ?? enemies.walker;
   const hitFlash = clampVisualValue(zombie.hitFlash ?? 0);
 
   if (type === 'walker') {
@@ -301,7 +336,7 @@ export function drawZombie(
     return;
   }
 
-  const appearance = getEnemyAppearance(type, {
+  const appearance = getEnemyAppearance(appearanceType, {
     bodyColor: baseColor,
     outlineColor: zombie.isElite ? enemies.elite : enemies.outline,
     limbColor: zombie.isElite ? enemies.elite : enemies.limb,

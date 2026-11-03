@@ -1,7 +1,6 @@
 import {
   GAME_VIEWPORT,
-  MAX_DEVICE_PIXEL_RATIO,
-  MAX_FRAME_DELTA_SECONDS,
+  GAME_RUNTIME_CONFIG,
 } from './GameConfig';
 import { KeyboardInput, type MovementVector } from './KeyboardInput';
 import type { GameKeyBindings } from './GameSettings';
@@ -23,7 +22,7 @@ import {
 } from './GameState';
 import type { RareUpgradeId } from '../upgrades/ProgressionSystem';
 import { placeSupportTurret, updateGameState } from './GameSimulation';
-import { adjustRareUpgrade, adjustRunStat } from './GameProgression';
+import { adjustRareUpgrade, adjustRunStat, startWave } from './GameProgression';
 import {
   createGameStateRenderLayers,
   getGameEntityCount,
@@ -61,7 +60,6 @@ export class GameEngine {
   private readonly mouseAimInput = new MouseAimInput();
   private readonly dualJoystickInput = new DualJoystickInput();
   private mobileMovement: JoystickVector = { x: 0, y: 0 };
-  private turretPlacementArmed = false;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -88,6 +86,7 @@ export class GameEngine {
     );
     this.mouseAimInput.attach(this.canvas, this.handleMousePosition);
     this.canvas.addEventListener('pointerdown', this.handleCanvasPointerDown);
+    this.canvas.addEventListener('contextmenu', this.handleCanvasContextMenu);
     if (mobileControls) {
       this.dualJoystickInput.attach(
         mobileControls.movement,
@@ -129,7 +128,10 @@ export class GameEngine {
 
     this.cssWidth = width;
     this.cssHeight = height;
-    this.pixelRatio = Math.min(devicePixelRatio, MAX_DEVICE_PIXEL_RATIO);
+    this.pixelRatio = Math.min(
+      devicePixelRatio,
+      GAME_RUNTIME_CONFIG.maximumDevicePixelRatio,
+    );
 
     const { width: logicalWidth, height: logicalHeight } =
       this.getLogicalViewportSize(width, height);
@@ -197,12 +199,16 @@ export class GameEngine {
     this.scheduleFrame();
   }
 
-  reset(gameMode: GameMode = this.gameMode): void {
+  reset(
+    gameMode: GameMode = this.gameMode,
+    campaignLevelId: number | null = null,
+    initialStandardPoints = 0,
+    levelCompletionRewardEligible = true,
+  ): void {
     this.assertNotDestroyed();
     this.gameMode = gameMode;
     this.setInputEnabled(false);
     this.mobileMovement = { x: 0, y: 0 };
-    this.turretPlacementArmed = false;
     this.simulatedSeconds = 0;
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
@@ -216,7 +222,13 @@ export class GameEngine {
         logicalSize.width,
         logicalSize.height,
         this.gameMode,
+        campaignLevelId,
+        initialStandardPoints,
+        levelCompletionRewardEligible,
       );
+      if (this.gameMode === 'level' && this.gameState) {
+        startWave(this.gameState, this.gameState.wave.currentWave);
+      }
     } else {
       this.gameState = null;
     }
@@ -270,10 +282,6 @@ export class GameEngine {
     return this.gameState?.player.aimAngle ?? -0.22;
   }
 
-  isTurretPlacementArmed(): boolean {
-    return this.turretPlacementArmed;
-  }
-
   destroy(): void {
     if (this.isDestroyed) return;
 
@@ -281,6 +289,7 @@ export class GameEngine {
     this.keyboardInput.detach();
     this.mouseAimInput.detach();
     this.canvas.removeEventListener('pointerdown', this.handleCanvasPointerDown);
+    this.canvas.removeEventListener('contextmenu', this.handleCanvasContextMenu);
     this.dualJoystickInput.detach();
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     if (this.motionPreference && this.motionPreferenceListener) {
@@ -322,7 +331,7 @@ export class GameEngine {
       ? 0
       : Math.min(
           Math.max(0, (timestamp - this.previousFrameTime) / 1000),
-          MAX_FRAME_DELTA_SECONDS,
+          GAME_RUNTIME_CONFIG.maximumFrameDeltaSeconds,
         );
     this.previousFrameTime = timestamp;
 
@@ -341,14 +350,6 @@ export class GameEngine {
     ) return;
 
     const combinedMovement = this.getMovementInput();
-    if (
-      this.keyboardInput.consumeTurretRequest() &&
-      this.gameState.turrets > 0 &&
-      this.gameState.player.alive &&
-      this.gameState.wave.phase === 'combat'
-    ) {
-      this.turretPlacementArmed = true;
-    }
     updateGameState(
       this.gameState,
       {
@@ -381,8 +382,7 @@ export class GameEngine {
   private readonly handleCanvasPointerDown = (event: PointerEvent): void => {
     if (
       !this.isActive ||
-      event.button !== 0 ||
-      !this.turretPlacementArmed ||
+      event.button !== 2 ||
       !this.gameState
     ) {
       return;
@@ -393,10 +393,13 @@ export class GameEngine {
     });
     if (!position) return;
     if (placeSupportTurret(this.gameState, position.x, position.y)) {
-      this.turretPlacementArmed = false;
       this.refreshRenderLayers();
       this.render();
     }
+  };
+
+  private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
+    event.preventDefault();
   };
 
   private getWorldPosition(
@@ -436,7 +439,6 @@ export class GameEngine {
 
   private setInputEnabled(enabled: boolean): void {
     const shouldEnable = enabled && !document.hidden;
-    if (!shouldEnable) this.turretPlacementArmed = false;
     this.keyboardInput.setEnabled(shouldEnable);
     this.mouseAimInput.setEnabled(shouldEnable);
     this.dualJoystickInput.setEnabled(shouldEnable);

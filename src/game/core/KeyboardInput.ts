@@ -13,7 +13,6 @@ export class KeyboardInput {
   private readonly pressedKeys = new Set<string>();
   private keyBindings = DEFAULT_GAME_KEY_BINDINGS;
   private bombRequested = false;
-  private turretRequested = false;
   private elements: HTMLElement[] = [];
   private windowTarget: Window | null = null;
   private isEnabled = true;
@@ -69,16 +68,9 @@ export class KeyboardInput {
     return requested;
   }
 
-  consumeTurretRequest(): boolean {
-    const requested = this.turretRequested;
-    this.turretRequested = false;
-    return requested;
-  }
-
   clear = (): void => {
     this.pressedKeys.clear();
     this.bombRequested = false;
-    this.turretRequested = false;
   };
 
   setEnabled(enabled: boolean): void {
@@ -119,13 +111,6 @@ export class KeyboardInput {
       !this.pressedKeys.has(keyEvent.code)
     ) {
       this.bombRequested = true;
-    }
-    if (
-      keyEvent.code === this.keyBindings.useTurret &&
-      !keyEvent.repeat &&
-      !this.pressedKeys.has(keyEvent.code)
-    ) {
-      this.turretRequested = true;
     }
     this.pressedKeys.add(keyEvent.code);
   };

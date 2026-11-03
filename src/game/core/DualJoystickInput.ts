@@ -19,8 +19,6 @@ interface JoystickState {
   handlers: JoystickTargetHandlers | null;
 }
 
-const DEAD_ZONE = 0.12;
-
 export class DualJoystickInput {
   private readonly movement: JoystickState = {
     element: null,
@@ -152,7 +150,7 @@ export class DualJoystickInput {
       x /= magnitude;
       y /= magnitude;
     }
-    if (Math.hypot(x, y) < DEAD_ZONE) {
+    if (Math.hypot(x, y) < GAME_INPUT_CONFIG.joystickDeadZone) {
       x = 0;
       y = 0;
     }
@@ -188,3 +186,4 @@ export class DualJoystickInput {
     return name === 'movement' ? this.movement : this.aim;
   }
 }
+import { GAME_INPUT_CONFIG } from './GameConfig';

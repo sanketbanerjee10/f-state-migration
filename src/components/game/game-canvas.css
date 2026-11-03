@@ -428,6 +428,106 @@
   outline-offset: 3px;
 }
 
+.game-level-select-overlay {
+  width: min(940px, calc(100% - 28px));
+}
+
+.game-level-progress {
+  margin: 12px 0;
+  color: #b7d4c4;
+  font: 600 12px var(--app-font-mono);
+}
+
+.game-level-selection-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+}
+
+.game-level-selection-actions button {
+  width: min(280px, 100%);
+}
+
+.game-level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+  text-align: left;
+}
+
+.game-level-card {
+  display: grid;
+  min-width: 0;
+  min-height: 154px;
+  align-content: start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(152, 177, 168, 0.42);
+  border-radius: 8px;
+  background: #27352f;
+  color: #e5eee8;
+  font: 500 12px/1.45 var(--app-font-mono);
+  text-align: left;
+  cursor: pointer;
+}
+
+.game-level-card:not(:disabled):hover,
+.game-level-card.is-current {
+  border-color: #7dd3fc;
+  background: #30433a;
+}
+
+.game-level-card.is-completed {
+  border-color: rgba(125, 211, 165, 0.65);
+}
+
+.game-level-card.is-boss {
+  background: linear-gradient(135deg, #442e27, #27352f 70%);
+}
+
+.game-level-card:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.game-level-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  color: #9fb6aa;
+  font-size: 10px;
+}
+
+.game-level-card-heading strong {
+  color: #f0f7f2;
+  font-size: 16px;
+}
+
+.game-level-card-name {
+  color: #f0f7f2;
+  font-weight: 700;
+}
+
+.game-level-card-map,
+.game-level-card-enemies,
+.game-level-card-record {
+  color: #b5c5bc;
+  line-height: 1.4;
+}
+
+.game-level-card-enemies {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.game-level-card-record {
+  color: #7dd3a5;
+}
+
 .game-pause-button {
   position: absolute;
   top: calc(10px + env(safe-area-inset-top, 0px));
@@ -776,6 +876,14 @@
   gap: 10px;
   width: 100%;
   text-align: left;
+}
+
+.game-key-binding-static {
+  cursor: default;
+}
+
+.game-setting-option.game-key-binding-static:hover {
+  border-color: rgba(152, 177, 168, 0.25);
 }
 
 .game-key-binding strong {
@@ -1283,6 +1391,12 @@
     var(--ocean-panel);
 }
 
+.game-menu-overlay.game-level-select-overlay {
+  width: min(1200px, calc(100% - 32px));
+  max-height: calc(100% - 24px - env(safe-area-inset-top, 0px));
+  padding: clamp(24px, 4vw, 42px);
+}
+
 .game-main-menu-overlay {
   width: min(560px, calc(100% - 28px));
   padding: clamp(28px, 6vw, 50px);
@@ -1692,6 +1806,27 @@
 
 .game-pause-rare-upgrade-row {
   padding: 8px 0;
+}
+
+.game-pause-stat-upgrade-row {
+  align-items: start;
+  padding: 8px 0;
+}
+
+.game-pause-stat-upgrade-row > div {
+  align-content: start;
+  gap: 4px;
+}
+
+.game-pause-stat-upgrade-row span {
+  overflow: visible;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.game-pause-stat-upgrade-row .game-pause-upgrade-description {
+  color: var(--ocean-text-secondary);
+  font: 10px var(--app-font-sans);
 }
 
 .game-pause-rare-upgrade-row .game-pause-rare-upgrade-details {
@@ -2333,12 +2468,35 @@
   .game-orb-guide-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .game-level-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .game-level-card {
+    min-height: 142px;
+    padding: 12px;
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 520px) {
   .game-enemy-guide-grid,
   .game-orb-guide-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .game-level-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .game-level-card {
+    min-height: 132px;
+    padding: 10px;
+    font-size: 10px;
   }
 
   .game-enemy-guide-card {

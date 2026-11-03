@@ -44,7 +44,7 @@ const ORB_GUIDE_DETAILS: Readonly<Record<GameItemType, {
   },
   turret: {
     name: 'Turret Orb',
-    description: 'Adds one turret to your inventory. Press your configured turret key, then click or tap an open arena spot to deploy it. Each turret fires at nearby enemies for a limited time.',
+    description: 'Adds one turret to your inventory. Right-click an open arena spot to deploy it. Each turret fires at nearby enemies for a limited time.',
   },
   cursed: {
     name: 'Cursed Orb',

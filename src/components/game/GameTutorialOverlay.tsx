@@ -61,7 +61,7 @@ export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
     id: 'hud',
     title: 'Read the HUD',
     description:
-      'Wave and progress are at the top; Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Press the turret key and click an open spot to deploy one. Collected temporary effects appear beneath them.',
+      'Wave and progress are at the top; Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Right-click an open spot to deploy a turret. Collected temporary effects appear beneath them.',
     action: null,
     highlight: 'hud',
     simulate: false,
@@ -88,7 +88,7 @@ export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
     id: 'powerups',
     title: 'Power-up orbs',
     description:
-      'Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key shown on the HUD to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, press the turret key, then click or tap an open spot to place one for 12 seconds.',
+      'Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key shown on the HUD to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, then right-click an open spot to place one for 12 seconds.',
     action: null,
     highlight: 'hud',
     simulate: false,

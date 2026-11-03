@@ -5,22 +5,9 @@ import {
 import type { GameState, ZombieType } from '../core/GameState';
 import { GAME_VISUAL_CONFIG } from '../rendering/VisualConfig';
 import { getArenaCollisionObstacles } from '../arena/ArenaSystem';
+import { SPAWN_FRACTIONS, WAVE_SPAWN_CONFIG } from '../core/GameConfig';
 
-export const WAVE_SPAWN_CONFIG = {
-  maximumActiveEnemies: 36,
-  minimumPlayerDistance: 120,
-  enemySpacing: 8,
-} as const;
-
-const SPAWN_FRACTIONS: readonly number[] = [
-  0.1,
-  0.24,
-  0.38,
-  0.5,
-  0.62,
-  0.76,
-  0.9,
-];
+export { WAVE_SPAWN_CONFIG } from '../core/GameConfig';
 
 type ZombieRadiusKey =
   | 'walkerRadius'

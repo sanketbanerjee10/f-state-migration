@@ -1,10 +1,6 @@
 export const GAME_VISUAL_CONFIG = {
   arena: {
-    gridSpacing: 48,
-    outerBoundaryInset: 5,
-    outerBoundaryWidth: 10,
-    innerBoundaryInset: 14,
-    innerBoundaryWidth: 2,
+    gridSpacing: 24,
     centerMarkingHalfLength: 54,
     centerMarkingWidth: 2,
   },

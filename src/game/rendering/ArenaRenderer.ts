@@ -18,6 +18,14 @@ interface ArenaRenderState {
   readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
   readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
   readonly theme: ArenaThemeId;
+  readonly transition?: {
+    readonly from: {
+      readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
+      readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+      readonly theme: ArenaThemeId;
+    };
+    readonly progress: number;
+  };
 }
 
 function drawObstacle(
@@ -204,11 +212,14 @@ function drawBarrel(
   }
 }
 
-export function renderArena(
+function renderArenaLayer(
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
   arena?: ArenaRenderState,
+  alpha = 1,
+  scale = 1,
+  includeObstacles = true,
 ): void {
   const { arena: dimensions } = GAME_VISUAL_CONFIG;
   const baseColors = GAME_PALETTE.arena;
@@ -225,6 +236,10 @@ export function renderArena(
 
   context.save();
   try {
+    context.globalAlpha *= alpha;
+    context.translate(width / 2, height / 2);
+    context.scale(scale, scale);
+    context.translate(-width / 2, -height / 2);
     drawRect(context, 0, 0, width, height, { fill: colors.floor });
 
     context.save();
@@ -245,58 +260,101 @@ export function renderArena(
       context.restore();
     }
 
-    const outerInset = dimensions.outerBoundaryInset;
-    drawRect(
-      context,
-      outerInset,
-      outerInset,
-      Math.max(0, width - outerInset * 2),
-      Math.max(0, height - outerInset * 2),
-      { stroke: colors.boundary, lineWidth: dimensions.outerBoundaryWidth },
-    );
-
-    const innerInset = dimensions.innerBoundaryInset;
-    drawRect(
-      context,
-      innerInset,
-      innerInset,
-      Math.max(0, width - innerInset * 2),
-      Math.max(0, height - innerInset * 2),
-      { stroke: colors.innerBoundary, lineWidth: dimensions.innerBoundaryWidth },
-    );
-
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const halfLength = dimensions.centerMarkingHalfLength;
-    drawLine(
-      context,
-      { x: centerX - halfLength, y: centerY },
-      { x: centerX + halfLength, y: centerY },
-      colors.marking,
-      dimensions.centerMarkingWidth,
-    );
-    drawLine(
-      context,
-      { x: centerX, y: centerY - halfLength },
-      { x: centerX, y: centerY + halfLength },
-      colors.marking,
-      dimensions.centerMarkingWidth,
-    );
-
-    for (const obstacle of arena?.obstacles ?? ARENA_OBSTACLES) {
-      drawObstacle(context, obstacle, width, height);
+    context.save();
+    try {
+      context.strokeStyle = colors.marking;
+      context.lineWidth = 1;
+      for (let line = 0; line < 8; line += 1) {
+        const offset = (line + 1) * (width / 9);
+        const y = (line % 2 === 0 ? height * 0.2 : height * 0.74) + ((line % 3) * 18);
+        const startX = Math.max(26, offset - 18);
+        const endX = Math.min(width - 26, offset + 18);
+        context.beginPath();
+        context.moveTo(startX, y);
+        context.lineTo(endX, y + (line % 2 === 0 ? 10 : -10));
+        context.stroke();
+      }
+    } finally {
+      context.restore();
     }
-    for (const barrel of arena?.barrels ?? []) {
-      drawBarrel(context, barrel, width, height);
+
+    if (includeObstacles) {
+      renderArenaObstacles(context, width, height, arena);
     }
-    drawLine(
-      context,
-      { x: dimensions.outerBoundaryInset + 8, y: dimensions.outerBoundaryInset + 8 },
-      { x: dimensions.outerBoundaryInset + 32, y: dimensions.outerBoundaryInset + 8 },
-      theme.accent,
-      2,
-    );
   } finally {
     context.restore();
   }
+}
+
+function renderArenaObstacles(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  arena?: ArenaRenderState,
+  alpha = 1,
+  scale = 1,
+): void {
+  const obstacles = arena?.obstacles ?? ARENA_OBSTACLES;
+  for (const obstacle of obstacles) {
+    const centerX = width * obstacle.xFraction;
+    const centerY = height * obstacle.yFraction;
+    context.save();
+    try {
+      context.globalAlpha *= alpha;
+      context.translate(centerX, centerY);
+      context.scale(scale, scale);
+      context.translate(-centerX, -centerY);
+      drawObstacle(context, obstacle, width, height);
+    } finally {
+      context.restore();
+    }
+
+  }
+  for (const barrel of arena?.barrels ?? []) {
+    const centerX = width * barrel.xFraction;
+    const centerY = height * barrel.yFraction;
+    context.save();
+    try {
+      context.globalAlpha *= alpha;
+      context.translate(centerX, centerY);
+      context.scale(scale, scale);
+      context.translate(-centerX, -centerY);
+      drawBarrel(context, barrel, width, height);
+    } finally {
+      context.restore();
+    }
+  }
+}
+
+export function renderArena(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  arena?: ArenaRenderState,
+): void {
+  if (!arena?.transition) {
+    renderArenaLayer(context, width, height, arena);
+    return;
+  }
+
+  const transition = arena.transition;
+  const progress = Math.max(0, Math.min(1, transition.progress));
+  renderArenaLayer(context, width, height, arena, 1, 1, false);
+  if (progress < 0.5) {
+    const phaseProgress = progress * 2;
+    const zoomOut = phaseProgress * phaseProgress * (3 - 2 * phaseProgress);
+    renderArenaObstacles(
+      context,
+      width,
+      height,
+      transition.from,
+      1 - zoomOut,
+      1 - zoomOut,
+    );
+    return;
+  }
+
+  const phaseProgress = (progress - 0.5) * 2;
+  const zoomIn = phaseProgress * phaseProgress * (3 - 2 * phaseProgress);
+  renderArenaObstacles(context, width, height, arena, zoomIn, zoomIn);
 }

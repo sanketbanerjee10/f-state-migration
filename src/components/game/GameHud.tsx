@@ -1,17 +1,12 @@
 import type { GameStateSnapshot } from '@/game/core/GameState';
-import {
-  formatGameKeyCode,
-  type HudDensitySetting,
-} from '@/game/core/GameSettings';
+import { formatGameKeyCode, type HudDensitySetting } from '@/game/core/GameSettings';
 import { GameActiveEffects } from './GameActiveEffects';
-import { WAVE_MODIFIER_CONFIG } from '@/game/modifiers/WaveModifiers';
+import { WAVE_MODIFIER_CONFIG } from '@/game/core/GameConfig';
 
 interface GameHudProps {
   readonly gameState: GameStateSnapshot;
   readonly density: HudDensitySetting;
   readonly bombKey: string;
-  readonly turretKey: string;
-  readonly turretPlacementArmed: boolean;
   readonly highlighted?: boolean;
 }
 
@@ -19,8 +14,6 @@ export function GameHud({
   gameState,
   density,
   bombKey,
-  turretKey,
-  turretPlacementArmed,
   highlighted = false,
 }: GameHudProps) {
   const zombiesDefeatedThisWave = Math.max(
@@ -169,11 +162,7 @@ export function GameHud({
           <strong>{gameState.bombs} / 5</strong>
         </div>
         <div className="game-hud-stat game-hud-turrets">
-          <span className="game-hud-label">
-            {turretPlacementArmed
-              ? 'CLICK TO PLACE'
-              : `TURRETS (${formatGameKeyCode(turretKey)})`}
-          </span>
+          <span className="game-hud-label">TURRETS (RIGHT CLICK)</span>
           <strong>{gameState.turrets} / 5</strong>
         </div>
       </div>

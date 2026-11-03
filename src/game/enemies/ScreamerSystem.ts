@@ -7,13 +7,9 @@ import {
   createValidSpawnPosition,
   WAVE_SPAWN_CONFIG,
 } from '../waves/SpawnSystem';
+import { SCREAMER_CONFIG } from '../core/GameConfig';
 
-export const SCREAMER_CONFIG = {
-  summonIntervalSeconds: 6,
-  summonGroupSize: 1,
-  maximumActiveSummons: 3,
-  retryIntervalSeconds: 1,
-} as const;
+export { SCREAMER_CONFIG } from '../core/GameConfig';
 
 function spawnScreamerSupport(
   state: GameState,

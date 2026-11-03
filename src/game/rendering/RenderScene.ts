@@ -29,6 +29,14 @@ export interface RenderLayers {
     readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
     readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
     readonly theme: ArenaThemeId;
+    readonly transition?: {
+      readonly from: {
+        readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
+        readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+        readonly theme: ArenaThemeId;
+      };
+      readonly progress: number;
+    };
   };
   readonly groundShadows: readonly RenderCommand[];
   readonly pickups: readonly RenderCommand[];

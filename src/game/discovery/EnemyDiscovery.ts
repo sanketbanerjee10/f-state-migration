@@ -1,6 +1,14 @@
 import type { ZombieType } from '@/game/core/GameState';
+import type { BossType } from '@/game/bosses/BossSystem';
 
 export const ENEMY_DISCOVERY_STORAGE_KEY = 'state-565.enemy-discoveries.v1';
+export const BOSS_DISCOVERY_STORAGE_KEY = 'state-565.boss-discoveries.v1';
+
+export const BOSS_DISCOVERY_TYPES: readonly BossType[] = [
+  'charger',
+  'acidQueen',
+  'hordeCaller',
+];
 
 export const ENEMY_DISCOVERY_LABELS: Record<ZombieType, string> = {
   walker: 'Walker',
@@ -64,6 +72,11 @@ function isZombieType(value: unknown): value is ZombieType {
     ENEMY_DISCOVERY_TYPES.includes(value as ZombieType);
 }
 
+function isBossType(value: unknown): value is BossType {
+  return typeof value === 'string' &&
+    BOSS_DISCOVERY_TYPES.includes(value as BossType);
+}
+
 export function getEnemyDisplayName(type: ZombieType): string {
   return ENEMY_DISCOVERY_LABELS[type];
 }
@@ -94,6 +107,22 @@ export function readDiscoveredEnemies(storage: Storage | null | undefined): Set<
   }
 }
 
+export function readDiscoveredBosses(storage: Storage | null | undefined): Set<BossType> {
+  if (!storage) return new Set();
+
+  try {
+    const rawValue = storage.getItem(BOSS_DISCOVERY_STORAGE_KEY);
+    if (!rawValue) return new Set();
+
+    const parsed: unknown = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) return new Set();
+
+    return new Set(parsed.filter(isBossType));
+  } catch {
+    return new Set();
+  }
+}
+
 export function writeDiscoveredEnemies(
   storage: Storage | null | undefined,
   discovered: Iterable<ZombieType>,
@@ -103,6 +132,20 @@ export function writeDiscoveredEnemies(
   try {
     const ordered = [...new Set(discovered)] as ZombieType[];
     storage.setItem(ENEMY_DISCOVERY_STORAGE_KEY, JSON.stringify(ordered));
+  } catch {
+    // Storage failures should never interrupt gameplay.
+  }
+}
+
+export function writeDiscoveredBosses(
+  storage: Storage | null | undefined,
+  discovered: Iterable<BossType>,
+): void {
+  if (!storage) return;
+
+  try {
+    const ordered = [...new Set(discovered)];
+    storage.setItem(BOSS_DISCOVERY_STORAGE_KEY, JSON.stringify(ordered));
   } catch {
     // Storage failures should never interrupt gameplay.
   }
@@ -128,6 +171,26 @@ export function recordEnemyDiscovery(
   return newlyDiscovered;
 }
 
+export function recordBossDiscoveries(
+  storage: Storage | null | undefined,
+  bossTypes: Iterable<BossType>,
+): BossType[] {
+  const discovered = readDiscoveredBosses(storage);
+  const newlyDiscovered: BossType[] = [];
+
+  for (const bossType of bossTypes) {
+    if (discovered.has(bossType)) continue;
+    discovered.add(bossType);
+    newlyDiscovered.push(bossType);
+  }
+
+  if (newlyDiscovered.length > 0) {
+    writeDiscoveredBosses(storage, discovered);
+  }
+
+  return newlyDiscovered;
+}
+
 export function notifyNewEnemyDiscoveries(
   storage: Storage | null | undefined,
   enemyTypes: Iterable<ZombieType>,
@@ -136,6 +199,18 @@ export function notifyNewEnemyDiscoveries(
   const newlyDiscovered = recordEnemyDiscovery(storage, enemyTypes);
   for (const enemyType of newlyDiscovered) {
     onDiscovered(enemyType);
+  }
+  return newlyDiscovered;
+}
+
+export function notifyNewBossDiscoveries(
+  storage: Storage | null | undefined,
+  bossTypes: Iterable<BossType>,
+  onDiscovered: (bossType: BossType) => void,
+): BossType[] {
+  const newlyDiscovered = recordBossDiscoveries(storage, bossTypes);
+  for (const bossType of newlyDiscovered) {
+    onDiscovered(bossType);
   }
   return newlyDiscovered;
 }

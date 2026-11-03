@@ -27,16 +27,22 @@ import {
   BOSS_TYPES,
   spawnDevBoss,
 } from '../bosses/BossSystem';
-import { getArenaTheme } from '../arena/ArenaSystem';
 import {
-  PLAYER_MOVEMENT_SPEED,
-  PLAYER_STARTING_DAMAGE,
-  PLAYER_STARTING_SHOTS_PER_SECOND,
-  WAVE_ONE_ENEMY_BUDGET,
+  createArenaLayoutForWave,
+  createArenaObstacles,
+  createExplosiveBarrels,
+} from '../arena/ArenaSystem';
+import {
+  ARENA_TRANSITION_SECONDS,
+  ARENA_INTERACTION_CONFIG,
+  GAME_PROGRESSION_CONFIG,
+  ORB_DROP_SEQUENCE,
+  PLAYER_CONFIG,
+  STANDARD_POINTS_PER_CLEAR,
+  STANDARD_ATTRIBUTE_DEFINITIONS,
+  WAVE_MODIFIER_CONFIG,
+  WAVE_MILESTONE_RARE_POINT_REWARDS,
 } from './GameConfig';
-import type {
-  GameItemType,
-} from './GameState';
 import {
   awardStandardWavePoint,
   buyNormalAttribute,
@@ -47,56 +53,21 @@ import {
   refundRareUpgrade,
   awardRareReward,
   getNormalAttributeValue,
-  STANDARD_ATTRIBUTE_DEFINITIONS,
   type StandardAttributeId,
   type RareUpgradeId,
 } from '../upgrades/ProgressionSystem';
 import {
   getWaveModifierForWave,
-  WAVE_MODIFIER_CONFIG,
   type WaveModifierId,
 } from '../modifiers/WaveModifiers';
 
-export const GAME_PROGRESSION_CONFIG = {
-  baseEnemyBudget: WAVE_ONE_ENEMY_BUDGET,
-  baseSpawnDurationSeconds: 60,
-  additionalSpawnDurationPerWaveSeconds: 10,
-  baseSpawnIntervalSeconds: 1,
-  spawnIntervalDecreasePerWaveSeconds: 0.02,
-  minimumSpawnIntervalSeconds: 0.5,
-  itemLifetimeSeconds: 12,
-  maximumActiveItems: 3,
-  maximumBombInventory: 5,
-  maximumTurretInventory: 5,
-  killsPerOrbDrop: 2,
-  orbPickupRadius: 28,
-  healthOrbRestore: 25,
-  damageEffectSeconds: 10,
-  rapidFireEffectSeconds: 8,
-  shieldEffectSeconds: 12,
-  shieldAmount: 60,
-  bombRadius: 175,
-  bombDamage: 100,
-  damageMultiplier: 2,
-  rapidFireMultiplier: 2,
-} as const;
+export {
+  GAME_PROGRESSION_CONFIG,
+  ORB_DROP_SEQUENCE,
+  WAVE_MILESTONE_RARE_POINT_REWARDS,
+} from './GameConfig';
 
-export const WAVE_MILESTONE_RARE_POINT_REWARDS: Readonly<Record<number, number>> = {
-  20: 1,
-  30: 1,
-  40: 1,
-};
-
-export const ORB_DROP_SEQUENCE: readonly GameItemType[] = [
-  'health',
-  'damage',
-  'rapidFire',
-  'shield',
-  'bomb',
-  'magnet',
-  'turret',
-  'cursed',
-];
+const LAST_ENEMY_RARE_POINT_CHANCE = 0.5;
 
 export function getWaveEnemyBudget(
   waveNumber: number,
@@ -110,7 +81,9 @@ export function getWaveEnemyBudget(
     GAME_PROGRESSION_CONFIG.baseSpawnDurationSeconds +
     (waveNumber - 1) *
       GAME_PROGRESSION_CONFIG.additionalSpawnDurationPerWaveSeconds;
-  return Math.ceil(targetSpawnDuration / getWaveSpawnInterval(waveNumber)) + 1;
+  const originalBudget =
+    Math.ceil(targetSpawnDuration / getWaveSpawnInterval(waveNumber)) + 1;
+  return Math.round(originalBudget * GAME_PROGRESSION_CONFIG.enemyBudgetMultiplier);
 }
 
 export function getWaveSpawnInterval(
@@ -187,12 +160,52 @@ function spawnWaveEnemy(state: GameState): boolean {
   return true;
 }
 
+export function prepareArenaForWave(
+  state: GameState,
+  waveNumber: number,
+  previousLayoutId?: string,
+): void {
+  const layout = createArenaLayoutForWave(
+    waveNumber,
+    previousLayoutId ?? state.wave.lastArenaLayoutId,
+  );
+  state.arenaTheme = layout.theme;
+  state.wave.lastArenaLayoutId = layout.id;
+  state.arenaObstacles = layout.obstacles.map((obstacle) =>
+    obstacle.kind === 'barricade'
+      ? {
+          ...obstacle,
+          health: ARENA_INTERACTION_CONFIG.barricadeHealth,
+          maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
+        }
+      : { ...obstacle },
+  );
+  state.barrels = layout.barrels.map((barrel, index) => ({
+    ...barrel,
+    radius: ARENA_INTERACTION_CONFIG.barrelRadius,
+    health: ARENA_INTERACTION_CONFIG.barrelHealth,
+    maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
+    id: `${barrel.id}-${index}`,
+  }));
+  state.items = state.items.filter(
+    (item) => item.type !== 'rareGold' || item.remainingSeconds > 0,
+  );
+  state.hazards = [];
+  state.impacts = [];
+  state.damageNumbers = [];
+  state.collectionEffects = [];
+}
+
 export function startWave(state: GameState, waveNumber: number): void {
   state.wave.currentWave = waveNumber;
+  state.wave.pendingWaveNumber = waveNumber;
   state.wave.activeModifier = getWaveModifierForWave(waveNumber);
-  state.arenaTheme = getArenaTheme(waveNumber).id;
   state.wave.phase = 'combat';
-  state.wave.enemyBudget = getWaveEnemyBudget(waveNumber, state.gameMode);
+  state.wave.transitionCountdownSeconds = 0;
+  state.arenaTransitionFrom = undefined;
+  state.wave.enemyBudget = state.gameMode === 'level' && waveNumber % 10 === 0
+    ? 0
+    : getWaveEnemyBudget(waveNumber, state.gameMode);
   state.wave.enemiesSpawned = 0;
   state.wave.spawnCooldownSeconds = 0;
   state.wave.lastSpawnCandidateIndex = -1;
@@ -207,7 +220,9 @@ export function startWave(state: GameState, waveNumber: number): void {
   } else {
     beginBossWave(state, waveNumber);
   }
-  state.wave.announcement = `Wave ${waveNumber}`;
+  state.wave.announcement = state.gameMode === 'level'
+    ? `Level ${waveNumber}${waveNumber % 10 === 0 ? ' · BOSS' : ''}`
+    : `Wave ${waveNumber}`;
   state.wave.announcementSeconds = 3;
   state.statistics.highestWaveReached = Math.max(
     state.statistics.highestWaveReached,
@@ -223,6 +238,20 @@ export function advanceWaveProgression(
     0,
     state.wave.announcementSeconds - deltaSeconds,
   );
+
+  if (state.wave.phase === 'intermission') {
+    state.wave.transitionCountdownSeconds = Math.max(
+      0,
+      state.wave.transitionCountdownSeconds - deltaSeconds,
+    );
+    if (state.wave.transitionCountdownSeconds <= 0) {
+      const queuedWave = state.wave.pendingWaveNumber || state.wave.currentWave;
+      state.wave.phase = 'combat';
+      state.wave.transitionCountdownSeconds = 0;
+      startWave(state, queuedWave);
+    }
+    return;
+  }
 
   if (state.wave.phase !== 'combat') return;
 
@@ -362,10 +391,29 @@ export function completeWaveIfCleared(state: GameState): boolean {
   if (!state.progression) {
     state.progression = createRunProgressionState();
   }
-  const awarded = awardStandardWavePoint(state.progression, `wave-clear:${clearedWave}`);
+  const awarded = awardStandardWavePoint(
+    state.progression,
+    `wave-clear:${clearedWave}`,
+    state.gameMode === 'dev'
+      ? 1
+      : state.gameMode === 'level' && !state.levelCompletionRewardEligible
+        ? 0
+        : STANDARD_POINTS_PER_CLEAR,
+  );
   if (awarded) {
     state.statistics.upgradePoints = state.progression.standard.available;
     state.statistics.standardCurrency = { ...state.progression.standard };
+  }
+  if (
+    state.gameMode !== 'dev' &&
+    Math.random() < LAST_ENEMY_RARE_POINT_CHANCE &&
+    awardRareReward(
+      state.progression,
+      `last-enemy-rare-point:${clearedWave}`,
+      1,
+    )
+  ) {
+    state.statistics.rareCurrency = { ...state.progression.rare };
   }
   const rareMilestoneReward = WAVE_MILESTONE_RARE_POINT_REWARDS[clearedWave];
   if (
@@ -388,9 +436,27 @@ export function completeWaveIfCleared(state: GameState): boolean {
     ...state.progression.rareUpgradeUnlocked,
   };
 
-  startWave(state, clearedWave + 1);
-  state.wave.announcement =
-    `Wave ${clearedWave} complete - Wave ${state.wave.currentWave} starting (+1 stat point)`;
+  if (state.gameMode === 'level') {
+    state.wave.phase = 'levelComplete';
+    state.wave.transitionCountdownSeconds = 0;
+    state.wave.announcement = 'LEVEL COMPLETE';
+    state.wave.announcementSeconds = 4;
+    return true;
+  }
+
+  const nextWave = clearedWave + 1;
+  state.arenaTransitionFrom = {
+    obstacles: state.arenaObstacles.map((obstacle) => ({ ...obstacle })),
+    barrels: state.barrels.map((barrel) => ({ ...barrel })),
+    theme: state.arenaTheme,
+  };
+  state.wave.currentWave = nextWave;
+  state.wave.pendingWaveNumber = nextWave;
+  state.wave.phase = 'intermission';
+  state.wave.transitionCountdownSeconds = ARENA_TRANSITION_SECONDS;
+  state.wave.announcement = 'NEW ARENA';
+  state.wave.announcementSeconds = ARENA_TRANSITION_SECONDS;
+  prepareArenaForWave(state, nextWave, state.wave.lastArenaLayoutId);
   return true;
 }
 
@@ -469,10 +535,10 @@ export function adjustRunStat(
     getNormalAttributeValue(
       standardAttribute,
       {
-        damage: PLAYER_STARTING_DAMAGE,
-        shotsPerSecond: PLAYER_STARTING_SHOTS_PER_SECOND,
+        damage: PLAYER_CONFIG.startingDamage,
+        shotsPerSecond: PLAYER_CONFIG.startingShotsPerSecond,
         maxHealth: PLAYER_STARTING_MAX_HEALTH,
-        movementSpeed: PLAYER_MOVEMENT_SPEED,
+        movementSpeed: PLAYER_CONFIG.movementSpeed,
       }[attribute],
       nextLevel,
     ),
