@@ -1,3 +1,9 @@
+import type {
+  ArenaObstacleEntity,
+  ArenaThemeId,
+  ExplosiveBarrelEntity,
+} from '../arena/ArenaSystem';
+
 export interface RenderFrame {
   readonly elapsedSeconds: number;
 }
@@ -14,6 +20,16 @@ export interface RenderActor extends RenderCommand {
 }
 
 export interface RenderLayers {
+  readonly visibility?: {
+    readonly x: number;
+    readonly y: number;
+    readonly radius: number;
+  };
+  readonly arena?: {
+    readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
+    readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+    readonly theme: ArenaThemeId;
+  };
   readonly groundShadows: readonly RenderCommand[];
   readonly pickups: readonly RenderCommand[];
   readonly projectiles: readonly RenderCommand[];

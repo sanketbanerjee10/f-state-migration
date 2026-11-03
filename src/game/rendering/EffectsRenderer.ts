@@ -12,7 +12,7 @@ export interface MuzzleFlashVisualState extends WorldPoint {
 export interface ImpactVisualState extends WorldPoint {
   readonly progress: number;
   readonly critical?: boolean;
-  readonly kind?: 'hit' | 'death' | 'bomb' | 'orbExpiry' | 'spawn' | 'playerDamage';
+  readonly kind?: 'hit' | 'death' | 'bomb' | 'orbExpiry' | 'spawn' | 'playerDamage' | 'telegraph' | 'acid';
   readonly color?: string;
   readonly radius?: number;
 }

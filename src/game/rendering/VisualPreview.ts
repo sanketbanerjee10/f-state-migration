@@ -25,7 +25,7 @@ export function createVisualPreviewLayers(
   aimAngle = -0.22,
 ): RenderLayers {
   const centerX = width / 2;
-  const playerRadius = GAME_VISUAL_CONFIG.entity.playerRadius;
+  const playerRadius = GAME_VISUAL_CONFIG.entity.playerVisualRadius;
   const walkerPositions = [
     { x: width * 0.32, y: height * 0.39 },
     { x: width * 0.73, y: height * 0.62 },

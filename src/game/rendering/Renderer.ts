@@ -41,7 +41,7 @@ export function renderGameScene(
   layers: RenderLayers = EMPTY_RENDER_LAYERS,
 ): void {
   const frame = { elapsedSeconds };
-  renderArena(context, width, height);
+  renderArena(context, width, height, layers.arena);
   renderCommands(context, layers.groundShadows, frame);
   renderCommands(context, layers.pickups, frame);
   renderCommands(context, layers.projectiles, frame);
@@ -53,4 +53,19 @@ export function renderGameScene(
   renderCommands(context, layers.foregroundEffects, frame);
   renderCommands(context, layers.feedback, frame);
   renderCommands(context, layers.debugOverlays, frame);
+  if (layers.visibility) {
+    const { x, y, radius } = layers.visibility;
+    const visibility = context.createRadialGradient(
+      x,
+      y,
+      radius * 0.72,
+      x,
+      y,
+      radius,
+    );
+    visibility.addColorStop(0, 'rgba(7, 12, 10, 0)');
+    visibility.addColorStop(1, 'rgba(7, 12, 10, 0.9)');
+    context.fillStyle = visibility;
+    context.fillRect(0, 0, width, height);
+  }
 }

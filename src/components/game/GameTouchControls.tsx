@@ -2,12 +2,16 @@ import type { RefObject } from 'react';
 
 interface GameTouchControlsProps {
   readonly active: boolean;
+  readonly highlightMovement?: boolean;
+  readonly highlightAim?: boolean;
   readonly movementRef: RefObject<HTMLButtonElement | null>;
   readonly aimRef: RefObject<HTMLButtonElement | null>;
 }
 
 export function GameTouchControls({
   active,
+  highlightMovement = false,
+  highlightAim = false,
   movementRef,
   aimRef,
 }: GameTouchControlsProps) {
@@ -23,7 +27,7 @@ export function GameTouchControls({
         </span>
         <button
           ref={movementRef}
-          className="game-joystick game-joystick-movement"
+          className={`game-joystick game-joystick-movement${highlightMovement ? ' game-joystick-highlighted' : ''}`}
           type="button"
           aria-label="Movement joystick. Drag in a direction to move. WASD or arrow keys also work when focused."
         >
@@ -36,7 +40,7 @@ export function GameTouchControls({
         </span>
         <button
           ref={aimRef}
-          className="game-joystick game-joystick-aim"
+          className={`game-joystick game-joystick-aim${highlightAim ? ' game-joystick-highlighted' : ''}`}
           type="button"
           aria-label="Aim joystick. Drag in a direction to aim. Releasing keeps the last aim direction."
         >

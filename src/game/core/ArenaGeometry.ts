@@ -28,8 +28,9 @@ export function getArenaObstacleBounds(
 export function getArenaObstacles(
   width: number,
   height: number,
+  arenaObstacles: readonly ArenaObstacle[] = ARENA_OBSTACLES,
 ): readonly ArenaRectangle[] {
-  return ARENA_OBSTACLES.map((obstacle) =>
+  return arenaObstacles.map((obstacle) =>
     getArenaObstacleBounds(obstacle, width, height),
   );
 }
@@ -57,8 +58,9 @@ export function findCirclePositionInArena(
   radius: number,
   width: number,
   height: number,
+  arenaObstacles: readonly ArenaObstacle[] = ARENA_OBSTACLES,
 ): { x: number; y: number } {
-  const obstacles = getArenaObstacles(width, height);
+  const obstacles = getArenaObstacles(width, height, arenaObstacles);
   const position = {
     x: Math.min(Math.max(point.x, radius), Math.max(radius, width - radius)),
     y: Math.min(Math.max(point.y, radius), Math.max(radius, height - radius)),
@@ -100,40 +102,69 @@ export function moveCircleInArena(
   deltaY: number,
   width: number,
   height: number,
+  arenaObstacles: readonly ArenaObstacle[] = ARENA_OBSTACLES,
 ): { x: number; y: number } {
-  const obstacles = getArenaObstacles(width, height);
-  const next = findCirclePositionInArena(point, radius, width, height);
-  const candidateX = Math.min(
-    Math.max(next.x + deltaX, radius),
-    Math.max(radius, width - radius),
+  const obstacles = getArenaObstacles(width, height, arenaObstacles);
+  const next = findCirclePositionInArena(
+    point,
+    radius,
+    width,
+    height,
+    arenaObstacles,
   );
-  if (
-    !obstacles.some((obstacle) =>
-      circleOverlapsRectangle(
-        { x: candidateX, y: next.y },
-        radius,
-        obstacle,
-      ),
-    )
-  ) {
-    next.x = candidateX;
-  }
+  const moveAxis = (
+    axis: 'x' | 'y',
+    delta: number,
+    minimum: number,
+    maximum: number,
+  ): void => {
+    const start = next[axis];
+    const end = Math.min(Math.max(start + delta, minimum), maximum);
+    const overlaps = (value: number): boolean => {
+      const candidate = { ...next, [axis]: value };
+      return obstacles.some((obstacle) =>
+        circleOverlapsRectangle(candidate, radius, obstacle),
+      );
+    };
+    if (overlaps(start)) {
+      if (!overlaps(end)) next[axis] = end;
+      return;
+    }
 
-  const candidateY = Math.min(
-    Math.max(next.y + deltaY, radius),
-    Math.max(radius, height - radius),
-  );
-  if (
-    !obstacles.some((obstacle) =>
-      circleOverlapsRectangle(
-        { x: next.x, y: candidateY },
-        radius,
-        obstacle,
-      ),
-    )
-  ) {
-    next.y = candidateY;
-  }
+    let safeFraction = 0;
+    let blockedFraction: number | undefined;
+    const stepCount = Math.max(
+      1,
+      Math.ceil(Math.abs(end - start) / Math.max(radius, 1)),
+    );
+    for (let step = 1; step <= stepCount; step += 1) {
+      const fraction = step / stepCount;
+      if (overlaps(start + (end - start) * fraction)) {
+        blockedFraction = fraction;
+        break;
+      }
+      safeFraction = fraction;
+    }
+    if (blockedFraction === undefined) {
+      next[axis] = end;
+      return;
+    }
+
+    let low = safeFraction;
+    let high = blockedFraction;
+    for (let iteration = 0; iteration < 16; iteration += 1) {
+      const fraction = (low + high) / 2;
+      if (overlaps(start + (end - start) * fraction)) {
+        high = fraction;
+      } else {
+        low = fraction;
+      }
+    }
+    next[axis] = start + (end - start) * low;
+  };
+
+  moveAxis('x', deltaX, radius, Math.max(radius, width - radius));
+  moveAxis('y', deltaY, radius, Math.max(radius, height - radius));
   return next;
 }
 
@@ -177,8 +208,9 @@ export function findNextPathWaypointInArena(
   radius: number,
   width: number,
   height: number,
+  arenaObstacles: readonly ArenaObstacle[] = ARENA_OBSTACLES,
 ): CirclePosition {
-  const obstacles = getArenaObstacles(width, height);
+  const obstacles = getArenaObstacles(width, height, arenaObstacles);
   const padding = radius + 1;
   const isPathClear = (from: CirclePosition, to: CirclePosition): boolean =>
     obstacles.every((obstacle) =>

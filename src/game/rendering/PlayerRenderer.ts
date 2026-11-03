@@ -22,7 +22,7 @@ export function drawPlayer(
   const y = player.y + Math.sin(elapsedSeconds * 8) * movement * 1.2;
   const aimX = Math.cos(player.aimAngle);
   const aimY = Math.sin(player.aimAngle);
-  const radius = entity.playerRadius;
+  const radius = entity.playerVisualRadius;
   const barrelStart = radius * 0.4;
   const barrelEnd = radius + entity.aimMarkerLength * 0.58;
 
@@ -31,17 +31,16 @@ export function drawPlayer(
     { x: player.x + aimX * barrelStart, y: y + aimY * barrelStart },
     { x: player.x + aimX * barrelEnd, y: y + aimY * barrelEnd },
     colors.barrel,
-    7,
+    entity.aimMarkerWidth,
   );
   drawLine(
     context,
-    { x: player.x + aimX * (barrelEnd - 3), y: y + aimY * (barrelEnd - 3) },
-    { x: player.x + aimX * (barrelEnd + 2), y: y + aimY * (barrelEnd + 2) },
+    { x: player.x + aimX * (barrelEnd - 4), y: y + aimY * (barrelEnd - 4) },
+    { x: player.x + aimX * (barrelEnd + 3), y: y + aimY * (barrelEnd + 3) },
     colors.highlight,
-    2,
+    3,
   );
 
-  drawCircle(context, player.x, y, radius * 1.5, { fill: colors.glow });
   drawCircle(context, player.x, y, radius, {
     fill: colors.fill,
     stroke: colors.outline,

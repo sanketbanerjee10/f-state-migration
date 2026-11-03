@@ -4,6 +4,7 @@ import {
   MAX_FRAME_DELTA_SECONDS,
 } from './GameConfig';
 import { KeyboardInput, type MovementVector } from './KeyboardInput';
+import type { GameKeyBindings } from './GameSettings';
 import { MouseAimInput, type ClientPointerPosition } from './MouseAimInput';
 import {
   DualJoystickInput,
@@ -17,14 +18,12 @@ import {
   resizeGameState,
   type GameState,
   type GameStateSnapshot,
-  type RunUpgradeAttribute,
+  type GameMode,
+  type RunStatAttribute,
 } from './GameState';
-import { updateGameState } from './GameSimulation';
-import {
-  confirmNextWave,
-  selectRunUpgrade,
-  skipCappedUpgrades,
-} from './GameProgression';
+import type { RareUpgradeId } from '../upgrades/ProgressionSystem';
+import { placeSupportTurret, updateGameState } from './GameSimulation';
+import { adjustRareUpgrade, adjustRunStat } from './GameProgression';
 import {
   createGameStateRenderLayers,
   getGameEntityCount,
@@ -52,12 +51,17 @@ export class GameEngine {
   private cssWidth = 0;
   private cssHeight = 0;
   private pixelRatio = 1;
+  private prefersReducedMotion = false;
+  private motionPreference: MediaQueryList | null = null;
+  private motionPreferenceListener: ((event: MediaQueryListEvent) => void) | null = null;
   private renderLayers: RenderLayers = EMPTY_RENDER_LAYERS;
   private gameState: GameState | null = null;
+  private gameMode: GameMode = 'standard';
   private readonly keyboardInput = new KeyboardInput();
   private readonly mouseAimInput = new MouseAimInput();
   private readonly dualJoystickInput = new DualJoystickInput();
   private mobileMovement: JoystickVector = { x: 0, y: 0 };
+  private turretPlacementArmed = false;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -83,6 +87,7 @@ export class GameEngine {
       mobileControls ? [mobileControls.movement, mobileControls.aim] : [],
     );
     this.mouseAimInput.attach(this.canvas, this.handleMousePosition);
+    this.canvas.addEventListener('pointerdown', this.handleCanvasPointerDown);
     if (mobileControls) {
       this.dualJoystickInput.attach(
         mobileControls.movement,
@@ -95,6 +100,15 @@ export class GameEngine {
     this.mouseAimInput.setEnabled(false);
     this.dualJoystickInput.setEnabled(false);
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    if (typeof window.matchMedia === 'function') {
+      this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this.prefersReducedMotion = this.motionPreference.matches;
+      this.motionPreferenceListener = (event) => {
+        this.prefersReducedMotion = event.matches;
+        this.render();
+      };
+      this.motionPreference.addEventListener('change', this.motionPreferenceListener);
+    }
   }
 
   resize(width: number, height: number, devicePixelRatio: number): void {
@@ -120,7 +134,11 @@ export class GameEngine {
     const { width: logicalWidth, height: logicalHeight } =
       this.getLogicalViewportSize(width, height);
     if (this.gameState === null) {
-      this.gameState = createGameState(logicalWidth, logicalHeight);
+      this.gameState = createGameState(
+        logicalWidth,
+        logicalHeight,
+        this.gameMode,
+      );
     } else {
       resizeGameState(this.gameState, logicalWidth, logicalHeight);
     }
@@ -131,6 +149,16 @@ export class GameEngine {
     if (this.canvas.width !== backingWidth) this.canvas.width = backingWidth;
     if (this.canvas.height !== backingHeight) this.canvas.height = backingHeight;
 
+    this.render();
+  }
+
+  adjustRareUpgrade(upgradeId: RareUpgradeId, adjustment: -1 | 1): void {
+    this.assertNotDestroyed();
+    if (!this.gameState) {
+      throw new Error('Resize the game canvas before adjusting a rare upgrade.');
+    }
+    adjustRareUpgrade(this.gameState, upgradeId, adjustment);
+    this.refreshRenderLayers();
     this.render();
   }
 
@@ -169,10 +197,12 @@ export class GameEngine {
     this.scheduleFrame();
   }
 
-  reset(): void {
+  reset(gameMode: GameMode = this.gameMode): void {
     this.assertNotDestroyed();
+    this.gameMode = gameMode;
     this.setInputEnabled(false);
     this.mobileMovement = { x: 0, y: 0 };
+    this.turretPlacementArmed = false;
     this.simulatedSeconds = 0;
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
@@ -182,7 +212,11 @@ export class GameEngine {
         this.cssWidth,
         this.cssHeight,
       );
-      this.gameState = createGameState(logicalSize.width, logicalSize.height);
+      this.gameState = createGameState(
+        logicalSize.width,
+        logicalSize.height,
+        this.gameMode,
+      );
     } else {
       this.gameState = null;
     }
@@ -209,32 +243,16 @@ export class GameEngine {
       : null;
   }
 
-  selectUpgrade(attribute: RunUpgradeAttribute): void {
-    this.assertNotDestroyed();
-    if (!this.gameState) {
-      throw new Error('Resize the game canvas before choosing an upgrade.');
-    }
-    selectRunUpgrade(this.gameState, attribute);
-    this.refreshRenderLayers();
-    this.render();
+  setKeyBindings(keyBindings: GameKeyBindings): void {
+    this.keyboardInput.setKeyBindings(keyBindings);
   }
 
-  startNextWave(): void {
+  adjustStat(attribute: RunStatAttribute, adjustment: -1 | 1): void {
     this.assertNotDestroyed();
     if (!this.gameState) {
-      throw new Error('Resize the game canvas before starting a wave.');
+      throw new Error('Resize the game canvas before adjusting a stat.');
     }
-    confirmNextWave(this.gameState);
-    this.refreshRenderLayers();
-    this.render();
-  }
-
-  skipCappedUpgrades(): void {
-    this.assertNotDestroyed();
-    if (!this.gameState) {
-      throw new Error('Resize the game canvas before continuing.');
-    }
-    skipCappedUpgrades(this.gameState);
+    adjustRunStat(this.gameState, attribute, adjustment);
     this.refreshRenderLayers();
     this.render();
   }
@@ -252,14 +270,27 @@ export class GameEngine {
     return this.gameState?.player.aimAngle ?? -0.22;
   }
 
+  isTurretPlacementArmed(): boolean {
+    return this.turretPlacementArmed;
+  }
+
   destroy(): void {
     if (this.isDestroyed) return;
 
     this.pause();
     this.keyboardInput.detach();
     this.mouseAimInput.detach();
+    this.canvas.removeEventListener('pointerdown', this.handleCanvasPointerDown);
     this.dualJoystickInput.detach();
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    if (this.motionPreference && this.motionPreferenceListener) {
+      this.motionPreference.removeEventListener(
+        'change',
+        this.motionPreferenceListener,
+      );
+    }
+    this.motionPreference = null;
+    this.motionPreferenceListener = null;
     this.context = null;
     this.isDestroyed = true;
   }
@@ -310,12 +341,21 @@ export class GameEngine {
     ) return;
 
     const combinedMovement = this.getMovementInput();
+    if (
+      this.keyboardInput.consumeTurretRequest() &&
+      this.gameState.turrets > 0 &&
+      this.gameState.player.alive &&
+      this.gameState.wave.phase === 'combat'
+    ) {
+      this.turretPlacementArmed = true;
+    }
     updateGameState(
       this.gameState,
       {
         movementX: combinedMovement.x,
         movementY: combinedMovement.y,
         aimAngle: this.gameState.player.aimAngle,
+        useBomb: this.keyboardInput.consumeBombRequest(),
       },
       deltaSeconds,
     );
@@ -326,23 +366,53 @@ export class GameEngine {
   private readonly handleMousePosition = (
     position: ClientPointerPosition,
   ): void => {
-    if (this.cssWidth <= 0 || this.cssHeight <= 0) return;
-
-    const bounds = this.canvas.getBoundingClientRect();
-    if (bounds.width <= 0 || bounds.height <= 0) return;
-
-    const logicalSize = this.getLogicalViewportSize(this.cssWidth, this.cssHeight);
-    const worldX = ((position.x - bounds.left) / bounds.width) * logicalSize.width;
-    const worldY = ((position.y - bounds.top) / bounds.height) * logicalSize.height;
+    const worldPosition = this.getWorldPosition(position);
+    if (!worldPosition) return;
     if (this.gameState === null) return;
-    const deltaX = worldX - this.gameState.player.x;
-    const deltaY = worldY - this.gameState.player.y;
+    const deltaX = worldPosition.x - this.gameState.player.x;
+    const deltaY = worldPosition.y - this.gameState.player.y;
     if (deltaX === 0 && deltaY === 0) return;
 
     this.gameState.player.aimAngle = Math.atan2(deltaY, deltaX);
     this.refreshRenderLayers();
     this.render();
   };
+
+  private readonly handleCanvasPointerDown = (event: PointerEvent): void => {
+    if (
+      !this.isActive ||
+      event.button !== 0 ||
+      !this.turretPlacementArmed ||
+      !this.gameState
+    ) {
+      return;
+    }
+    const position = this.getWorldPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+    if (!position) return;
+    if (placeSupportTurret(this.gameState, position.x, position.y)) {
+      this.turretPlacementArmed = false;
+      this.refreshRenderLayers();
+      this.render();
+    }
+  };
+
+  private getWorldPosition(
+    position: ClientPointerPosition,
+  ): PlayerPosition | null {
+    if (this.cssWidth <= 0 || this.cssHeight <= 0) return null;
+
+    const bounds = this.canvas.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) return null;
+
+    const logicalSize = this.getLogicalViewportSize(this.cssWidth, this.cssHeight);
+    return {
+      x: ((position.x - bounds.left) / bounds.width) * logicalSize.width,
+      y: ((position.y - bounds.top) / bounds.height) * logicalSize.height,
+    };
+  }
 
   private readonly handleMobileMovement = (movement: JoystickVector): void => {
     this.mobileMovement = movement;
@@ -366,6 +436,7 @@ export class GameEngine {
 
   private setInputEnabled(enabled: boolean): void {
     const shouldEnable = enabled && !document.hidden;
+    if (!shouldEnable) this.turretPlacementArmed = false;
     this.keyboardInput.setEnabled(shouldEnable);
     this.mouseAimInput.setEnabled(shouldEnable);
     this.dualJoystickInput.setEnabled(shouldEnable);
@@ -396,7 +467,7 @@ export class GameEngine {
       context,
       viewportWidth,
       viewportHeight,
-      this.simulatedSeconds,
+      this.prefersReducedMotion ? 0 : this.simulatedSeconds,
       this.renderLayers,
     );
   }

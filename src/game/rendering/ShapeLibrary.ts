@@ -17,7 +17,10 @@ export type GameSymbol =
   | 'starburst'
   | 'snowflake'
   | 'chevron'
-  | 'star';
+  | 'star'
+  | 'magnet'
+  | 'turret'
+  | 'curse';
 
 function withCanvasState(
   context: CanvasRenderingContext2D,
@@ -260,6 +263,80 @@ export function drawSymbol(
         8,
         { stroke: color, lineWidth },
         Math.PI / 8,
+      );
+      break;
+    case 'magnet':
+      drawLine(
+        context,
+        { x: x - radius * 0.65, y: y - radius * 0.8 },
+        { x: x - radius * 0.65, y: y + radius * 0.15 },
+        color,
+        lineWidth * 1.5,
+      );
+      drawLine(
+        context,
+        { x: x + radius * 0.65, y: y - radius * 0.8 },
+        { x: x + radius * 0.65, y: y + radius * 0.15 },
+        color,
+        lineWidth * 1.5,
+      );
+      drawLine(
+        context,
+        { x: x - radius * 0.65, y: y + radius * 0.15 },
+        { x: x - radius * 0.25, y: y + radius * 0.75 },
+        color,
+        lineWidth * 1.5,
+      );
+      drawLine(
+        context,
+        { x: x + radius * 0.65, y: y + radius * 0.15 },
+        { x: x + radius * 0.25, y: y + radius * 0.75 },
+        color,
+        lineWidth * 1.5,
+      );
+      drawLine(
+        context,
+        { x: x - radius * 0.65, y: y - radius * 0.8 },
+        { x: x - radius * 0.22, y: y - radius * 0.8 },
+        color,
+        lineWidth * 1.5,
+      );
+      drawLine(
+        context,
+        { x: x + radius * 0.22, y: y - radius * 0.8 },
+        { x: x + radius * 0.65, y: y - radius * 0.8 },
+        color,
+        lineWidth * 1.5,
+      );
+      break;
+    case 'turret':
+      drawRoundedRectangle(
+        context,
+        x - radius * 0.55,
+        y - radius * 0.55,
+        radius * 1.1,
+        radius * 1.1,
+        radius * 0.15,
+        { stroke: color, lineWidth },
+      );
+      drawLine(
+        context,
+        { x, y },
+        { x: x + radius * 0.8, y: y - radius * 0.8 },
+        color,
+        lineWidth,
+      );
+      break;
+    case 'curse':
+      drawStarburst(
+        context,
+        x,
+        y,
+        radius,
+        innerRadius * 0.65,
+        5,
+        { stroke: color, lineWidth },
+        Math.PI / 5,
       );
       break;
     case 'snowflake':

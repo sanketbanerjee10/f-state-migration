@@ -3,7 +3,12 @@ import { GAME_VISUAL_CONFIG } from './VisualConfig';
 import type { WorldPoint } from './EntityRenderer';
 import { drawCircle, drawLine, drawRing } from './ShapeLibrary';
 
-export type ProjectileVisualType = 'standard' | 'heavy' | 'critical';
+export type ProjectileVisualType =
+  | 'standard'
+  | 'heavy'
+  | 'critical'
+  | 'turret'
+  | 'spitter';
 
 export interface ProjectileVisualState extends WorldPoint {
   readonly directionX: number;
@@ -30,13 +35,29 @@ export function drawProjectile(
       ? entity.heavyProjectileRadius
       : type === 'critical'
         ? entity.criticalProjectileRadius
-        : entity.projectileRadius
+        : type === 'turret'
+          ? entity.projectileRadius * 0.85
+          : type === 'spitter'
+            ? 5
+          : entity.projectileRadius
   );
-  const trailLength = type === 'heavy' ? 16 : type === 'critical' ? 13 : 10;
+  const trailLength = type === 'heavy'
+    ? 16
+    : type === 'critical'
+      ? 13
+      : type === 'turret'
+        ? 14
+        : type === 'spitter'
+          ? 14
+        : 10;
   const color = type === 'heavy'
     ? GAME_PALETTE.combat.heavyProjectile
     : type === 'critical'
       ? GAME_PALETTE.combat.critical
+      : type === 'turret'
+        ? GAME_PALETTE.combat.turretProjectile
+        : type === 'spitter'
+          ? GAME_PALETTE.combat.spitterProjectile
       : GAME_PALETTE.combat.projectile;
 
   drawLine(
@@ -51,12 +72,20 @@ export function drawProjectile(
     },
     type === 'heavy'
       ? GAME_PALETTE.combat.heavyProjectileTrail
-      : GAME_PALETTE.combat.projectileTrail,
-    type === 'heavy' ? 4 : 2,
+      : type === 'turret'
+        ? GAME_PALETTE.combat.turretProjectileTrail
+        : type === 'spitter'
+          ? GAME_PALETTE.combat.spitterProjectileTrail
+        : GAME_PALETTE.combat.projectileTrail,
+    type === 'heavy' || type === 'turret' || type === 'spitter' ? 4 : 2,
   );
   drawCircle(context, projectile.x, projectile.y, radius, {
     fill: color,
-    stroke: GAME_PALETTE.combat.projectileOutline,
+    stroke: type === 'turret'
+      ? GAME_PALETTE.combat.turretProjectile
+      : type === 'spitter'
+        ? GAME_PALETTE.combat.spitterProjectileOutline
+        : GAME_PALETTE.combat.projectileOutline,
     lineWidth: 1,
   });
 

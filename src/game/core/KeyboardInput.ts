@@ -1,21 +1,19 @@
+import {
+  DEFAULT_GAME_KEY_BINDINGS,
+  LEGACY_ARROW_BINDINGS,
+  type GameKeyBindings,
+} from './GameSettings';
+
 export interface MovementVector {
   readonly x: number;
   readonly y: number;
 }
 
-const MOVEMENT_KEYS = new Set([
-  'KeyW',
-  'ArrowUp',
-  'KeyS',
-  'ArrowDown',
-  'KeyA',
-  'ArrowLeft',
-  'KeyD',
-  'ArrowRight',
-]);
-
 export class KeyboardInput {
   private readonly pressedKeys = new Set<string>();
+  private keyBindings = DEFAULT_GAME_KEY_BINDINGS;
+  private bombRequested = false;
+  private turretRequested = false;
   private elements: HTMLElement[] = [];
   private windowTarget: Window | null = null;
   private isEnabled = true;
@@ -38,20 +36,49 @@ export class KeyboardInput {
   }
 
   getMovement(): MovementVector {
+    const hasActionKey = (action: keyof GameKeyBindings): boolean => {
+      const binding = this.keyBindings[action];
+      const legacyArrow = LEGACY_ARROW_BINDINGS[action];
+      const legacyArrowInUse = legacyArrow !== undefined &&
+        Object.values(this.keyBindings).includes(legacyArrow);
+      return this.pressedKeys.has(binding) ||
+        (legacyArrow !== undefined &&
+          !legacyArrowInUse &&
+          this.pressedKeys.has(legacyArrow));
+    };
     const horizontal =
-      Number(this.pressedKeys.has('KeyD') || this.pressedKeys.has('ArrowRight')) -
-      Number(this.pressedKeys.has('KeyA') || this.pressedKeys.has('ArrowLeft'));
+      Number(hasActionKey('moveRight')) -
+      Number(hasActionKey('moveLeft'));
     const vertical =
-      Number(this.pressedKeys.has('KeyS') || this.pressedKeys.has('ArrowDown')) -
-      Number(this.pressedKeys.has('KeyW') || this.pressedKeys.has('ArrowUp'));
+      Number(hasActionKey('moveDown')) -
+      Number(hasActionKey('moveUp'));
     const magnitude = Math.hypot(horizontal, vertical);
 
     if (magnitude === 0) return { x: 0, y: 0 };
     return { x: horizontal / magnitude, y: vertical / magnitude };
   }
 
+  setKeyBindings(keyBindings: GameKeyBindings): void {
+    this.keyBindings = keyBindings;
+    this.clear();
+  }
+
+  consumeBombRequest(): boolean {
+    const requested = this.bombRequested;
+    this.bombRequested = false;
+    return requested;
+  }
+
+  consumeTurretRequest(): boolean {
+    const requested = this.turretRequested;
+    this.turretRequested = false;
+    return requested;
+  }
+
   clear = (): void => {
     this.pressedKeys.clear();
+    this.bombRequested = false;
+    this.turretRequested = false;
   };
 
   setEnabled(enabled: boolean): void {
@@ -73,15 +100,33 @@ export class KeyboardInput {
 
   private readonly handleKeyDown = (event: Event): void => {
     const keyEvent = event as KeyboardEvent;
+    const supportedKeys = new Set([
+      ...Object.values(this.keyBindings),
+      ...Object.values(LEGACY_ARROW_BINDINGS),
+    ]);
     if (
       !this.isEnabled ||
       keyEvent.isComposing ||
-      !MOVEMENT_KEYS.has(keyEvent.code)
+      !supportedKeys.has(keyEvent.code)
     ) {
       return;
     }
 
     keyEvent.preventDefault();
+    if (
+      keyEvent.code === this.keyBindings.useBomb &&
+      !keyEvent.repeat &&
+      !this.pressedKeys.has(keyEvent.code)
+    ) {
+      this.bombRequested = true;
+    }
+    if (
+      keyEvent.code === this.keyBindings.useTurret &&
+      !keyEvent.repeat &&
+      !this.pressedKeys.has(keyEvent.code)
+    ) {
+      this.turretRequested = true;
+    }
     this.pressedKeys.add(keyEvent.code);
   };
 
