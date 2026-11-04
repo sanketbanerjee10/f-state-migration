@@ -274,7 +274,7 @@ export function CelebrationModal({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '6px',
           width: '100%',
           marginTop: '10px',

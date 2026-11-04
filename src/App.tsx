@@ -1,5 +1,5 @@
 import { useLayoutEffect } from 'react';
-import { Link, Route, Switch, useLocation } from 'wouter';
+import { Route, Switch, useLocation } from 'wouter';
 import { LeadershipLogin } from './pages/LeadershipLogin';
 import { LeadershipDashboard } from './pages/LeadershipDashboard';
 import { LeadershipSettings } from './pages/LeadershipSettings';
@@ -7,12 +7,11 @@ import { ApplicationWizard } from './pages/application/ApplicationWizard';
 import { ApplicationTracker } from './pages/ApplicationTracker';
 import { About565 } from './pages/About565';
 import { GamePage } from './pages/game/GamePage';
+import { NotFound } from './pages/NotFound';
 import { ReturningUserModal } from './components/ReturningUserModal';
 import { Toaster } from './components/ui/sonner';
-import { useTranslation } from 'react-i18next';
 
 function App() {
-  const { t } = useTranslation();
   const [location] = useLocation();
 
   useLayoutEffect(() => {
@@ -53,15 +52,7 @@ function App() {
         <Route path="/apply/:step*" component={ApplicationWizard} />
 
         {/* 404 fallback */}
-        <Route>
-          <main className="form-shell">
-            <h1 className="form-title">{t('pages.notFound.title')}</h1>
-            <p className="intro">{t('pages.notFound.description')}</p>
-            <Link className="button" href="/">
-              {t('common.actions.returnToApplication')}
-            </Link>
-          </main>
-        </Route>
+        <Route component={NotFound} />
       </Switch>
     </>
   );

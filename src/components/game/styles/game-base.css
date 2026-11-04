@@ -1,0 +1,234 @@
+.game-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #17201e;
+}
+
+.game-canvas-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #17201e;
+}
+
+.game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-canvas-playing {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%2314231f' stroke-width='5'/%3E%3Cpath d='M16 1v7m0 16v7M1 16h7m16 0h7' stroke='%2314231f' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23f6d780' stroke-width='2'/%3E%3Cpath d='M16 1v7m0 16v7M1 16h7m16 0h7' stroke='%237be0cb' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23f6d780' stroke='%2314231f' stroke-width='1.5'/%3E%3C/svg%3E") 16 16, crosshair;
+}
+
+.game-canvas:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -4px;
+}
+
+.game-mobile-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: none;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 clamp(14px, 5vw, 48px)
+    calc(14px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+
+.game-mobile-controls-hidden,
+.game-controls-never .game-mobile-controls {
+  display: none !important;
+}
+
+.game-controls-always .game-mobile-controls:not(.game-mobile-controls-hidden) {
+  display: flex;
+}
+
+.game-boss-intro,
+.game-boss-health {
+  min-width: 0;
+  margin: 0;
+}
+
+.game-boss-intro {
+  display: grid;
+  width: 100%;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 1px solid rgba(243, 155, 120, 0.35);
+  border-radius: 6px;
+  background: rgba(60, 32, 27, 0.65);
+}
+
+.game-boss-intro strong {
+  color: #f5b59c;
+  font: 700 12px var(--app-font-mono);
+}
+
+.game-boss-intro-track,
+.game-boss-health-track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(133, 158, 145, 0.2);
+}
+
+.game-boss-health-track {
+  width: 100%;
+}
+
+.game-boss-intro-track span {
+  display: block;
+  height: 100%;
+  background: #f39b78;
+  transition: width 180ms linear;
+}
+
+.game-boss-health {
+  box-sizing: border-box;
+  display: grid;
+  width: min(100%, 240px);
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid rgba(243, 155, 120, 0.3);
+  border-radius: 6px;
+  background: rgba(60, 32, 27, 0.55);
+}
+
+.game-boss-health-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.game-boss-health-label strong {
+  color: #f5b59c;
+  font: 700 11px var(--app-font-mono);
+}
+
+.game-boss-health-label span {
+  color: #d7a18d;
+  font: 600 10px var(--app-font-mono);
+}
+
+.game-boss-health-track span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #e76c59, #f5b16c);
+  transition: width 180ms ease-out;
+}
+
+.game-wave-announcement {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  border: 1px solid rgba(152, 177, 168, 0.36);
+  border-radius: 6px;
+  background: rgba(15, 22, 21, 0.82);
+  color: #f0f7f2;
+  font: 600 clamp(11px, 2.5vw, 16px) var(--app-font-mono);
+  pointer-events: none;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.game-screen {
+  --ah-midnight: #100d35;
+  --ah-purple: #a65bea;
+  --ah-pink: #f477c5;
+  --ah-cream: #fff0c9;
+  --ah-lavender: #d9c9ff;
+  --ah-muted: #c3b8e7;
+  --ah-blue: #51a0eb;
+  --ah-green: #b6f2bd;
+  --ah-peach: #ffc996;
+  --ah-white: #ffffff;
+  --ah-shadow: #08051f;
+  --ah-midnight-rgb: 16 13 53;
+  --ah-purple-rgb: 166 91 234;
+  --ah-pink-rgb: 244 119 197;
+  --ah-cream-rgb: 255 240 201;
+  --ah-lavender-rgb: 217 201 255;
+  --ah-muted-rgb: 195 184 231;
+  --ah-blue-rgb: 81 160 235;
+  --ah-green-rgb: 182 242 189;
+  --ah-peach-rgb: 255 201 150;
+  --ah-white-rgb: 255 255 255;
+  --ah-shadow-rgb: 8 5 31;
+
+  --ocean-arena: #142328;
+  --ocean-background: #1a2b31;
+  --ocean-panel: #20343a;
+  --ocean-elevated: #30474d;
+  --ocean-accent: #82b6b3;
+  --ocean-accent-soft: #9dbfad;
+  --ocean-text: #d5e2da;
+  --ocean-text-secondary: #a4b9b5;
+  --ocean-muted: #819a99;
+  --ocean-border: #42636a;
+  --ocean-warning: #d6b77f;
+  --ocean-danger: #d68e84;
+  --ocean-special: #a8a0c4;
+  --ocean-shadow: rgba(3, 12, 15, 0.42);
+
+  color: var(--ocean-text);
+  background: var(--ocean-arena);
+  font-family: var(--app-font-sans);
+}
+
+.game-canvas-frame {
+  background: var(--ocean-arena);
+}
+
+.game-canvas:focus-visible {
+  outline-color: var(--ocean-accent);
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .game-mobile-controls {
+    display: flex;
+  }
+}
+
+.game-canvas-diagnostics {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 8px;
+  border: 1px solid rgba(152, 177, 168, 0.2);
+  border-radius: 5px;
+  background: rgba(15, 22, 21, 0.82);
+  color: #d3e2da;
+  font: 11px var(--app-font-mono);
+  pointer-events: none;
+}
+
+.game-canvas-error {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  border: 1px solid rgba(203, 111, 103, 0.4);
+  border-radius: 6px;
+  background: rgba(28, 20, 21, 0.94);
+  color: #f0b3ac;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}

@@ -1,41 +1,53 @@
 import { useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { useGameLeaderboard } from '@/lib/gameApi';
+import { GameFranchiseWordmark } from './GameFranchiseWordmark';
 
 const PAGE_SIZE = 10;
 const MAX_LEADERBOARD_OFFSET = 10_000;
 
 interface GameLeaderboardPanelProps {
   readonly onBack?: () => void;
+  readonly backLabel?: string;
 }
 
 function formatSeconds(seconds: number): string {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-export function GameLeaderboardPanel({ onBack }: GameLeaderboardPanelProps) {
+export function GameLeaderboardPanel({
+  onBack,
+  backLabel = 'Back to menu',
+}: GameLeaderboardPanelProps) {
   const [offset, setOffset] = useState(0);
   const leaderboard = useGameLeaderboard({ limit: PAGE_SIZE, offset });
   const page = leaderboard.data;
 
   return (
     <section className="game-leaderboard" aria-labelledby="game-leaderboard-title">
-      <div className="game-leaderboard-heading">
-        <div>
-          <p className="game-panel-eyebrow">All-time rankings</p>
-          <h1 id="game-leaderboard-title">Leaderboard</h1>
+      <header className="game-leaderboard-heading">
+        <div className="game-leaderboard-brand">
+          {onBack && (
+            <button
+              className="game-level-back-button"
+              type="button"
+              onClick={onBack}
+              aria-label={backLabel}
+              autoFocus
+            >
+              <ChevronLeft size={22} aria-hidden="true" />
+            </button>
+          )}
+          <div>
+            <p className="game-dialog-wordmark">
+              <GameFranchiseWordmark />
+            </p>
+            <h1 id="game-leaderboard-title">Leaderboard</h1>
+          </div>
         </div>
-        {onBack && (
-          <button
-            className="game-menu-secondary game-leaderboard-back"
-            type="button"
-            onClick={onBack}
-          >
-            Back
-          </button>
-        )}
-      </div>
+      </header>
       <p className="game-leaderboard-ranking">
-        Ranked by waves cleared, score, zombies eliminated, then survival time.
+        All-time survival records, ranked by waves cleared, score, kills, then time.
       </p>
       {leaderboard.isPending ? (
         <p className="game-leaderboard-message" role="status">
@@ -76,21 +88,32 @@ export function GameLeaderboardPanel({ onBack }: GameLeaderboardPanelProps) {
                 </tr>
               </thead>
               <tbody>
-                {page.items.map((entry, index) => (
-                  <tr key={`${entry.createdAt}-${entry.playerName}-${index}`}>
-                    <td>{offset + index + 1}</td>
-                    <td>
-                      <strong>{entry.playerName}</strong>
-                      <span className="game-leaderboard-reached">
-                        Reached {entry.waveReached}
-                      </span>
-                    </td>
-                    <td>{entry.waveCleared}</td>
-                    <td>{entry.score.toLocaleString()}</td>
-                    <td>{entry.zombiesKilled.toLocaleString()}</td>
-                    <td>{formatSeconds(entry.survivalTime)}</td>
-                  </tr>
-                ))}
+                {page.items.map((entry, index) => {
+                  const rank = offset + index + 1;
+
+                  return (
+                    <tr
+                      className={rank <= 3 ? `game-leaderboard-top-${rank}` : undefined}
+                      key={`${entry.createdAt}-${entry.playerName}-${index}`}
+                    >
+                      <td>
+                        <span className="game-leaderboard-rank">
+                          {String(rank).padStart(2, '0')}
+                        </span>
+                      </td>
+                      <td>
+                        <strong>{entry.playerName}</strong>
+                        <span className="game-leaderboard-reached">
+                          Reached {entry.waveReached}
+                        </span>
+                      </td>
+                      <td>{entry.waveCleared}</td>
+                      <td>{entry.score.toLocaleString()}</td>
+                      <td>{entry.zombiesKilled.toLocaleString()}</td>
+                      <td>{formatSeconds(entry.survivalTime)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

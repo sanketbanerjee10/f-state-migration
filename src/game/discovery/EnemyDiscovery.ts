@@ -23,42 +23,52 @@ export const ENEMY_DISCOVERY_LABELS: Record<ZombieType, string> = {
 };
 
 export const ENEMY_GUIDE_DETAILS: Readonly<Record<ZombieType, {
+  readonly summary: string;
   readonly description: string;
   readonly ability: string;
 }>> = {
   walker: {
+    summary: 'A steady, close-range pursuer.',
     description: 'A slow, steady pursuer that closes in and attacks at close range.',
     ability: 'No special attack. Keep moving so the horde cannot surround you.',
   },
   runner: {
+    summary: 'A fast, fragile attacker.',
     description: 'A fragile but fast zombie that can quickly catch a drifting survivor.',
     ability: 'After 6 seconds at normal speed, dashes at twice its base speed for 2 seconds. It gives no visible warning before charging.',
   },
   brute: {
+    summary: 'A heavily built zombie with high health and melee damage.',
     description: 'A slow, heavily built zombie with more health and a punishing melee hit.',
     ability: 'Heavy contact damage. Avoid letting it reach you.',
   },
   spitter: {
+    summary: 'A ranged attacker that fires acid.',
     description: 'A ranged attacker that tries to hold its ground away from you.',
     ability: 'Fires a fast acid projectile when you are within range.',
   },
   swarm: {
+    summary: 'A group of small, fast attackers.',
     description: 'Small, quick zombies that are easy to overlook in a crowded arena.',
     ability: 'Moves faster than a Runner and dodges incoming shots at double speed, with a 3-second cooldown. After each dodge, it slows to half speed and recovers to normal over 2 seconds.',
   },
   armoured: {
+    summary: 'A durable zombie with reduced frontal damage.',
     description: 'A durable zombie that reduces the damage it deals when facing you.',
     ability: 'Deals less contact damage when its front faces you; avoid direct approaches.',
   },
   screamer: {
+    summary: 'A summoner that calls reinforcements.',
     description: 'A persistent pursuer that is most dangerous when the arena is crowded.',
     ability: 'Calls one walker reinforcement at a time; the Horde Caller summons twice as many.',
   },
   bloater: {
+    summary: 'A tough zombie that leaves an acid hazard.',
     description: 'A slow, tough zombie that leaves a dangerous parting gift.',
     ability: 'Bursts into a damaging acid hazard when defeated.',
   },
   splitter: {
+    summary: 'A zombie that divides into smaller enemies.',
     description: 'A tricky zombie that turns one threat into several.',
     ability: 'Splits into four smaller Swarm zombies when defeated.',
   },

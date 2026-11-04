@@ -1,0 +1,365 @@
+/*
+ * WARNING: This file should not accumulate duplicate menu rules.
+ * Before adding a new selector, check whether an existing rule already covers it
+ * and remove the older copy instead of duplicating the same styling.
+ */
+.game-screen .game-main-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  padding: clamp(24px, 5vw, 76px) clamp(24px, 6vw, 90px);
+  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse at 4% 92%, rgb(var(--ah-blue-rgb) / 18%), transparent 34%),
+    radial-gradient(ellipse at 96% 8%, rgb(var(--ah-blue-rgb) / 14%), transparent 32%),
+    linear-gradient(
+      90deg,
+      rgb(var(--ah-midnight-rgb) / 42%) 0%,
+      rgb(var(--ah-midnight-rgb) / 18%) 35%,
+      transparent 68%
+    ),
+    url('https://ik.imagekit.io/c1tiz3nte/PC%20Cozy%20Moonlit%20Zombie%20Campfire_scene.png')
+      center / cover no-repeat,
+    var(--ah-midnight);
+  box-shadow: none;
+  color: var(--ah-cream);
+  font-family: var(--app-font-sans);
+  text-align: left;
+  transform: none;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-content {
+  width: min(340px, 38vw);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  max-height: 100%;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-brand {
+  margin-bottom: 22px;
+  text-shadow: 0 3px 12px rgb(var(--ah-shadow-rgb) / 80%);
+}
+
+.game-screen .game-main-menu-overlay .game-panel-eyebrow {
+  margin: 0 0 5px;
+  color: #9bd3ff !important;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-brand h1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 0;
+  color: var(--ah-cream);
+  font-family: 'Spicy Sale', var(--app-font-sans);
+  font-size: clamp(38px, 5.3vw, 66px);
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: 0.04em;
+  text-shadow: 3px 4px 0 var(--ah-midnight), 5px 7px 0 rgb(var(--ah-shadow-rgb) / 75%);
+}
+
+.game-franchise-wordmark {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-family: 'Spicy Sale', var(--app-font-sans);
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: 0.04em;
+}
+
+.game-franchise-wordmark .game-brand-last {
+  color: var(--ah-peach);
+}
+
+.game-franchise-wordmark .game-brand-z {
+  color: var(--ah-pink);
+}
+
+.game-franchise-wordmark .game-brand-afterhours {
+  flex-basis: 100%;
+  margin-top: 5px;
+  color: var(--ah-lavender);
+  font-size: 0.73em;
+}
+
+.game-dialog-wordmark {
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 5px;
+  color: var(--ah-cream);
+  font-size: clamp(11px, 1.4vw, 14px);
+  text-shadow: 1px 2px 0 var(--ah-midnight);
+  white-space: nowrap;
+}
+
+.game-dialog-wordmark .game-franchise-wordmark {
+  width: auto;
+  flex-wrap: nowrap;
+}
+
+.game-dialog-wordmark .game-brand-afterhours {
+  flex-basis: auto;
+  margin-top: 0;
+  font-size: 1em;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-tagline {
+  margin: 13px 0 0;
+  color: var(--ah-cream);
+  font-size: clamp(10px, 1.1vw, 13px);
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  text-shadow: 0 2px 6px var(--ah-midnight);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-tagline span {
+  color: var(--ah-green);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 13px;
+  width: 100%;
+  min-height: 43px;
+  padding: 9px 15px;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 32%);
+  border-radius: 13px;
+  color: var(--ah-lavender);
+  font-family: var(--app-font-sans);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.025em;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgb(var(--ah-purple-rgb) / 32%), rgb(var(--ah-midnight-rgb) / 96%));
+  box-shadow: 0 4px 0 rgb(var(--ah-shadow-rgb) / 70%), 0 5px 14px rgb(var(--ah-shadow-rgb) / 35%), inset 0 1px rgb(var(--ah-white-rgb) / 12%);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-button-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 23px;
+  width: 23px;
+  height: 23px;
+  border-radius: 7px;
+  color: var(--ah-lavender);
+  background: rgb(var(--ah-purple-rgb) / 25%);
+  font-size: 15px;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-button-arrow {
+  margin-left: auto;
+  color: var(--ah-lavender);
+  font-size: 23px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions button:hover {
+  transform: translateX(5px);
+  border-color: var(--ah-pink);
+  background: linear-gradient(135deg, rgb(var(--ah-purple-rgb) / 72%), rgb(var(--ah-midnight-rgb) / 98%));
+  box-shadow: 0 5px 0 rgb(var(--ah-shadow-rgb) / 70%), 0 0 17px rgb(var(--ah-purple-rgb) / 25%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions button:hover .game-menu-button-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
+  min-height: 51px;
+  border: 2px solid var(--ah-pink);
+  color: var(--ah-white);
+  background: linear-gradient(135deg, var(--ah-pink), var(--ah-purple) 65%, var(--ah-midnight));
+  box-shadow: 0 4px 0 var(--ah-midnight), 0 0 17px rgb(var(--ah-blue-rgb) / 55%), inset 0 1px rgb(var(--ah-white-rgb) / 40%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary:hover {
+  border-color: var(--ah-white);
+  background: linear-gradient(135deg, var(--ah-pink), var(--ah-purple) 65%, var(--ah-midnight));
+  box-shadow: 0 4px 0 var(--ah-midnight), 0 0 25px rgb(var(--ah-blue-rgb) / 80%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions button:focus-visible {
+  outline: 3px solid var(--ah-peach);
+  outline-offset: 4px;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 25px;
+  color: var(--ah-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  text-shadow: 0 2px 5px var(--ah-midnight);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-footer strong {
+  color: var(--ah-green);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-community-dot {
+  color: var(--ah-lavender);
+  font-size: 16px;
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .game-screen .game-main-menu-overlay {
+    padding: 4vw;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-content {
+    width: min(310px, 38vw);
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-brand h1 {
+    font-size: clamp(36px, 5vw, 52px);
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions {
+    gap: 7px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions button {
+    min-height: 41px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-screen .game-main-menu-overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(var(--ah-midnight-rgb) / 16%),
+        rgb(var(--ah-midnight-rgb) / 12%) 48%,
+        rgb(var(--ah-midnight-rgb) / 30%)
+      ),
+      url('https://ik.imagekit.io/c1tiz3nte/Mobile%20Cozy%20Moonlit%20Campfire%20Night.png')
+        center / cover no-repeat,
+      var(--ah-midnight);
+    padding: max(18px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-content {
+    width: min(340px, 100%);
+    max-height: 100%;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-brand {
+    width: 100%;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-brand h1 {
+    justify-content: center;
+    font-size: clamp(35px, 10vw, 49px);
+  }
+
+  .game-screen .game-main-menu-overlay .game-franchise-wordmark {
+    justify-content: center;
+  }
+
+  .game-screen .game-main-menu-overlay .game-panel-eyebrow {
+    font-size: 9px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-tagline {
+    margin-top: 9px;
+    font-size: 10px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions {
+    width: min(290px, 90%);
+    gap: 7px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions button {
+    min-height: 39px;
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
+    min-height: 44px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-footer {
+    justify-content: center;
+    margin-top: 12px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 380px), (max-height: 650px) {
+  .game-screen .game-main-menu-overlay {
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-brand {
+    margin-bottom: 9px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-brand h1 {
+    font-size: clamp(30px, 9vw, 38px);
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions {
+    gap: 5px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions button {
+    min-height: 35px;
+    padding: 5px 10px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
+    min-height: 39px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-footer {
+    margin-top: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-screen .game-main-menu-overlay .game-menu-actions button,
+  .game-screen .game-main-menu-overlay .game-menu-button-arrow {
+    transition: none;
+  }
+}

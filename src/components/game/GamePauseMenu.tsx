@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from 'react';
+import { SlidersHorizontal, Sparkles } from 'lucide-react';
 import type {
   GameStateSnapshot,
   RunStatAttribute,
@@ -11,17 +12,11 @@ import {
   RARE_UPGRADE_ORDER,
   type RareUpgradeId,
 } from '@/game/upgrades';
-import { GameActiveEffects } from './GameActiveEffects';
-import { GameMusicPlayer } from './GameMusicPlayer';
 import type { GameMenuView } from './GameMenuTypes';
 
 interface GamePauseMenuProps {
   readonly active: boolean;
   readonly gameState: GameStateSnapshot | null;
-  readonly musicTrackName: string;
-  readonly musicPlaying: boolean;
-  readonly musicEnabled: boolean;
-  readonly onToggleMusic: () => void;
   readonly onViewChange: (view: GameMenuView) => void;
   readonly onResume: () => void;
   readonly onAdjustStat: (
@@ -39,13 +34,12 @@ interface GamePauseMenuProps {
 
 type PauseTab = 'stats' | 'rare';
 
+const formatNumber = (value: number) =>
+  value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
 export function GamePauseMenu({
   active,
   gameState,
-  musicTrackName,
-  musicPlaying,
-  musicEnabled,
-  onToggleMusic,
   onViewChange,
   onResume,
   onAdjustStat,
@@ -71,294 +65,435 @@ export function GamePauseMenu({
 
   if (!active) return null;
 
+  const healthPercent = gameState
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          (gameState.player.health / gameState.player.maxHealth) * 100,
+        ),
+      )
+    : 0;
+
   return (
-    <>
-      <p className="game-panel-eyebrow">Take a breather</p>
-      <h1 id="game-paused-title">Game paused</h1>
+    <div className="game-pause-ui">
+      <header className="game-pause-header">
+        <div className="game-pause-heading-copy">
+          <h1 id="game-paused-title">Game paused<span>.</span></h1>
+        </div>
+        <div className="game-pause-moon" aria-hidden="true">
+          <span className="game-pause-moon-halo" />
+          <span className="game-pause-moon-core">☾</span>
+          <span className="game-pause-moon-star game-pause-moon-star-one">✦</span>
+          <span className="game-pause-moon-star game-pause-moon-star-two">·</span>
+        </div>
+      </header>
+
       {gameState && (
-        <>
-          <section
-            className="game-pause-summary"
-            aria-label="Current run statistics"
-          >
-            <div className="game-pause-stat game-pause-stat-primary">
-              <span>WAVE</span>
-              <strong>{String(gameState.wave.currentWave).padStart(2, '0')}</strong>
-            </div>
-            <div className="game-pause-stat game-pause-stat-primary">
-              <span>SCORE</span>
-              <strong>{gameState.score.toLocaleString()}</strong>
-            </div>
-            <div className="game-pause-stat game-pause-stat-vitals">
-              <span>VITALS</span>
-              <strong>
-                {Math.ceil(gameState.player.health)} / {gameState.player.maxHealth}
-              </strong>
-              <span className="game-pause-health-track" aria-hidden="true">
-                <span
-                  style={{
-                    width: `${Math.max(0, Math.min(100, (gameState.player.health / gameState.player.maxHealth) * 100))}%`,
-                  }}
-                />
-              </span>
-            </div>
-            <div className="game-pause-stat">
-              <span>ELIMINATED</span>
-              <strong>{gameState.statistics.zombiesKilled}</strong>
-            </div>
-            <div className="game-pause-stat">
-              <span>HOSTILES</span>
-              <strong>{gameState.zombies.length}</strong>
-            </div>
-            <div className="game-pause-stat">
-              <span>SURVIVAL TIME</span>
-              <strong>
-                {Math.floor(gameState.statistics.survivalSeconds / 60)}:
-                {String(Math.floor(gameState.statistics.survivalSeconds % 60)).padStart(2, '0')}
-              </strong>
-            </div>
-            <div className="game-pause-stat game-pause-stat-supporting">
-              <span>ORBS COLLECTED</span>
-              <strong>{gameState.statistics.orbsCollected}</strong>
-            </div>
-          </section>
-          <div className="game-pause-tabs" role="tablist" aria-label="Pause menu details">
-            <button
-              id="game-pause-stats-tab"
-              className="game-pause-tab"
-              type="button"
-              role="tab"
-              aria-selected={pauseTab === 'stats'}
-              aria-controls="game-pause-stats-panel"
-              tabIndex={pauseTab === 'stats' ? 0 : -1}
-              onClick={() => setPauseTab('stats')}
-              onKeyDown={(event) => handleTabKeyDown(event, 'stats')}
-            >
-              <span>Run Stats</span>
-              <span
-                className="game-pause-tab-points"
-                aria-label={devMode ? 'Unlimited stat points in dev mode' : `${gameState.progression.standard.available} unused stat points`}
+        <div className="game-pause-layout">
+          <aside className="game-pause-sidebar">
+            <section className="game-pause-quick-actions" aria-label="Game actions">
+              <div className="game-pause-section-kicker">
+                <span className="game-pause-kicker-mark" />
+                QUICK ACCESS
+              </div>
+              <button
+                className="game-pause-resume"
+                type="button"
+                onClick={onResume}
+                autoFocus
               >
-                {devMode ? '∞' : gameState.progression.standard.available}
-              </span>
-            </button>
-            <button
-              id="game-pause-rare-tab"
-              className="game-pause-tab"
-              type="button"
-              role="tab"
-              aria-selected={pauseTab === 'rare'}
-              aria-controls="game-pause-rare-panel"
-              tabIndex={pauseTab === 'rare' ? 0 : -1}
-              onClick={() => setPauseTab('rare')}
-              onKeyDown={(event) => handleTabKeyDown(event, 'rare')}
-            >
-              <span>Rare Abilities</span>
-              <span
-                className="game-pause-tab-points game-pause-tab-points-rare"
-                aria-label={devMode ? 'Unlimited rare ability points in dev mode' : `${gameState.progression.rare.available} unused rare ability points`}
-              >
-                {devMode ? '∞' : gameState.progression.rare.available}
-              </span>
-            </button>
-          </div>
-          <div
-            id={`game-pause-${pauseTab}-panel`}
-            className="game-pause-tab-panel"
-            key={pauseTab}
-            role="tabpanel"
-            aria-labelledby={`game-pause-${pauseTab}-tab`}
-            tabIndex={0}
-          >
-            {pauseTab === 'stats' ? (
-              <section className="game-pause-upgrades" aria-label="Spend stat points">
-                <div className="game-pause-upgrades-heading">
-                  <h2>Run stats</h2>
-                  <span aria-live="polite">
-                    {devMode
-                      ? 'Unlimited upgrades · Dev mode'
-                      : `${gameState.progression.standard.available} Stat ${gameState.progression.standard.available === 1 ? 'Point' : 'Points'} Available`}
-                  </span>
-                </div>
-                <div className="game-pause-upgrade-list">
-                  {gameState.statOptions.map((option) => {
-                    const allocated = gameState.statAllocations[option.attribute];
-                    return (
-                      <div
-                        className="game-pause-upgrade-row game-pause-stat-upgrade-row"
-                        key={option.attribute}
-                      >
-                        <div>
-                          <strong>{option.label}</strong>
-                          <span>
-                            {option.currentValue.toLocaleString(undefined, {
-                              maximumFractionDigits: 2,
-                            })}{' '}
-                            {option.unit}
-                            {allocated > 0 && ` · ${allocated} allocated`}
-                          </span>
-                          <span className="game-pause-upgrade-description">
-                            {option.description} Next: {option.nextLevelEffect}
-                            {devMode ? ' · Free in Dev mode' : ` · ${option.cost} SP`}
-                          </span>
-                        </div>
-                        <button
-                          className="game-pause-upgrade-control"
-                          type="button"
-                          aria-label={`Decrease ${option.label}`}
-                          disabled={allocated === 0}
-                          onClick={() => onAdjustStat(option.attribute, -1)}
-                        >
-                          -
-                        </button>
-                        <button
-                          className="game-pause-upgrade-control"
-                          type="button"
-                          aria-label={`Increase ${option.label}`}
-                          disabled={!option.canIncrease || (!devMode && gameState.upgradePoints < option.cost)}
-                          onClick={() => onAdjustStat(option.attribute, 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            ) : (
-              <section className="game-pause-upgrades game-pause-rare-upgrades" aria-label="Rare upgrades">
-                <div className="game-pause-upgrades-heading">
-                  <h2>Rare abilities</h2>
-                  <span aria-live="polite">
-                    {devMode
-                      ? 'Unlimited upgrades · Dev mode'
-                      : `${gameState.progression.rare.available} Rare ${gameState.progression.rare.available === 1 ? 'Point' : 'Points'} Available`}
-                  </span>
-                </div>
-                <div className="game-pause-upgrade-list">
-                  {RARE_UPGRADE_ORDER.map((upgradeId: RareUpgradeId) => {
-                    const definition = RARE_UPGRADE_DEFINITIONS[upgradeId];
-                    const level = gameState.progression.rareUpgradeLevels[upgradeId];
-                    const unlocked = devMode || isRareUpgradeUnlocked(gameState.progression, upgradeId);
-                    const atMaxLevel = !devMode && level >= definition.maxLevel;
-                    const canIncreaseInDev = Number.isSafeInteger(level) && level < Number.MAX_SAFE_INTEGER;
-                    const cost = atMaxLevel ? null : getRareUpgradeCost(upgradeId, level);
-                    const canPurchase =
-                      devMode
-                        ? canIncreaseInDev
-                        : unlocked &&
-                          !atMaxLevel &&
-                          cost !== null &&
-                          gameState.progression.rare.available >= cost;
-                    return (
-                      <div
-                        className="game-pause-upgrade-row game-pause-rare-upgrade-row"
-                        key={upgradeId}
-                      >
-                        <div className="game-pause-rare-upgrade-details">
-                          <strong>
-                            {definition.name}
-                            <span className={`game-pause-upgrade-rarity game-pause-upgrade-rarity-${definition.rarity}`}>
-                              {definition.rarity}
-                            </span>
-                          </strong>
-                          <span className="game-pause-upgrade-description">{definition.description}</span>
-                          <span>
-                            Level {level}/{devMode ? '∞' : definition.maxLevel}
-                            {devMode
-                              ? ' · Unlimited in Dev mode'
-                              : atMaxLevel
-                                ? ' · Max level'
-                                : ` · Next: ${getRareUpgradeNextEffectText(upgradeId, level)} · ${cost} RP`}
-                          </span>
-                          {!unlocked && (
-                            <span className="game-pause-upgrade-lock">
-                              Locked: {definition.unlockText}
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          className="game-pause-upgrade-control"
-                          type="button"
-                          aria-label={`Refund ${definition.name}`}
-                          disabled={level === 0 || !definition.refundable}
-                          onClick={() => onAdjustRareUpgrade(upgradeId, -1)}
-                        >
-                          −
-                        </button>
-                        <button
-                          className="game-pause-upgrade-control"
-                          type="button"
-                          aria-label={`Purchase ${definition.name}`}
-                          disabled={!canPurchase}
-                          onClick={() => onAdjustRareUpgrade(upgradeId, 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-          </div>
-          {gameState.activeEffects.length > 0 && (
-            <section
-              className="game-pause-effects"
-              aria-label="Active effects"
-            >
-              <h2>Active effects</h2>
-              <GameActiveEffects effects={gameState.activeEffects} />
+                <span className="game-pause-resume-symbol" aria-hidden="true">▶</span>
+                <span className="game-pause-resume-copy">
+                  <strong>Resume run</strong>
+                  <small>Jump back into the action</small>
+                </span>
+                <span className="game-pause-resume-key" aria-hidden="true">↵</span>
+              </button>
+
+              <div className="game-pause-action-grid">
+                <button
+                  className="game-pause-action"
+                  type="button"
+                  onClick={() => onViewChange('settings')}
+                >
+                  <span className="game-pause-action-icon" aria-hidden="true">⚙</span>
+                  <span>Settings</span>
+                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+                </button>
+                <button
+                  className="game-pause-action"
+                  type="button"
+                  onClick={() => onViewChange('enemy-guide')}
+                >
+                  <span className="game-pause-action-icon" aria-hidden="true">▤</span>
+                  <span>Field guide</span>
+                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+                </button>
+                {!tutorialMode && (
+                  <button
+                    className="game-pause-action game-pause-action-muted"
+                    type="button"
+                    onClick={onRestart}
+                  >
+                    <span className="game-pause-action-icon" aria-hidden="true">↻</span>
+                    <span>Restart run</span>
+                    <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+                  </button>
+                )}
+                <button
+                  className="game-pause-action game-pause-action-muted"
+                  type="button"
+                  onClick={onReturnToMenu}
+                >
+                  <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
+                  <span>{tutorialMode ? 'Exit tutorial' : 'Main menu'}</span>
+                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+                </button>
+              </div>
             </section>
-          )}
-        </>
+
+            <section
+              className="game-pause-run"
+              aria-label="Current run statistics"
+            >
+              <div className="game-pause-section-kicker">
+                <span className="game-pause-kicker-mark" />
+                CURRENT RUN
+              </div>
+
+              <div className="game-pause-hero-stats">
+                <div className="game-pause-wave-block">
+                  <span className="game-pause-stat-label">WAVE</span>
+                  <strong>{String(gameState.wave.currentWave).padStart(2, '0')}</strong>
+                  <span className="game-pause-stat-foot">The night continues</span>
+                </div>
+                <div className="game-pause-score-block">
+                  <span className="game-pause-stat-label">TOTAL SCORE</span>
+                  <strong>{gameState.score.toLocaleString()}</strong>
+                  <span className="game-pause-stat-foot">Points earned</span>
+                </div>
+              </div>
+
+              <div className="game-pause-vitals">
+                <div className="game-pause-vitals-heading">
+                  <span className="game-pause-stat-label">PLAYER VITALS</span>
+                  <strong>
+                    {Math.ceil(gameState.player.health)}{' '}
+                    <span>/ {gameState.player.maxHealth}</span>
+                  </strong>
+                </div>
+                <div
+                  className="game-pause-health-track"
+                  role="progressbar"
+                  aria-label="Player health"
+                  aria-valuemin={0}
+                  aria-valuemax={gameState.player.maxHealth}
+                  aria-valuenow={Math.max(
+                    0,
+                    Math.min(gameState.player.maxHealth, Math.ceil(gameState.player.health)),
+                  )}
+                >
+                  <span style={{ width: `${healthPercent}%` }} />
+                </div>
+                <span className="game-pause-vitals-caption">
+                  {healthPercent <= 25
+                    ? 'Critical condition — stay sharp'
+                    : healthPercent <= 55
+                      ? 'A little battered, still standing'
+                      : 'Looking good out there'}
+                </span>
+              </div>
+
+              <div className="game-pause-mini-stats">
+                <div className="game-pause-mini-stat">
+                  <span className="game-pause-mini-icon" aria-hidden="true">✕</span>
+                  <span className="game-pause-mini-copy">
+                    <small>ELIMINATED</small>
+                    <strong>{gameState.statistics.zombiesKilled.toLocaleString()}</strong>
+                  </span>
+                </div>
+                <div className="game-pause-mini-stat">
+                  <span className="game-pause-mini-icon game-pause-mini-icon-blue" aria-hidden="true">◷</span>
+                  <span className="game-pause-mini-copy">
+                    <small>SURVIVAL TIME</small>
+                    <strong>
+                      {Math.floor(gameState.statistics.survivalSeconds / 60)}:
+                      {String(Math.floor(gameState.statistics.survivalSeconds % 60)).padStart(2, '0')}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+
+            </section>
+          </aside>
+
+          <main className="game-pause-workspace">
+            <section className="game-pause-upgrade-station">
+              <div className="game-pause-workspace-heading">
+                <div className="game-pause-section-kicker">
+                  <span className="game-pause-kicker-mark" />
+                  SURVIVOR DEVELOPMENT
+                </div>
+              </div>
+
+              <div
+                className={`game-pause-tabs${pauseTab === 'rare' ? ' game-pause-tabs-rare-selected' : ''}`}
+                role="tablist"
+                aria-label="Pause menu details"
+              >
+                <button
+                  id="game-pause-stats-tab"
+                  className="game-pause-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected={pauseTab === 'stats'}
+                  aria-controls="game-pause-stats-panel"
+                  tabIndex={pauseTab === 'stats' ? 0 : -1}
+                  onClick={() => setPauseTab('stats')}
+                  onKeyDown={(event) => handleTabKeyDown(event, 'stats')}
+                >
+                  <span className="game-pause-tab-symbol" aria-hidden="true">
+                    <SlidersHorizontal />
+                  </span>
+                  <span className="game-pause-tab-copy">
+                    <strong>Core attributes</strong>
+                    <small>Fine-tune your survivor's build.</small>
+                  </span>
+                  <span
+                    className="game-pause-tab-points"
+                    aria-label={devMode
+                      ? 'Unlimited stat points in dev mode'
+                      : `${gameState.progression.standard.available} unused stat points`}
+                  >
+                    {devMode ? '∞' : gameState.progression.standard.available}
+                  </span>
+                </button>
+                <button
+                  id="game-pause-rare-tab"
+                  className="game-pause-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected={pauseTab === 'rare'}
+                  aria-controls="game-pause-rare-panel"
+                  tabIndex={pauseTab === 'rare' ? 0 : -1}
+                  onClick={() => setPauseTab('rare')}
+                  onKeyDown={(event) => handleTabKeyDown(event, 'rare')}
+                >
+                  <span className="game-pause-tab-symbol game-pause-tab-symbol-rare" aria-hidden="true">
+                    <Sparkles />
+                  </span>
+                  <span className="game-pause-tab-copy">
+                    <strong>Rare abilities</strong>
+                    <small>Powerful perks for the long nights.</small>
+                  </span>
+                  <span
+                    className="game-pause-tab-points game-pause-tab-points-rare"
+                    aria-label={devMode
+                      ? 'Unlimited rare ability points in dev mode'
+                      : `${gameState.progression.rare.available} unused rare ability points`}
+                  >
+                    {devMode ? '∞' : gameState.progression.rare.available}
+                  </span>
+                </button>
+              </div>
+
+              <div
+                id={`game-pause-${pauseTab}-panel`}
+                className="game-pause-tab-panel"
+                key={pauseTab}
+                role="tabpanel"
+                aria-labelledby={`game-pause-${pauseTab}-tab`}
+                tabIndex={0}
+              >
+                {pauseTab === 'stats' ? (
+                  <section className="game-pause-upgrades" aria-label="Spend stat points">
+                    <div className="game-pause-upgrade-list">
+                      {gameState.statOptions.map((option) => {
+                        const allocated = gameState.statAllocations[option.attribute];
+                        const currentValue = formatNumber(option.currentValue);
+
+                        return (
+                          <article
+                            className="game-pause-upgrade-row game-pause-stat-upgrade-row"
+                            key={option.attribute}
+                          >
+                            <div className="game-pause-upgrade-info">
+                              <div className="game-pause-upgrade-title-line">
+                                <strong>{option.label}</strong>
+                                <span className="game-pause-current-value">
+                                  {currentValue} <small>{option.unit}</small>
+                                </span>
+                              </div>
+                              {allocated > 0 && (
+                                <span className="game-pause-allocation">
+                                  +{allocated} allocated
+                                </span>
+                              )}
+                              <span className="game-pause-upgrade-description">
+                                {option.description}
+                              </span>
+                              <span className="game-pause-upgrade-next">
+                                <span aria-hidden="true">↗</span> Next: {option.nextLevelEffect}
+                                {devMode ? ' · Free in Dev mode' : ` · ${option.cost} SP`}
+                              </span>
+                            </div>
+                            <div className="game-pause-upgrade-controls">
+                              <button
+                                className="game-pause-upgrade-control"
+                                type="button"
+                                aria-label={`Decrease ${option.label}`}
+                                disabled={allocated === 0}
+                                onClick={() => onAdjustStat(option.attribute, -1)}
+                              >
+                                −
+                              </button>
+                              <button
+                                className="game-pause-upgrade-control game-pause-upgrade-increase"
+                                type="button"
+                                aria-label={`Increase ${option.label}`}
+                                disabled={!option.canIncrease || (!devMode && gameState.upgradePoints < option.cost)}
+                                onClick={() => onAdjustStat(option.attribute, 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ) : (
+                  <section className="game-pause-upgrades game-pause-rare-upgrades" aria-label="Rare upgrades">
+                    <div className="game-pause-upgrade-list">
+                      {RARE_UPGRADE_ORDER.map((upgradeId: RareUpgradeId) => {
+                        const definition = RARE_UPGRADE_DEFINITIONS[upgradeId];
+                        const level = gameState.progression.rareUpgradeLevels[upgradeId];
+                        const unlocked = devMode || isRareUpgradeUnlocked(gameState.progression, upgradeId);
+                        const atMaxLevel = !devMode && level >= definition.maxLevel;
+                        const canIncreaseInDev = Number.isSafeInteger(level) && level < Number.MAX_SAFE_INTEGER;
+                        const cost = atMaxLevel ? null : getRareUpgradeCost(upgradeId, level);
+                        const canPurchase = devMode
+                          ? canIncreaseInDev
+                          : unlocked &&
+                            !atMaxLevel &&
+                            cost !== null &&
+                            gameState.progression.rare.available >= cost;
+
+                        return (
+                          <article
+                            className={[
+                              'game-pause-upgrade-row',
+                              'game-pause-rare-upgrade-row',
+                              !unlocked ? 'is-locked' : '',
+                              atMaxLevel ? 'is-maxed' : '',
+                            ].filter(Boolean).join(' ')}
+                            key={upgradeId}
+                          >
+                            <div className="game-pause-upgrade-info game-pause-rare-upgrade-details">
+                              <div className="game-pause-upgrade-title-line">
+                                <strong>{definition.name}</strong>
+                                <span className={`game-pause-upgrade-rarity game-pause-upgrade-rarity-${definition.rarity}`}>
+                                  {definition.rarity}
+                                </span>
+                              </div>
+                              <span className="game-pause-upgrade-description">
+                                {definition.description}
+                              </span>
+                              <span className="game-pause-rare-level">
+                                Level {level}/{devMode ? '∞' : definition.maxLevel}
+                                {devMode
+                                  ? ' · Unlimited in Dev mode'
+                                  : atMaxLevel
+                                    ? ' · Max level'
+                                    : ` · Next: ${getRareUpgradeNextEffectText(upgradeId, level)} · ${cost} RP`}
+                              </span>
+                              {!unlocked && (
+                                <span className="game-pause-upgrade-lock">
+                                  <span aria-hidden="true">▣</span> Locked: {definition.unlockText}
+                                </span>
+                              )}
+                              {atMaxLevel && (
+                                <span className="game-pause-max-level">✦ Maximum level reached</span>
+                              )}
+                            </div>
+                            <div className="game-pause-upgrade-controls">
+                              <button
+                                className="game-pause-upgrade-control"
+                                type="button"
+                                aria-label={`Refund ${definition.name}`}
+                                disabled={level === 0 || !definition.refundable}
+                                onClick={() => onAdjustRareUpgrade(upgradeId, -1)}
+                              >
+                                −
+                              </button>
+                              <button
+                                className="game-pause-upgrade-control game-pause-upgrade-increase"
+                                type="button"
+                                aria-label={`Purchase ${definition.name}`}
+                                disabled={!canPurchase}
+                                onClick={() => onAdjustRareUpgrade(upgradeId, 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+              </div>
+            </section>
+
+          </main>
+        </div>
       )}
-      <div className="game-menu-actions">
-        <button
-          className="game-menu-primary"
-          type="button"
-          onClick={onResume}
-          autoFocus
-        >
-          Resume
-        </button>
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={() => onViewChange('settings')}
-        >
-          Settings
-        </button>
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={() => onViewChange('enemy-guide')}
-        >
-          Guides
-        </button>
-        {!tutorialMode && (
-          <button
-            className="game-menu-secondary"
-            type="button"
-            onClick={onRestart}
-          >
-            Restart run
+
+      {!gameState && (
+        <section className="game-pause-no-run" aria-label="Run unavailable">
+          <span aria-hidden="true">☾</span>
+          <strong>Your next chapter is waiting.</strong>
+          <p>Resume when you're ready to return.</p>
+        </section>
+      )}
+
+      {!gameState && (
+        <div className="game-pause-null-actions">
+          <button className="game-pause-resume" type="button" onClick={onResume} autoFocus>
+            <span className="game-pause-resume-symbol" aria-hidden="true">▶</span>
+            <span className="game-pause-resume-copy">
+              <strong>Resume</strong>
+              <small>Back to the game</small>
+            </span>
           </button>
-        )}
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={onReturnToMenu}
-        >
-          {tutorialMode ? 'Exit tutorial' : 'Main menu'}
-        </button>
-      </div>
-      <GameMusicPlayer
-        trackName={musicTrackName}
-        isPlaying={musicPlaying}
-        musicEnabled={musicEnabled}
-        onToggle={onToggleMusic}
-      />
-    </>
+          <div className="game-pause-action-grid">
+            <button className="game-pause-action" type="button" onClick={() => onViewChange('settings')}>
+              <span className="game-pause-action-icon" aria-hidden="true">⚙</span>
+              <span>Settings</span>
+              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button className="game-pause-action" type="button" onClick={() => onViewChange('enemy-guide')}>
+              <span className="game-pause-action-icon" aria-hidden="true">▤</span>
+              <span>Guides</span>
+              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+            </button>
+            {!tutorialMode && (
+              <button className="game-pause-action" type="button" onClick={onRestart}>
+                <span className="game-pause-action-icon" aria-hidden="true">↻</span>
+                <span>Restart run</span>
+                <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+              </button>
+            )}
+            <button className="game-pause-action" type="button" onClick={onReturnToMenu}>
+              <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
+              <span>{tutorialMode ? 'Exit tutorial' : 'Main menu'}</span>
+              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 }

@@ -1,0 +1,292 @@
+.game-hud {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  left: clamp(12px, 2vw, 24px);
+  z-index: 3;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: min(1400px, calc(100% - 112px));
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ocean-text);
+  pointer-events: none;
+}
+
+.game-hud-stats-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(10px, 1.4vw, 20px);
+  margin: 0;
+}
+
+.game-hud-wave {
+  display: grid;
+  flex: 0 0 auto;
+  justify-items: start;
+  gap: 3px;
+  margin: 0;
+}
+
+.game-hud-wave-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.game-hud-wave strong {
+  color: var(--ocean-text);
+  font: 700 25px/1 var(--app-font-mono);
+  letter-spacing: -0.07em;
+}
+
+.game-hud-wave-progress {
+  position: static;
+  width: clamp(56px, 7vw, 100px);
+  height: 4px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(133, 158, 145, 0.2);
+}
+
+.game-hud-wave-progress span,
+.game-hud-health-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width 180ms ease-out;
+}
+
+.game-hud-wave-progress span {
+  background: linear-gradient(90deg, #39b9d1, #7be0cb);
+  box-shadow: 0 0 12px rgba(74, 211, 190, 0.4);
+}
+
+.game-hud-stats {
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1.4vw, 20px);
+  margin: 0;
+}
+
+.game-hud-health,
+.game-hud-stat {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 0;
+  align-self: center;
+  gap: 5px;
+  margin: 0;
+}
+
+.game-hud-health > strong,
+.game-hud-stat strong {
+  overflow: hidden;
+  color: #edf5f0;
+  font: 600 14px var(--app-font-mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-hud-health > strong span {
+  color: var(--ocean-muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.game-hud-label {
+  color: var(--ocean-muted);
+  font: 600 9px var(--app-font-mono);
+  letter-spacing: 0.12em;
+}
+
+.game-hud-health-track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(133, 158, 145, 0.2);
+}
+
+.game-hud-health-track span {
+  background: linear-gradient(90deg, #43c89a, #a5e77b);
+}
+
+.game-hud-score strong {
+  color: #f6d780;
+}
+
+.game-hud-hostiles strong {
+  color: #f39b78;
+}
+
+.game-hud-bombs strong {
+  color: #f6d780;
+}
+
+.game-hud-turrets strong {
+  color: #79c7bc;
+}
+
+.game-hud-modifier {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 5px 8px;
+  border: 1px solid rgba(214, 183, 127, 0.35);
+  border-radius: 6px;
+  background: rgba(57, 48, 30, 0.48);
+  white-space: nowrap;
+}
+
+.game-hud-modifier strong {
+  color: #f0d7aa;
+  font: 700 11px var(--app-font-mono);
+  letter-spacing: 0.04em;
+}
+
+.game-hud-active-effects {
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.game-hud-effects {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game-hud-effects li {
+  position: relative;
+  gap: 7px;
+  min-height: 28px;
+  padding: 4px 9px;
+  overflow: hidden;
+  border: 1px solid var(--ocean-border);
+  border-radius: 7px;
+  background: rgba(26, 43, 49, 0.84);
+  color: var(--ocean-text-secondary);
+  font: 600 10px var(--app-font-mono);
+  letter-spacing: 0;
+}
+
+.game-effect-icon {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(130, 182, 179, 0.13);
+  color: var(--ocean-accent);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.game-effect-damage .game-effect-icon {
+  color: var(--ocean-danger);
+}
+
+.game-effect-rapidFire .game-effect-icon {
+  color: var(--ocean-warning);
+}
+
+.game-effect-shield .game-effect-icon {
+  color: var(--ocean-accent);
+}
+
+.game-effect-magnet .game-effect-icon {
+  color: #7dd3fc;
+}
+
+.game-effect-magnet .game-effect-duration {
+  background: #7dd3fc;
+}
+
+.game-effect-turret .game-effect-icon {
+  color: var(--ocean-accent-soft);
+}
+
+.game-effect-turret .game-effect-duration {
+  background: var(--ocean-accent-soft);
+}
+
+.game-effect-cursed .game-effect-icon {
+  color: #c08497;
+}
+
+.game-effect-cursed .game-effect-duration {
+  background: #c08497;
+}
+
+.game-effect-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.game-hud-effects strong {
+  color: var(--ocean-text);
+  font-size: 10px;
+}
+
+.game-effect-duration {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--ocean-accent);
+  transition: width 180ms linear;
+}
+
+.game-effect-damage .game-effect-duration {
+  background: var(--ocean-danger);
+}
+
+.game-effect-rapidFire .game-effect-duration {
+  background: var(--ocean-warning);
+}
+
+.game-effect-expiring .game-effect-icon {
+  animation: game-effect-expire-pulse 800ms ease-in-out infinite alternate;
+}
+
+.game-effect-damage .game-effect-icon {
+  animation: game-effect-ring 2s ease-out infinite;
+}
+
+.game-effect-rapidFire .game-effect-icon {
+  animation: game-effect-speed 900ms ease-in-out infinite;
+}
+
+.game-effect-shield .game-effect-icon {
+  animation: game-effect-breathe 2.4s ease-in-out infinite;
+}
+
+.game-hud-compact {
+  padding: 1px 0;
+}

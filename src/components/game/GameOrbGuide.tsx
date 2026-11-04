@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { GameItemType } from '@/game/core/GameState';
 import { drawOrb } from '@/game/rendering/OrbRenderer';
+import { GameGuideDetailDialog } from './GameGuideDetailDialog';
 
 const GAME_ITEM_TYPES = [
   'health',
@@ -17,42 +18,52 @@ const GAME_ITEM_TYPES = [
 const ORB_GUIDE_DETAILS: Readonly<Record<GameItemType, {
   readonly name: string;
   readonly description: string;
+  readonly details: string;
 }>> = {
   health: {
     name: 'Health Orb',
-    description: 'Restores some health, up to your maximum.',
+    description: 'Restores health.',
+    details: 'Restores 25 health, up to your maximum.',
   },
   damage: {
     name: 'Damage Orb',
-    description: 'Increases your projectile damage for a limited time.',
+    description: 'Boosts projectile damage.',
+    details: 'Doubles your projectile damage for a limited time.',
   },
   rapidFire: {
     name: 'Rapid Fire Orb',
-    description: 'Increases your firing speed for a limited time.',
+    description: 'Speeds up your firing rate.',
+    details: 'Doubles your firing rate for a limited time.',
   },
   shield: {
     name: 'Shield Orb',
-    description: 'Adds a shield that absorbs incoming damage for a limited time.',
+    description: 'Absorbs incoming damage.',
+    details: 'Adds a shield that absorbs incoming damage for a limited time.',
   },
   bomb: {
     name: 'Bomb Orb',
-    description: 'Adds one bomb to your inventory. Use your configured bomb key to detonate it.',
+    description: 'Adds an explosive charge to your inventory.',
+    details: 'A bomb damages nearby enemies when detonated.',
   },
   magnet: {
     name: 'Magnet Orb',
-    description: 'Pulls nearby orbs toward you for a limited time.',
+    description: 'Draws nearby orbs toward you.',
+    details: 'Pulls nearby orbs toward you for a limited time.',
   },
   turret: {
     name: 'Turret Orb',
-    description: 'Adds one turret to your inventory. Right-click an open arena spot to deploy it. Each turret fires at nearby enemies for a limited time.',
+    description: 'Deploys an automated turret.',
+    details: 'A deployed turret targets nearby enemies and fires for a limited time.',
   },
   cursed: {
     name: 'Cursed Orb',
-    description: 'Enemies move faster for a limited time, making this a dangerous pickup.',
+    description: 'Makes enemies move faster.',
+    details: 'Increases enemy movement speed for a limited time.',
   },
   rareGold: {
     name: 'Rare Gold Orb',
-    description: 'Grants a Rare Point when collected.',
+    description: 'Awards one Rare Point.',
+    details: 'Grants one Rare Point.',
   },
 };
 
@@ -85,6 +96,7 @@ function GameOrbPortrait({ type }: GameOrbPortraitProps) {
 
   return (
     <div className="game-orb-guide-portrait" aria-hidden="true">
+      <span className="game-orb-guide-orbit" />
       <canvas
         ref={canvasRef}
         className="game-orb-guide-image"
@@ -96,28 +108,60 @@ function GameOrbPortrait({ type }: GameOrbPortraitProps) {
 }
 
 export function GameOrbGuideSection() {
+  const [selectedOrb, setSelectedOrb] = useState<GameItemType | null>(null);
+
   return (
-    <section className="game-orb-guide" aria-labelledby="game-orb-guide-title">
-      <h2 className="game-enemy-guide-section-title" id="game-orb-guide-title">
-        Orbs
-      </h2>
-      <p className="game-orb-guide-intro">
-        Collect orbs during a run to gain their effects.
-      </p>
+    <section
+      className="game-orb-guide game-guide-section"
+      aria-labelledby="game-orb-guide-title"
+    >
+      <div className="game-guide-section-heading">
+        <span className="game-guide-eyebrow">SUPPLIES &amp; POWER-UPS</span>
+        <div className="game-guide-section-heading-row">
+          <div className="game-guide-section-index" aria-hidden="true">01</div>
+          <h2 id="game-orb-guide-title">Orbs</h2>
+        </div>
+        <p className="game-guide-section-description">
+          Useful pickups that can turn the tide of a run.
+        </p>
+      </div>
+
       <div className="game-orb-guide-grid">
         {GAME_ITEM_TYPES.map((type) => {
           const details = ORB_GUIDE_DETAILS[type];
+
           return (
-            <article className="game-orb-guide-card" key={type}>
+            <button
+              className="game-orb-guide-card"
+              type="button"
+              key={type}
+              aria-haspopup="dialog"
+              aria-label={`View ${details.name} details`}
+              onClick={() => setSelectedOrb(type)}
+            >
               <GameOrbPortrait type={type} />
               <div className="game-orb-guide-card-copy">
-                <h2>{details.name}</h2>
+                <div className="game-orb-guide-name">
+                  <h3>{details.name}</h3>
+                  {type === 'rareGold' && (
+                    <span className="game-orb-guide-rare-label">RARE</span>
+                  )}
+                </div>
                 <p>{details.description}</p>
               </div>
-            </article>
+            </button>
           );
         })}
       </div>
+      {selectedOrb && (
+        <GameGuideDetailDialog
+          title={ORB_GUIDE_DETAILS[selectedOrb].name}
+          preview={<GameOrbPortrait type={selectedOrb} />}
+          onClose={() => setSelectedOrb(null)}
+        >
+          <p>{ORB_GUIDE_DETAILS[selectedOrb].details}</p>
+        </GameGuideDetailDialog>
+      )}
     </section>
   );
 }
