@@ -482,10 +482,14 @@ export function createGameState(
   initialStandardPoints = 0,
   levelCompletionRewardEligible = true,
   initialStandardAttributeLevels?: Partial<Record<StandardAttributeId, number>>,
+  initialRarePoints = 0,
 ): GameState {
   assertArenaSize(width, height);
   if (!Number.isSafeInteger(initialStandardPoints) || initialStandardPoints < 0) {
     throw new RangeError('Initial Standard Points must be a non-negative safe integer.');
+  }
+  if (!Number.isSafeInteger(initialRarePoints) || initialRarePoints < 0) {
+    throw new RangeError('Initial Rare Points must be a non-negative safe integer.');
   }
   const playerRadius = GAME_VISUAL_CONFIG.entity.playerRadius;
   const player: PlayerEntity = {
@@ -540,6 +544,11 @@ export function createGameState(
   player.x = playerSpawn.x;
   player.y = playerSpawn.y;
   const progression = createRunProgressionState();
+  progression.rare = {
+    earned: initialRarePoints,
+    available: initialRarePoints,
+    spent: 0,
+  };
   if (gameMode === 'level') {
     for (const attribute of Object.keys(
       progression.standardAttributeLevels,

@@ -24,10 +24,8 @@ import {
   saveLevelCampaignProgress,
 } from '@/game/core/LevelCampaign';
 import type { RareUpgradeId } from '@/game/upgrades';
-import {
-  GameMusicPlayer,
-  type GameMenuMode,
-} from './GameMenuOverlay';
+import type { GameMenuMode } from './GameMenuTypes';
+import { GameMusicPlayer } from './GameMusicPlayer';
 import { GameHud } from './GameHud';
 import { GameMenuOverlay } from './GameMenuOverlay';
 import { GamePauseButton } from './GamePauseButton';
@@ -82,6 +80,7 @@ export function GameCanvas() {
   const currentRunGameModeRef = useRef<GameMode>('survival');
   const currentCampaignLevelIdRef = useRef<number | null>(null);
   const currentCampaignRewardEligibleRef = useRef(true);
+  const currentCampaignStartingRarePointsRef = useRef(0);
   const savedCampaignLevelIdRef = useRef<number | null>(null);
   const { settings, error: settingsError, updateSettings } = useGameSettings();
 
@@ -257,6 +256,7 @@ export function GameCanvas() {
 
   const startRun = (gameMode: GameMode = 'survival', levelId?: number) => {
     let startingStatPoints = 0;
+    let startingRarePoints = 0;
     let startingAttributeLevels:
       | ReturnType<typeof readLevelCampaignProgress>['standardAttributeLevels']
       | undefined;
@@ -268,6 +268,8 @@ export function GameCanvas() {
       }
       saveLevelCampaignProgress(progress);
       startingStatPoints = progress.statPoints;
+      startingRarePoints = progress.rarePoints;
+      currentCampaignStartingRarePointsRef.current = startingRarePoints;
       startingAttributeLevels = progress.standardAttributeLevels;
       currentCampaignRewardEligibleRef.current =
         !progress.completedLevelIds.includes(levelId);
@@ -276,6 +278,7 @@ export function GameCanvas() {
     } else {
       currentCampaignLevelIdRef.current = null;
       currentCampaignRewardEligibleRef.current = false;
+      currentCampaignStartingRarePointsRef.current = 0;
     }
     setOpenLevelSelectionOnMenu(false);
     currentRunGameModeRef.current = gameMode;
@@ -285,6 +288,7 @@ export function GameCanvas() {
       startingStatPoints,
       gameMode === 'level' && currentCampaignRewardEligibleRef.current,
       startingAttributeLevels,
+      startingRarePoints,
     );
     syncGameState();
     setTutorialStepIndex(null);
@@ -396,6 +400,7 @@ export function GameCanvas() {
       startingStatPoints,
       gameMode === 'level' && currentCampaignRewardEligibleRef.current,
       campaignProgress?.standardAttributeLevels,
+      currentCampaignStartingRarePointsRef.current,
     );
     previousAudioEventsRef.current = {
       impacts: new Set(),
@@ -415,6 +420,7 @@ export function GameCanvas() {
     if (!engine) return;
     currentRunGameModeRef.current = 'survival';
     currentCampaignLevelIdRef.current = null;
+    currentCampaignStartingRarePointsRef.current = 0;
     engine.reset('survival');
     engine.pause();
     audioRef.current?.pauseGameplay();
@@ -463,6 +469,7 @@ export function GameCanvas() {
         gameState.statistics.standardCurrency?.available ??
           gameState.upgradePoints,
         gameState.progression.standardAttributeLevels,
+        gameState.statistics.rareCurrency?.available ?? 0,
       );
       saveLevelCampaignProgress(progress);
       savedCampaignLevelIdRef.current = gameState.campaignLevelId;

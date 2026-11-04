@@ -109,6 +109,10 @@ function getDeterministicRoll(firstId: number, secondId: number, salt: number): 
   return value - Math.floor(value);
 }
 
+function getRareUpgradeLevelEffect(values: readonly number[], level: number): number {
+  return values[Math.min(Math.max(0, level), values.length - 1)] ?? 0;
+}
+
 function resolveRareDefensiveTriggers(state: GameState): void {
   const { player, progression } = state;
   const secondWindLevel = progression.rareUpgradeLevels.secondWind;
@@ -121,9 +125,10 @@ function resolveRareDefensiveTriggers(state: GameState): void {
     player.health = Math.max(
       1,
       player.maxHealth *
-        (RARE_UPGRADE_EFFECT_CONFIG.secondWindHealthPercentByLevel[
-          secondWindLevel
-        ] ?? 0),
+        getRareUpgradeLevelEffect(
+          RARE_UPGRADE_EFFECT_CONFIG.secondWindHealthPercentByLevel,
+          secondWindLevel,
+        ),
     );
     player.alive = true;
   }
@@ -139,8 +144,10 @@ function resolveRareDefensiveTriggers(state: GameState): void {
     return;
   }
 
-  const durationSeconds =
-    RARE_UPGRADE_EFFECT_CONFIG.emergencyShieldDurationByLevel[shieldLevel] ?? 0;
+  const durationSeconds = getRareUpgradeLevelEffect(
+    RARE_UPGRADE_EFFECT_CONFIG.emergencyShieldDurationByLevel,
+    shieldLevel,
+  );
   const existingShield = getEffect(state, 'shield');
   if (existingShield) {
     existingShield.remainingSeconds = Math.max(
@@ -364,8 +371,10 @@ function applyZombieDamage(
   zombie.health = Math.max(0, zombie.health - healthDamage);
   if (source === 'weapon' && damageDealt > 0) {
     const lifestealLevel = state.progression.rareUpgradeLevels.lifesteal;
-    const healRatio =
-      RARE_UPGRADE_EFFECT_CONFIG.lifestealPercentByLevel[lifestealLevel] ?? 0;
+    const healRatio = getRareUpgradeLevelEffect(
+      RARE_UPGRADE_EFFECT_CONFIG.lifestealPercentByLevel,
+      lifestealLevel,
+    );
     state.player.health = Math.min(
       state.player.maxHealth,
       state.player.health + damageDealt * healRatio,
@@ -1134,8 +1143,10 @@ function fireProjectile(state: GameState): void {
   const radius = GAME_VISUAL_CONFIG.entity.projectileRadius;
   const spawnDistance = player.radius + radius + 2;
   const criticalLevel = state.progression.rareUpgradeLevels.criticalMastery;
-  const criticalChance =
-    RARE_UPGRADE_EFFECT_CONFIG.criticalChanceByLevel[criticalLevel] ?? 0;
+  const criticalChance = getRareUpgradeLevelEffect(
+    RARE_UPGRADE_EFFECT_CONFIG.criticalChanceByLevel,
+    criticalLevel,
+  );
   const critical =
     getDeterministicRoll(projectileId, 0, 1) < criticalChance;
   const damage = getProjectileDamage(state) * (
@@ -1158,8 +1169,10 @@ function fireProjectile(state: GameState): void {
     ...(piercingLevel > 0
       ? { remainingPierces: piercingLevel, hitZombieIds: [] }
       : {}),
-    explosiveChance:
-      RARE_UPGRADE_EFFECT_CONFIG.explosiveChanceByLevel[explosiveLevel] ?? 0,
+    explosiveChance: getRareUpgradeLevelEffect(
+      RARE_UPGRADE_EFFECT_CONFIG.explosiveChanceByLevel,
+      explosiveLevel,
+    ),
   };
   state.projectiles.push(projectile);
   player.shotsFired += 1;

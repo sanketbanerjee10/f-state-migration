@@ -243,39 +243,43 @@ function drawWalker(
   fill: string,
 ): void {
   const { enemies } = GAME_PALETTE;
-  const lineWidth = GAME_VISUAL_CONFIG.entity.enemyOutlineWidth;
-  drawLine(
-    context,
-    { x: x - radius * 0.58, y: y + radius * 0.35 },
-    { x: x - radius * 1.08, y: y + radius * 0.76 },
-    enemies.limb,
-    lineWidth + 1,
-  );
-  drawLine(
-    context,
-    { x: x + radius * 0.58, y: y + radius * 0.35 },
-    { x: x + radius * 1.08, y: y + radius * 0.76 },
-    enemies.limb,
-    lineWidth + 1,
-  );
-  drawCircle(context, x, y, radius, {
-    fill,
-    stroke: enemies.outline,
-    lineWidth,
-  });
-  drawCircle(context, x - radius * 0.32, y - radius * 0.12, radius * 0.12, {
-    fill: enemies.eye,
-  });
-  drawCircle(context, x + radius * 0.32, y - radius * 0.12, radius * 0.12, {
-    fill: enemies.eye,
-  });
-  drawLine(
-    context,
-    { x: x - radius * 0.2, y: y + radius * 0.38 },
-    { x: x + radius * 0.2, y: y + radius * 0.38 },
-    enemies.outline,
-    1.5,
-  );
+  const lineWidth = GAME_VISUAL_CONFIG.entity.enemyOutlineWidth + 0.3;
+
+  context.save();
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+
+  context.fillStyle = 'rgba(9, 18, 22, 0.18)';
+  context.beginPath();
+  context.ellipse(x, y + radius * 1.08, radius * 0.82, radius * 0.24, 0, 0, Math.PI * 2);
+  context.fill();
+
+  context.fillStyle = fill;
+  context.strokeStyle = enemies.outline;
+  context.lineWidth = lineWidth;
+  context.beginPath();
+  context.ellipse(x, y + radius * 0.12, radius * 1.18, radius * 1.05, -0.2, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+
+  context.fillStyle = 'rgba(255,255,255,0.18)';
+  context.beginPath();
+  context.ellipse(x - radius * 0.28, y - radius * 0.2, radius * 0.3, radius * 0.25, 0, 0, Math.PI * 2);
+  context.fill();
+
+  drawLine(context, { x: x - radius * 0.6, y: y + radius * 0.5 }, { x: x - radius * 0.9, y: y + radius * 1.12 }, enemies.limb, 3);
+  drawLine(context, { x: x + radius * 0.6, y: y + radius * 0.5 }, { x: x + radius * 0.9, y: y + radius * 1.12 }, enemies.limb, 3);
+  drawLine(context, { x: x - radius * 0.3, y: y + radius * 0.95 }, { x: x - radius * 0.18, y: y + radius * 1.35 }, enemies.limb, 3);
+  drawLine(context, { x: x + radius * 0.3, y: y + radius * 0.95 }, { x: x + radius * 0.18, y: y + radius * 1.35 }, enemies.limb, 3);
+
+  const eyeRadius = radius * 0.12;
+  drawCircle(context, x - radius * 0.28, y - radius * 0.06, eyeRadius, { fill: enemies.eye, stroke: enemies.outline, lineWidth: 1.4 });
+  drawCircle(context, x + radius * 0.28, y - radius * 0.06, eyeRadius, { fill: enemies.eye, stroke: enemies.outline, lineWidth: 1.4 });
+  drawCircle(context, x - radius * 0.28, y - radius * 0.06, eyeRadius * 0.36, { fill: enemies.outline });
+  drawCircle(context, x + radius * 0.28, y - radius * 0.06, eyeRadius * 0.36, { fill: enemies.outline });
+  drawLine(context, { x: x - radius * 0.18, y: y + radius * 0.26 }, { x: x + radius * 0.18, y: y + radius * 0.26 }, enemies.outline, 1.7);
+
+  context.restore();
 }
 
 export function drawZombie(

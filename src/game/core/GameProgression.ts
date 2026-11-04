@@ -40,6 +40,7 @@ import {
   GAME_PROGRESSION_CONFIG,
   ORB_DROP_SEQUENCE,
   PLAYER_CONFIG,
+  RARE_UPGRADE_DEFINITIONS,
   STANDARD_POINTS_PER_CLEAR,
   STANDARD_ATTRIBUTE_DEFINITIONS,
   WAVE_MODIFIER_CONFIG,
@@ -494,6 +495,48 @@ export function adjustRunStat(
     (candidate) => candidate.attribute === attribute,
   );
 
+  if (state.gameMode === 'dev') {
+    const level = state.progression.standardAttributeLevels[standardAttribute] ?? 0;
+    const nextLevel = adjustment === 1 ? level + 1 : level - 1;
+    if (
+      !option ||
+      !Number.isSafeInteger(nextLevel) ||
+      nextLevel < 0
+    ) {
+      throw new RangeError(
+        adjustment === 1
+          ? 'That stat has reached the supported numeric limit.'
+          : 'No stat point is allocated to that stat.',
+      );
+    }
+
+    state.progression.standardAttributeLevels[standardAttribute] = nextLevel;
+    const value = adjustment === 1
+      ? option.newValue
+      : getNormalAttributeValue(
+          standardAttribute,
+          {
+            damage: PLAYER_CONFIG.startingDamage,
+            shotsPerSecond: PLAYER_CONFIG.startingShotsPerSecond,
+            maxHealth: PLAYER_STARTING_MAX_HEALTH,
+            movementSpeed: PLAYER_CONFIG.movementSpeed,
+          }[attribute],
+          nextLevel,
+        );
+    applyStatValue(state, attribute, value);
+    state.statistics.upgradePoints = state.progression.standard.available;
+    state.statistics.standardCurrency = { ...state.progression.standard };
+    state.statistics.standardAttributeLevels = {
+      ...state.progression.standardAttributeLevels,
+    };
+    state.statistics.standardAttributeCosts = {
+      ...state.progression.standardAttributeCosts,
+    };
+    state.statistics.statAllocations[attribute] = nextLevel;
+    if (adjustment === 1) state.statistics.upgradesSelected += 1;
+    return;
+  }
+
   if (adjustment === 1) {
     if (!option) {
       throw new RangeError('Unknown stat attribute.');
@@ -576,6 +619,37 @@ export function adjustRareUpgrade(
   }
   if (!state.progression) {
     state.progression = createRunProgressionState();
+  }
+
+  if (state.gameMode === 'dev') {
+    const currentLevel = state.progression.rareUpgradeLevels[upgradeId] ?? 0;
+    const nextLevel = adjustment === 1 ? currentLevel + 1 : currentLevel - 1;
+    if (
+      !Number.isSafeInteger(nextLevel) ||
+      nextLevel < 0 ||
+      (adjustment === -1 && !RARE_UPGRADE_DEFINITIONS[upgradeId].refundable)
+    ) {
+      throw new RangeError(
+        adjustment === 1
+          ? 'That rare upgrade has reached the supported numeric limit.'
+          : 'That rare upgrade cannot be refunded.',
+      );
+    }
+
+    state.progression.rareUpgradeUnlocked[upgradeId] = true;
+    state.progression.rareUpgradeLevels[upgradeId] = nextLevel;
+    state.statistics.rareCurrency = { ...state.progression.rare };
+    state.statistics.rareUpgradeLevels = {
+      ...state.progression.rareUpgradeLevels,
+    };
+    state.statistics.rareUpgradeCosts = {
+      ...state.progression.rareUpgradeCosts,
+    };
+    state.statistics.rareUpgradeUnlocked = {
+      ...state.progression.rareUpgradeUnlocked,
+    };
+    if (adjustment === 1) state.statistics.upgradesSelected += 1;
+    return;
   }
 
   const succeeded = adjustment === 1

@@ -14,11 +14,65 @@ import {
   readDiscoveredBosses,
   readDiscoveredEnemies,
 } from '@/game/discovery/EnemyDiscovery';
+import {
+  ARENA_THEME_CYCLE,
+  createArenaLayoutForWave,
+  createExplosiveBarrels,
+} from '@/game/arena/ArenaSystem';
+import { renderArena } from '@/game/rendering/ArenaRenderer';
 import { drawZombie } from '@/game/rendering/ZombieRenderer';
+import { GameOrbGuideSection } from './GameOrbGuide';
 
 interface GameEnemyGuideProps {
   readonly onBack: () => void;
   readonly backLabel: string;
+}
+
+const ARENA_GUIDE_DETAILS = [
+  'A moonlit outpost with supply crates, sandbag cover, and destructible barricades.',
+  'A heavy industrial floor broken up by concrete structures and reinforced barriers.',
+  'A weathered green zone with scattered cover and dangerous open lanes.',
+  'A ruined city arena where broken walls and cover shape the battlefield.',
+  'A cold underground complex of concrete defenses and tight corridors.',
+] as const;
+
+const ARENA_GUIDE_ENTRIES = ARENA_THEME_CYCLE.map((theme, index) => {
+  const waveNumber = index * 10 + 1;
+  const layout = createArenaLayoutForWave(waveNumber);
+  return {
+    theme,
+    waveNumber,
+    layout,
+    description: ARENA_GUIDE_DETAILS[index]!,
+  };
+});
+
+type ArenaGuideEntry = (typeof ARENA_GUIDE_ENTRIES)[number];
+
+function GameArenaPreview({ entry }: { readonly entry: ArenaGuideEntry }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+
+    renderArena(context, canvas.width, canvas.height, {
+      obstacles: entry.layout.obstacles,
+      barrels: createExplosiveBarrels(entry.waveNumber),
+      theme: entry.theme.id,
+    });
+  }, [entry]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="game-arena-guide-canvas"
+      width={480}
+      height={240}
+      aria-hidden="true"
+    />
+  );
 }
 
 interface GameEnemyPortraitProps {
@@ -116,11 +170,11 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
 
   return (
     <div className="game-enemy-guide">
-      <p className="game-panel-eyebrow">Field intelligence</p>
-      <h1 id="game-enemy-guide-title">Enemy guide</h1>
-      <p className="game-enemy-guide-progress" aria-live="polite">
-        {discoveredCount} / {ENEMY_DISCOVERY_TYPES.length} enemy types identified
-      </p>
+      <h1 id="game-enemy-guide-title">Guides</h1>
+      <GameOrbGuideSection />
+      <h2 className="game-enemy-guide-section-title" aria-live="polite">
+        Enemies <span>({discoveredCount}/{ENEMY_DISCOVERY_TYPES.length} identified)</span>
+      </h2>
       <div className="game-enemy-guide-grid">
         {ENEMY_DISCOVERY_TYPES.map((type) => {
           const discovered = discoveredEnemies.has(type);
@@ -151,10 +205,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
           );
         })}
       </div>
-      <h2 className="game-enemy-guide-section-title">Bosses</h2>
-      <p className="game-enemy-guide-progress" aria-live="polite">
-        {discoveredBossCount} / {BOSS_DISCOVERY_TYPES.length} bosses identified
-      </p>
+      <h2 className="game-enemy-guide-section-title" aria-live="polite">
+        Bosses <span>({discoveredBossCount}/{BOSS_DISCOVERY_TYPES.length} identified)</span>
+      </h2>
       <div className="game-enemy-guide-grid">
         {BOSS_TYPES.map((bossType) => {
           const discovered = discoveredBosses.has(bossType);
@@ -194,6 +247,32 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
           );
         })}
       </div>
+      <section className="game-arena-guide" aria-labelledby="game-arena-guide-title">
+        <h2 className="game-enemy-guide-section-title" id="game-arena-guide-title">
+          Arenas
+        </h2>
+        <p className="game-arena-guide-intro">
+          Five environments rotate through Survival waves, each with varied
+          obstacle layouts.
+        </p>
+        <div className="game-arena-guide-grid">
+          {ARENA_GUIDE_ENTRIES.map((entry) => (
+            <article className="game-arena-guide-card" key={entry.theme.id}>
+              <div className="game-arena-guide-preview">
+                <GameArenaPreview entry={entry} />
+                <span>{entry.layout.name} layout</span>
+              </div>
+              <div className="game-arena-guide-copy">
+                <p className="game-arena-guide-wave">
+                  Waves {entry.waveNumber}–{entry.waveNumber + 9}
+                </p>
+                <h3>{entry.theme.name}</h3>
+                <p>{entry.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
       <p className="game-enemy-guide-note">
         Elite enemies are tougher variants with Fast, Shielded, Regenerating,
         or Explosive traits.

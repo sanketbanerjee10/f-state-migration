@@ -1,4 +1,4 @@
-import { drawCircle, drawLine, drawPolygon } from '../ShapeLibrary';
+import { drawCircle } from '../ShapeLibrary';
 import {
   DEFAULT_ENEMY_APPEARANCE,
   type EnemyAppearance,
@@ -40,35 +40,37 @@ export function drawHead(
   appearance: EnemyAppearance = DEFAULT_ENEMY_APPEARANCE,
 ): void {
   const radius = Math.max(6, head.radius ?? 16) * (appearance.headScale ?? 1);
+  const variant = appearance.variant ?? 'walker';
+  const headWidth = radius * (variant === 'screamer' ? 0.84 : variant === 'bloater' ? 0.72 : 0.9);
+  const headHeight = radius * (variant === 'screamer' ? 1.12 : variant === 'bloater' ? 0.9 : 0.95);
 
   withRotation(context, head.x, head.y, head.rotation ?? 0, () => {
-    const skull = [
-      { x: head.x, y: head.y - radius * 1.2 },
-      { x: head.x + radius * 1.08, y: head.y - radius * 0.18 },
-      { x: head.x + radius * 0.78, y: head.y + radius * 1.08 },
-      { x: head.x - radius * 0.78, y: head.y + radius * 1.08 },
-      { x: head.x - radius * 1.08, y: head.y - radius * 0.18 },
-    ];
+    context.save();
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    context.fillStyle = appearance.bodyColor;
+    context.strokeStyle = appearance.outlineColor;
+    context.lineWidth = 2.2;
 
-    drawPolygon(context, skull, {
-      fill: appearance.bodyColor,
-      stroke: appearance.outlineColor,
-      lineWidth: 2,
-    });
+    context.beginPath();
+    context.ellipse(head.x, head.y, headWidth, headHeight, 0, 0, Math.PI * 2);
+    context.fill();
+    context.stroke();
 
-    drawCircle(context, head.x, head.y + radius * 0.1, radius * 0.76, {
-      fill: appearance.bodyColor,
-      stroke: appearance.outlineColor,
-      lineWidth: 2,
-    });
+    context.fillStyle = 'rgba(255, 255, 255, 0.14)';
+    context.beginPath();
+    context.ellipse(head.x - headWidth * 0.22, head.y - headHeight * 0.2, headWidth * 0.36, headHeight * 0.24, 0, 0, Math.PI * 2);
+    context.fill();
 
-    drawLine(
-      context,
-      { x: head.x - radius * 0.14, y: head.y + radius * 1.12 },
-      { x: head.x + radius * 0.14, y: head.y + radius * 1.12 },
-      appearance.outlineColor,
-      2,
-    );
+    if (variant === 'armoured') {
+      drawCircle(context, head.x, head.y + headHeight * 0.12, headHeight * 0.2, {
+        fill: '#d6c6a8',
+        stroke: appearance.outlineColor,
+        lineWidth: 2,
+      });
+    }
+
+    context.restore();
   });
 }
 

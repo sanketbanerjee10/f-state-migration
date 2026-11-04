@@ -53,34 +53,76 @@ export function GameHud({
       className={`game-hud game-hud-${density}${highlighted ? ' game-hud-highlighted' : ''}`}
       aria-label="Run status"
     >
-      <div className="game-hud-topline">
+      <div className="game-hud-stats-row">
         <div className="game-hud-wave">
-          <span className="game-hud-label">WAVE</span>
-          <strong>{String(gameState.wave.currentWave).padStart(2, '0')}</strong>
+          <div className="game-hud-wave-heading">
+            <span className="game-hud-label">WAVE</span>
+            <strong>{String(gameState.wave.currentWave).padStart(2, '0')}</strong>
+          </div>
+          <div
+            className="game-hud-wave-progress"
+            role="progressbar"
+            aria-label="Wave progress"
+            aria-valuemin={0}
+            aria-valuemax={gameState.wave.enemyBudget}
+            aria-valuenow={zombiesDefeatedThisWave}
+          >
+            <span style={{ width: `${waveProgressPercent}%` }} />
+          </div>
         </div>
-        <div
-          className="game-hud-wave-progress"
-          role="progressbar"
-          aria-label="Wave progress"
-          aria-valuemin={0}
-          aria-valuemax={gameState.wave.enemyBudget}
-          aria-valuenow={zombiesDefeatedThisWave}
-        >
-          <span style={{ width: `${waveProgressPercent}%` }} />
+        <div className="game-hud-stats">
+          <div className="game-hud-health">
+            <strong>
+              {Math.ceil(gameState.player.health)}
+              <span> / {gameState.player.maxHealth}</span>
+            </strong>
+            <div
+              className="game-hud-health-track"
+              role="progressbar"
+              aria-label="Player health"
+              aria-valuemin={0}
+              aria-valuemax={gameState.player.maxHealth}
+              aria-valuenow={Math.ceil(gameState.player.health)}
+            >
+              <span style={{ width: `${healthPercent}%` }} />
+            </div>
+          </div>
+          <div className="game-hud-stat">
+            <span className="game-hud-label">ELIMINATED</span>
+            <strong>{String(gameState.statistics.zombiesKilled).padStart(2, '0')}</strong>
+          </div>
+          <div className="game-hud-stat game-hud-score">
+            <span className="game-hud-label">SCORE</span>
+            <strong>{gameState.score.toLocaleString()}</strong>
+          </div>
+          <div className="game-hud-stat game-hud-hostiles">
+            <span className="game-hud-label">HOSTILES</span>
+            <strong>{gameState.zombies.length}</strong>
+          </div>
+          <div className="game-hud-stat game-hud-bombs">
+            <span className="game-hud-label">BOMBS ({formatGameKeyCode(bombKey)})</span>
+            <strong>{gameState.bombs} / 5</strong>
+          </div>
+          <div className="game-hud-stat game-hud-turrets">
+            <span className="game-hud-label">TURRETS (RIGHT CLICK)</span>
+            <strong>{gameState.turrets} / 5</strong>
+          </div>
         </div>
       </div>
-      {activeModifier && (
+      <div className="game-hud-power-row">
         <div
           className="game-hud-modifier"
           role="status"
-          aria-label={`Wave modifier: ${activeModifier.name}`}
-          title={activeModifier.description}
+          aria-label={`Custom wave power: ${activeModifier?.name ?? 'None'}`}
+          title={activeModifier?.description ?? 'No custom wave power is active.'}
         >
-          <span className="game-hud-label">WAVE MODIFIER</span>
-          <strong>{activeModifier.name}</strong>
-          <span>{activeModifier.description}</span>
+          <span className="game-hud-label">POWER</span>
+          <strong>{activeModifier?.name ?? 'None'}</strong>
         </div>
-      )}
+        <div className="game-hud-active-effects" aria-label="Active player stats">
+          <GameActiveEffects effects={gameState.activeEffects} />
+        </div>
+      </div>
       {bossIntroActive && (
         <div className="game-boss-intro" role="status" aria-live="polite">
           <span className="game-hud-label">BOSS APPROACHING</span>
@@ -127,46 +169,6 @@ export function GameHud({
           </div>
         </div>
       )}
-      <div className="game-hud-stats">
-        <div className="game-hud-health">
-          <span className="game-hud-label">VITALS</span>
-          <strong>
-            {Math.ceil(gameState.player.health)}
-            <span> / {gameState.player.maxHealth}</span>
-          </strong>
-          <div
-            className="game-hud-health-track"
-            role="progressbar"
-            aria-label="Player health"
-            aria-valuemin={0}
-            aria-valuemax={gameState.player.maxHealth}
-            aria-valuenow={Math.ceil(gameState.player.health)}
-          >
-            <span style={{ width: `${healthPercent}%` }} />
-          </div>
-        </div>
-        <div className="game-hud-stat">
-          <span className="game-hud-label">ELIMINATED</span>
-          <strong>{String(gameState.statistics.zombiesKilled).padStart(2, '0')}</strong>
-        </div>
-        <div className="game-hud-stat game-hud-score">
-          <span className="game-hud-label">SCORE</span>
-          <strong>{gameState.score.toLocaleString()}</strong>
-        </div>
-        <div className="game-hud-stat game-hud-hostiles">
-          <span className="game-hud-label">HOSTILES</span>
-          <strong>{gameState.zombies.length}</strong>
-        </div>
-        <div className="game-hud-stat game-hud-bombs">
-          <span className="game-hud-label">BOMBS ({formatGameKeyCode(bombKey)})</span>
-          <strong>{gameState.bombs} / 5</strong>
-        </div>
-        <div className="game-hud-stat game-hud-turrets">
-          <span className="game-hud-label">TURRETS (RIGHT CLICK)</span>
-          <strong>{gameState.turrets} / 5</strong>
-        </div>
-      </div>
-      <GameActiveEffects effects={gameState.activeEffects} />
     </section>
   );
 }

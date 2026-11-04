@@ -56,11 +56,6 @@ const ORB_GUIDE_DETAILS: Readonly<Record<GameItemType, {
   },
 };
 
-interface GameOrbGuideProps {
-  readonly onBack: () => void;
-  readonly backLabel: string;
-}
-
 interface GameOrbPortraitProps {
   readonly type: GameItemType;
 }
@@ -100,11 +95,12 @@ function GameOrbPortrait({ type }: GameOrbPortraitProps) {
   );
 }
 
-export function GameOrbGuide({ onBack, backLabel }: GameOrbGuideProps) {
+export function GameOrbGuideSection() {
   return (
-    <div className="game-orb-guide">
-      <p className="game-panel-eyebrow">Pickup field guide</p>
-      <h1 id="game-orb-guide-title">Orb guide</h1>
+    <section className="game-orb-guide" aria-labelledby="game-orb-guide-title">
+      <h2 className="game-enemy-guide-section-title" id="game-orb-guide-title">
+        Orbs
+      </h2>
       <p className="game-orb-guide-intro">
         Collect orbs during a run to gain their effects.
       </p>
@@ -122,16 +118,6 @@ export function GameOrbGuide({ onBack, backLabel }: GameOrbGuideProps) {
           );
         })}
       </div>
-      <div className="game-menu-actions game-orb-guide-actions">
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={onBack}
-          autoFocus
-        >
-          {backLabel}
-        </button>
-      </div>
-    </div>
+    </section>
   );
 }

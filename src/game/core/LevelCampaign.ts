@@ -29,6 +29,7 @@ export interface LevelCampaignProgress {
   readonly bestTimes: Record<number, number>;
   readonly bestScores: Record<number, number>;
   readonly statPoints: number;
+  readonly rarePoints: number;
   readonly standardAttributeLevels: Record<StandardAttributeId, number>;
 }
 
@@ -93,6 +94,7 @@ export function createDefaultLevelCampaignProgress(): LevelCampaignProgress {
     bestTimes: {},
     bestScores: {},
     statPoints: 0,
+    rarePoints: 0,
     standardAttributeLevels: {
       damage: 0,
       fireRate: 0,
@@ -223,6 +225,16 @@ export function readLevelCampaignProgress(
       Number.isSafeInteger(rawStatPoints) &&
       rawStatPoints >= 0;
   const parsedStatPoints = hasValidStatPoints ? rawStatPoints : 0;
+  const rawRarePoints = parsedRecord?.rarePoints;
+  const hasValidRarePoints = typeof rawRarePoints === 'number' &&
+    Number.isSafeInteger(rawRarePoints) &&
+    rawRarePoints >= 0;
+  const migratedRarePoints = hasValidRarePoints
+    ? rawRarePoints
+    : completedLevelIds.reduce(
+      (total) => total + (Math.random() < 0.5 ? 1 : 0),
+      0,
+    );
   const maximumEarnedStatPoints =
     completedLevelIds.length * STANDARD_POINTS_PER_CLEAR;
   const standardAttributeLevels = readAttributeLevels(
@@ -233,6 +245,13 @@ export function readLevelCampaignProgress(
     0,
     maximumEarnedStatPoints - getSpentAttributePoints(standardAttributeLevels),
   );
+  const hasAllocatedAttributes = Object.values(standardAttributeLevels).some(
+    (level) => level > 0,
+  );
+  const recoveredStatPoints = !hasValidStatPoints ||
+      (parsedStatPoints === 0 && !hasAllocatedAttributes)
+    ? maximumAvailableStatPoints
+    : Math.min(parsedStatPoints, maximumAvailableStatPoints);
   const progress = !hasCompletedLevelData
     ? createDefaultLevelCampaignProgress()
     : {
@@ -242,9 +261,8 @@ export function readLevelCampaignProgress(
         bestTimes: readBestValues(parsedRecord.bestTimes),
         bestScores: readBestValues(parsedRecord.bestScores),
         standardAttributeLevels,
-        statPoints: hasValidStatPoints
-          ? Math.min(parsedStatPoints, maximumAvailableStatPoints)
-          : maximumAvailableStatPoints,
+        statPoints: recoveredStatPoints,
+        rarePoints: migratedRarePoints,
       };
 
   if (raw !== JSON.stringify(progress)) {
@@ -286,6 +304,10 @@ export function saveLevelCampaignProgress(
     statPoints: validStatPoints
       ? Math.min(progress.statPoints, maximumAvailableStatPoints)
       : maximumAvailableStatPoints,
+    rarePoints: Number.isSafeInteger(progress.rarePoints) &&
+        progress.rarePoints >= 0
+      ? progress.rarePoints
+      : 0,
   };
   storage.setItem(
     LEVEL_CAMPAIGN_STORAGE_KEY,
@@ -300,12 +322,16 @@ export function completeLevelProgress(
   elapsedSeconds: number,
   statPoints = progress.statPoints,
   standardAttributeLevels = progress.standardAttributeLevels,
+  rarePoints = progress.rarePoints,
 ): LevelCampaignProgress {
   if (!Number.isInteger(levelId) || levelId < 1 || levelId > LEVEL_CAMPAIGN_SIZE) {
     throw new RangeError(`Level ID must be an integer between 1 and ${LEVEL_CAMPAIGN_SIZE}.`);
   }
   if (!Number.isSafeInteger(statPoints) || statPoints < 0) {
     throw new RangeError('Campaign Stat Points must be a non-negative safe integer.');
+  }
+  if (!Number.isSafeInteger(rarePoints) || rarePoints < 0) {
+    throw new RangeError('Campaign Rare Points must be a non-negative safe integer.');
   }
 
   const completed = new Set(progress.completedLevelIds);
@@ -346,6 +372,7 @@ export function completeLevelProgress(
     bestScores,
     standardAttributeLevels: normalizedAttributeLevels,
     statPoints: statPointBalance,
+    rarePoints,
   };
 }
 

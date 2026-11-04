@@ -205,6 +205,7 @@ export class GameEngine {
     initialStandardPoints = 0,
     levelCompletionRewardEligible = true,
     initialStandardAttributeLevels?: Parameters<typeof createGameState>[6],
+    initialRarePoints = 0,
   ): void {
     this.assertNotDestroyed();
     this.gameMode = gameMode;
@@ -227,6 +228,7 @@ export class GameEngine {
         initialStandardPoints,
         levelCompletionRewardEligible,
         initialStandardAttributeLevels,
+        initialRarePoints,
       );
       if (this.gameMode === 'level' && this.gameState) {
         startWave(this.gameState, this.gameState.wave.currentWave);

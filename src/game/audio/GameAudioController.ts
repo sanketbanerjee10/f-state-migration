@@ -92,24 +92,15 @@ export class GameAudioController {
     this.gameMusicSelected = true;
     if (this.playlist.hasStarted) {
       if (this.settings.musicEnabled && !this.gameplayMusicPaused) {
-        this.playlist.resume();
+        this.playlist.setVolume(0);
+        this.playlist.start(() => this.crossfadeToGameplay());
       }
       this.soundEffects.unlock();
       return;
     }
     if (this.settings.musicEnabled) {
       this.playlist.setVolume(0);
-      this.playlist.start(() => {
-        if (this.disposed || !this.gameplayActive || !this.settings.musicEnabled) return;
-        this.playlist.fadeTo(
-          this.settings.musicVolume,
-          MUSIC_CROSSFADE_MILLISECONDS,
-        );
-        this.menuPlaylist.fadeTo(0, MUSIC_CROSSFADE_MILLISECONDS, () => {
-          this.menuPlaylist.pause();
-          this.menuPlaylist.setVolume(this.settings.musicVolume);
-        });
-      });
+      this.playlist.start(() => this.crossfadeToGameplay());
     }
     this.soundEffects.unlock();
   }
@@ -194,6 +185,18 @@ export class GameAudioController {
     this.playlist.dispose();
     this.menuPlaylist.dispose();
     this.soundEffects.dispose();
+  }
+
+  private crossfadeToGameplay(): void {
+    if (this.disposed || !this.gameplayActive || !this.settings.musicEnabled) return;
+    this.playlist.fadeTo(
+      this.settings.musicVolume,
+      MUSIC_CROSSFADE_MILLISECONDS,
+    );
+    this.menuPlaylist.fadeTo(0, MUSIC_CROSSFADE_MILLISECONDS, () => {
+      this.menuPlaylist.pause();
+      this.menuPlaylist.setVolume(this.settings.musicVolume);
+    });
   }
 
   private readonly handleVisibilityChange = (): void => {

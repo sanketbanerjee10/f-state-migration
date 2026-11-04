@@ -39,61 +39,67 @@ export function drawFace(
   appearance: EnemyAppearance = DEFAULT_ENEMY_APPEARANCE,
 ): void {
   const radius = Math.max(6, face.radius ?? 15) * (appearance.headScale ?? 1);
+  const variant = appearance.variant ?? 'walker';
 
   withRotation(context, face.x, face.y, face.rotation ?? 0, () => {
-    const eyeRadius = radius * 0.12;
-    const leftEye = { x: face.x - radius * 0.3, y: face.y - radius * 0.1 };
-    const rightEye = { x: face.x + radius * 0.3, y: face.y - radius * 0.1 };
+    const eyeRadius = radius * (variant === 'runner' ? 0.11 : 0.13);
+    const eyeY = face.y - radius * 0.08;
+    const leftEyeX = face.x - radius * 0.3;
+    const rightEyeX = face.x + radius * 0.3;
+    const eyeFill = appearance.eyeStyle === 'angry' ? '#F4E9B9' : '#F7EDBE';
 
-    if (appearance.eyeStyle === 'glowing') {
-      drawCircle(context, leftEye.x, leftEye.y, eyeRadius * 1.4, {
-        fill: '#f9fafb',
-        stroke: appearance.outlineColor,
-        lineWidth: 1.5,
-      });
-      drawCircle(context, rightEye.x, rightEye.y, eyeRadius * 1.4, {
-        fill: '#f9fafb',
-        stroke: appearance.outlineColor,
-        lineWidth: 1.5,
-      });
-    } else {
-      drawCircle(context, leftEye.x, leftEye.y, eyeRadius, {
-        fill: appearance.eyeStyle === 'angry' ? '#fef3c7' : '#f8fafc',
-        stroke: appearance.outlineColor,
-        lineWidth: 1,
-      });
-      drawCircle(context, rightEye.x, rightEye.y, eyeRadius, {
-        fill: appearance.eyeStyle === 'angry' ? '#fef3c7' : '#f8fafc',
-        stroke: appearance.outlineColor,
-        lineWidth: 1,
-      });
+    const eyeStyle = { fill: eyeFill, stroke: appearance.outlineColor, lineWidth: 1.7 };
+    drawCircle(context, leftEyeX, eyeY, eyeRadius, eyeStyle);
+    drawCircle(context, rightEyeX, eyeY, eyeRadius, eyeStyle);
+    drawCircle(context, leftEyeX, eyeY, eyeRadius * 0.4, { fill: appearance.outlineColor });
+    drawCircle(context, rightEyeX, eyeY, eyeRadius * 0.4, { fill: appearance.outlineColor });
+
+    if (appearance.eyeStyle === 'angry') {
+      drawLine(
+        context,
+        { x: leftEyeX - radius * 0.18, y: eyeY - radius * 0.14 },
+        { x: leftEyeX + radius * 0.12, y: eyeY - radius * 0.22 },
+        appearance.outlineColor,
+        2,
+      );
+      drawLine(
+        context,
+        { x: rightEyeX - radius * 0.12, y: eyeY - radius * 0.22 },
+        { x: rightEyeX + radius * 0.18, y: eyeY - radius * 0.14 },
+        appearance.outlineColor,
+        2,
+      );
     }
 
     if (appearance.mouthStyle === 'closed') {
       drawLine(
         context,
-        { x: face.x - radius * 0.28, y: face.y + radius * 0.4 },
-        { x: face.x + radius * 0.28, y: face.y + radius * 0.4 },
+        { x: face.x - radius * 0.24, y: face.y + radius * 0.26 },
+        { x: face.x + radius * 0.24, y: face.y + radius * 0.26 },
         appearance.outlineColor,
         2,
       );
     } else if (appearance.mouthStyle === 'open') {
-      drawCircle(context, face.x, face.y + radius * 0.5, radius * 0.2, {
-        fill: appearance.outlineColor,
-      });
+      context.save();
+      context.lineCap = 'round';
+      context.strokeStyle = appearance.outlineColor;
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(face.x, face.y + radius * 0.26, radius * 0.22, 0.2, Math.PI - 0.2);
+      context.stroke();
+      context.restore();
     } else {
-      const fangLength = radius * 0.32;
       drawLine(
         context,
-        { x: face.x - radius * 0.22, y: face.y + radius * 0.2 },
-        { x: face.x - radius * 0.14, y: face.y + fangLength },
+        { x: face.x - radius * 0.22, y: face.y + radius * 0.18 },
+        { x: face.x - radius * 0.12, y: face.y + radius * 0.42 },
         appearance.outlineColor,
         2,
       );
       drawLine(
         context,
-        { x: face.x + radius * 0.22, y: face.y + radius * 0.2 },
-        { x: face.x + radius * 0.14, y: face.y + fangLength },
+        { x: face.x + radius * 0.22, y: face.y + radius * 0.18 },
+        { x: face.x + radius * 0.12, y: face.y + radius * 0.42 },
         appearance.outlineColor,
         2,
       );

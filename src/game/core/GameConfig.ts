@@ -194,8 +194,8 @@ export const WAVE_ENEMY_INTRODUCTIONS = [
 ] as const;
 
 export const WAVE_COMPOSITION_CONFIG = {
-  developmentEnemyGroupSize: 4,
-  developmentBossGroupSize: 2,
+  developmentEnemyGroupSize: 2,
+  developmentBossGroupSize: 1,
   developmentBossGroupCount: 3,
   eliteIntroductionWave: 18,
   bossWaveMilestones: [10, 20],
