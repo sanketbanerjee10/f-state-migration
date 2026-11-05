@@ -538,7 +538,12 @@ export function GameCanvas() {
     if (!hasStarted || isTerminalPhase) return;
 
     const handlePauseShortcut = (event: KeyboardEvent) => {
-      if (event.code !== 'Escape' || event.repeat) return;
+      if (
+        (event.code !== 'Escape' && event.code !== 'KeyP') ||
+        event.repeat
+      ) {
+        return;
+      }
       event.preventDefault();
       if (isPaused) resumeRun();
       else pauseRun();
@@ -604,7 +609,7 @@ export function GameCanvas() {
           : '',
       ].filter(Boolean).join(' ')}
       tabIndex={0}
-        aria-label="565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key to use one. Collect up to five turrets, then right-click an open spot in the arena to place one."
+        aria-label="565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key or the touch bomb button to use one. Collect up to five turrets, then right-click or double-tap an open spot in the arena to place one."
         onPointerDown={(event) => event.currentTarget.focus()}
       >
         Canvas rendering is not supported by this browser.
@@ -615,6 +620,7 @@ export function GameCanvas() {
           !isPaused &&
           gameState?.wave.phase === 'combat'
         }
+        bombs={gameState?.bombs ?? 0}
         highlightMovement={
           tutorialStepIndex !== null &&
           GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'movement'
@@ -623,6 +629,7 @@ export function GameCanvas() {
           tutorialStepIndex !== null &&
           GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'aim'
         }
+        onUseBomb={() => engineRef.current?.requestBomb()}
         movementRef={movementJoystickRef}
         aimRef={aimJoystickRef}
       />
@@ -630,7 +637,6 @@ export function GameCanvas() {
         <GameHud
           gameState={gameState}
           density={settings.hudDensity}
-          bombKey={settings.keyBindings.useBomb}
           highlighted={
             tutorialStepIndex !== null &&
             GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'hud'

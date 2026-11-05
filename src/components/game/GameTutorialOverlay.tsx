@@ -61,7 +61,7 @@ export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
     id: 'hud',
     title: 'Read the HUD',
     description:
-      'Wave and progress are at the top; Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Right-click an open spot to deploy a turret. Collected temporary effects appear beneath them.',
+      'Wave, Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Use the bomb key or touch bomb button to use a bomb. Right-click or double-tap an open spot to deploy a turret. Collected temporary effects appear beneath the HUD.',
     action: null,
     highlight: 'hud',
     simulate: false,
@@ -88,7 +88,7 @@ export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
     id: 'powerups',
     title: 'Power-up orbs',
     description:
-      'Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key shown on the HUD to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, then right-click an open spot to place one for 12 seconds.',
+      'Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key or touch bomb button to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, then right-click or double-tap an open spot to place one for 12 seconds.',
     action: null,
     highlight: 'hud',
     simulate: false,
@@ -97,7 +97,7 @@ export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
     id: 'collect-orb',
     title: 'Collect an orb',
     description:
-      'Walk over an orb to collect it. Orbs drop after every two zombie eliminations; follow a glowing orb and collect one to see its effect. Bombs are stored until you press the bomb key shown on the HUD.',
+      'Walk over an orb to collect it. Orbs drop after every two zombie eliminations; follow a glowing orb and collect one to see its effect. Bombs are stored until you press the bomb key or touch bomb button.',
     action: 'orb',
     highlight: 'orb',
     simulate: true,

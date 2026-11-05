@@ -17,6 +17,13 @@ export const GAME_RUNTIME_CONFIG = {
   maximumFrameDeltaSeconds: 0.05,
 } as const;
 
+export const GAME_RESPONSIVE_ZOOM_CONFIG = {
+  portraitAspectRatio: 0.8,
+  landscapeAspectRatio: 1.3,
+  portraitZoom: 1.35,
+  landscapeZoom: 0.82,
+} as const;
+
 export const PLAYER_CONFIG = {
   movementSpeed: 165,
   startingHealth: 100,

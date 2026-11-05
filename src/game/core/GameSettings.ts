@@ -71,7 +71,7 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
   keyBindings: DEFAULT_GAME_KEY_BINDINGS,
   musicEnabled: true,
   soundEnabled: true,
-  musicVolume: 0.25,
+  musicVolume: 0.5,
   soundVolume: 0.5,
 };
 

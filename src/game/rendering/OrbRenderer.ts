@@ -110,6 +110,26 @@ const RARITY_COLORS: Record<OrbRarity, string> = {
   special: GAME_PALETTE.orbs.rareGold,
 };
 
+export function drawOrbGlyph(
+  context: CanvasRenderingContext2D,
+  type: OrbVisualType,
+  x: number,
+  y: number,
+  size: number,
+): void {
+  const style = ORB_STYLE[type];
+  drawOrbSymbol(
+    context,
+    type,
+    x,
+    y,
+    size,
+    style.symbolColor,
+    style.outlineColor ?? GAME_PALETTE.orbs.symbolOutline,
+    style.accentColor ?? style.rimColor,
+  );
+}
+
 export function drawOrb(
   context: CanvasRenderingContext2D,
   orb: OrbVisualState,
@@ -161,15 +181,12 @@ export function drawOrb(
   } finally {
     context.restore();
   }
-  drawOrbSymbol(
+  drawOrbGlyph(
     context,
     orb.type,
     orb.x,
     orb.y,
     shellRadius * style.symbolScale,
-    style.symbolColor,
-    style.outlineColor ?? GAME_PALETTE.orbs.symbolOutline,
-    style.accentColor ?? style.rimColor,
   );
 
   if (life > 0) {

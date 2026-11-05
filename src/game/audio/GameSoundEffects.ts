@@ -40,6 +40,8 @@ interface SoundCueConfig {
   readonly pitchVariation?: number;
 }
 
+const MAX_SOUND_EFFECTS_VOLUME = 0.12;
+
 const SOUND_CUES: Record<GameSoundCue, SoundCueConfig> = {
   collection: {
     duration: 0.16,
@@ -215,7 +217,8 @@ export class GameSoundEffects {
     source.buffer = this.getCueBuffer(cue, context);
     const cueVolume = cue === 'shoot' ? 0.4 : 1;
     gain.gain.setValueAtTime(
-      this.settings.soundVolume *
+      this.settings.soundVolume ** 2 *
+        MAX_SOUND_EFFECTS_VOLUME *
         cueVolume *
         Math.min(1.4, Math.max(0, intensity)),
       context.currentTime,

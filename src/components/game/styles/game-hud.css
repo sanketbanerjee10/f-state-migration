@@ -1,179 +1,303 @@
+/* ==========================================================================
+   Afterhours gameplay HUD — "Cozy Midnight Arcade"
+   Target: src/components/game/styles/game-hud.css
+
+   Layout is driven by CONTAINER queries on .game-hud (not viewport width),
+   so it adapts to however much room the pause button / safe areas leave.
+   Standard = full cards with tiles.  Compact = slim strip, inline counters.
+   The HUD only ever occupies the top-left; joysticks (bottom corners), the
+   music player (lower right) and the pause button (top right) stay clear.
+   ========================================================================== */
+
 .game-hud {
+  /* ---- sizing tokens (Standard defaults; Compact + short screens override) */
+  --hud-gutter: clamp(8px, 2vw, 20px);
+  --hud-reserve-right: 68px;            /* room kept free for the pause button */
+  --hud-max-width: 560px;
+  --hud-pad: 10px;
+  --hud-gap: 8px;
+  --hud-radius: 14px;
+  --hud-label-size: 10px;
+  --hud-hint-size: 9px;
+  --hud-value-size: clamp(15px, 0.9vw + 9px, 18px);
+  --hud-wave-size: clamp(24px, 1.2vw + 14px, 30px);
+  --hud-bar-h: 6px;
+
+  /* ---- palette: Afterhours brand colors over the dark arena ---------------- */
+  --hud-border: rgb(var(--ah-lavender-rgb) / 28%);
+  --hud-shadow: rgb(var(--ah-shadow-rgb) / 72%);
+  --hud-text: var(--ah-cream);
+  --hud-text-strong: var(--ah-cream);
+  --hud-muted: var(--ah-muted);
+  --hud-track: rgb(var(--ah-lavender-rgb) / 22%);
+  --hud-progress: linear-gradient(90deg, var(--ah-purple), var(--ah-pink));
+  --hud-health-ok: linear-gradient(90deg, var(--ah-blue), var(--ah-green));
+  --hud-health-mid: linear-gradient(90deg, var(--ah-peach), var(--ah-cream));
+  --hud-health-low: linear-gradient(90deg, var(--ah-pink), var(--ah-peach));
+  --hud-score: var(--ah-peach);
+  --hud-bombs: var(--ah-cream);
+  --hud-turrets: var(--ah-green);
+  --hud-power: var(--ah-cream);
+  --hud-special: var(--ah-lavender);
+  --hud-warning: var(--ah-peach);
+  --hud-danger: var(--ah-pink);
+  --hud-highlight: var(--ah-cream);
+
   position: absolute;
-  top: calc(14px + env(safe-area-inset-top, 0px));
-  left: clamp(12px, 2vw, 24px);
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: calc(var(--hud-gutter) + env(safe-area-inset-left, 0px));
   z-index: 3;
   box-sizing: border-box;
+  container-type: inline-size;
+  container-name: game-hud;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  width: min(1400px, calc(100% - 112px));
+  width: min(
+    var(--hud-max-width),
+    calc(
+      100% - var(--hud-gutter) - var(--hud-reserve-right)
+      - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    )
+  );
   margin: 0;
-  padding: 2px 0;
+  padding: 0;
   border: 0;
-  border-radius: 0;
   background: transparent;
-  box-shadow: none;
-  color: var(--ocean-text);
-  pointer-events: none;
+  color: var(--hud-text);
+  font-family: var(--app-font-sans, inherit);
+  pointer-events: none;           /* passive overlay: never eats game input */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.game-hud-stats-row {
-  display: flex;
+.game-hud strong { font-weight: 700; margin: 0; }
+
+/* ---- Main status layout -------------------------------------------------- */
+
+.game-hud-main {
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--hud-gap);
   width: 100%;
-  align-items: center;
-  justify-content: flex-start;
-  gap: clamp(10px, 1.4vw, 20px);
-  margin: 0;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
+
+.game-hud-label {
+  color: var(--hud-muted);
+  font: 600 var(--hud-label-size) / 1.2 var(--app-font-mono, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px var(--hud-shadow);
+}
+
+.game-hud-hint {
+  display: block;                 /* wraps under the name on tight tiles */
+  color: var(--hud-muted);
+  font-size: var(--hud-hint-size);
+  letter-spacing: 0.06em;
+  opacity: 0.92;
+}
+
+/* Primary row: wave | health | score.
+   Narrow default (< 340px of HUD width): wave+score on top, health below. */
+.game-hud-primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "wave score"
+    "health health";
+  align-items: end;
+  gap: var(--hud-gap);
+  min-width: 0;
+}
+
+.game-hud-wave   { grid-area: wave; }
+.game-hud-health { grid-area: health; }
+.game-hud-score  { grid-area: score; justify-items: end; text-align: right; }
+
+/* ---- Wave ----------------------------------------------------------------- */
 
 .game-hud-wave {
   display: grid;
-  flex: 0 0 auto;
-  justify-items: start;
-  gap: 3px;
-  margin: 0;
+  gap: 5px;
+  min-width: 0;
 }
 
 .game-hud-wave-heading {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 7px;
+  min-width: 0;
 }
 
-.game-hud-wave strong {
-  color: var(--ocean-text);
-  font: 700 25px/1 var(--app-font-mono);
-  letter-spacing: -0.07em;
+.game-hud-wave-heading strong {
+  color: var(--hud-text-strong);
+  font: 700 var(--hud-wave-size) / 1 var(--app-font-mono, monospace);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 4px var(--hud-shadow);
 }
 
-.game-hud-wave-progress {
-  position: static;
-  width: clamp(56px, 7vw, 100px);
-  height: 4px;
+.game-hud-wave-progress,
+.game-hud-health-track,
+.game-boss-intro-track,
+.game-boss-health-track {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 64px;
+  height: var(--hud-bar-h);
   overflow: hidden;
   border-radius: 99px;
-  background: rgba(133, 158, 145, 0.2);
+  background: var(--hud-track);
+  box-shadow: inset 0 0 0 1px rgb(var(--ah-midnight-rgb) / 30%);
 }
 
 .game-hud-wave-progress span,
-.game-hud-health-track span {
+.game-hud-health-track span,
+.game-boss-intro-track span,
+.game-boss-health-track span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  transition: width 180ms ease-out;
 }
 
-.game-hud-wave-progress span {
-  background: linear-gradient(90deg, #39b9d1, #7be0cb);
-  box-shadow: 0 0 12px rgba(74, 211, 190, 0.4);
-}
+.game-hud-wave-progress span { background: var(--hud-progress); }
 
-.game-hud-stats {
-  display: flex;
-  flex: 0 1 auto;
+/* ---- Health --------------------------------------------------------------- */
+
+.game-hud-health {
+  display: grid;
+  gap: 5px;
   min-width: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(10px, 1.4vw, 20px);
-  margin: 0;
 }
 
-.game-hud-health,
+.game-hud-health-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.game-hud-health-heading strong {
+  color: var(--hud-text-strong);
+  font: 700 var(--hud-value-size) / 1.1 var(--app-font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px var(--hud-shadow);
+}
+
+.game-hud-health-heading strong span {
+  color: var(--hud-muted);
+  font-size: 0.68em;
+  font-weight: 500;
+}
+
+.game-hud-health-track span { background: var(--hud-health-ok); }
+.game-hud-health-mid .game-hud-health-track span { background: var(--hud-health-mid); }
+.game-hud-health-low .game-hud-health-track span { background: var(--hud-health-low); }
+
+.game-hud-health-flag {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid currentColor;
+  border-radius: 99px;
+  color: var(--hud-danger);
+  font-size: var(--hud-hint-size);
+  letter-spacing: 0.08em;
+}
+
+/* ---- Counters ------------------------------------------------------------- */
+
 .game-hud-stat {
   display: grid;
-  flex: 0 0 auto;
+  gap: 2px;
   min-width: 0;
-  align-self: center;
-  gap: 5px;
-  margin: 0;
 }
 
-.game-hud-health > strong,
 .game-hud-stat strong {
-  overflow: hidden;
-  color: #edf5f0;
-  font: 600 14px var(--app-font-mono);
-  text-overflow: ellipsis;
+  color: var(--hud-text-strong);
+  font: 700 var(--hud-value-size) / 1.1 var(--app-font-mono, monospace);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  text-shadow: 0 1px 4px var(--hud-shadow);
 }
 
-.game-hud-health > strong span {
-  color: var(--ocean-muted);
-  font-size: 10px;
-  font-weight: 400;
-}
+.game-hud-score strong     { color: var(--hud-score); }
+.game-hud-bombs strong     { color: var(--hud-bombs); }
+.game-hud-turrets strong   { color: var(--hud-turrets); }
 
-.game-hud-label {
-  color: var(--ocean-muted);
-  font: 600 9px var(--app-font-mono);
-  letter-spacing: 0.12em;
-}
-
-.game-hud-health-track {
-  height: 5px;
-  overflow: hidden;
-  border-radius: 99px;
-  background: rgba(133, 158, 145, 0.2);
-}
-
-.game-hud-health-track span {
-  background: linear-gradient(90deg, #43c89a, #a5e77b);
-}
-
-.game-hud-score strong {
-  color: #f6d780;
-}
-
-.game-hud-hostiles strong {
-  color: #f39b78;
-}
-
-.game-hud-bombs strong {
-  color: #f6d780;
-}
-
-.game-hud-turrets strong {
-  color: #79c7bc;
-}
-
-.game-hud-modifier {
+/* Keep secondary counters in a single unboxed row. */
+.game-hud-stats {
   display: flex;
-  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
   min-width: 0;
-  align-items: center;
-  gap: 7px;
-  margin: 0;
-  padding: 5px 8px;
-  border: 1px solid rgba(214, 183, 127, 0.35);
-  border-radius: 6px;
-  background: rgba(57, 48, 30, 0.48);
-  white-space: nowrap;
 }
 
-.game-hud-modifier strong {
-  color: #f0d7aa;
-  font: 700 11px var(--app-font-mono);
-  letter-spacing: 0.04em;
+.game-hud-stats .game-hud-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* ---- Power + effects ------------------------------------------------------ */
+
+.game-hud-power-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  width: calc(
+    100vw - var(--hud-gutter) - var(--hud-reserve-right)
+    - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+  );
+  min-width: 0;
 }
 
 .game-hud-active-effects {
   display: flex;
   flex: 0 1 auto;
   min-width: 0;
+}
+
+.game-hud-modifier {
+  box-sizing: border-box;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.game-hud-modifier strong {
+  min-width: 0;
+  color: var(--hud-power);
+  font: 700 12px / 1.2 var(--app-font-sans, inherit);
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
 }
 
 .game-hud-effects {
   display: flex;
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -181,76 +305,45 @@
 
 .game-hud-effects li {
   position: relative;
-  gap: 7px;
-  min-height: 28px;
-  padding: 4px 9px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 3px 8px 5px;
   overflow: hidden;
-  border: 1px solid var(--ocean-border);
-  border-radius: 7px;
-  background: rgba(26, 43, 49, 0.84);
-  color: var(--ocean-text-secondary);
-  font: 600 10px var(--app-font-mono);
-  letter-spacing: 0;
+  border: 1px solid var(--hud-border);
+  border-radius: 99px;
+  background: rgb(var(--ah-midnight-rgb) / 14%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--hud-muted);
+  font: 600 10px / 1 var(--app-font-sans, inherit);
 }
 
 .game-effect-icon {
-  display: grid;
-  width: 17px;
-  height: 17px;
-  flex: 0 0 17px;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(130, 182, 179, 0.13);
-  color: var(--ocean-accent);
-  font-size: 12px;
-  line-height: 1;
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
 }
 
-.game-effect-damage .game-effect-icon {
-  color: var(--ocean-danger);
-}
-
-.game-effect-rapidFire .game-effect-icon {
-  color: var(--ocean-warning);
-}
-
-.game-effect-shield .game-effect-icon {
-  color: var(--ocean-accent);
-}
-
-.game-effect-magnet .game-effect-icon {
-  color: #7dd3fc;
-}
-
-.game-effect-magnet .game-effect-duration {
-  background: #7dd3fc;
-}
-
-.game-effect-turret .game-effect-icon {
-  color: var(--ocean-accent-soft);
-}
-
-.game-effect-turret .game-effect-duration {
-  background: var(--ocean-accent-soft);
-}
-
-.game-effect-cursed .game-effect-icon {
-  color: #c08497;
-}
-
-.game-effect-cursed .game-effect-duration {
-  background: #c08497;
+.game-effect-icon canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .game-effect-name {
   min-width: 0;
+  color: var(--hud-text);
   overflow-wrap: anywhere;
-  white-space: normal;
 }
 
-.game-hud-effects strong {
-  color: var(--ocean-text);
-  font-size: 10px;
+.game-effect-time {
+  color: var(--hud-text-strong);
+  font: 700 10px var(--app-font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .game-effect-duration {
@@ -259,34 +352,281 @@
   bottom: 0;
   left: 0;
   height: 2px;
-  background: var(--ocean-accent);
-  transition: width 180ms linear;
+  background: var(--ah-lavender);
 }
 
-.game-effect-damage .game-effect-duration {
-  background: var(--ocean-danger);
+.game-effect-damage .game-effect-duration { background: #c94a58; }
+.game-effect-rapidFire .game-effect-duration { background: #d89a32; }
+.game-effect-shield .game-effect-duration { background: #397ec1; }
+.game-effect-magnet .game-effect-duration { background: #299ba3; }
+.game-effect-cursed .game-effect-duration { background: #793caf; }
+
+/* "Expiring" is signalled by more than colour: warm border + timer colour */
+.game-effect-expiring { border-color: var(--hud-warning); }
+.game-effect-expiring .game-effect-time { color: var(--hud-warning); }
+
+/* ---- Boss (overrides the shared base stylesheet) -------------------------- */
+
+.game-hud .game-boss-intro,
+.game-hud .game-boss-health {
+  box-sizing: border-box;
+  display: grid;
+  gap: 6px;
+  width: min(100%, 360px);
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid rgb(var(--ah-pink-rgb) / 44%);
+  border-radius: 12px;
+  background: rgb(var(--ah-midnight-rgb) / 38%);
 }
 
-.game-effect-rapidFire .game-effect-duration {
-  background: var(--ocean-warning);
+.game-hud .game-boss-intro strong {
+  color: var(--ah-cream);
+  font: 700 14px / 1.2 var(--app-font-sans, inherit);
+  overflow-wrap: anywhere;
 }
 
-.game-effect-expiring .game-effect-icon {
-  animation: game-effect-expire-pulse 800ms ease-in-out infinite alternate;
+.game-boss-intro-track span { background: var(--ah-pink); }
+
+.game-boss-health-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 10px;
 }
 
-.game-effect-damage .game-effect-icon {
-  animation: game-effect-ring 2s ease-out infinite;
+.game-hud .game-boss-health-label strong {
+  color: var(--ah-cream);
+  font: 700 13px / 1.2 var(--app-font-sans, inherit);
+  overflow-wrap: anywhere;
 }
 
-.game-effect-rapidFire .game-effect-icon {
-  animation: game-effect-speed 900ms ease-in-out infinite;
+.game-hud .game-boss-health-label > span {
+  color: var(--ah-muted);
+  font: 600 11px / 1.2 var(--app-font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
-.game-effect-shield .game-effect-icon {
-  animation: game-effect-breathe 2.4s ease-in-out infinite;
+.game-boss-health-track span {
+  background: linear-gradient(90deg, var(--ah-pink), var(--ah-peach));
 }
+
+/* Shielded: dashed border + lavender striped bar + "◇ SHIELDED" text */
+.game-hud .game-boss-health-shielded {
+  border-style: dashed;
+  border-color: rgb(var(--ah-lavender-rgb) / 72%);
+}
+
+.game-boss-health-shielded .game-boss-health-track span {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ah-lavender) 0 6px,
+    var(--ah-muted) 6px 12px
+  );
+}
+
+/* ---- Tutorial highlight --------------------------------------------------- */
+
+.game-hud-highlighted .game-hud-main {
+  filter: drop-shadow(0 0 5px rgb(var(--ah-cream-rgb) / 62%));
+}
+
+/* ==========================================================================
+   Container-query layout tiers (width of the HUD itself)
+   ========================================================================== */
+
+/* ≥ 340px: wave | health | score on one row */
+@container game-hud (min-width: 340px) {
+  .game-hud-primary {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "wave health score";
+    align-items: center;
+    column-gap: calc(var(--hud-gap) + 6px);
+  }
+}
+
+/* ≥ 480px: four counters across */
+@container game-hud (min-width: 480px) {
+  .game-hud-stats { gap: 6px 18px; }
+}
+
+@media (max-width: 600px) {
+  .game-hud-primary {
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    grid-template-areas:
+      "wave health"
+      "score score";
+    align-items: center;
+  }
+
+  .game-hud-score {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .game-hud-wave-progress {
+    display: none;
+  }
+
+  .game-hud-effects li {
+    gap: 5px;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .game-effect-name {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   COMPACT — "More room": a slim, lighter strip with inline counters
+   ========================================================================== */
 
 .game-hud-compact {
-  padding: 1px 0;
+  --hud-max-width: 520px;
+  --hud-pad: 6px 10px;
+  --hud-gap: 5px;
+  --hud-radius: 12px;
+  --hud-label-size: 9px;
+  --hud-hint-size: 8.5px;
+  --hud-value-size: clamp(12px, 0.5vw + 9px, 14px);
+  --hud-wave-size: clamp(18px, 0.6vw + 13px, 22px);
+  --hud-bar-h: 4px;
+  gap: 4px;
+}
+
+.game-hud-compact .game-hud-main {
+  padding: 0;
+}
+
+.game-hud-compact .game-hud-hint {
+  display: inline;
+}
+
+.game-hud-compact .game-hud-stats { gap: 2px 12px; }
+
+.game-hud-compact .game-hud-stats .game-hud-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.game-hud-compact .game-hud-power-row { gap: 4px; }
+
+.game-hud-compact .game-hud-modifier {
+  box-shadow: none;
+}
+
+.game-hud-compact .game-hud-modifier strong { font-size: 11px; }
+
+.game-hud-compact .game-hud-effects li {
+  min-height: 20px;
+  padding: 2px 7px 4px;
+  gap: 4px;
+  box-shadow: none;
+  font-size: 9px;
+}
+
+.game-hud-compact .game-effect-icon {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
+}
+
+.game-hud-compact .game-effect-time { font-size: 9px; }
+.game-hud-compact .game-effect-duration { height: 2px; }
+
+.game-hud-compact .game-boss-intro,
+.game-hud-compact .game-boss-health {
+  width: min(100%, 300px);
+  padding: 5px 9px;
+  gap: 4px;
+  box-shadow: none;
+}
+
+.game-hud-compact .game-boss-health-label strong { font-size: 12px; }
+.game-hud-compact .game-boss-health-label > span { font-size: 10px; }
+
+/* ==========================================================================
+   Short landscape screens (phones on their side): trim vertical use
+   ========================================================================== */
+
+@media (max-height: 480px) {
+  .game-hud {
+    top: calc(6px + env(safe-area-inset-top, 0px));
+    gap: 4px;
+  }
+
+  .game-hud-standard {
+    --hud-pad: 6px 9px;
+    --hud-gap: 5px;
+    --hud-label-size: 9px;
+    --hud-hint-size: 8.5px;
+    --hud-value-size: 14px;
+    --hud-wave-size: 20px;
+    --hud-bar-h: 4px;
+  }
+
+  .game-hud-standard .game-hud-stats .game-hud-stat {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 5px;
+  }
+
+  .game-hud-standard .game-hud-stats .game-hud-hint { display: inline; }
+}
+
+/* ==========================================================================
+   Motion — only when the player hasn't asked to reduce it
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-hud-wave-progress span,
+  .game-hud-health-track span,
+  .game-boss-health-track span {
+    transition: width 180ms ease-out;
+  }
+
+  .game-boss-intro-track span,
+  .game-effect-duration {
+    transition: width 180ms linear;
+  }
+
+  .game-effect-shield .game-effect-icon {
+    animation: game-hud-breathe 2.4s ease-in-out infinite;
+  }
+
+  .game-effect-expiring .game-effect-icon {
+    animation: game-hud-expire 900ms ease-in-out infinite alternate;
+  }
+
+  .game-hud-highlighted .game-hud-main {
+    animation: game-hud-highlight 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes game-hud-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+@keyframes game-hud-expire {
+  from { opacity: 1; }
+  to   { opacity: 0.55; }
+}
+
+@keyframes game-hud-highlight {
+  0%, 100% { filter: drop-shadow(0 0 3px rgb(var(--ah-cream-rgb) / 48%)); }
+  50%      { filter: drop-shadow(0 0 7px rgb(var(--ah-cream-rgb) / 72%)); }
 }

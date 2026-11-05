@@ -21,6 +21,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  touch-action: none;
 }
 
 .game-canvas-playing {
@@ -49,6 +50,41 @@
 .game-mobile-control {
   display: grid;
   justify-items: center;
+}
+
+.game-mobile-control-aim {
+  gap: 10px;
+}
+
+.game-bomb-button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgb(var(--ah-cream-rgb) / 55%);
+  border-radius: 50%;
+  background: rgb(var(--ah-midnight-rgb) / 76%);
+  box-shadow:
+    0 2px 8px rgb(var(--ah-shadow-rgb) / 50%),
+    0 0 14px rgb(var(--ah-pink-rgb) / 20%);
+  color: var(--ah-cream);
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.game-bomb-button svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2;
+}
+
+.game-bomb-button:disabled {
+  opacity: 0.42;
+}
+
+.game-bomb-button:focus-visible {
+  outline: 2px solid var(--ah-cream);
+  outline-offset: 3px;
 }
 
 .game-joystick {
@@ -398,8 +434,8 @@
 
 .game-canvas-diagnostics {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
   padding: 5px 8px;
   border: 1px solid rgba(152, 177, 168, 0.2);
   border-radius: 5px;

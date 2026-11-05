@@ -1,21 +1,23 @@
 import type { GameStateSnapshot } from '@/game/core/GameState';
-import { formatGameKeyCode, type HudDensitySetting } from '@/game/core/GameSettings';
+import type { HudDensitySetting } from '@/game/core/GameSettings';
 import { GameActiveEffects } from './GameActiveEffects';
 import { WAVE_MODIFIER_CONFIG } from '@/game/core/GameConfig';
 
 interface GameHudProps {
   readonly gameState: GameStateSnapshot;
   readonly density: HudDensitySetting;
-  readonly bombKey: string;
   readonly highlighted?: boolean;
 }
+
+const pad2 = (value: number): string => String(value).padStart(2, '0');
+const clampPercent = (value: number): number => Math.max(0, Math.min(100, value));
 
 export function GameHud({
   gameState,
   density,
-  bombKey,
   highlighted = false,
 }: GameHudProps) {
+  // ---- Derived values (unchanged game math) -------------------------------
   const zombiesDefeatedThisWave = Math.max(
     0,
     gameState.wave.enemiesSpawned - gameState.zombies.length,
@@ -44,38 +46,57 @@ export function GameHud({
   const bossHealthPercent = activeBoss && activeBoss.maxHealth > 0
     ? Math.max(0, Math.min(100, activeBoss.health / activeBoss.maxHealth * 100))
     : 0;
+  const bossIntroPercent = gameState.wave.bossIntroDurationSeconds > 0
+    ? clampPercent(
+        (1 - gameState.wave.bossIntroSeconds /
+          gameState.wave.bossIntroDurationSeconds) * 100,
+      )
+    : 100;
   const activeModifier = gameState.wave.activeModifier
     ? WAVE_MODIFIER_CONFIG.definitions[gameState.wave.activeModifier]
     : undefined;
+
+  // Presentation-only: drives bar colour + a text "LOW" flag (not colour alone).
+  const healthLevel = healthPercent <= 25 ? 'low' : healthPercent <= 50 ? 'mid' : 'ok';
 
   return (
     <section
       className={`game-hud game-hud-${density}${highlighted ? ' game-hud-highlighted' : ''}`}
       aria-label="Run status"
     >
-      <div className="game-hud-stats-row">
-        <div className="game-hud-wave">
-          <div className="game-hud-wave-heading">
-            <span className="game-hud-label">WAVE</span>
-            <strong>{String(gameState.wave.currentWave).padStart(2, '0')}</strong>
+      {/* Core status card: wave, health, score + secondary counters */}
+      <div className="game-hud-main">
+        <div className="game-hud-primary">
+          <div className="game-hud-wave">
+            <div className="game-hud-wave-heading">
+              <span className="game-hud-label">WAVE</span>
+              <strong>{pad2(gameState.wave.currentWave)}</strong>
+            </div>
+            <div
+              className="game-hud-wave-progress"
+              role="progressbar"
+              aria-label="Wave progress"
+              aria-valuemin={0}
+              aria-valuemax={gameState.wave.enemyBudget}
+              aria-valuenow={zombiesDefeatedThisWave}
+            >
+              <span style={{ width: `${waveProgressPercent}%` }} />
+            </div>
           </div>
-          <div
-            className="game-hud-wave-progress"
-            role="progressbar"
-            aria-label="Wave progress"
-            aria-valuemin={0}
-            aria-valuemax={gameState.wave.enemyBudget}
-            aria-valuenow={zombiesDefeatedThisWave}
-          >
-            <span style={{ width: `${waveProgressPercent}%` }} />
-          </div>
-        </div>
-        <div className="game-hud-stats">
-          <div className="game-hud-health">
-            <strong>
-              {Math.ceil(gameState.player.health)}
-              <span> / {gameState.player.maxHealth}</span>
-            </strong>
+
+          <div className={`game-hud-health game-hud-health-${healthLevel}`}>
+            <div className="game-hud-health-heading">
+              <span className="game-hud-label">
+                HEALTH
+                {healthLevel === 'low' && (
+                  <span className="game-hud-health-flag" aria-hidden="true">LOW</span>
+                )}
+              </span>
+              <strong>
+                {Math.ceil(gameState.player.health)}
+                <span> / {gameState.player.maxHealth}</span>
+              </strong>
+            </div>
             <div
               className="game-hud-health-track"
               role="progressbar"
@@ -87,42 +108,49 @@ export function GameHud({
               <span style={{ width: `${healthPercent}%` }} />
             </div>
           </div>
-          <div className="game-hud-stat">
-            <span className="game-hud-label">ELIMINATED</span>
-            <strong>{String(gameState.statistics.zombiesKilled).padStart(2, '0')}</strong>
-          </div>
+
           <div className="game-hud-stat game-hud-score">
             <span className="game-hud-label">SCORE</span>
             <strong>{gameState.score.toLocaleString()}</strong>
           </div>
-          <div className="game-hud-stat game-hud-hostiles">
-            <span className="game-hud-label">HOSTILES</span>
-            <strong>{gameState.zombies.length}</strong>
+        </div>
+
+        <div className="game-hud-stats">
+          <div className="game-hud-stat game-hud-eliminated">
+            <span className="game-hud-label">ELIMINATED</span>
+            <strong>{pad2(gameState.statistics.zombiesKilled)}</strong>
           </div>
           <div className="game-hud-stat game-hud-bombs">
-            <span className="game-hud-label">BOMBS ({formatGameKeyCode(bombKey)})</span>
-            <strong>{gameState.bombs} / 5</strong>
+            <span className="game-hud-label">BOMBS</span>
+            <strong>{gameState.bombs}</strong>
           </div>
           <div className="game-hud-stat game-hud-turrets">
-            <span className="game-hud-label">TURRETS (RIGHT CLICK)</span>
-            <strong>{gameState.turrets} / 5</strong>
+            <span className="game-hud-label">TURRETS</span>
+            <strong>{gameState.turrets}</strong>
           </div>
         </div>
       </div>
-      <div className="game-hud-power-row">
-        <div
-          className="game-hud-modifier"
-          role="status"
-          aria-label={`Custom wave power: ${activeModifier?.name ?? 'None'}`}
-          title={activeModifier?.description ?? 'No custom wave power is active.'}
-        >
-          <span className="game-hud-label">POWER</span>
-          <strong>{activeModifier?.name ?? 'None'}</strong>
+
+      {(activeModifier || gameState.activeEffects.length > 0) && (
+        <div className="game-hud-power-row">
+          {activeModifier && (
+            <div
+              className="game-hud-modifier"
+              role="status"
+              aria-label={`Custom wave power: ${activeModifier.name}`}
+              title={activeModifier.description}
+            >
+              <span className="game-hud-label">POWER</span>
+              <strong>{activeModifier.name}</strong>
+            </div>
+          )}
+          <div className="game-hud-active-effects" aria-label="Active player stats">
+            <GameActiveEffects effects={gameState.activeEffects} />
+          </div>
         </div>
-        <div className="game-hud-active-effects" aria-label="Active player stats">
-          <GameActiveEffects effects={gameState.activeEffects} />
-        </div>
-      </div>
+      )}
+
+      {/* Boss intro (can be active before the boss entity exists) */}
       {bossIntroActive && (
         <div className="game-boss-intro" role="status" aria-live="polite">
           <span className="game-hud-label">BOSS APPROACHING</span>
@@ -138,20 +166,24 @@ export function GameHud({
               gameState.wave.bossIntroSeconds
             }
           >
-            <span style={{
-              width: `${gameState.wave.bossIntroDurationSeconds > 0
-                ? (1 - gameState.wave.bossIntroSeconds /
-                  gameState.wave.bossIntroDurationSeconds) * 100
-                : 100}%`,
-            }} />
+            <span style={{ width: `${bossIntroPercent}%` }} />
           </div>
         </div>
       )}
+
+      {/* Boss health (separate state, shown while a boss entity is alive) */}
       {activeBoss && (
-        <div className="game-boss-health" role="group" aria-label="Boss status">
+        <div
+          className={`game-boss-health${activeBoss.bossShielded ? ' game-boss-health-shielded' : ''}`}
+          role="group"
+          aria-label="Boss status"
+        >
           <div className="game-boss-health-label">
             <strong>{gameState.wave.bossName ?? 'Boss'}</strong>
             <span>
+              {activeBoss.bossShielded && (
+                <span className="game-boss-shield-icon" aria-hidden="true">◇ </span>
+              )}
               {activeBoss.bossShielded ? 'SHIELDED' : 'BOSS'}
               {' · '}
               {Math.ceil(activeBoss.health)} / {activeBoss.maxHealth}

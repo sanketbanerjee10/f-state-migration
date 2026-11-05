@@ -1,6 +1,7 @@
 import {
   GAME_VIEWPORT,
   GAME_RUNTIME_CONFIG,
+  GAME_RESPONSIVE_ZOOM_CONFIG,
 } from './GameConfig';
 import { KeyboardInput, type MovementVector } from './KeyboardInput';
 import type { GameKeyBindings } from './GameSettings';
@@ -60,6 +61,11 @@ export class GameEngine {
   private readonly mouseAimInput = new MouseAimInput();
   private readonly dualJoystickInput = new DualJoystickInput();
   private mobileMovement: JoystickVector = { x: 0, y: 0 };
+  private lastTouchTap: {
+    readonly time: number;
+    readonly x: number;
+    readonly y: number;
+  } | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -178,6 +184,7 @@ export class GameEngine {
 
   pause(): void {
     this.isActive = false;
+    this.lastTouchTap = null;
     this.setInputEnabled(false);
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
@@ -261,6 +268,11 @@ export class GameEngine {
 
   setKeyBindings(keyBindings: GameKeyBindings): void {
     this.keyboardInput.setKeyBindings(keyBindings);
+  }
+
+  requestBomb(): void {
+    if (!this.isActive || this.gameState?.wave.phase !== 'combat') return;
+    this.keyboardInput.requestBomb();
   }
 
   adjustStat(attribute: RunStatAttribute, adjustment: -1 | 1): void {
@@ -384,23 +396,50 @@ export class GameEngine {
   };
 
   private readonly handleCanvasPointerDown = (event: PointerEvent): void => {
-    if (
-      !this.isActive ||
-      event.button !== 2 ||
-      !this.gameState
-    ) {
+    if (!this.isActive || !this.gameState) {
+      this.lastTouchTap = null;
       return;
     }
-    const position = this.getWorldPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
+
+    if (event.pointerType === 'touch') {
+      const previousTap = this.lastTouchTap;
+      const isDoubleTap = Boolean(
+        previousTap &&
+        event.timeStamp - previousTap.time >= 0 &&
+        event.timeStamp - previousTap.time <= 350 &&
+        Math.hypot(
+          event.clientX - previousTap.x,
+          event.clientY - previousTap.y,
+        ) <= 36,
+      );
+      this.lastTouchTap = isDoubleTap ? null : {
+        time: event.timeStamp,
+        x: event.clientX,
+        y: event.clientY,
+      };
+      if (!isDoubleTap) {
+        return;
+      }
+    } else {
+      this.lastTouchTap = null;
+      if (event.button !== 2) return;
+    }
+
+    this.placeSupportTurretAtClientPosition(event.clientX, event.clientY);
+  };
+
+  private placeSupportTurretAtClientPosition(
+    clientX: number,
+    clientY: number,
+  ): void {
+    if (!this.gameState) return;
+    const position = this.getWorldPosition({ x: clientX, y: clientY });
     if (!position) return;
     if (placeSupportTurret(this.gameState, position.x, position.y)) {
       this.refreshRenderLayers();
       this.render();
     }
-  };
+  }
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -520,10 +559,17 @@ export class GameEngine {
   }
 
   private getViewportScale(width: number, height: number): number {
+    const aspectRatio = width / height;
+    const zoom = aspectRatio < GAME_RESPONSIVE_ZOOM_CONFIG.portraitAspectRatio
+      ? GAME_RESPONSIVE_ZOOM_CONFIG.portraitZoom
+      : aspectRatio > GAME_RESPONSIVE_ZOOM_CONFIG.landscapeAspectRatio
+        ? GAME_RESPONSIVE_ZOOM_CONFIG.landscapeZoom
+        : 1;
+
     return Math.min(
       width / GAME_VIEWPORT.width,
       height / GAME_VIEWPORT.height,
-    );
+    ) * zoom;
   }
 
   private getLogicalViewportSize(width: number, height: number): {

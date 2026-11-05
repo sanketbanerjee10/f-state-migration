@@ -1,4 +1,4 @@
-import { renderArena } from './ArenaRenderer';
+import { renderArena } from '../arenas';
 import {
   EMPTY_RENDER_LAYERS,
   type RenderActor,

@@ -117,21 +117,110 @@
 }
 
 .game-pause-button {
+  position: absolute;
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: 12px;
-  min-width: 40px;
-  min-height: 34px;
-  padding: 6px 10px;
-  border-color: rgb(var(--ah-lavender-rgb) / 35%);
-  border-radius: 9px;
-  background: rgb(var(--ah-midnight-rgb) / 88%);
+  z-index: 4;
+  display: flex;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 42%);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgb(var(--ah-purple-rgb) / 24%), transparent 75%),
+    rgb(var(--ah-midnight-rgb) / 82%);
+  box-shadow:
+    0 3px 12px rgb(var(--ah-shadow-rgb) / 52%),
+    inset 0 1px rgb(var(--ah-white-rgb) / 8%);
   color: var(--ah-cream);
-  font-family: var(--app-font-sans);
+  cursor: pointer;
+  opacity: 0.3;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease,
+    width 500ms ease,
+    gap 500ms ease;
 }
 
-.game-pause-button:hover {
-  border-color: var(--ah-pink);
-  background: rgb(var(--ah-purple-rgb) / 38%);
+.game-pause-button svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+  flex: 0 0 auto;
+}
+
+.game-pause-button span {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  font: 700 12px / 1 var(--app-font-sans);
+  white-space: nowrap;
+  transition:
+    max-width 500ms ease,
+    opacity 140ms ease;
+}
+
+.game-pause-button:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .game-pause-button:hover,
+  .game-pause-button:focus-visible {
+    width: 126px;
+    gap: 8px;
+  }
+
+  .game-pause-button:hover {
+    border-color: var(--ah-pink);
+    background:
+      linear-gradient(145deg, rgb(var(--ah-pink-rgb) / 20%), transparent 75%),
+      rgb(var(--ah-midnight-rgb) / 94%);
+    box-shadow:
+      0 4px 16px rgb(var(--ah-shadow-rgb) / 58%),
+      0 0 14px rgb(var(--ah-pink-rgb) / 18%);
+    transform: translateY(-1px);
+    opacity: 1;
+  }
+
+  .game-pause-button:hover span,
+  .game-pause-button:focus-visible span {
+    max-width: 88px;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .game-pause-button {
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+  }
+
+  .game-pause-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-pause-button,
+  .game-pause-button span {
+    transition: none;
+  }
 }
 
 .game-run-summary dt {
@@ -2710,7 +2799,7 @@
 }
 
 .game-music-player-controls-dimmed {
-  opacity: 0.68;
+  opacity: 1;
 }
 
 .game-music-player-controls-floating:hover,
@@ -2719,6 +2808,7 @@
 }
 
 .game-music-player {
+  position: relative;
   display: flex;
   min-width: 0;
   max-width: 100%;
@@ -2732,6 +2822,13 @@
   font: 500 10px var(--app-font-mono);
   cursor: pointer;
   transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.game-music-player-controls-dimmed .game-music-player {
+  border-color: rgb(var(--ah-lavender-rgb) / 0.12);
+  background: rgb(var(--ah-midnight-rgb) / 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .game-music-player:hover:not(:disabled) {
@@ -2762,6 +2859,44 @@
   max-width: min(35vw, 260px);
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: opacity 180ms ease, width 180ms ease;
+}
+
+.game-music-player-title-measure {
+  position: absolute;
+  width: max-content;
+  max-width: none;
+  overflow: visible;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.game-music-player-title.is-exiting {
+  opacity: 0;
+}
+
+.game-music-player-title.is-entering {
+  animation: game-music-title-in 180ms ease both;
+}
+
+@keyframes game-music-title-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-music-player-title {
+    transition-duration: 0.01ms;
+  }
+
+  .game-music-player-title.is-entering {
+    animation-duration: 0.01ms;
+  }
 }
 
 .game-music-bars {

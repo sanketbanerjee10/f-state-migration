@@ -323,7 +323,7 @@ export function GameSettingsPanel({
 
                   <div className="settings-key-row settings-key-static">
                     <span>Place turret</span>
-                    <kbd>RIGHT CLICK</kbd>
+                    <kbd>RIGHT CLICK / DOUBLE TAP</kbd>
                   </div>
                 </div>
 

@@ -1,12 +1,39 @@
+import { useEffect, useRef } from 'react';
 import type { ActiveTemporaryEffect } from '@/game/core/GameState';
+import { drawOrbGlyph } from '@/game/rendering/OrbRenderer';
 
 const EFFECT_PRESENTATION = {
-  damage: { label: 'Damage', symbol: '↑' },
-  rapidFire: { label: 'Rapid fire', symbol: '»' },
-  shield: { label: 'Shield', symbol: '◇' },
-  magnet: { label: 'Orb magnet', symbol: '⌁' },
-  cursed: { label: 'Cursed power', symbol: '☠' },
+  damage: { label: 'Damage' },
+  rapidFire: { label: 'Rapid fire' },
+  shield: { label: 'Shield' },
+  magnet: { label: 'Orb magnet' },
+  cursed: { label: 'Cursed power' },
 } as const;
+
+interface GameActiveEffectIconProps {
+  readonly type: ActiveTemporaryEffect['type'];
+}
+
+function GameActiveEffectIcon({ type }: GameActiveEffectIconProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawOrbGlyph(
+      context,
+      type,
+      canvas.width / 2,
+      canvas.height / 2,
+      9,
+    );
+  }, [type]);
+
+  return <canvas ref={canvasRef} width={24} height={24} />;
+}
 
 interface GameActiveEffectsProps {
   readonly effects: readonly Readonly<ActiveTemporaryEffect>[];
@@ -42,10 +69,10 @@ export function GameActiveEffects({ effects }: GameActiveEffectsProps) {
             aria-label={`${presentation.label}, ${secondsRemaining} seconds remaining`}
           >
             <span className="game-effect-icon" aria-hidden="true">
-              {presentation.symbol}
+              <GameActiveEffectIcon type={effect.type} />
             </span>
             <span className="game-effect-name">{presentation.label}</span>
-            <strong>{secondsRemaining}s</strong>
+            <strong className="game-effect-time">{secondsRemaining}s</strong>
             <span
               className="game-effect-duration"
               aria-hidden="true"

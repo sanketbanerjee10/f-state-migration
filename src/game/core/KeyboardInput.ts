@@ -68,6 +68,10 @@ export class KeyboardInput {
     return requested;
   }
 
+  requestBomb(): void {
+    if (this.isEnabled) this.bombRequested = true;
+  }
+
   clear = (): void => {
     this.pressedKeys.clear();
     this.bombRequested = false;
