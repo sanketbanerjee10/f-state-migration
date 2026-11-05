@@ -4,6 +4,8 @@
  * and remove the older copy instead of duplicating the same styling.
  */
 .game-screen .game-main-menu-overlay {
+  --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/PC%20Cozy%20Moonlit%20Zombie%20Campfire_scene.png?updatedAt=1793767502838');
+
   position: fixed;
   inset: 0;
   z-index: 6;
@@ -23,8 +25,7 @@
       rgb(var(--ah-midnight-rgb) / 18%) 35%,
       transparent 68%
     ),
-    url('https://ik.imagekit.io/c1tiz3nte/PC%20Cozy%20Moonlit%20Zombie%20Campfire_scene.png')
-      center / cover no-repeat,
+    var(--game-main-menu-background) center / cover no-repeat,
     var(--ah-midnight);
   box-shadow: none;
   color: var(--ah-cream);
@@ -237,6 +238,8 @@
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .game-screen .game-main-menu-overlay {
+    --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/Tablet%20Moonlit%20Campfire%20at%20Watchtower%20565.png?updatedAt=1793767502872');
+
     padding: 4vw;
   }
 
@@ -260,6 +263,8 @@
 
 @media (max-width: 600px) {
   .game-screen .game-main-menu-overlay {
+    --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/Mobile%20Cozy%20Moonlit%20Campfire%20Night.png?updatedAt=1793767502741');
+
     background:
       linear-gradient(
         180deg,
@@ -267,8 +272,7 @@
         rgb(var(--ah-midnight-rgb) / 12%) 48%,
         rgb(var(--ah-midnight-rgb) / 30%)
       ),
-      url('https://ik.imagekit.io/c1tiz3nte/Mobile%20Cozy%20Moonlit%20Campfire%20Night.png')
-        center / cover no-repeat,
+      var(--game-main-menu-background) center / cover no-repeat,
       var(--ah-midnight);
     padding: max(18px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom));
   }

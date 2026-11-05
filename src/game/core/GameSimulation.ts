@@ -323,7 +323,7 @@ function defeatZombie(state: GameState, zombie: ZombieEntity): void {
     );
     state.impacts.push(createImpact(state, zombie.x, zombie.y, {
       kind: 'acid',
-      color: '#7d8c78',
+      color: '#F0FF9B',
       radius: hazardRadius,
     }));
   }

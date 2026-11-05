@@ -46,6 +46,93 @@
   pointer-events: none;
 }
 
+.game-mobile-control {
+  display: grid;
+  justify-items: center;
+}
+
+.game-joystick {
+  --joystick-accent: var(--ocean-accent);
+  --joystick-glow: rgba(130, 182, 179, 0.28);
+
+  position: relative;
+  display: block;
+  width: clamp(108px, 27vw, 148px);
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--joystick-glow) 0 2%, transparent 3%),
+    radial-gradient(circle, transparent 0 43%, var(--joystick-glow) 44%, color-mix(in srgb, var(--joystick-accent) 72%, var(--ocean-border)) 45% 46%, var(--joystick-glow) 47%, transparent 49%),
+    transparent;
+  box-shadow: none;
+  color: var(--ocean-text);
+  touch-action: none;
+  overscroll-behavior: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+}
+
+.game-joystick-movement {
+  --joystick-accent: var(--ah-purple);
+  --joystick-glow: rgba(166, 91, 234, 0.36);
+}
+
+.game-joystick-aim {
+  --joystick-accent: var(--ah-pink);
+  --joystick-glow: rgba(244, 119, 197, 0.34);
+}
+
+.game-joystick-knob::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: var(--ah-midnight);
+  content: "MOVE";
+  font: 700 clamp(8px, 2vw, 10px)/1 var(--app-font-mono);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  text-align: center;
+  text-shadow:
+    0 0 2px var(--ah-cream),
+    0 0 7px var(--joystick-accent);
+  transform: translate(-50%, -50%);
+}
+
+.game-joystick-aim .game-joystick-knob::after {
+  content: "AIM";
+}
+
+.game-joystick:focus-visible {
+  outline: 2px solid var(--joystick-accent);
+  outline-offset: 3px;
+}
+
+.game-joystick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 40%;
+  height: 40%;
+  border: 1px solid color-mix(in srgb, var(--joystick-accent) 76%, var(--ocean-text));
+  border-radius: 50%;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--joystick-accent) 76%, white),
+    color-mix(in srgb, var(--joystick-accent) 68%, var(--ocean-elevated))
+  );
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    0 0 16px var(--joystick-glow);
+  pointer-events: none;
+  transform: translate(var(--joystick-x, 0px), var(--joystick-y, 0px))
+    translate(-50%, -50%);
+}
+
 .game-mobile-controls-hidden,
 .game-controls-never .game-mobile-controls {
   display: none !important;
@@ -53,6 +140,11 @@
 
 .game-controls-always .game-mobile-controls:not(.game-mobile-controls-hidden) {
   display: flex;
+}
+
+.game-controls-always.game-touch-controls-active
+  .game-music-player-controls-floating {
+  display: none;
 }
 
 .game-boss-intro,
@@ -136,15 +228,47 @@
   z-index: 3;
   width: max-content;
   max-width: calc(100% - 32px);
-  padding: 8px 14px;
-  border: 1px solid rgba(152, 177, 168, 0.36);
-  border-radius: 6px;
-  background: rgba(15, 22, 21, 0.82);
-  color: #f0f7f2;
-  font: 600 clamp(11px, 2.5vw, 16px) var(--app-font-mono);
+  padding: 10px 18px;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 22%);
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at 50% 0, rgb(var(--ah-purple-rgb) / 10%), transparent 75%),
+    rgb(var(--ah-midnight-rgb) / 42%);
+  box-shadow:
+    0 8px 24px rgb(var(--ah-shadow-rgb) / 24%),
+    0 0 18px rgb(var(--ah-purple-rgb) / 8%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  color: var(--ah-cream);
+  font: 700 clamp(11px, 2.5vw, 16px) var(--app-font-mono);
+  letter-spacing: 0.08em;
   pointer-events: none;
   text-align: center;
   transform: translateX(-50%);
+}
+
+.portal-toast.game-discovery-toast[data-sonner-toast] {
+  border: 1px solid rgb(217 201 255 / 20%) !important;
+  border-radius: 12px !important;
+  background:
+    radial-gradient(ellipse at 100% 0, rgb(166 91 234 / 10%), transparent 68%),
+    rgb(16 13 53 / 48%) !important;
+  box-shadow:
+    0 10px 30px rgb(8 5 31 / 30%),
+    0 0 18px rgb(166 91 234 / 8%) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  color: #fff0c9 !important;
+  font-family: var(--app-font-sans) !important;
+}
+
+.portal-toast.game-discovery-toast [data-title] {
+  color: #fff0c9;
+  font-weight: 700;
+}
+
+.portal-toast.game-discovery-toast [data-description] {
+  color: #c3b8e7;
 }
 
 .game-screen {
@@ -191,6 +315,45 @@
   font-family: var(--app-font-sans);
 }
 
+.game-screen,
+.game-guide-item-portal {
+  --game-scrollbar-thumb: var(--ah-pink);
+  --game-scrollbar-track: transparent;
+  --game-scrollbar-size: 8px;
+}
+
+.game-screen,
+.game-screen *,
+.game-guide-item-portal,
+.game-guide-item-portal * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--game-scrollbar-thumb) var(--game-scrollbar-track);
+}
+
+.game-screen *::-webkit-scrollbar,
+.game-guide-item-portal *::-webkit-scrollbar {
+  width: var(--game-scrollbar-size);
+  height: var(--game-scrollbar-size);
+}
+
+.game-screen *::-webkit-scrollbar-track,
+.game-guide-item-portal *::-webkit-scrollbar-track {
+  border-radius: 9999px;
+  background: var(--game-scrollbar-track);
+}
+
+.game-screen *::-webkit-scrollbar-thumb,
+.game-screen *::-webkit-scrollbar-thumb:hover,
+.game-screen *::-webkit-scrollbar-thumb:active,
+.game-guide-item-portal *::-webkit-scrollbar-thumb,
+.game-guide-item-portal *::-webkit-scrollbar-thumb:hover,
+.game-guide-item-portal *::-webkit-scrollbar-thumb:active {
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background: var(--game-scrollbar-thumb);
+  background-clip: padding-box;
+}
+
 .game-canvas-frame {
   background: var(--ocean-arena);
 }
@@ -202,6 +365,34 @@
 @media (max-width: 760px), (pointer: coarse) {
   .game-mobile-controls {
     display: flex;
+  }
+
+  .game-touch-controls-active:not(.game-controls-never):not(.game-controls-always)
+    .game-music-player-controls-floating {
+    display: none;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .game-mobile-controls {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .game-joystick {
+    width: min(23vw, 112px);
+  }
+}
+
+.game-joystick-highlighted {
+  border-color: var(--joystick-accent) !important;
+  box-shadow: 0 0 0 5px var(--joystick-glow), 0 0 24px var(--joystick-glow);
+  animation: game-tutorial-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes game-tutorial-pulse {
+  50% {
+    opacity: 0.58;
   }
 }
 

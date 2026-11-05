@@ -197,6 +197,7 @@ export function GameCanvas() {
               toast.success(`${getEnemyDisplayName(enemyType)} discovered`, {
                 description: 'First encounter recorded. Stay alert.',
                 duration: 3000,
+                className: 'game-discovery-toast',
               });
             },
           );
@@ -213,6 +214,7 @@ export function GameCanvas() {
               toast.success(`${getBossName(bossType)} discovered`, {
                 description: 'First encounter recorded. Stay alert.',
                 duration: 3000,
+                className: 'game-discovery-toast',
               });
             },
           );
@@ -528,13 +530,12 @@ export function GameCanvas() {
     syncGameState();
   };
 
+  const isTerminalPhase =
+    gameState?.wave.phase === 'gameOver' ||
+    gameState?.wave.phase === 'levelComplete';
+
   useEffect(() => {
-    if (
-      !hasStarted ||
-      gameState?.wave.phase === 'gameOver'
-    ) {
-      return;
-    }
+    if (!hasStarted || isTerminalPhase) return;
 
     const handlePauseShortcut = (event: KeyboardEvent) => {
       if (event.code !== 'Escape' || event.repeat) return;
@@ -544,7 +545,7 @@ export function GameCanvas() {
     };
     window.addEventListener('keydown', handlePauseShortcut);
     return () => window.removeEventListener('keydown', handlePauseShortcut);
-  }, [gameState?.wave.phase, hasStarted, isPaused]);
+  }, [hasStarted, isPaused, isTerminalPhase]);
 
   useEffect(() => {
     if (tutorialStepIndex === null || tutorialActionComplete || !gameState) return;
@@ -571,7 +572,7 @@ export function GameCanvas() {
 
   const menuMode: GameMenuMode | null = !hasStarted
     ? 'main'
-    : isPaused && gameState?.wave.phase !== 'gameOver'
+    : isPaused && !isTerminalPhase
       ? 'pause'
       : null;
 
@@ -581,6 +582,12 @@ export function GameCanvas() {
         'game-canvas-frame',
         settings.touchControls === 'always' ? 'game-controls-always' : '',
         settings.touchControls === 'never' ? 'game-controls-never' : '',
+        hasStarted &&
+        !isPaused &&
+        gameState?.wave.phase === 'combat' &&
+        tutorialStepIndex === null
+          ? 'game-touch-controls-active'
+          : '',
         tutorialStepIndex !== null &&
         GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'arena'
           ? 'game-tutorial-arena-highlight'
@@ -633,9 +640,10 @@ export function GameCanvas() {
       {hasStarted && !isPaused && gameState?.wave.phase === 'combat' && (
         <GamePauseButton onPause={pauseRun} />
       )}
-      {!menuMode && (
+      {(!menuMode || menuMode === 'pause') && (
         <GameMusicPlayer
           floating
+          dimmed={hasStarted && !isPaused && gameState?.wave.phase === 'combat'}
           trackName={musicStatus.trackName || 'Game soundtrack'}
           isPlaying={musicStatus.isPlaying}
           musicEnabled={settings.musicEnabled}

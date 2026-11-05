@@ -158,7 +158,7 @@ function createAcidPool(state: GameState, x: number, y: number): void {
     kind: 'acid',
     critical: false,
     shieldAbsorbed: false,
-    color: '#7d8c78',
+    color: '#F0FF9B',
     radius: hazard.radius,
   });
 }
@@ -177,7 +177,7 @@ function createBossTelegraph(
     kind: 'telegraph',
     critical: true,
     shieldAbsorbed: false,
-    color: '#b96e68',
+    color: '#FF8A3D',
     radius,
   });
 }
@@ -318,7 +318,7 @@ function updateAcidQueen(
       kind: 'telegraph',
       critical: false,
       shieldAbsorbed: false,
-      color: '#7d8c78',
+      color: '#C8FF65',
       radius: 44,
     });
   } else {
@@ -333,7 +333,7 @@ function updateAcidQueen(
       kind: 'telegraph',
       critical: true,
       shieldAbsorbed: false,
-      color: '#7d8c78',
+      color: '#C8FF65',
       radius: BOSS_CONFIG.acidQueenPoolRadius,
     });
     boss.bossAcidPoolTargetX = poolX;
@@ -413,7 +413,7 @@ function updateHordeCaller(
         kind: 'telegraph',
         critical: false,
         shieldAbsorbed: false,
-        color: '#b96e68',
+        color: '#FFD166',
         radius: boss.radius + 28,
       });
     } else {

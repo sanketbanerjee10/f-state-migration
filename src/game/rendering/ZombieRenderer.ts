@@ -126,9 +126,15 @@ function drawBossDetails(
 ): void {
   if (!boss.isBoss) return;
 
-  const color = GAME_PALETTE.enemies.boss;
+  const bossAccent = boss.bossType === 'charger'
+    ? '#FF5874'
+    : boss.bossType === 'acidQueen'
+      ? '#B8F05A'
+      : boss.bossType === 'hordeCaller'
+        ? '#B58BFF'
+        : GAME_PALETTE.enemies.boss;
   drawCircle(context, boss.x, y, radius + 4, {
-    stroke: color,
+    stroke: bossAccent,
     lineWidth: 3,
   });
   if (boss.bossType === 'acidQueen') {
@@ -139,7 +145,7 @@ function drawBossDetails(
         y + radius * 0.4,
         radius * 0.22,
         {
-          fill: '#a6b975',
+          fill: '#D9FF75',
           stroke: GAME_PALETTE.enemies.outline,
           lineWidth: 2,
         },
@@ -149,13 +155,13 @@ function drawBossDetails(
         boss.x + side * radius * 0.88,
         y + radius * 0.4,
         radius * 0.08,
-        { fill: '#d6b77f' },
+        { fill: '#FFF18A' },
       );
     }
   } else {
     const hornColor = boss.bossType === 'hordeCaller'
       ? GAME_PALETTE.enemies.elite
-      : color;
+      : bossAccent;
     const hornSpread = boss.bossType === 'charger' ? 0.78 : 0.55;
     const hornLength = boss.bossType === 'charger' ? 1.55 : 1.2;
     drawLine(
@@ -180,13 +186,13 @@ function drawBossDetails(
   const barY = y - radius - 17;
   drawRect(context, barX, barY, barWidth, barHeight, {
     fill: GAME_PALETTE.enemies.healthTrack,
-    stroke: color,
+    stroke: bossAccent,
     lineWidth: 1.5,
   });
   const health = clampVisualValue(boss.healthFraction ?? 1);
   if (health > 0) {
     drawRect(context, barX, barY, barWidth * health, barHeight, {
-      fill: color,
+      fill: bossAccent,
     });
   }
 
@@ -202,7 +208,7 @@ function drawBossDetails(
         x: boss.x + Math.cos(boss.bossChargeAngle) * length,
         y: y + Math.sin(boss.bossChargeAngle) * length,
       },
-      color,
+      boss.bossType === 'charger' ? '#FF8A3D' : bossAccent,
       4 + Math.sin(elapsedSeconds * 18) * 1.5,
     );
   }
@@ -298,9 +304,13 @@ export function drawZombie(
     : zombie.isBoss && zombie.bossType === 'hordeCaller'
       ? 'screamer'
       : type;
-  const baseColor = zombie.isBoss && zombie.bossType === 'acidQueen'
-    ? '#a6b975'
-    : enemies[appearanceType] ?? enemies.walker;
+  const baseColor = zombie.isBoss && zombie.bossType === 'charger'
+    ? '#FF5874'
+    : zombie.isBoss && zombie.bossType === 'acidQueen'
+      ? '#B8F05A'
+      : zombie.isBoss && zombie.bossType === 'hordeCaller'
+        ? '#B58BFF'
+        : enemies[appearanceType] ?? enemies.walker;
   const hitFlash = clampVisualValue(zombie.hitFlash ?? 0);
 
   if (type === 'walker') {
@@ -330,7 +340,7 @@ export function drawZombie(
         });
         if (health > 0) {
           drawRect(context, zombie.x - radius, barY, barWidth * health, 4, {
-            fill: GAME_PALETTE.combat.damage,
+            fill: GAME_PALETTE.enemies.healthFill,
           });
         }
       }

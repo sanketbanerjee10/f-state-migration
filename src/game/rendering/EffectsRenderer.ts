@@ -72,9 +72,15 @@ export function drawImpactEffect(
   effect: ImpactVisualState,
 ): void {
   const progress = clampVisualValue(effect.progress);
-  const color = effect.color ?? (effect.critical
-    ? GAME_PALETTE.combat.critical
-    : GAME_PALETTE.combat.impact);
+  const color = effect.color ?? (
+    effect.kind === 'telegraph'
+      ? GAME_PALETTE.enemies.chargerTelegraph
+      : effect.kind === 'acid'
+        ? GAME_PALETTE.hazards.acidImpact
+        : effect.critical
+          ? GAME_PALETTE.combat.critical
+          : GAME_PALETTE.combat.impact
+  );
   const baseRadius = effect.radius ?? GAME_VISUAL_CONFIG.effects.impactRingRadius;
   const radius = 3 + progress * baseRadius;
   const particleCount = effect.kind === 'death'

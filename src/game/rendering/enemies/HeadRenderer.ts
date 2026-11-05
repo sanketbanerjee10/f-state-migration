@@ -57,14 +57,14 @@ export function drawHead(
     context.fill();
     context.stroke();
 
-    context.fillStyle = 'rgba(255, 255, 255, 0.14)';
+    context.fillStyle = 'rgba(255, 255, 255, 0.18)';
     context.beginPath();
     context.ellipse(head.x - headWidth * 0.22, head.y - headHeight * 0.2, headWidth * 0.36, headHeight * 0.24, 0, 0, Math.PI * 2);
     context.fill();
 
     if (variant === 'armoured') {
       drawCircle(context, head.x, head.y + headHeight * 0.12, headHeight * 0.2, {
-        fill: '#d6c6a8',
+        fill: '#C5EDFF',
         stroke: appearance.outlineColor,
         lineWidth: 2,
       });

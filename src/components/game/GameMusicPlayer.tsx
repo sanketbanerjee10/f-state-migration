@@ -6,6 +6,7 @@ interface GameMusicPlayerProps {
   readonly musicEnabled: boolean;
   readonly onToggle: () => void;
   readonly floating?: boolean;
+  readonly dimmed?: boolean;
 }
 
 export function GameMusicPlayer({
@@ -14,12 +15,14 @@ export function GameMusicPlayer({
   musicEnabled,
   onToggle,
   floating = false,
+  dimmed = false,
 }: GameMusicPlayerProps) {
   return (
     <div
       className={[
         'game-music-player-controls',
         floating ? 'game-music-player-controls-floating' : '',
+        dimmed ? 'game-music-player-controls-dimmed' : '',
       ].filter(Boolean).join(' ')}
     >
       <button

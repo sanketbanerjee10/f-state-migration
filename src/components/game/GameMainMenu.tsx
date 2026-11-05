@@ -302,7 +302,7 @@ export function GameMainMenu({
           onClick={() => onViewChange('enemy-guide')}
         >
           <span className="game-menu-button-icon">♧</span>
-          <span>Guides</span>
+          <span>Field Guides</span>
         </button>
 
         <button

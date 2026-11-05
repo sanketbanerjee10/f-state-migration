@@ -64,7 +64,7 @@ export function updateScreamerAbilities(
         kind: 'telegraph',
         critical: false,
         shieldAbsorbed: false,
-        color: '#b96e68',
+        color: '#FFE6A8',
         radius: screamer.radius + 20,
       });
     } else {

@@ -31,6 +31,17 @@ interface ArenaRenderState {
 
 type CanvasPaint = string | CanvasGradient | CanvasPattern;
 
+function withAlpha(hexColor: string, alpha: number): string {
+  const normalized = hexColor.replace('#', '');
+  const expanded = normalized.length === 3
+    ? normalized.split('').map((character) => character + character).join('')
+    : normalized;
+  const red = Number.parseInt(expanded.slice(0, 2), 16);
+  const green = Number.parseInt(expanded.slice(2, 4), 16);
+  const blue = Number.parseInt(expanded.slice(4, 6), 16);
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 function roundedRectPath(
   context: CanvasRenderingContext2D,
   x: number,
@@ -134,6 +145,42 @@ function getArenaTheme(themeId?: ArenaThemeId): ArenaTheme {
     ARENA_THEME_CYCLE[0]!;
 }
 
+function getArenaObjectPalette(themeId: ArenaThemeId) {
+  const palette = GAME_PALETTE.arenaThemes[themeId] ?? GAME_PALETTE.arenaThemes.military;
+  return {
+    crate: {
+      fill: palette.crate.fill,
+      edge: palette.crate.edge,
+      inset: palette.crate.detail,
+      detail: palette.crate.highlight,
+    },
+    barricade: {
+      fill: palette.barricade.fill,
+      edge: palette.barricade.edge,
+      detail: palette.barricade.detail,
+      highlight: palette.barricade.highlight,
+    },
+    wall: {
+      fill: palette.wall.fill,
+      edge: palette.wall.edge,
+      detail: palette.wall.detail,
+      highlight: palette.wall.highlight,
+    },
+    cover: {
+      fill: palette.cover.fill,
+      edge: palette.cover.edge,
+      detail: palette.cover.detail,
+      highlight: palette.cover.highlight,
+    },
+    barrel: {
+      fill: palette.barrel.fill,
+      edge: palette.barrel.edge,
+      detail: palette.barrel.detail,
+      highlight: palette.barrel.highlight,
+    },
+  };
+}
+
 function drawArenaFloor(
   context: CanvasRenderingContext2D,
   width: number,
@@ -152,8 +199,8 @@ function drawArenaFloor(
     height * 0.42,
     Math.max(width, height) * 0.72,
   );
-  ambient.addColorStop(0, 'rgba(213, 184, 135, 0.075)');
-  ambient.addColorStop(0.48, 'rgba(150, 166, 133, 0.035)');
+  ambient.addColorStop(0, withAlpha(theme.highlight, 0.16));
+  ambient.addColorStop(0.48, withAlpha(theme.detail, 0.09));
   ambient.addColorStop(1, 'rgba(8, 14, 11, 0)');
   context.fillStyle = ambient;
   context.fillRect(0, 0, width, height);
@@ -168,7 +215,7 @@ function drawArenaFloor(
   for (const stain of stains) {
     const x = width * stain.x;
     const y = height * stain.y;
-    context.fillStyle = 'rgba(5, 10, 8, 0.035)';
+    context.fillStyle = withAlpha(theme.detail, 0.07);
     context.beginPath();
     context.ellipse(x, y, width * stain.rx, height * stain.ry, 0, 0, Math.PI * 2);
     context.fill();
@@ -291,7 +338,7 @@ function drawObstacle(
   theme: ArenaTheme,
 ): void {
   const dimensions = GAME_VISUAL_CONFIG.obstacle;
-  const colors = GAME_PALETTE.arena;
+  const colors = getArenaObjectPalette(theme.id);
   const { x, y, width, height } = getArenaObstacleBounds(
     obstacle,
     arenaWidth,
@@ -336,7 +383,7 @@ function drawObstacle(
         context,
         { x: x + inset + 5, y: plankY + 2 },
         { x: x + width * 0.62, y: plankY + 2 },
-        'rgba(225, 199, 151, 0.12)',
+        withAlpha(colors.crate.detail, 0.18),
         1,
       );
     }
@@ -366,8 +413,8 @@ function drawObstacle(
       drawCircle(context, cornerX, cornerY, 1.2, { fill: colors.crate.detail });
     }
 
-    drawLine(context, { x: x + 7, y: y + 1 }, { x: x + width - 7, y: y + 1 }, 'rgba(244, 224, 184, 0.28)', 1);
-    drawLine(context, { x: x + 2, y: y + height - 2 }, { x: x + width - 2, y: y + height - 2 }, 'rgba(12, 15, 12, 0.35)', 1.5);
+    drawLine(context, { x: x + 7, y: y + 1 }, { x: x + width - 7, y: y + 1 }, withAlpha(colors.crate.detail, 0.28), 1);
+    drawLine(context, { x: x + 2, y: y + height - 2 }, { x: x + width - 2, y: y + height - 2 }, withAlpha(colors.crate.inset, 0.48), 1.5);
     return;
   }
 
@@ -486,14 +533,14 @@ function drawObstacle(
           context,
           { x: centerX - bagWidth * 0.22, y: centerY + 1 },
           { x: centerX + bagWidth * 0.22, y: centerY + 1 },
-          'rgba(31, 38, 29, 0.38)',
+          withAlpha(colors.cover.detail, 0.42),
           1,
         );
         drawLine(
           context,
           { x: centerX - bagWidth * 0.2, y: centerY - bagHeight * 0.2 },
           { x: centerX + bagWidth * 0.2, y: centerY - bagHeight * 0.2 },
-          'rgba(236, 225, 185, 0.16)',
+          withAlpha(colors.cover.highlight, 0.18),
           1,
         );
       }
@@ -510,8 +557,8 @@ function drawObstacle(
   fillRoundedRect(context, x, y, width, height, Math.min(5, height * 0.35), barrierGradient);
   strokeRoundedRect(context, x + 0.5, y + 0.5, width - 1, height - 1, Math.min(5, height * 0.35), colors.barricade.edge, dimensions.barricadeEdgeWidth);
 
-  fillRoundedRect(context, x + 4, y + 2, Math.max(0, width - 8), Math.max(1, height * 0.2), 2, 'rgba(239, 224, 186, 0.16)');
-  drawLine(context, { x: x + 4, y: y + height - 2 }, { x: x + width - 4, y: y + height - 2 }, 'rgba(12, 17, 14, 0.38)', 1.25);
+  fillRoundedRect(context, x + 4, y + 2, Math.max(0, width - 8), Math.max(1, height * 0.2), 2, withAlpha(colors.barricade.highlight, 0.18));
+  drawLine(context, { x: x + 4, y: y + height - 2 }, { x: x + width - 4, y: y + height - 2 }, withAlpha(colors.barricade.detail, 0.7), 1.25);
 
   const reflectorCount = width >= 90 ? 3 : 2;
   for (let index = 0; index < reflectorCount; index += 1) {
@@ -560,32 +607,51 @@ function drawBarrel(
   const x = arenaWidth * barrel.xFraction;
   const y = arenaHeight * barrel.yFraction;
   const radius = barrel.radius;
-  const colors = GAME_PALETTE.arena.barrel;
+  const colors = getArenaObjectPalette(theme.id).barrel;
   const alive = barrel.health > 0;
 
   drawCircle(context, x + 2, y + radius * 0.28 + 3, radius * 1.08, {
     fill: theme.shadow,
   });
   drawCircle(context, x, y + 1, radius + 1.5, {
-    fill: alive ? colors.edge : GAME_PALETTE.arena.obstacleShadow,
+    fill: alive ? colors.edge : '#343944',
   });
 
-  const drumGradient = context.createRadialGradient(
-    x - radius * 0.32,
-    y - radius * 0.38,
-    1,
-    x,
-    y,
-    radius * 1.15,
-  );
-  drumGradient.addColorStop(0, alive ? colors.detail : '#27302B');
-  drumGradient.addColorStop(0.42, alive ? colors.fill : '#1B2420');
-  drumGradient.addColorStop(1, alive ? '#493A2D' : '#111916');
-  fillEllipse(context, x, y, radius - 1.5, radius - 1.5, drumGradient);
-  drawCircle(context, x, y, radius - 2, {
-    stroke: alive ? colors.edge : 'rgba(111, 119, 102, 0.45)',
-    lineWidth: 1,
-  });
+  if (alive) {
+    const drumGradient = context.createRadialGradient(
+      x - radius * 0.32,
+      y - radius * 0.38,
+      1,
+      x,
+      y,
+      radius * 1.15,
+    );
+    drumGradient.addColorStop(0, colors.highlight);
+    drumGradient.addColorStop(0.42, colors.fill);
+    drumGradient.addColorStop(1, colors.detail);
+    fillEllipse(context, x, y, radius - 1.5, radius - 1.5, drumGradient);
+    drawCircle(context, x, y, radius - 2, {
+      stroke: colors.edge,
+      lineWidth: 1,
+    });
+  } else {
+    const destroyedGradient = context.createRadialGradient(
+      x - radius * 0.32,
+      y - radius * 0.38,
+      1,
+      x,
+      y,
+      radius * 1.15,
+    );
+    destroyedGradient.addColorStop(0, '#394653');
+    destroyedGradient.addColorStop(0.38, '#343944');
+    destroyedGradient.addColorStop(1, '#171F2D');
+    fillEllipse(context, x, y, radius - 1.5, radius - 1.5, destroyedGradient);
+    drawCircle(context, x, y, radius - 2, {
+      stroke: '#252D3A',
+      lineWidth: 1,
+    });
+  }
 
   context.save();
   try {
@@ -602,20 +668,21 @@ function drawBarrel(
   }
 
   drawCircle(context, x + radius * 0.28, y - radius * 0.18, Math.max(1.5, radius * 0.13), {
-    fill: alive ? colors.edge : '#202923',
-    stroke: 'rgba(20, 22, 17, 0.48)',
+    fill: alive ? colors.edge : '#252D3A',
+    stroke: alive ? 'rgba(20, 22, 17, 0.48)' : 'rgba(150, 166, 166, 0.42)',
     lineWidth: 1,
   });
   drawCircle(context, x - radius * 0.42, y - radius * 0.45, Math.max(1, radius * 0.1), {
-    fill: 'rgba(246, 224, 181, 0.28)',
+    fill: alive ? withAlpha(colors.highlight, 0.36) : 'rgba(150, 166, 166, 0.42)',
   });
 
   if (alive && barrel.health < barrel.maxHealth) {
+    const damagedTone = alive ? colors.detail : '#394653';
     drawLine(
       context,
       { x: x - radius * 0.1, y: y - radius * 0.55 },
       { x: x + radius * 0.2, y: y - radius * 0.08 },
-      'rgba(238, 215, 174, 0.8)',
+      damagedTone,
       1.25,
     );
   }

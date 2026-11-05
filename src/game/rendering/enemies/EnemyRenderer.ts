@@ -1,3 +1,4 @@
+import { GAME_PALETTE } from '../GamePalette';
 import { drawGroundShadow } from '../EntityRenderer';
 import { drawCircle, drawLine } from '../ShapeLibrary';
 import { DEFAULT_ENEMY_APPEARANCE, type EnemyAppearance } from './EnemyAppearance';
@@ -46,8 +47,8 @@ export function drawEnemyAnatomy(
   const health = Number.isFinite(enemy.healthFraction ?? 1) ? enemy.healthFraction ?? 1 : 1;
   if (health >= 0 && health < 1) {
     const trackY = y - radius - 8;
-    drawLine(context, { x: enemy.x - radius, y: trackY }, { x: enemy.x + radius, y: trackY }, '#0b1215', 3);
-    drawLine(context, { x: enemy.x - radius, y: trackY }, { x: enemy.x - radius + radius * 2 * health, y: trackY }, '#d68e84', 3);
+    drawLine(context, { x: enemy.x - radius, y: trackY }, { x: enemy.x + radius, y: trackY }, GAME_PALETTE.enemies.healthTrack, 3);
+    drawLine(context, { x: enemy.x - radius, y: trackY }, { x: enemy.x - radius + radius * 2 * health, y: trackY }, GAME_PALETTE.enemies.healthFill, 3);
   }
 
   drawCircle(context, enemy.x, y + radius * 1.1, radius * 0.18, {

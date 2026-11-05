@@ -44,15 +44,20 @@ export function drawMutations(
     if (variant === 'spitter') {
       for (const offset of [-1, 0, 1]) {
         drawCircle(context, mutation.x + offset * radius * 0.58, mutation.y - radius * 0.82, radius * 0.2, {
-          fill: '#cbe29a',
+          fill: '#D5C4FF',
           stroke: appearance.outlineColor,
           lineWidth: 2,
         });
       }
       drawCircle(context, mutation.x + radius * 0.2, mutation.y + radius * 0.1, radius * 0.16, {
-        fill: '#7cc76a',
+        fill: '#E6DCFF',
         stroke: appearance.outlineColor,
         lineWidth: 1.5,
+      });
+      drawCircle(context, mutation.x + radius * 0.2, mutation.y + radius * 0.1, radius * 0.08, {
+        fill: '#C8FF65',
+        stroke: appearance.outlineColor,
+        lineWidth: 1,
       });
     }
 

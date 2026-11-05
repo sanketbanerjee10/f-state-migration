@@ -80,7 +80,7 @@ export function drawBody(
 
     const shadowX = body.x;
     const shadowY = baseY + bodyHeight * 0.9;
-    context.fillStyle = 'rgba(5, 15, 18, 0.18)';
+    context.fillStyle = 'rgba(18, 22, 42, 0.22)';
     context.beginPath();
     context.ellipse(shadowX, shadowY, bodyWidth * 0.78, radius * 0.24, 0, 0, Math.PI * 2);
     context.fill();
@@ -110,7 +110,7 @@ export function drawBody(
     context.fill();
     context.stroke();
 
-    context.fillStyle = 'rgba(255, 255, 255, 0.18)';
+    context.fillStyle = 'rgba(255, 255, 255, 0.22)';
     context.beginPath();
     context.ellipse(
       x - bodyWidth * 0.26,

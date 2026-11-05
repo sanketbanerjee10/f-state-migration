@@ -46,7 +46,7 @@ export function drawFace(
     const eyeY = face.y - radius * 0.08;
     const leftEyeX = face.x - radius * 0.3;
     const rightEyeX = face.x + radius * 0.3;
-    const eyeFill = appearance.eyeStyle === 'angry' ? '#F4E9B9' : '#F7EDBE';
+    const eyeFill = '#FFF3A6';
 
     const eyeStyle = { fill: eyeFill, stroke: appearance.outlineColor, lineWidth: 1.7 };
     drawCircle(context, leftEyeX, eyeY, eyeRadius, eyeStyle);

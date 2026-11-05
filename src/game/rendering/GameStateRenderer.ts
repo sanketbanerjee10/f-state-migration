@@ -141,14 +141,14 @@ export function createGameStateRenderLayers(state: GameState): RenderLayers {
           } else {
             context.globalAlpha = 0.35;
             drawCircle(context, hazard.x, hazard.y, hazard.radius, {
-              fill: '#7d8c78',
+              fill: GAME_PALETTE.hazards.acidFill,
             });
             drawRing(
               context,
               hazard.x,
               hazard.y,
               hazard.radius,
-              '#b9c68a',
+              GAME_PALETTE.hazards.acidEdge,
               2,
             );
           }
@@ -181,9 +181,11 @@ export function createGameStateRenderLayers(state: GameState): RenderLayers {
         ? 'turret'
         : projectile.kind === 'spitter'
           ? 'spitter'
-        : projectile.kind === 'heavy' || projectile.kind === 'critical'
-          ? projectile.kind
-          : 'standard',
+          : projectile.kind === 'acid'
+            ? 'acid'
+            : projectile.kind === 'heavy' || projectile.kind === 'critical'
+              ? projectile.kind
+              : 'standard',
     }),
   }));
   const foregroundEffects: RenderCommand[] = [

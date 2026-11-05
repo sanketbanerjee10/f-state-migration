@@ -119,7 +119,6 @@ export function GamePauseMenu({
                 >
                   <span className="game-pause-action-icon" aria-hidden="true">⚙</span>
                   <span>Settings</span>
-                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
                 </button>
                 <button
                   className="game-pause-action"
@@ -128,7 +127,6 @@ export function GamePauseMenu({
                 >
                   <span className="game-pause-action-icon" aria-hidden="true">▤</span>
                   <span>Field guide</span>
-                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
                 </button>
                 {!tutorialMode && (
                   <button
@@ -138,7 +136,6 @@ export function GamePauseMenu({
                   >
                     <span className="game-pause-action-icon" aria-hidden="true">↻</span>
                     <span>Restart run</span>
-                    <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
                   </button>
                 )}
                 <button
@@ -148,7 +145,6 @@ export function GamePauseMenu({
                 >
                   <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
                   <span>{tutorialMode ? 'Exit tutorial' : 'Main menu'}</span>
-                  <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
                 </button>
               </div>
             </section>
@@ -471,24 +467,20 @@ export function GamePauseMenu({
             <button className="game-pause-action" type="button" onClick={() => onViewChange('settings')}>
               <span className="game-pause-action-icon" aria-hidden="true">⚙</span>
               <span>Settings</span>
-              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
             </button>
             <button className="game-pause-action" type="button" onClick={() => onViewChange('enemy-guide')}>
               <span className="game-pause-action-icon" aria-hidden="true">▤</span>
               <span>Guides</span>
-              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
             </button>
             {!tutorialMode && (
               <button className="game-pause-action" type="button" onClick={onRestart}>
                 <span className="game-pause-action-icon" aria-hidden="true">↻</span>
                 <span>Restart run</span>
-                <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
               </button>
             )}
             <button className="game-pause-action" type="button" onClick={onReturnToMenu}>
               <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
               <span>{tutorialMode ? 'Exit tutorial' : 'Main menu'}</span>
-              <span className="game-pause-action-arrow" aria-hidden="true">↗</span>
             </button>
           </div>
         </div>

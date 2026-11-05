@@ -8,7 +8,8 @@ export type ProjectileVisualType =
   | 'heavy'
   | 'critical'
   | 'turret'
-  | 'spitter';
+  | 'spitter'
+  | 'acid';
 
 export interface ProjectileVisualState extends WorldPoint {
   readonly directionX: number;
@@ -39,7 +40,9 @@ export function drawProjectile(
           ? entity.projectileRadius * 0.85
           : type === 'spitter'
             ? 5
-          : entity.projectileRadius
+            : type === 'acid'
+              ? 6
+              : entity.projectileRadius
   );
   const trailLength = type === 'heavy'
     ? 16
@@ -49,7 +52,9 @@ export function drawProjectile(
         ? 14
         : type === 'spitter'
           ? 14
-        : 10;
+          : type === 'acid'
+            ? 14
+            : 10;
   const color = type === 'heavy'
     ? GAME_PALETTE.combat.heavyProjectile
     : type === 'critical'
@@ -57,8 +62,10 @@ export function drawProjectile(
       : type === 'turret'
         ? GAME_PALETTE.combat.turretProjectile
         : type === 'spitter'
-          ? GAME_PALETTE.combat.spitterProjectile
-      : GAME_PALETTE.combat.projectile;
+          ? GAME_PALETTE.enemies.spitterProjectile
+          : type === 'acid'
+            ? GAME_PALETTE.enemies.acidProjectile
+            : GAME_PALETTE.combat.projectile;
 
   drawLine(
     context,
@@ -75,17 +82,21 @@ export function drawProjectile(
       : type === 'turret'
         ? GAME_PALETTE.combat.turretProjectileTrail
         : type === 'spitter'
-          ? GAME_PALETTE.combat.spitterProjectileTrail
-        : GAME_PALETTE.combat.projectileTrail,
-    type === 'heavy' || type === 'turret' || type === 'spitter' ? 4 : 2,
+          ? GAME_PALETTE.enemies.spitterProjectileTrail
+          : type === 'acid'
+            ? GAME_PALETTE.enemies.acidProjectileTrail
+            : GAME_PALETTE.combat.projectileTrail,
+    type === 'heavy' || type === 'turret' || type === 'spitter' || type === 'acid' ? 4 : 2,
   );
   drawCircle(context, projectile.x, projectile.y, radius, {
     fill: color,
     stroke: type === 'turret'
       ? GAME_PALETTE.combat.turretProjectile
       : type === 'spitter'
-        ? GAME_PALETTE.combat.spitterProjectileOutline
-        : GAME_PALETTE.combat.projectileOutline,
+        ? GAME_PALETTE.enemies.spitterProjectileOutline
+        : type === 'acid'
+          ? GAME_PALETTE.enemies.acidProjectileOutline
+          : GAME_PALETTE.combat.projectileOutline,
     lineWidth: 1,
   });
 

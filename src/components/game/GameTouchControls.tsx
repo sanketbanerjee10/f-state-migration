@@ -22,9 +22,6 @@ export function GameTouchControls({
       aria-label="Touch controls"
     >
       <div className="game-mobile-control">
-        <span className="game-mobile-control-label" aria-hidden="true">
-          MOVE
-        </span>
         <button
           ref={movementRef}
           className={`game-joystick game-joystick-movement${highlightMovement ? ' game-joystick-highlighted' : ''}`}
@@ -35,9 +32,6 @@ export function GameTouchControls({
         </button>
       </div>
       <div className="game-mobile-control">
-        <span className="game-mobile-control-label" aria-hidden="true">
-          AIM
-        </span>
         <button
           ref={aimRef}
           className={`game-joystick game-joystick-aim${highlightAim ? ' game-joystick-highlighted' : ''}`}

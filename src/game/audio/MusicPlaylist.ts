@@ -1,7 +1,7 @@
 import { DEFAULT_GAME_SETTINGS } from '../core/GameSettings';
 
 export const MUSIC_PREFETCH_SECONDS = 30;
-export const MUSIC_CROSSFADE_MILLISECONDS = 1500;
+export const MUSIC_CROSSFADE_MILLISECONDS = 3000;
 
 const GAME_AUDIO_BASE_URL = import.meta.env.DEV
   ? (typeof __DEV_GAME_AUDIO_BASE_URL__ === 'undefined'
