@@ -356,6 +356,31 @@
   gap: 21px;
 }
 
+.game-pause-overlay > .game-pause-ui.game-pause-ui-stats {
+  height: max-content;
+  grid-template-rows: auto auto;
+  padding-bottom: 1px;
+}
+
+.game-pause-ui-stats .game-pause-layout,
+.game-pause-ui-stats .game-pause-workspace,
+.game-pause-ui-stats .game-pause-upgrade-station {
+  height: auto;
+}
+
+.game-pause-ui-stats .game-pause-layout {
+  min-height: max-content;
+}
+
+.game-pause-ui-stats .game-pause-workspace {
+  grid-template-rows: auto;
+}
+
+.game-pause-ui-stats .game-pause-upgrade-station {
+  min-height: max-content;
+  grid-template-rows: auto auto auto;
+}
+
 .game-pause-overlay > .game-pause-ui,
 .game-pause-overlay .game-pause-ui * {
   box-sizing: border-box;
@@ -919,6 +944,10 @@
   margin-top: 14px;
   overflow: auto;
   outline: none;
+}
+
+.game-pause-stats-panel {
+  overflow: visible;
 }
 
 .game-pause-upgrades {
@@ -2812,6 +2841,13 @@
   }
 }
 
+@media (max-width: 900px) and (orientation: landscape) and (pointer: coarse),
+  (max-height: 600px) and (orientation: landscape) and (pointer: coarse) {
+  .game-pause-header {
+    display: none;
+  }
+}
+
 /* Very short landscape screens and compact desktop windows */
 
 @media (max-height: 720px) and (min-width: 651px) {
@@ -3429,6 +3465,42 @@
   color: var(--ah-cream);
   background: color-mix(in srgb, var(--ah-pink) 17%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ah-pink) 10%, transparent);
+}
+
+.settings-touch-controls .settings-choice {
+  min-height: 44px;
+}
+
+.settings-range {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0;
+  color: var(--ah-lavender);
+  font-size: 10px;
+}
+
+.settings-range > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.settings-range output {
+  color: var(--ah-cream);
+  font: 600 10px var(--app-font-mono);
+}
+
+.settings-range input {
+  width: 100%;
+  accent-color: var(--ah-pink);
+}
+
+@media (max-height: 600px) {
+  .settings-touch-controls .settings-choice {
+    min-height: 44px;
+    padding: 6px 3px;
+  }
 }
 
 .settings-hud-options {

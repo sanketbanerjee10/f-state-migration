@@ -9,7 +9,9 @@ import { MouseAimInput, type ClientPointerPosition } from './MouseAimInput';
 import {
   DualJoystickInput,
   type JoystickVector,
+  type ZoneInputOptions,
 } from './DualJoystickInput';
+import type { ControlSettings } from './ControlSettings';
 import { renderGameScene } from '../rendering/Renderer';
 import { getArenaBackgroundCacheMetrics } from '../arenas/core/ArenaRenderer';
 import { EMPTY_RENDER_LAYERS, type RenderLayers } from '../rendering/RenderScene';
@@ -74,6 +76,7 @@ export class GameEngine {
     readonly movement: HTMLElement;
     readonly aim: HTMLElement;
   } | null = null;
+  private mobileControlsActive = true;
   private mobileMovement: JoystickVector = { x: 0, y: 0 };
   private lastTouchTap: {
     readonly time: number;
@@ -366,12 +369,26 @@ export class GameEngine {
   setMobileControls(controls: {
     readonly movement: HTMLElement;
     readonly aim: HTMLElement;
+    readonly surface?: HTMLElement;
+    readonly gameplaySurface?: HTMLElement;
+    readonly getZones?: ZoneInputOptions['getZones'];
+    readonly settings?: ControlSettings;
+    readonly positionStick?: ZoneInputOptions['positionStick'];
+    readonly active?: boolean;
   } | null): void {
     this.assertNotDestroyed();
     if (
-      controls?.movement === this.mobileControlElements?.movement &&
-      controls?.aim === this.mobileControlElements?.aim
+      controls &&
+      controls.movement === this.mobileControlElements?.movement &&
+      controls.aim === this.mobileControlElements?.aim
     ) {
+      if (controls.settings) {
+        this.dualJoystickInput.setControlSettings(controls.settings);
+      }
+      this.mobileControlsActive = controls.active ?? true;
+      this.dualJoystickInput.setEnabled(
+        this.isActive && !document.hidden && this.mobileControlsActive,
+      );
       return;
     }
 
@@ -381,15 +398,44 @@ export class GameEngine {
     );
     this.mobileControlElements = controls;
     this.mobileMovement = { x: 0, y: 0 };
+    this.mobileControlsActive = controls?.active ?? true;
     if (!controls) return;
 
-    this.dualJoystickInput.attach(
-      controls.movement,
-      controls.aim,
-      this.handleMobileMovement,
-      this.handleMobileAim,
+    if (
+      controls.surface &&
+      controls.gameplaySurface &&
+      controls.getZones &&
+      controls.settings &&
+      controls.positionStick
+    ) {
+      this.dualJoystickInput.attachToZones(
+        controls.movement,
+        controls.aim,
+        this.handleMobileMovement,
+        this.handleMobileAim,
+        {
+          surface: controls.surface,
+          gameplaySurface: controls.gameplaySurface,
+          getZones: controls.getZones,
+          settings: controls.settings,
+          positionStick: controls.positionStick,
+        },
+      );
+    } else {
+      this.dualJoystickInput.attach(
+        controls.movement,
+        controls.aim,
+        this.handleMobileMovement,
+        this.handleMobileAim,
+      );
+    }
+    this.dualJoystickInput.setEnabled(
+      this.isActive && !document.hidden && this.mobileControlsActive,
     );
-    this.dualJoystickInput.setEnabled(this.isActive && !document.hidden);
+  }
+
+  updateTouchZones(): void {
+    this.dualJoystickInput.refreshZones();
   }
 
   requestBomb(): void {
@@ -665,7 +711,9 @@ export class GameEngine {
     const shouldEnable = enabled && !document.hidden;
     this.keyboardInput.setEnabled(shouldEnable);
     this.mouseAimInput.setEnabled(shouldEnable);
-    this.dualJoystickInput.setEnabled(shouldEnable);
+    this.dualJoystickInput.setEnabled(
+      shouldEnable && this.mobileControlsActive,
+    );
   }
 
   private render(): void {

@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 
 import * as React from 'react';
-import { act, createElement, createRef } from 'react';
+import { act, createElement, createRef, Profiler } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GameSettingsPanel } from '@/components/game/GameSettingsPanel';
 import { GameTouchControls } from '@/components/game/GameTouchControls';
+import { DualJoystickInput } from '@/game/core/DualJoystickInput';
 import { DEFAULT_GAME_SETTINGS, type GameSettings } from '@/game/core/GameSettings';
 import type { GameStateSnapshot } from '@/game/core/GameState';
 import { GameScoreSubmission } from '@/components/game/GameScoreSubmission';
@@ -40,6 +41,28 @@ const mocks = vi.hoisted(() => ({
     'game.fullscreenButton.exit': 'Exit fullscreen',
     'game.settings.controls': 'Controls',
     'game.settings.audio': 'Audio',
+    'game.settings.touchControlsTitle': 'Touch Controls',
+    'game.settings.controlLayout': 'Control layout',
+    'game.settings.controlLayoutHint': 'Choose which hand controls movement.',
+    'game.settings.rightHanded': 'Right-handed',
+    'game.settings.leftHanded': 'Left-handed',
+    'game.settings.joystickAppearance': 'Joystick appearance',
+    'game.settings.joystickAppearanceHint': 'Customize both floating sticks.',
+    'game.settings.baseOpacity': 'Base and glow opacity',
+    'game.settings.thumbOpacity': 'Thumb opacity',
+    'game.settings.joystickSize': 'Joystick size',
+    'game.settings.small': 'Small',
+    'game.settings.medium': 'Medium',
+    'game.settings.large': 'Large',
+    'game.settings.joystickPreview': 'Live preview of movement and aim sticks',
+    'game.settings.joystickBehaviour': 'Joystick behaviour',
+    'game.settings.joystickBehaviourHint': 'Choose how the movement stick appears.',
+    'game.settings.fixed': 'Fixed',
+    'game.settings.floating': 'Floating',
+    'game.settings.joystickPosition': 'Position',
+    'game.settings.edgePosition': 'Edge ({{side}})',
+    'game.settings.middlePositionMiddle': 'Middle',
+    'game.settings.innerPosition': 'Inner ({{side}})',
     'game.settings.pauseGame': 'Pause Game',
     'game.settings.leftDoubleOrRightClick': 'DOUBLE LEFT-CLICK OR RIGHT-CLICK',
     'game.settings.placeTurret': 'Place turret',
@@ -51,6 +74,8 @@ const mocks = vi.hoisted(() => ({
     'game.settings.actions.moveRight': 'Move right',
     'game.settings.keyCannotAssign': 'This key cannot be assigned by your browser.',
     'game.touch.controls': 'Touch controls',
+    'game.touch.movement': 'Movement',
+    'game.touch.aim': 'Aim',
     'game.touch.useBomb': 'Use bomb',
     'game.tutorial.ariaLabel': 'Interactive game tutorial',
     'game.tutorial.confirmExit': 'Confirm tutorial exit',
@@ -110,6 +135,7 @@ vi.mock('@/game/core/GameEngine', () => {
       resize = vi.fn();
       setKeyBindings = vi.fn();
       setMobileControls = vi.fn();
+      updateTouchZones = vi.fn();
       requestBomb = vi.fn();
       getPerformanceSnapshotBuildMs = vi.fn(() => 0);
       recordPerformanceUiPoll = vi.fn();
@@ -840,15 +866,12 @@ describe('game UI scenarios', () => {
     expect(onBack).toHaveBeenCalledOnce();
   });
 
-  it('hides keyboard and mouse controls for touch devices', async () => {
+  it('shows touch settings and hides keyboard bindings on touch devices', async () => {
     await act(async () => mediaQuery.setMatches(true));
     await renderSettings();
+    await clickButton('Controls');
 
-    expect(
-      Array.from(container?.querySelectorAll('button') ?? []).some(
-        (button) => button.textContent?.includes('Controls'),
-      ),
-    ).toBe(false);
+    expect(container?.textContent).toContain('Touch Controls');
     expect(container?.querySelector('.settings-key-grid')).toBeNull();
   });
 
@@ -955,6 +978,58 @@ describe('game UI scenarios', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it('shows touch settings without desktop key bindings on touch devices', async () => {
+    await act(async () => mediaQuery.setMatches(true));
+    const onChange = vi.fn();
+    await renderSettings(vi.fn(), onChange);
+    await clickButton('Controls');
+
+    expect(container?.textContent).toContain('Touch Controls');
+    expect(container?.querySelector('[aria-label="Key bindings"]')).toBeNull();
+    await clickButton('Left-handed');
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        touchControlSettings: expect.objectContaining({ layout: 'left' }),
+      }),
+    );
+  });
+
+  it('updates both-stick appearance settings and renders their shared live preview', async () => {
+    await act(async () => mediaQuery.setMatches(true));
+    const onChange = vi.fn();
+    await renderSettings(vi.fn(), onChange);
+    await clickButton('Controls');
+
+    const preview = container?.querySelector<HTMLElement>(
+      '.game-joystick-preview-row',
+    );
+    expect(preview?.dataset.size).toBe('medium');
+    expect(
+      preview?.querySelectorAll('.game-joystick-preview'),
+    ).toHaveLength(2);
+    expect(preview?.getAttribute('aria-label')).toBe(
+      'Live preview of movement and aim sticks',
+    );
+
+    const baseOpacity = container?.querySelector<HTMLInputElement>(
+      'input[aria-label="Base and glow opacity"]',
+    );
+    expect(baseOpacity).not.toBeNull();
+    await setInputValue(baseOpacity!, '20');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        touchControlSettings: expect.objectContaining({ baseOpacity: 20 }),
+      }),
+    );
+
+    await clickButton('Large');
+    expect(onChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        touchControlSettings: expect.objectContaining({ joystickSize: 'large' }),
+      }),
+    );
+  });
+
   it('GAME-UI-12 mounts touch controls for Always, hides them for Never, and follows Auto media changes', async () => {
     await mountGame();
     expect(container?.querySelector('[aria-label="Touch controls"]')).toBeNull();
@@ -976,21 +1051,33 @@ describe('game UI scenarios', () => {
     const onUseBomb = vi.fn();
     const movementRef = createRef<HTMLButtonElement>();
     const aimRef = createRef<HTMLButtonElement>();
+    const firstBombRef = createRef<HTMLDivElement>();
+    const secondBombRef = createRef<HTMLDivElement>();
+    const firstRootRef = createRef<HTMLDivElement>();
+    const secondRootRef = createRef<HTMLDivElement>();
     await render(
       <>
         <GameTouchControls
           active
           bombs={2}
+          controlSettings={DEFAULT_GAME_SETTINGS.touchControlSettings}
+          onZonesChange={vi.fn()}
+          rootRef={firstRootRef}
           onUseBomb={onUseBomb}
           movementRef={movementRef}
           aimRef={aimRef}
+          bombRef={firstBombRef}
         />
         <GameTouchControls
           active
           bombs={0}
+          controlSettings={DEFAULT_GAME_SETTINGS.touchControlSettings}
+          onZonesChange={vi.fn()}
+          rootRef={secondRootRef}
           onUseBomb={onUseBomb}
           movementRef={createRef<HTMLButtonElement>()}
           aimRef={createRef<HTMLButtonElement>()}
+          bombRef={secondBombRef}
         />
       </>,
     );
@@ -1000,6 +1087,65 @@ describe('game UI scenarios', () => {
     await act(async () => (bombs[0] as HTMLButtonElement).click());
     await act(async () => (bombs[1] as HTMLButtonElement).click());
     expect(onUseBomb).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the touch-controls subtree render count flat during pointer drags (proxy)', async () => {
+    const movementRef = createRef<HTMLButtonElement>();
+    const aimRef = createRef<HTMLButtonElement>();
+    const bombRef = createRef<HTMLDivElement>();
+    const rootRef = createRef<HTMLDivElement>();
+    const profile = vi.fn();
+    await render(
+      <Profiler id="touch-controls-proxy" onRender={profile}>
+        <GameTouchControls
+          active
+          bombs={1}
+          controlSettings={DEFAULT_GAME_SETTINGS.touchControlSettings}
+          onZonesChange={vi.fn()}
+          rootRef={rootRef}
+          onUseBomb={vi.fn()}
+          movementRef={movementRef}
+          aimRef={aimRef}
+          bombRef={bombRef}
+        />
+      </Profiler>,
+    );
+
+    const movement = movementRef.current!;
+    const aim = aimRef.current!;
+    movement.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 100, height: 100 }) as DOMRect;
+    aim.getBoundingClientRect = movement.getBoundingClientRect;
+    const capture = new Set<number>();
+    for (const element of [movement, aim]) {
+      element.setPointerCapture = vi.fn((id: number) => capture.add(id));
+      element.hasPointerCapture = vi.fn((id: number) => capture.has(id));
+      element.releasePointerCapture = vi.fn((id: number) => capture.delete(id));
+    }
+
+    const input = new DualJoystickInput();
+    input.attach(movement, aim, vi.fn(), vi.fn());
+    const commitCountAfterMount = profile.mock.calls.length;
+    const createPointerEvent = (type: string, clientX: number) => {
+      const event = new Event(type, { cancelable: true }) as PointerEvent;
+      Object.defineProperties(event, {
+        pointerId: { value: 31 },
+        pointerType: { value: 'touch' },
+        clientX: { value: clientX },
+        clientY: { value: 50 },
+      });
+      return event;
+    };
+
+    await act(async () => {
+      movement.dispatchEvent(createPointerEvent('pointerdown', 50));
+      movement.dispatchEvent(createPointerEvent('pointermove', 80));
+      movement.dispatchEvent(createPointerEvent('pointermove', 90));
+      movement.dispatchEvent(createPointerEvent('pointerup', 90));
+    });
+
+    expect(profile).toHaveBeenCalledTimes(commitCountAfterMount);
+    input.detach();
   });
 
   it('GAME-UI-14 rejects blank and whitespace-only leaderboard names accessibly', async () => {

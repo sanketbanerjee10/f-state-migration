@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DEFAULT_GAME_SETTINGS,
@@ -19,6 +19,8 @@ export function useGameSettings(): GameSettingsState {
   const [settings, setSettings] = useState(DEFAULT_GAME_SETTINGS);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const saveTimer = useRef<number | null>(null);
+  const pendingSettings = useRef<GameSettings | null>(null);
 
   useEffect(() => {
     try {
@@ -36,8 +38,7 @@ export function useGameSettings(): GameSettingsState {
     }
   }, [t]);
 
-  const updateSettings = useCallback((nextSettings: GameSettings) => {
-    setSettings(nextSettings);
+  const persistSettings = useCallback((nextSettings: GameSettings) => {
     try {
       saveGameSettings(window.localStorage, nextSettings);
       setError(null);
@@ -51,6 +52,31 @@ export function useGameSettings(): GameSettingsState {
       );
     }
   }, [t]);
+
+  const flushPendingSettings = useCallback(() => {
+    if (saveTimer.current !== null) {
+      window.clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+    const nextSettings = pendingSettings.current;
+    pendingSettings.current = null;
+    if (nextSettings) persistSettings(nextSettings);
+  }, [persistSettings]);
+
+  useEffect(() => {
+    window.addEventListener('pagehide', flushPendingSettings);
+    return () => {
+      window.removeEventListener('pagehide', flushPendingSettings);
+      flushPendingSettings();
+    };
+  }, [flushPendingSettings]);
+
+  const updateSettings = useCallback((nextSettings: GameSettings) => {
+    setSettings(nextSettings);
+    pendingSettings.current = nextSettings;
+    if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(flushPendingSettings, 250);
+  }, [flushPendingSettings]);
 
   return { settings, error, loaded, updateSettings };
 }

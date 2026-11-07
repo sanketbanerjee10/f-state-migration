@@ -1,9 +1,15 @@
-import { Fragment, useEffect, useState, type KeyboardEvent } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageFlag } from '@/components/LanguageSelector';
 import { LANGUAGE_STORAGE_KEY } from '@/i18n';
-import { GAME_TOUCH_CONTROLS_MEDIA_QUERY } from '@/game/core/GameConfig';
+import { supportsTouchControls, type ControlSettings } from '@/game/core/ControlSettings';
 import {
   LANGUAGE_METADATA,
   SUPPORTED_LANGUAGES,
@@ -18,6 +24,7 @@ import {
 } from '@/game/core/GameSettings';
 import { GAME_MUSIC_TRACKS } from '@/game/audio/GameAudioController';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
+import { GameJoystickVisual } from './GameJoystickVisual';
 
 interface GameSettingsPanelProps {
   readonly settings: GameSettings;
@@ -69,16 +76,22 @@ export function GameSettingsPanel({
   const [isTouchDevice, setIsTouchDevice] = useState(
     () =>
       typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY).matches,
+      supportsTouchControls(
+        typeof window.matchMedia === 'function' &&
+          window.matchMedia('(pointer: coarse)').matches,
+        window.navigator.maxTouchPoints,
+      ),
   );
 
   useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return;
-    const responsiveQuery = window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY);
+    const responsiveQuery = window.matchMedia('(pointer: coarse)');
     const updateDeviceType = () => {
-      setIsTouchDevice(responsiveQuery.matches);
-      if (responsiveQuery.matches) {
+      const touchAvailable = supportsTouchControls(
+        responsiveQuery.matches,
+        window.navigator.maxTouchPoints,
+      );
+      setIsTouchDevice(touchAvailable);
+      if (!touchAvailable) {
         setActiveSection((section) =>
           section === 'controls' ? 'play' : section,
         );
@@ -157,6 +170,18 @@ export function GameSettingsPanel({
     setKeyBindingError(null);
   };
 
+  const updateTouchControlSettings = (
+    next: Partial<ControlSettings>,
+  ) => {
+    onChange({
+      ...settings,
+      touchControlSettings: {
+        ...settings.touchControlSettings,
+        ...next,
+      },
+    });
+  };
+
   const changeSection = (section: SettingsSection) => {
     setActiveSection(section);
     setCapturingAction(null);
@@ -199,9 +224,7 @@ export function GameSettingsPanel({
 
       <div className="settings-workspace">
         <nav className="settings-nav" aria-label={t('game.settings.categories')}>
-          {SECTIONS.filter(
-            (section) => section.id !== 'controls' || !isTouchDevice,
-          ).map((section) => (
+          {SECTIONS.map((section) => (
             <button
               key={section.id}
               type="button"
@@ -218,7 +241,11 @@ export function GameSettingsPanel({
 
               <span className="settings-nav-copy">
                 <strong>{t(`game.settings.${section.labelKey}`)}</strong>
-                <small>{t(`game.settings.${section.hintKey}`)}</small>
+                <small>
+                  {section.id === 'controls' && isTouchDevice
+                    ? t('game.settings.touchControlsTitle')
+                    : t(`game.settings.${section.hintKey}`)}
+                </small>
               </span>
 
               <span className="settings-nav-arrow" aria-hidden="true">
@@ -325,6 +352,153 @@ export function GameSettingsPanel({
                   </div>
                 </section>
 
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'controls' && isTouchDevice && (
+            <div className="settings-section-view">
+              <div className="settings-section-heading">
+                <div>
+                  <span className="settings-kicker">{t('game.settings.sectionControls')}</span>
+                  <h2>{t('game.settings.touchControlsTitle')}</h2>
+                </div>
+                <span className="settings-heading-decoration" aria-hidden="true">
+                  ⌘
+                </span>
+              </div>
+
+              <div className="settings-card-grid settings-touch-controls">
+                <section className="settings-card">
+                  <div className="settings-card-heading">
+                    <span className="settings-card-icon">↔</span>
+                    <div>
+                      <h3>{t('game.settings.controlLayout')}</h3>
+                      <p>{t('game.settings.controlLayoutHint')}</p>
+                    </div>
+                  </div>
+                  <div
+                    className="settings-choice-row"
+                    role="group"
+                    aria-label={t('game.settings.controlLayout')}
+                  >
+                    {([
+                      ['right', t('game.settings.rightHanded')],
+                      ['left', t('game.settings.leftHanded')],
+                    ] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        className="settings-choice"
+                        aria-pressed={settings.touchControlSettings.layout === value}
+                        onClick={() => updateTouchControlSettings({ layout: value })}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="settings-card">
+                  <div className="settings-card-heading">
+                    <span className="settings-card-icon">◉</span>
+                    <div>
+                      <h3>{t('game.settings.joystickAppearance')}</h3>
+                      <p>{t('game.settings.joystickAppearanceHint')}</p>
+                    </div>
+                  </div>
+                  <label className="settings-range">
+                    <span>
+                      {t('game.settings.baseOpacity')}
+                      <output>{settings.touchControlSettings.baseOpacity}%</output>
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={settings.touchControlSettings.baseOpacity}
+                      aria-label={t('game.settings.baseOpacity')}
+                      onChange={(event) =>
+                        updateTouchControlSettings({
+                          baseOpacity: Number(event.currentTarget.value),
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="settings-range">
+                    <span>
+                      {t('game.settings.thumbOpacity')}
+                      <output>{settings.touchControlSettings.thumbOpacity}%</output>
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={settings.touchControlSettings.thumbOpacity}
+                      aria-label={t('game.settings.thumbOpacity')}
+                      onChange={(event) =>
+                        updateTouchControlSettings({
+                          thumbOpacity: Number(event.currentTarget.value),
+                        })
+                      }
+                    />
+                  </label>
+                  <p className="settings-card-footnote">
+                    {t('game.settings.joystickSize')}
+                  </p>
+                  <div
+                    className="settings-choice-row"
+                    role="group"
+                    aria-label={t('game.settings.joystickSize')}
+                  >
+                    {([
+                      ['small', t('game.settings.small')],
+                      ['medium', t('game.settings.medium')],
+                      ['large', t('game.settings.large')],
+                    ] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        className="settings-choice"
+                        aria-pressed={
+                          settings.touchControlSettings.joystickSize === value
+                        }
+                        onClick={() => updateTouchControlSettings({ joystickSize: value })}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    className="game-joystick-preview-row"
+                    data-size={settings.touchControlSettings.joystickSize}
+                    style={
+                      {
+                        '--joy-base-a':
+                          settings.touchControlSettings.baseOpacity / 100,
+                        '--joy-thumb-a':
+                          settings.touchControlSettings.thumbOpacity / 100,
+                      } as CSSProperties
+                    }
+                    role="img"
+                    aria-label={t('game.settings.joystickPreview')}
+                  >
+                    <div className="game-joystick-preview-item">
+                      <div className="game-joystick game-joystick-movement game-joystick-preview">
+                        <GameJoystickVisual />
+                      </div>
+                      <span>{t('game.touch.movement')}</span>
+                    </div>
+                    <div className="game-joystick-preview-item">
+                      <div className="game-joystick game-joystick-aim game-joystick-preview">
+                        <GameJoystickVisual />
+                      </div>
+                      <span>{t('game.touch.aim')}</span>
+                    </div>
+                  </div>
+                </section>
               </div>
             </div>
           )}

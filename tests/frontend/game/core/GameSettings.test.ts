@@ -34,6 +34,11 @@ describe('game settings persistence', () => {
       soundEnabled: true,
       musicVolume: 0.6,
       soundVolume: 0.2,
+      touchControlSettings: {
+        ...DEFAULT_GAME_SETTINGS.touchControlSettings,
+        layout: 'left',
+        baseOpacity: 32,
+      },
     };
 
     saveGameSettings(storage, settings);
@@ -48,7 +53,55 @@ describe('game settings persistence', () => {
         getItem: () =>
           JSON.stringify({ touchControls: 'auto', hudDensity: 'standard' }),
       }),
-    ).toEqual(DEFAULT_GAME_SETTINGS);
+    ).toEqual({
+      ...DEFAULT_GAME_SETTINGS,
+      touchControlSettings: {
+        ...DEFAULT_GAME_SETTINGS.touchControlSettings,
+        baseOpacity: 40,
+        thumbOpacity: 40,
+      },
+    });
+  });
+
+  it('migrates existing saved settings without overwriting storage on load', () => {
+    let saved = JSON.stringify({
+      touchControls: 'auto',
+      hudDensity: 'standard',
+    });
+    const storage = {
+      getItem: () => saved,
+      setItem: vi.fn((_key: string, value: string) => {
+        saved = value;
+      }),
+    };
+
+    expect(loadGameSettings(storage).touchControlSettings).toEqual(
+      {
+        ...DEFAULT_GAME_SETTINGS.touchControlSettings,
+        baseOpacity: 40,
+        thumbOpacity: 40,
+      },
+    );
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it('normalizes corrupt touch-control settings without rejecting other preferences', () => {
+    const loaded = loadGameSettings({
+      getItem: () => JSON.stringify({
+        touchControls: 'auto',
+        hudDensity: 'standard',
+        touchControlSettings: {
+          layout: 'invalid',
+          baseOpacity: 145,
+        },
+      }),
+    });
+
+    expect(loaded.touchControlSettings).toEqual({
+      ...DEFAULT_GAME_SETTINGS.touchControlSettings,
+      baseOpacity: 100,
+      thumbOpacity: 40,
+    });
   });
 
   it('fills key bindings with defaults for earlier saved settings', () => {

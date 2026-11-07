@@ -1,3 +1,9 @@
+import {
+  DEFAULT_CONTROL_SETTINGS,
+  normalizeControlSettings,
+  type ControlSettings,
+} from './ControlSettings';
+
 export type TouchControlsSetting = 'auto' | 'always' | 'never';
 export type HudDensitySetting = 'compact' | 'standard';
 
@@ -65,6 +71,7 @@ export interface GameSettings {
   readonly soundEnabled: boolean;
   readonly musicVolume: number;
   readonly soundVolume: number;
+  readonly touchControlSettings: ControlSettings;
 }
 
 export const DEFAULT_GAME_SETTINGS: GameSettings = {
@@ -76,6 +83,7 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
   soundEnabled: true,
   musicVolume: 0.5,
   soundVolume: 0.5,
+  touchControlSettings: DEFAULT_CONTROL_SETTINGS,
 };
 
 const GAME_SETTINGS_KEY = 'state565.game.settings.v1';
@@ -145,6 +153,9 @@ export function loadGameSettings(storage: Pick<Storage, 'getItem'>): GameSetting
     soundEnabled,
     musicVolume,
     soundVolume,
+    touchControlSettings: normalizeControlSettings(
+      settings.touchControlSettings ?? {},
+    ),
   };
 }
 

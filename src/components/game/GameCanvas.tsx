@@ -1,9 +1,11 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { GameEngine } from '@/game/core/GameEngine';
 import { GAME_TOUCH_CONTROLS_MEDIA_QUERY } from '@/game/core/GameConfig';
+import { supportsTouchControls } from '@/game/core/ControlSettings';
+import type { ControlPoint, ControlZones } from '@/game/core/TouchControlGeometry';
 import type { GamePerformanceSnapshot } from '@/game/core/GamePerformanceDiagnostics';
 import {
   GameAudioController,
@@ -33,7 +35,7 @@ import { GameHud } from './GameHud';
 import { GameMenuOverlay } from './GameMenuOverlay';
 import { GamePauseButton } from './GamePauseButton';
 import { GamePhaseOverlays } from './GamePhaseOverlays';
-import { GameTouchControls } from './GameTouchControls';
+import { GameTouchControls, positionFloatingStick } from './GameTouchControls';
 import { useFullscreenState } from './useFullscreenState';
 import {
   GAME_TUTORIAL_STEPS,
@@ -75,6 +77,9 @@ export function GameCanvas() {
   const escapeRepeatToastShownRef = useRef(false);
   const movementJoystickRef = useRef<HTMLButtonElement>(null);
   const aimJoystickRef = useRef<HTMLButtonElement>(null);
+  const bombControlRef = useRef<HTMLDivElement>(null);
+  const touchControlsRootRef = useRef<HTMLDivElement>(null);
+  const touchControlZonesRef = useRef<ControlZones | null>(null);
   const engineRef = useRef<GameEngine | null>(null);
   const audioRef = useRef<GameAudioController | null>(null);
   const diagnosticsEnabledRef = useRef(false);
@@ -122,9 +127,48 @@ export function GameCanvas() {
       typeof window.matchMedia === 'function' &&
       window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY).matches,
   );
+  const [isTouchCapable, setIsTouchCapable] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      supportsTouchControls(
+        typeof window.matchMedia === 'function' &&
+          window.matchMedia('(pointer: coarse)').matches,
+        window.navigator.maxTouchPoints,
+      ),
+  );
   const shouldMountTouchControls =
     settings.touchControls === 'always' ||
-    (settings.touchControls === 'auto' && isResponsiveLayout);
+    (settings.touchControls === 'auto' &&
+      isResponsiveLayout &&
+      isTouchCapable);
+  const touchControlsActive =
+    hasStarted &&
+    !isPaused &&
+    gameState?.wave.phase === 'combat';
+
+  const handleTouchZonesChange = useCallback((zones: ControlZones | null) => {
+    touchControlZonesRef.current = zones;
+    engineRef.current?.updateTouchZones();
+  }, []);
+
+  const positionStick = useCallback(
+    (
+      stick: 'movement' | 'aim',
+      point: ControlPoint | null,
+      zones: ControlZones,
+    ) => {
+      positionFloatingStick(
+        touchControlsRootRef.current,
+        stick,
+        stick === 'movement'
+          ? movementJoystickRef.current
+          : aimJoystickRef.current,
+        point,
+        zones,
+      );
+    },
+    [],
+  );
 
   const requestGameFullscreen = () => {
     const container = containerRef.current;
@@ -197,6 +241,22 @@ export function GameCanvas() {
     responsiveQuery.addEventListener('change', updateResponsiveMode);
     return () =>
       responsiveQuery.removeEventListener('change', updateResponsiveMode);
+  }, []);
+
+  useEffect(() => {
+    const coarsePointerQuery = window.matchMedia('(pointer: coarse)');
+    const updateTouchCapability = () => {
+      setIsTouchCapable(
+        supportsTouchControls(
+          coarsePointerQuery.matches,
+          window.navigator.maxTouchPoints,
+        ),
+      );
+    };
+    updateTouchCapability();
+    coarsePointerQuery.addEventListener('change', updateTouchCapability);
+    return () =>
+      coarsePointerQuery.removeEventListener('change', updateTouchCapability);
   }, []);
 
   useEffect(() => {
@@ -380,9 +440,25 @@ export function GameCanvas() {
       : null;
     const aim = shouldMountTouchControls ? aimJoystickRef.current : null;
     engine.setMobileControls(
-      movement && aim ? { movement, aim } : null,
+      movement && aim
+        ? {
+            movement,
+            aim,
+            surface: containerRef.current ?? undefined,
+            gameplaySurface: canvasRef.current ?? undefined,
+            getZones: () => touchControlZonesRef.current,
+            settings: settings.touchControlSettings,
+            positionStick,
+            active: touchControlsActive,
+          }
+        : null,
     );
-  }, [shouldMountTouchControls]);
+  }, [
+    positionStick,
+    settings.touchControlSettings,
+    shouldMountTouchControls,
+    touchControlsActive,
+  ]);
 
   const syncGameState = () => {
     setGameState(engineRef.current?.getGameState() ?? null);
@@ -965,11 +1041,8 @@ export function GameCanvas() {
       </canvas>
       {shouldMountTouchControls && (
         <GameTouchControls
-          active={
-            hasStarted &&
-            !isPaused &&
-            gameState?.wave.phase === 'combat'
-          }
+          rootRef={touchControlsRootRef}
+          active={touchControlsActive}
           bombs={gameState?.bombs ?? 0}
           highlightMovement={
             tutorialStepIndex !== null &&
@@ -980,8 +1053,11 @@ export function GameCanvas() {
             GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'aim'
           }
           onUseBomb={() => engineRef.current?.requestBomb()}
+          controlSettings={settings.touchControlSettings}
+          onZonesChange={handleTouchZonesChange}
           movementRef={movementJoystickRef}
           aimRef={aimJoystickRef}
+          bombRef={bombControlRef}
         />
       )}
       {gameState && hasStarted && !isPaused && gameState.wave.phase === 'combat' && (

@@ -78,7 +78,7 @@ export function GamePauseMenu({
     : 0;
 
   return (
-    <div className="game-pause-ui">
+    <div className={`game-pause-ui${pauseTab === 'stats' ? ' game-pause-ui-stats' : ''}`}>
       <header className="game-pause-header">
         <div className="game-pause-heading-copy">
           <h1 id="game-paused-title">{t('game.pause.title')}<span>.</span></h1>
@@ -298,7 +298,7 @@ export function GamePauseMenu({
 
               <div
                 id={`game-pause-${pauseTab}-panel`}
-                className="game-pause-tab-panel"
+                className={`game-pause-tab-panel${pauseTab === 'stats' ? ' game-pause-stats-panel' : ''}`}
                 key={pauseTab}
                 role="tabpanel"
                 aria-labelledby={`game-pause-${pauseTab}-tab`}

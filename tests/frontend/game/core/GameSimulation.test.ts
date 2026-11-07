@@ -1211,4 +1211,35 @@ describe('game simulation', () => {
       ),
     ).toThrow(RangeError);
   });
+
+  it('replays a fixed movement vector sequence frame by frame (determinism proxy)', () => {
+    const replay = () => {
+      const state = createGameState(960, 540);
+      state.player.x = 480;
+      state.player.y = 270;
+      state.zombies = [];
+      state.items = [];
+      state.wave.spawnCooldownSeconds = 10_000;
+      const vectors = [
+        { movementX: 1, movementY: 0 },
+        { movementX: 0, movementY: 1 },
+        {
+          movementX: -Math.SQRT1_2,
+          movementY: -Math.SQRT1_2,
+        },
+        { movementX: 0, movementY: 0 },
+      ];
+
+      return vectors.map((vector) => {
+        updateGameState(
+          state,
+          { ...vector, aimAngle: 0 },
+          1 / 60,
+        );
+        return { x: state.player.x, y: state.player.y };
+      });
+    };
+
+    expect(replay()).toEqual(replay());
+  });
 });
