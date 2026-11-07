@@ -24,6 +24,9 @@ export const GAME_RESPONSIVE_ZOOM_CONFIG = {
   landscapeZoom: 0.82,
 } as const;
 
+export const GAME_TOUCH_CONTROLS_MEDIA_QUERY =
+  '(max-width: 760px), (pointer: coarse)';
+
 export const PLAYER_CONFIG = {
   movementSpeed: 165,
   startingHealth: 100,
@@ -35,7 +38,7 @@ export const GAME_INPUT_CONFIG = {
   joystickDeadZone: 0.12,
 } as const;
 
-export const WAVE_ONE_ENEMY_BUDGET = 49;
+export const WAVE_ONE_ENEMY_BUDGET = 37;
 
 // Arena layout and interaction tuning.
 export interface ArenaObstacle {
@@ -63,6 +66,206 @@ export const ARENA_INTERACTION_CONFIG = {
   barrelExplosionDamage: 72,
   barrelExplosionDamagesPlayer: true,
   barrelExplosionDamagesEnemies: true,
+  industrialCrateHealth: 120,
+} as const;
+
+export const CONTAMINATED_OBJECT_CONFIG = {
+  toxicBarrel: {
+    health: 100,
+    width: 30,
+    height: 42,
+    burstRadius: 92,
+    burstDamage: 34,
+    puddleRadiusX: 38,
+    puddleRadiusY: 24,
+    puddleDurationSeconds: 24,
+    puddleDamage: 8,
+    puddleDamageIntervalSeconds: 1.2,
+    zombieSlowMultiplier: 0.62,
+  },
+  chemicalTank: {
+    health: 180,
+    width: 54,
+    height: 72,
+    cloudRadiusX: 62,
+    cloudRadiusY: 48,
+    cloudSpeed: 26,
+    cloudDurationSeconds: 18,
+    cloudDamage: 10,
+    cloudDamageIntervalSeconds: 1,
+  },
+  mutagenContainer: {
+    health: 140,
+    width: 50,
+    height: 66,
+    spawnCount: 3,
+    spawnDamageMultiplier: 1.2,
+    spawnSpeedMultiplier: 1.15,
+    temporaryBuffDurationSeconds: 10,
+    temporaryBuffDamageMultiplier: 1.15,
+    temporaryBuffSpeedMultiplier: 1.2,
+    spillRadius: 124,
+    spillRadiusX: 54,
+    spillRadiusY: 36,
+    spillDurationSeconds: 45,
+    attractionRadius: 260,
+  },
+  leakingPipe: {
+    width: 58,
+    height: 18,
+    warningDurationSeconds: 2.5,
+    sprayDurationSeconds: 2.2,
+    cooldownDurationSeconds: 8,
+    sprayLength: 120,
+    sprayWidth: 42,
+    damage: 8,
+    damageIntervalSeconds: 0.8,
+  },
+  contaminatedPuddle: {
+    radiusX: 34,
+    radiusY: 22,
+    durationSeconds: 28,
+    playerDamage: 6,
+    playerDamageIntervalSeconds: 1.2,
+    zombieSlowMultiplier: 0.62,
+  },
+  biohazardWasteBin: {
+    health: 120,
+    width: 52,
+    height: 48,
+    splashRadius: 84,
+    splashDamage: 28,
+    puddleRadiusX: 42,
+    puddleRadiusY: 28,
+    puddleDurationSeconds: 28,
+    puddleDamage: 6,
+    puddleDamageIntervalSeconds: 1.2,
+    zombieSlowMultiplier: 0.62,
+  },
+  brokenVentilationFan: {
+    width: 58,
+    height: 50,
+    idleDurationSeconds: 8,
+    warningDurationSeconds: 2,
+    activeDurationSeconds: 1.4,
+    cooldownDurationSeconds: 4,
+    influenceRadius: 196,
+    pushDistance: 24,
+    cloudInfluence: 0.55,
+  },
+  gasCloud: {
+    damageCooldownSeconds: 1,
+    windInfluence: 0.55,
+    maximumCount: 3,
+  },
+  maximumMutagenSpawnsPerRupture: 3,
+} as const;
+
+export const MILITARY_OBJECT_CONFIG = {
+  sandbag: {
+    health: 180,
+    width: 104,
+    height: 34,
+    sandWidth: 154,
+    sandHeight: 86,
+    slowMultiplier: 0.5,
+    spillDurationSeconds: 30,
+  },
+  ammoCrate: {
+    health: 120,
+    width: 48,
+    height: 44,
+    explosionRadius: 72,
+    explosionDamage: 34,
+    explosionDurationSeconds: 0.36,
+    rewardOffsetX: 20,
+    blastDamagesPlayer: true,
+    blastDamagesEnemies: true,
+  },
+  fuelDrum: {
+    health: 80,
+    width: 34,
+    height: 46,
+    blastRadius: 132,
+    blastDamage: 60,
+    ignitionDurationSeconds: 0.16,
+    blastDurationSeconds: 0.72,
+    aftermathDurationSeconds: 2.4,
+    rewardOffsetX: 24,
+  },
+  razorWire: {
+    width: 112,
+    height: 34,
+    activeDurationSeconds: 45,
+    damage: 9,
+    damageIntervalSeconds: 0.85,
+    slowMultiplier: 0.6,
+    zombieChargeDistance: 160,
+  },
+  abandonedTurret: {
+    width: 48,
+    height: 42,
+    health: 220,
+    reviveRange: 54,
+    reviveDurationSeconds: 4,
+    rebuildDurationSeconds: 6,
+    wireOffset: 14,
+    wireDamage: 9,
+    wireDamageIntervalSeconds: 0.85,
+    zombieTargetChance: 0.4,
+  },
+  supplyCrate: {
+    health: 150,
+    width: 56,
+    height: 48,
+    destructionDurationSeconds: 0.4,
+  },
+} as const;
+
+export const INDUSTRIAL_OBJECT_CONFIG = {
+  oilFire: {
+    radius: 54,
+    durationSeconds: 6,
+    damagePerTick: 8,
+    tickIntervalSeconds: 0.7,
+    lingeringBurnSeconds: 2.4,
+  },
+  gasCylinder: {
+    radius: 13,
+    width: 26,
+    height: 38,
+    triggerRange: 340,
+    launchCooldownSeconds: 5.5,
+    travelSpeed: 260,
+    travelDurationSeconds: 2.2,
+    detonationDurationSeconds: 0.32,
+    explosionRadius: 74,
+    damage: 46,
+  },
+  generator: {
+    cycleSeconds: 7.5,
+    dischargeStartSeconds: 3.1,
+    cooldownStartSeconds: 4.3,
+    dangerRadiusMultiplier: 1.8,
+    damagePerPulse: 18,
+    zombieDamagePerPulse: 16,
+    pulseCooldownSeconds: 0.85,
+  },
+  movingWall: {
+    amplitude: 18,
+    angularSpeed: 0.9,
+    pushPadding: 2,
+  },
+  steamPipe: {
+    cycleSeconds: 8,
+    warningStartSeconds: 2,
+    ventStartSeconds: 2.8,
+    cooldownStartSeconds: 4.6,
+    playerDamage: 14,
+    zombieDamage: 12,
+    knockbackSpeed: 120,
+    zombiePulseCooldownSeconds: 0.85,
+  },
 } as const;
 
 export const GAME_SCORING_CONFIG = {
@@ -119,13 +322,14 @@ export const ENEMY_ABILITY_CONFIG = {
 
 export const GAME_PROGRESSION_CONFIG = {
   baseEnemyBudget: WAVE_ONE_ENEMY_BUDGET,
-  enemyBudgetMultiplier: 0.8,
+  enemyBudgetMultiplier: 0.6,
   baseSpawnDurationSeconds: 60,
   additionalSpawnDurationPerWaveSeconds: 10,
   baseSpawnIntervalSeconds: 1,
   spawnIntervalDecreasePerWaveSeconds: 0.02,
   minimumSpawnIntervalSeconds: 0.5,
-  arenaTransitionSeconds: 1,
+  arenaTransitionSeconds: 3,
+  playerSpawnProtectionSeconds: 1.5,
   itemLifetimeSeconds: 12,
   maximumActiveItems: 3,
   maximumBombInventory: 5,
@@ -180,6 +384,7 @@ export const SPAWN_FRACTIONS: readonly number[] = [
 ];
 
 export const WAVE_DIFFICULTY_CONFIG = {
+  baseEnemySpeedMultiplier: 0.5,
   healthIncreasePerTwoWaves: 0.1,
   speedIncreasePerWave: 0.035,
   maximumSpeedIncreaseWaves: 8,
@@ -206,7 +411,7 @@ export const WAVE_COMPOSITION_CONFIG = {
   developmentBossGroupCount: 3,
   eliteIntroductionWave: 18,
   bossWaveMilestones: [10, 20],
-  waveOneRunnerFirstSpawnIndex: 40,
+  waveOneRunnerFirstSpawnIndex: 30,
   waveOneRunnerSpawnInterval: 10,
 } as const;
 

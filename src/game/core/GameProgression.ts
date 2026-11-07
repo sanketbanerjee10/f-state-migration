@@ -30,9 +30,17 @@ import {
 import {
   createArenaLayoutForWave,
   createArenaObstacles,
+  createArenaObstacleEntities,
+  createIndustrialGasCylinders,
+  createMilitaryOutpostObjects,
   createExplosiveBarrels,
   getArenaCollisionObstacles,
+  getArenaTheme,
 } from '../arena/ArenaSystem';
+import {
+  cloneContaminatedArenaEntity,
+  createContaminatedArenaObjects,
+} from '../arena/ContaminatedArenaSystem';
 import { findCirclePositionInArena } from './ArenaGeometry';
 import {
   ARENA_TRANSITION_SECONDS,
@@ -174,14 +182,9 @@ export function prepareArenaForWave(
   );
   state.arenaTheme = layout.theme;
   state.wave.lastArenaLayoutId = layout.id;
-  state.arenaObstacles = layout.obstacles.map((obstacle) =>
-    obstacle.kind === 'barricade'
-      ? {
-          ...obstacle,
-          health: ARENA_INTERACTION_CONFIG.barricadeHealth,
-          maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
-        }
-      : { ...obstacle },
+  state.arenaObstacles = createArenaObstacleEntities(
+    layout.obstacles,
+    layout.theme,
   );
   state.barrels = layout.barrels.map((barrel, index) => ({
     ...barrel,
@@ -190,12 +193,31 @@ export function prepareArenaForWave(
     maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
     id: `${barrel.id}-${index}`,
   }));
+  state.militaryObjects = createMilitaryOutpostObjects(
+    layout.theme,
+    `${layout.id}-${waveNumber}`,
+  );
+  state.contaminatedObjects = createContaminatedArenaObjects(
+    layout,
+    state.arenaWidth,
+    state.arenaHeight,
+  );
+  state.gasCylinders = createIndustrialGasCylinders(
+    layout,
+    state.arenaWidth,
+    state.arenaHeight,
+  );
+  state.oilFirePatches = [];
   const playerSpawn = findCirclePositionInArena(
     state.player,
     state.player.radius,
     state.arenaWidth,
     state.arenaHeight,
-    getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+    getArenaCollisionObstacles(
+      state.arenaObstacles,
+      state.barrels,
+      state.militaryObjects,
+    ),
   );
   state.player.x = playerSpawn.x;
   state.player.y = playerSpawn.y;
@@ -209,6 +231,9 @@ export function prepareArenaForWave(
 }
 
 export function startWave(state: GameState, waveNumber: number): void {
+  if (state.arenaTheme !== getArenaTheme(waveNumber).id) {
+    prepareArenaForWave(state, waveNumber, state.wave.lastArenaLayoutId);
+  }
   state.wave.currentWave = waveNumber;
   state.wave.pendingWaveNumber = waveNumber;
   state.wave.activeModifier = getWaveModifierForWave(waveNumber);
@@ -232,6 +257,11 @@ export function startWave(state: GameState, waveNumber: number): void {
   } else {
     beginBossWave(state, waveNumber);
   }
+  state.player.spawnProtectionSeconds = Math.max(
+    state.player.spawnProtectionSeconds,
+    state.wave.bossIntroSeconds +
+      GAME_PROGRESSION_CONFIG.playerSpawnProtectionSeconds,
+  );
   state.wave.announcement = state.gameMode === 'level'
     ? `Level ${waveNumber}${waveNumber % 10 === 0 ? ' · BOSS' : ''}`
     : `Wave ${waveNumber}`;
@@ -256,6 +286,10 @@ export function advanceWaveProgression(
       0,
       state.wave.transitionCountdownSeconds - deltaSeconds,
     );
+    state.wave.announcement = String(
+      Math.max(1, Math.ceil(state.wave.transitionCountdownSeconds)),
+    );
+    state.wave.announcementSeconds = state.wave.transitionCountdownSeconds;
     if (state.wave.transitionCountdownSeconds <= 0) {
       const queuedWave = state.wave.pendingWaveNumber || state.wave.currentWave;
       state.wave.phase = 'combat';
@@ -460,14 +494,27 @@ export function completeWaveIfCleared(state: GameState): boolean {
   state.arenaTransitionFrom = {
     obstacles: state.arenaObstacles.map((obstacle) => ({ ...obstacle })),
     barrels: state.barrels.map((barrel) => ({ ...barrel })),
+    gasCylinders: state.gasCylinders.map((cylinder) => ({
+      ...cylinder,
+      hitActorIds: [...cylinder.hitActorIds],
+    })),
+    oilFirePatches: state.oilFirePatches.map((patch) => ({ ...patch })),
+    militaryObjects: state.militaryObjects.map((object) => ({ ...object })),
+    contaminatedObjects: state.contaminatedObjects.map(
+      cloneContaminatedArenaEntity,
+    ),
     theme: state.arenaTheme,
+    elapsedSeconds: state.elapsedSeconds,
   };
   state.wave.currentWave = nextWave;
   state.wave.pendingWaveNumber = nextWave;
   state.wave.phase = 'intermission';
   state.wave.transitionCountdownSeconds = ARENA_TRANSITION_SECONDS;
-  state.wave.announcement = 'NEW ARENA';
+  state.wave.announcement = String(ARENA_TRANSITION_SECONDS);
   state.wave.announcementSeconds = ARENA_TRANSITION_SECONDS;
+  state.player.spawnProtectionSeconds =
+    ARENA_TRANSITION_SECONDS +
+    GAME_PROGRESSION_CONFIG.playerSpawnProtectionSeconds;
   prepareArenaForWave(state, nextWave, state.wave.lastArenaLayoutId);
   return true;
 }
@@ -614,7 +661,10 @@ export function adjustRareUpgrade(
   upgradeId: RareUpgradeId,
   adjustment: -1 | 1,
 ): void {
-  if (state.wave.phase !== 'combat') {
+  if (
+    state.wave.phase !== 'combat' &&
+    state.wave.phase !== 'intermission'
+  ) {
     throw new RangeError('Rare upgrades can only be adjusted during an active run.');
   }
   if (!state.progression) {

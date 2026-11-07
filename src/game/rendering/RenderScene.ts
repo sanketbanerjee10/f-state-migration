@@ -2,7 +2,11 @@ import type {
   ArenaObstacleEntity,
   ArenaThemeId,
   ExplosiveBarrelEntity,
+  IndustrialGasCylinderEntity,
+  OilFirePatchEntity,
 } from '../arena/ArenaSystem';
+import type { MilitaryVisualObject } from './MilitaryObjectRenderer';
+import type { ContaminatedVisualObject } from './ContaminatedObjectRenderer';
 
 export interface RenderFrame {
   readonly elapsedSeconds: number;
@@ -28,12 +32,22 @@ export interface RenderLayers {
   readonly arena?: {
     readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
     readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+    readonly gasCylinders?: readonly Readonly<IndustrialGasCylinderEntity>[];
+    readonly oilFirePatches?: readonly Readonly<OilFirePatchEntity>[];
+    readonly militaryObjects?: readonly MilitaryVisualObject[];
+    readonly contaminatedObjects?: readonly ContaminatedVisualObject[];
     readonly theme: ArenaThemeId;
+    readonly elapsedSeconds?: number;
     readonly transition?: {
       readonly from: {
         readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
         readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+        readonly gasCylinders?: readonly Readonly<IndustrialGasCylinderEntity>[];
+        readonly oilFirePatches?: readonly Readonly<OilFirePatchEntity>[];
+        readonly militaryObjects?: readonly MilitaryVisualObject[];
+        readonly contaminatedObjects?: readonly ContaminatedVisualObject[];
         readonly theme: ArenaThemeId;
+        readonly elapsedSeconds?: number;
       };
       readonly progress: number;
     };

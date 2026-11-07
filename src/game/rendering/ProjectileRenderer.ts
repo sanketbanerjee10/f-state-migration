@@ -62,7 +62,7 @@ export function drawProjectile(
       : type === 'turret'
         ? GAME_PALETTE.combat.turretProjectile
         : type === 'spitter'
-          ? GAME_PALETTE.enemies.spitterProjectile
+          ? GAME_PALETTE.combat.spitterProjectile
           : type === 'acid'
             ? GAME_PALETTE.enemies.acidProjectile
             : GAME_PALETTE.combat.projectile;
@@ -82,7 +82,7 @@ export function drawProjectile(
       : type === 'turret'
         ? GAME_PALETTE.combat.turretProjectileTrail
         : type === 'spitter'
-          ? GAME_PALETTE.enemies.spitterProjectileTrail
+          ? GAME_PALETTE.combat.spitterProjectileTrail
           : type === 'acid'
             ? GAME_PALETTE.enemies.acidProjectileTrail
             : GAME_PALETTE.combat.projectileTrail,
@@ -93,7 +93,7 @@ export function drawProjectile(
     stroke: type === 'turret'
       ? GAME_PALETTE.combat.turretProjectile
       : type === 'spitter'
-        ? GAME_PALETTE.enemies.spitterProjectileOutline
+        ? GAME_PALETTE.combat.spitterProjectileOutline
         : type === 'acid'
           ? GAME_PALETTE.enemies.acidProjectileOutline
           : GAME_PALETTE.combat.projectileOutline,

@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { GameEngine, type GameDiagnostics } from '@/game/core/GameEngine';
+import { GameEngine } from '@/game/core/GameEngine';
+import { GAME_TOUCH_CONTROLS_MEDIA_QUERY } from '@/game/core/GameConfig';
+import type { GamePerformanceSnapshot } from '@/game/core/GamePerformanceDiagnostics';
 import {
   GameAudioController,
   GAME_MUSIC_TRACKS,
@@ -56,12 +58,19 @@ export function GameCanvas() {
   const aimJoystickRef = useRef<HTMLButtonElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   const audioRef = useRef<GameAudioController | null>(null);
+  const diagnosticsEnabledRef = useRef(false);
   const previousAudioEventsRef = useRef({
     impacts: new Set<number>(),
     collections: new Set<number>(),
     shotsFired: 0,
   });
-  const [diagnostics, setDiagnostics] = useState<GameDiagnostics | null>(null);
+  const [diagnosticsEnabled, setDiagnosticsEnabled] = useState(false);
+  const [diagnosticsPanelExpanded, setDiagnosticsPanelExpanded] = useState(true);
+  const [diagnostics, setDiagnostics] =
+    useState<GamePerformanceSnapshot | null>(null);
+  const [diagnosticThresholds, setDiagnosticThresholds] =
+    useState<[number, number, number]>([16.7, 33, 50]);
+  const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [musicStatus, setMusicStatus] = useState({
@@ -83,6 +92,26 @@ export function GameCanvas() {
   const currentCampaignStartingRarePointsRef = useRef(0);
   const savedCampaignLevelIdRef = useRef<number | null>(null);
   const { settings, error: settingsError, updateSettings } = useGameSettings();
+  const [isResponsiveLayout, setIsResponsiveLayout] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY).matches,
+  );
+  const shouldMountTouchControls =
+    settings.touchControls === 'always' ||
+    (settings.touchControls === 'auto' && isResponsiveLayout);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const responsiveQuery = window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY);
+    const updateResponsiveMode = () =>
+      setIsResponsiveLayout(responsiveQuery.matches);
+    updateResponsiveMode();
+    responsiveQuery.addEventListener('change', updateResponsiveMode);
+    return () =>
+      responsiveQuery.removeEventListener('change', updateResponsiveMode);
+  }, []);
 
   useEffect(() => {
     const audio = new GameAudioController(GAME_MUSIC_TRACKS, (error) => {
@@ -109,14 +138,9 @@ export function GameCanvas() {
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    const movementJoystick = movementJoystickRef.current;
-    const aimJoystick = aimJoystickRef.current;
-    if (!container || !canvas || !movementJoystick || !aimJoystick) return;
+    if (!container || !canvas) return;
 
-    const engine = new GameEngine(
-      canvas,
-      import.meta.env.DEV ? setDiagnostics : undefined,
-    );
+    const engine = new GameEngine(canvas);
     engineRef.current = engine;
 
     let observer: ResizeObserver | null = null;
@@ -129,10 +153,7 @@ export function GameCanvas() {
     };
 
     try {
-      engine.initialize({
-        movement: movementJoystick,
-        aim: aimJoystick,
-      });
+      engine.initialize();
       observer = new ResizeObserver(resize);
       observer.observe(container);
       window.addEventListener('resize', resize);
@@ -141,7 +162,13 @@ export function GameCanvas() {
       engine.start();
       engine.pause();
       stateInterval = window.setInterval(() => {
+        const measureUiPoll =
+          import.meta.env.DEV && diagnosticsEnabledRef.current;
+        const pollStartedAt = measureUiPoll ? performance.now() : 0;
         const nextState = engine.getGameState();
+        const snapshotBuildMs = measureUiPoll
+          ? engine.getPerformanceSnapshotBuildMs()
+          : 0;
         if (nextState) {
           const previous = previousAudioEventsRef.current;
           const newImpacts = nextState.impacts.filter(
@@ -228,6 +255,12 @@ export function GameCanvas() {
           };
         }
         setGameState(nextState);
+        if (measureUiPoll) {
+          engine.recordPerformanceUiPoll({
+            snapshotBuildMs,
+            pollWorkMs: performance.now() - pollStartedAt,
+          }, pollStartedAt, performance.now());
+        }
       }, 200);
       setGameState(engine.getGameState());
     } catch (error) {
@@ -251,6 +284,18 @@ export function GameCanvas() {
       engineRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const movement = shouldMountTouchControls
+      ? movementJoystickRef.current
+      : null;
+    const aim = shouldMountTouchControls ? aimJoystickRef.current : null;
+    engine.setMobileControls(
+      movement && aim ? { movement, aim } : null,
+    );
+  }, [shouldMountTouchControls]);
 
   const syncGameState = () => {
     setGameState(engineRef.current?.getGameState() ?? null);
@@ -530,9 +575,77 @@ export function GameCanvas() {
     syncGameState();
   };
 
+  const toggleDiagnostics = () => {
+    const enabled = !diagnosticsEnabled;
+    const engine = engineRef.current;
+    if (!engine) return;
+    engine.setPerformanceDiagnosticsEnabled(enabled);
+    diagnosticsEnabledRef.current = enabled;
+    if (enabled) engine.setPerformanceThresholds(diagnosticThresholds);
+    setDiagnosticsEnabled(enabled);
+    setDiagnosticsPanelExpanded(enabled);
+    setDiagnostics(engine.getPerformanceDiagnostics());
+    setDiagnosticsError(null);
+  };
+
+  const updateDiagnosticThreshold = (index: 0 | 1 | 2, value: string) => {
+    const next: [number, number, number] = [...diagnosticThresholds];
+    next[index] = Number(value);
+    setDiagnosticThresholds(next);
+    if (
+      !next.every(Number.isFinite) ||
+      next[0] <= 0 ||
+      next[0] >= next[1] ||
+      next[1] >= next[2]
+    ) {
+      setDiagnosticsError('Thresholds must be positive and strictly increasing.');
+      return;
+    }
+    try {
+      engineRef.current?.setPerformanceThresholds(next);
+      setDiagnosticsError(null);
+    } catch (error) {
+      setDiagnosticsError(
+        error instanceof Error ? error.message : 'Unable to update thresholds.',
+      );
+    }
+  };
+
+  const exportDiagnostics = () => {
+    try {
+      const report = engineRef.current?.exportPerformanceReport();
+      if (!report) throw new Error('Performance diagnostics are unavailable.');
+      const blob = new Blob([JSON.stringify(report, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `last-z-performance-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      setDiagnosticsError(null);
+    } catch (error) {
+      setDiagnosticsError(
+        error instanceof Error ? error.message : 'Unable to export diagnostics.',
+      );
+    }
+  };
+
   const isTerminalPhase =
     gameState?.wave.phase === 'gameOver' ||
     gameState?.wave.phase === 'levelComplete';
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || !diagnosticsEnabled) return;
+    const refreshDiagnostics = () => {
+      setDiagnostics(engineRef.current?.getPerformanceDiagnostics() ?? null);
+    };
+    refreshDiagnostics();
+    if (!hasStarted || isPaused || isTerminalPhase) return;
+    const interval = window.setInterval(refreshDiagnostics, 250);
+    return () => window.clearInterval(interval);
+  }, [diagnosticsEnabled, hasStarted, isPaused, isTerminalPhase]);
 
   useEffect(() => {
     if (!hasStarted || isTerminalPhase) return;
@@ -587,6 +700,9 @@ export function GameCanvas() {
         'game-canvas-frame',
         settings.touchControls === 'always' ? 'game-controls-always' : '',
         settings.touchControls === 'never' ? 'game-controls-never' : '',
+        settings.touchControls === 'auto' && isResponsiveLayout
+          ? 'game-controls-responsive'
+          : '',
         hasStarted &&
         !isPaused &&
         gameState?.wave.phase === 'combat' &&
@@ -614,25 +730,27 @@ export function GameCanvas() {
       >
         Canvas rendering is not supported by this browser.
       </canvas>
-      <GameTouchControls
-        active={
-          hasStarted &&
-          !isPaused &&
-          gameState?.wave.phase === 'combat'
-        }
-        bombs={gameState?.bombs ?? 0}
-        highlightMovement={
-          tutorialStepIndex !== null &&
-          GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'movement'
-        }
-        highlightAim={
-          tutorialStepIndex !== null &&
-          GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'aim'
-        }
-        onUseBomb={() => engineRef.current?.requestBomb()}
-        movementRef={movementJoystickRef}
-        aimRef={aimJoystickRef}
-      />
+      {shouldMountTouchControls && (
+        <GameTouchControls
+          active={
+            hasStarted &&
+            !isPaused &&
+            gameState?.wave.phase === 'combat'
+          }
+          bombs={gameState?.bombs ?? 0}
+          highlightMovement={
+            tutorialStepIndex !== null &&
+            GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'movement'
+          }
+          highlightAim={
+            tutorialStepIndex !== null &&
+            GAME_TUTORIAL_STEPS[tutorialStepIndex]?.highlight === 'aim'
+          }
+          onUseBomb={() => engineRef.current?.requestBomb()}
+          movementRef={movementJoystickRef}
+          aimRef={aimJoystickRef}
+        />
+      )}
       {gameState && hasStarted && !isPaused && gameState.wave.phase === 'combat' && (
         <GameHud
           gameState={gameState}
@@ -739,11 +857,96 @@ export function GameCanvas() {
           />
         </>
       )}
-      {import.meta.env.DEV && diagnostics && (
-        <output className="game-canvas-diagnostics" aria-live="off">
-          {diagnostics.fps} FPS <span aria-hidden="true">·</span>{' '}
-          {diagnostics.entityCount} entities
-        </output>
+      {import.meta.env.DEV && (
+        <aside className="game-performance-tools" aria-label="Developer performance tools">
+          <button
+            type="button"
+            className="game-performance-toggle"
+            aria-expanded={diagnosticsEnabled}
+            onClick={toggleDiagnostics}
+          >
+            {diagnosticsEnabled ? 'Disable performance capture' : 'Enable performance capture'}
+          </button>
+          {diagnosticsEnabled && diagnostics && (
+            <section className="game-performance-panel" aria-label="Performance diagnostics">
+              <header>
+                <strong>Performance capture</strong>
+                <button
+                  type="button"
+                  aria-expanded={diagnosticsPanelExpanded}
+                  aria-controls="game-performance-details"
+                  onClick={() =>
+                    setDiagnosticsPanelExpanded((expanded) => !expanded)
+                  }
+                >
+                  {diagnosticsPanelExpanded ? 'Collapse details' : 'Expand details'}
+                </button>
+                <button type="button" onClick={exportDiagnostics}>Export JSON</button>
+              </header>
+              <div
+                id="game-performance-details"
+                hidden={!diagnosticsPanelExpanded}
+              >
+                <div className="game-performance-grid">
+                <span>FPS</span><strong>{diagnostics.currentFps.toFixed(1)} current / {diagnostics.averageFps.toFixed(1)} average</strong>
+                <span>Frame time</span><strong>{diagnostics.frameTimeMs.toFixed(2)} ms · p95 {diagnostics.frameTimeP95Ms.toFixed(2)} · p99 {diagnostics.frameTimeP99Ms.toFixed(2)}</strong>
+                <span>Over thresholds</span><strong>{diagnostics.framesOverThreshold1} / {diagnostics.framesOverThreshold2} / {diagnostics.framesOverThreshold3} frames in rolling {diagnostics.rollingFrameCount} over {diagnostics.thresholdsMs.join(' / ')} ms</strong>
+                <span>Phases</span><strong>update {diagnostics.timings.updateMs.toFixed(2)} ms (p95 {diagnostics.timingStatisticsMs.updateMs.p95Ms.toFixed(2)} · max {diagnostics.timingStatisticsMs.updateMs.maxMs.toFixed(2)}) · render {diagnostics.timings.renderMs.toFixed(2)} ms</strong>
+                <span>UI polling</span><strong>snapshot {diagnostics.uiTimings.snapshotBuildMs.toFixed(2)} ms · poll/schedule {diagnostics.uiTimings.pollWorkMs.toFixed(2)} ms (React commit excluded)</strong>
+                <span>Long tasks</span><strong>{diagnostics.browserMetrics.longTaskSupport === 'available' ? `${diagnostics.browserMetrics.longTaskCount} captured · ${(diagnostics.browserMetrics.totalLongTaskDurationMs).toFixed(1)} ms total · ${diagnostics.browserMetrics.longestLongTaskMs.toFixed(1)} ms max` : 'unavailable'}</strong>
+                <span>Garbage collection</span><strong>{diagnostics.browserMetrics.garbageCollectionSupport === 'available' ? `${diagnostics.browserMetrics.garbageCollectionCount} events · ${diagnostics.browserMetrics.totalGarbageCollectionDurationMs.toFixed(1)} ms total · ${diagnostics.browserMetrics.longestGarbageCollectionMs.toFixed(1)} ms max` : 'unavailable'}</strong>
+                <span>RAF scheduling gap</span><strong>{diagnostics.browserMetrics.latestRafSchedulingGapMs.toFixed(2)} ms latest · {diagnostics.browserMetrics.averageRafSchedulingGapMs.toFixed(2)} ms average · p95 {diagnostics.browserMetrics.p95RafSchedulingGapMs.toFixed(2)} ms · current callback {diagnostics.timings.frameCallbackMs.toFixed(2)} ms · {diagnostics.browserMetrics.consecutiveDelayedFrames} delayed ({diagnostics.browserMetrics.maximumConsecutiveDelayedFrames} max streak)</strong>
+                <span>Layers / sort</span><strong>{diagnostics.timings.renderLayersMs.toFixed(2)} / {diagnostics.timings.actorSortMs.toFixed(2)} ms</strong>
+                <span>Collision</span><strong>{diagnostics.collisionMs.toFixed(2)} ms · projectile {diagnostics.timings.projectileCollisionMs.toFixed(2)} · zombie subset {diagnostics.timings.zombieCollisionMs.toFixed(2)} · swarm {diagnostics.timings.swarmProjectileAvoidanceMs.toFixed(2)}</strong>
+                <span>Gameplay events / frame</span><strong>{diagnostics.timings.events.counts.hitEvents} hits · {diagnostics.timings.events.counts.enemyDeathEvents} enemy deaths · {diagnostics.timings.events.counts.arenaObjectDestructionEvents} objects destroyed · {diagnostics.timings.events.counts.impactEffectsCreated + diagnostics.timings.events.counts.damageNumbersCreated + diagnostics.timings.events.counts.collectionEffectsCreated + diagnostics.timings.events.counts.temporaryEffectsCreated} effects · {diagnostics.timings.events.counts.hazardsCreated} hazards · {diagnostics.counts.playerProjectiles + diagnostics.counts.enemyProjectiles + diagnostics.counts.turretProjectiles} active projectiles · {diagnostics.counts.zombies} enemies · {diagnostics.counts.arenaObjects} arena objects</strong>
+                <span>Events / capture</span><strong>{diagnostics.eventCountTotals.hitEvents} hits · {diagnostics.eventCountTotals.enemyDamageEvents} enemy damage · {diagnostics.eventCountTotals.enemyDeathEvents} deaths · {diagnostics.eventCountTotals.arenaObjectDestructionEvents} objects destroyed · {diagnostics.eventCountTotals.explosionsCreated} explosions · {diagnostics.eventCountTotals.hazardsCreated} hazards · {diagnostics.eventCountTotals.orbsGenerated}/{diagnostics.eventCountTotals.orbsCollected} orbs generated/collected · {diagnostics.eventCountTotals.splitterOffspringCreated} Splitter offspring · {diagnostics.eventCountTotals.temporaryEffectsCreated} temporary effects</strong>
+                <span>Event p95 / max</span><strong>p95 shown after 20 samples; max covers capture</strong>
+                {diagnostics.eventTimings.map((event) => (
+                  <Fragment key={event.name}>
+                    <span>{event.name} ({event.sampleCount})</span>
+                    <strong>{event.sampleCount >= 20 ? `${event.p95Ms.toFixed(3)} ms p95` : `p95 n/a (${event.sampleCount} samples)`} · {event.maxMs.toFixed(3)} ms max · {event.totalMs.toFixed(3)} ms total</strong>
+                  </Fragment>
+                ))}
+                <span>Arena render / floor</span><strong>{diagnostics.timings.arenaRenderMs.toFixed(2)} / {diagnostics.timings.arenaFloorMs.toFixed(2)} ms</strong>
+                <span>Background cache</span><strong>{diagnostics.arenaBackgroundCache.generationCount} generated · {diagnostics.arenaBackgroundCache.cacheRebuildCount} cache builds</strong>
+                <span>Heap</span><strong>{diagnostics.memoryUsageBytes === null ? 'unavailable' : `${(diagnostics.memoryUsageBytes / 1024 / 1024).toFixed(1)} MB (${diagnostics.memoryTrend})`}</strong>
+                <span>Entities</span><strong>{diagnostics.counts.totalActiveEntities} current / {diagnostics.peakCounts.totalActiveEntities} peak · {diagnostics.counts.zombies} zombies · {diagnostics.counts.playerProjectiles}/{diagnostics.counts.enemyProjectiles}/{diagnostics.counts.turretProjectiles} player/enemy/turret shots</strong>
+                <span>Objects</span><strong>{diagnostics.counts.arenaObstacles} obstacles · {diagnostics.counts.militaryObjects} military · {diagnostics.counts.industrialObjects} industrial · {diagnostics.counts.contaminatedObjects} contaminated · {diagnostics.counts.destructibleObjects} destructible · {diagnostics.counts.movingObjects} moving</strong>
+                <span>Effects</span><strong>{diagnostics.counts.explosions} explosions · {diagnostics.counts.activeEffects} effects · {diagnostics.counts.hazards} hazards · {diagnostics.counts.items} items</strong>
+                <span>Canvas</span><strong>{diagnostics.canvasMetrics.width}×{diagnostics.canvasMetrics.height} backing · {diagnostics.canvasMetrics.cssWidth.toFixed(0)}×{diagnostics.canvasMetrics.cssHeight.toFixed(0)} CSS · DPR {diagnostics.canvasMetrics.devicePixelRatio.toFixed(2)} · {diagnostics.canvasMetrics.resizeCount} resizes</strong>
+                <span>Browser render pipeline</span><strong>Paint/raster/compositor/GPU per frame unavailable in-page; Paint Timing {diagnostics.browserMetrics.paintTimingSupport}; React commit not instrumented</strong>
+                  </div>
+                  <div className="game-performance-thresholds">
+                <span>Frame thresholds (ms)</span>
+                {diagnosticThresholds.map((threshold, index) => (
+                  <input
+                    key={index}
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    aria-label={`Frame threshold ${index + 1}`}
+                    value={threshold}
+                    onChange={(event) =>
+                      updateDiagnosticThreshold(index as 0 | 1 | 2, event.target.value)
+                    }
+                  />
+                ))}
+                  </div>
+                  {diagnostics.spikes.length > 0 && (
+                    <div className="game-performance-spikes">
+                  <strong>Recent spikes</strong>
+                  {diagnostics.spikes.slice(-5).reverse().map((spike) => (
+                    <div key={`${spike.timestamp}-${spike.wave}`}>
+                      {spike.wallClockTimestamp} · interval {spike.frameTimeMs.toFixed(1)} ms · callback {spike.frameCallbackMs.toFixed(1)} ms · update {spike.updateMs.toFixed(1)} ms · projectile processing {spike.events.totalMs.projectileProcessing.toFixed(2)} ms · hits {spike.events.counts.hitEvents} · deaths {spike.events.counts.enemyDeathEvents} · objects destroyed {spike.events.counts.arenaObjectDestructionEvents} · previous callback {spike.previousCallbackDurationMs.toFixed(1)} ms · RAF gap ≈ {spike.estimatedSchedulingGapMs.toFixed(1)} ms · wave {spike.wave} · {spike.arena} · {spike.counts.totalActiveEntities} entities · {spike.correlatedLongTasks.length} long tasks · {spike.correlatedGarbageCollections.length} GC · {spike.correlatedUiPolls.length} UI polls · timeline {spike.precedingFrameTimesMs.slice(-3).map((value) => value.toFixed(1)).join(' → ')} → spike → {spike.followingFrameTimesMs.map((value) => value.toFixed(1)).join(' → ')}
+                    </div>
+                  ))}
+                    </div>
+                  )}
+              </div>
+              {diagnosticsError && <p role="alert">{diagnosticsError}</p>}
+            </section>
+          )}
+        </aside>
       )}
       {renderError && (
         <div className="game-canvas-error" role="alert">

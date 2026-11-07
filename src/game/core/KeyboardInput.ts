@@ -13,7 +13,8 @@ export class KeyboardInput {
   private readonly pressedKeys = new Set<string>();
   private keyBindings = DEFAULT_GAME_KEY_BINDINGS;
   private bombRequested = false;
-  private elements: HTMLElement[] = [];
+  private element: HTMLElement | null = null;
+  private additionalElements: HTMLElement[] = [];
   private windowTarget: Window | null = null;
   private isEnabled = true;
 
@@ -22,16 +23,26 @@ export class KeyboardInput {
     windowTarget: Window = window,
     additionalElements: readonly HTMLElement[] = [],
   ): void {
-    if (this.elements.length > 0) return;
+    if (this.element) return;
 
-    this.elements = [element, ...additionalElements];
+    this.element = element;
     this.windowTarget = windowTarget;
-    for (const target of this.elements) {
-      target.addEventListener('keydown', this.handleKeyDown);
-      target.addEventListener('keyup', this.handleKeyUp);
-      target.addEventListener('blur', this.clear);
-    }
+    this.attachKeyListeners(element);
+    this.setAdditionalElements(additionalElements);
     windowTarget.addEventListener('blur', this.clear);
+  }
+
+  setAdditionalElements(elements: readonly HTMLElement[]): void {
+    for (const element of this.additionalElements) {
+      this.detachKeyListeners(element);
+    }
+    this.clear();
+    this.additionalElements = [...new Set(elements)].filter(
+      (element) => element !== this.element,
+    );
+    for (const element of this.additionalElements) {
+      this.attachKeyListeners(element);
+    }
   }
 
   getMovement(): MovementVector {
@@ -83,15 +94,27 @@ export class KeyboardInput {
   }
 
   detach(): void {
-    for (const target of this.elements) {
-      target.removeEventListener('keydown', this.handleKeyDown);
-      target.removeEventListener('keyup', this.handleKeyUp);
-      target.removeEventListener('blur', this.clear);
+    if (this.element) this.detachKeyListeners(this.element);
+    for (const element of this.additionalElements) {
+      this.detachKeyListeners(element);
     }
     this.windowTarget?.removeEventListener('blur', this.clear);
-    this.elements = [];
+    this.element = null;
+    this.additionalElements = [];
     this.windowTarget = null;
     this.clear();
+  }
+
+  private attachKeyListeners(element: HTMLElement): void {
+    element.addEventListener('keydown', this.handleKeyDown);
+    element.addEventListener('keyup', this.handleKeyUp);
+    element.addEventListener('blur', this.clear);
+  }
+
+  private detachKeyListeners(element: HTMLElement): void {
+    element.removeEventListener('keydown', this.handleKeyDown);
+    element.removeEventListener('keyup', this.handleKeyUp);
+    element.removeEventListener('blur', this.clear);
   }
 
   private readonly handleKeyDown = (event: Event): void => {

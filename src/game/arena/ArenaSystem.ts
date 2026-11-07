@@ -1,6 +1,8 @@
 import {
   ARENA_TRANSITION_SECONDS,
   ARENA_INTERACTION_CONFIG,
+  INDUSTRIAL_OBJECT_CONFIG,
+  MILITARY_OBJECT_CONFIG,
   ARENA_OBSTACLES,
   type ArenaObstacle,
 } from '../core/GameConfig';
@@ -13,6 +15,14 @@ export {
 export interface ArenaObstacleEntity extends ArenaObstacle {
   health?: number;
   readonly maxHealth?: number;
+  readonly industrialMotion?: {
+    readonly originXFraction: number;
+    readonly originYFraction: number;
+    readonly angle: number;
+    readonly amplitude: number;
+    readonly phase: number;
+    readonly pathMode: 'loop' | 'pingPong';
+  };
 }
 
 export interface ExplosiveBarrelEntity {
@@ -23,6 +33,103 @@ export interface ExplosiveBarrelEntity {
   health: number;
   readonly maxHealth: number;
 }
+
+export interface IndustrialGasCylinderEntity {
+  readonly id: number;
+  originX: number;
+  originY: number;
+  x: number;
+  y: number;
+  radius: number;
+  phase: 'idle' | 'flying' | 'detonating';
+  directionX: number;
+  directionY: number;
+  remainingSeconds: number;
+  cooldownSeconds: number;
+  readonly hitActorIds: number[];
+}
+
+export interface OilFirePatchEntity {
+  readonly id: number;
+  readonly barrelId: string;
+  x: number;
+  y: number;
+  radius: number;
+  remainingSeconds: number;
+}
+
+interface MilitaryOutpostObjectBase {
+  readonly id: string;
+  readonly xFraction: number;
+  readonly yFraction: number;
+  readonly width: number;
+  readonly height: number;
+  readonly rotation: number;
+}
+
+export interface MilitarySandbagEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'sandbag-barricade';
+  health: number;
+  readonly maxHealth: number;
+  destroyed: boolean;
+  spillRemainingSeconds: number;
+}
+
+export interface MilitaryAmmoCrateEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'military-ammo-crate';
+  health: number;
+  readonly maxHealth: number;
+  destroyed: boolean;
+  explosionRemainingSeconds: number;
+  rewardSpawned: boolean;
+  rewardItemId?: number;
+}
+
+export interface MilitaryFuelDrumEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'fuel-drum';
+  health: number;
+  readonly maxHealth: number;
+  destroyed: boolean;
+  phase: 'idle' | 'igniting' | 'blast' | 'aftermath' | 'finished';
+  phaseRemainingSeconds: number;
+  blastDamageApplied: boolean;
+  rewardSpawned: boolean;
+  rewardItemId?: number;
+}
+
+export interface MilitaryRazorWireEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'razor-wire';
+  active: boolean;
+  remainingSeconds: number;
+}
+
+export interface MilitaryTurretEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'abandoned-turret';
+  health: number;
+  readonly maxHealth: number;
+  state: 'broken' | 'revive-ready' | 'reviving' | 'active' | 'firing' | 'damaged' | 'destroyed';
+  reviveProgress: number;
+  attackCooldownSeconds: number;
+  facingAngle: number;
+  muzzleFlashSeconds: number;
+}
+
+export interface MilitarySupplyCrateEntity extends MilitaryOutpostObjectBase {
+  readonly kind: 'military-supply-crate';
+  health: number;
+  readonly maxHealth: number;
+  destroyed: boolean;
+  destructionRemainingSeconds: number;
+  rewardSpawned: boolean;
+}
+
+export type MilitaryOutpostEntity =
+  | MilitarySandbagEntity
+  | MilitaryAmmoCrateEntity
+  | MilitaryFuelDrumEntity
+  | MilitaryRazorWireEntity
+  | MilitaryTurretEntity
+  | MilitarySupplyCrateEntity;
 
 export type ArenaThemeId =
   | 'military'
@@ -51,6 +158,7 @@ export interface ArenaLayoutDefinition {
   readonly theme: ArenaThemeId;
   readonly obstacles: ArenaObstacle[];
   readonly barrels: ReadonlyArray<Pick<ExplosiveBarrelEntity, 'id' | 'xFraction' | 'yFraction'>>;
+  readonly gasCylinders?: ReadonlyArray<{ readonly xFraction: number; readonly yFraction: number }>;
 }
 
 export const ARENA_THEME_CYCLE: readonly ArenaTheme[] = [
@@ -128,10 +236,10 @@ const THEME_LAYOUTS: Readonly<Record<ArenaThemeId, readonly ArenaLayoutDefinitio
       { xFraction: 0.82, yFraction: 0.2, width: 74, height: 62, kind: 'crate' },
       { xFraction: 0.82, yFraction: 0.77, width: 68, height: 60, kind: 'crate' },
       { xFraction: 0.2, yFraction: 0.8, width: 70, height: 64, kind: 'crate' },
-      { xFraction: 0.48, yFraction: 0.21, width: 108, height: 20, kind: 'barricade' },
-      { xFraction: 0.52, yFraction: 0.79, width: 112, height: 20, kind: 'barricade' },
+      { xFraction: 0.73, yFraction: 0.3, width: 92, height: 24, kind: 'barricade' },
+      { xFraction: 0.3, yFraction: 0.72, width: 82, height: 24, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.5, width: 36, height: 22, kind: 'cover' },
-    ], barrels: [{ id: 'military-barrel-1', xFraction: 0.64, yFraction: 0.43 }, { id: 'military-barrel-2', xFraction: 0.36, yFraction: 0.57 }] },
+    ], barrels: [{ id: 'military-barrel-1', xFraction: 0.5, yFraction: 0.2 }, { id: 'military-barrel-2', xFraction: 0.58, yFraction: 0.2 }] },
     { id: 'military-corridor-network', name: 'Corridor Network', theme: 'military', obstacles: [
       { xFraction: 0.27, yFraction: 0.28, width: 72, height: 18, kind: 'barricade' },
       { xFraction: 0.72, yFraction: 0.28, width: 72, height: 18, kind: 'barricade' },
@@ -169,7 +277,9 @@ const THEME_LAYOUTS: Readonly<Record<ArenaThemeId, readonly ArenaLayoutDefinitio
       { xFraction: 0.5, yFraction: 0.22, width: 110, height: 18, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.78, width: 104, height: 18, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.5, width: 44, height: 28, kind: 'cover' },
-    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.34, yFraction: 0.5 }, { id: 'ind-barrel-2', xFraction: 0.66, yFraction: 0.5 }] },
+      { xFraction: 0.33, yFraction: 0.36, width: 44, height: 38, kind: 'crate' },
+      { xFraction: 0.67, yFraction: 0.64, width: 44, height: 38, kind: 'crate' },
+    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.34, yFraction: 0.5 }, { id: 'ind-barrel-2', xFraction: 0.66, yFraction: 0.5 }], gasCylinders: [{ xFraction: 0.5, yFraction: 0.36 }] },
     { id: 'industrial-cluster-split', name: 'Industrial Cluster', theme: 'industrial', obstacles: [
       { xFraction: 0.3, yFraction: 0.3, width: 84, height: 70, kind: 'wall' },
       { xFraction: 0.7, yFraction: 0.3, width: 84, height: 70, kind: 'wall' },
@@ -178,7 +288,9 @@ const THEME_LAYOUTS: Readonly<Record<ArenaThemeId, readonly ArenaLayoutDefinitio
       { xFraction: 0.5, yFraction: 0.5, width: 52, height: 52, kind: 'cover' },
       { xFraction: 0.5, yFraction: 0.18, width: 110, height: 20, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.82, width: 110, height: 20, kind: 'barricade' },
-    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.5, yFraction: 0.32 }, { id: 'ind-barrel-2', xFraction: 0.5, yFraction: 0.68 }] },
+      { xFraction: 0.2, yFraction: 0.5, width: 44, height: 40, kind: 'crate' },
+      { xFraction: 0.8, yFraction: 0.5, width: 44, height: 40, kind: 'crate' },
+    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.5, yFraction: 0.32 }, { id: 'ind-barrel-2', xFraction: 0.5, yFraction: 0.68 }], gasCylinders: [{ xFraction: 0.22, yFraction: 0.5 }, { xFraction: 0.78, yFraction: 0.5 }] },
     { id: 'industrial-corridor', name: 'Corridor Grid', theme: 'industrial', obstacles: [
       { xFraction: 0.24, yFraction: 0.25, width: 66, height: 18, kind: 'barricade' },
       { xFraction: 0.76, yFraction: 0.25, width: 66, height: 18, kind: 'barricade' },
@@ -186,8 +298,10 @@ const THEME_LAYOUTS: Readonly<Record<ArenaThemeId, readonly ArenaLayoutDefinitio
       { xFraction: 0.76, yFraction: 0.75, width: 66, height: 18, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.26, width: 90, height: 22, kind: 'wall' },
       { xFraction: 0.5, yFraction: 0.74, width: 90, height: 22, kind: 'wall' },
-      { xFraction: 0.5, yFraction: 0.5, width: 60, height: 62, kind: 'crate' },
-    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.38, yFraction: 0.5 }, { id: 'ind-barrel-2', xFraction: 0.62, yFraction: 0.5 }] },
+      { xFraction: 0.5, yFraction: 0.5, width: 42, height: 34, kind: 'cover' },
+      { xFraction: 0.3, yFraction: 0.5, width: 44, height: 38, kind: 'crate' },
+      { xFraction: 0.7, yFraction: 0.5, width: 44, height: 38, kind: 'crate' },
+    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.38, yFraction: 0.5 }, { id: 'ind-barrel-2', xFraction: 0.62, yFraction: 0.5 }], gasCylinders: [{ xFraction: 0.34, yFraction: 0.35 }, { xFraction: 0.66, yFraction: 0.65 }] },
     { id: 'industrial-rust-scrap', name: 'Rust Scrap', theme: 'industrial', obstacles: [
       { xFraction: 0.2, yFraction: 0.18, width: 54, height: 44, kind: 'crate' },
       { xFraction: 0.8, yFraction: 0.18, width: 54, height: 44, kind: 'crate' },
@@ -196,7 +310,7 @@ const THEME_LAYOUTS: Readonly<Record<ArenaThemeId, readonly ArenaLayoutDefinitio
       { xFraction: 0.5, yFraction: 0.5, width: 120, height: 30, kind: 'barricade' },
       { xFraction: 0.5, yFraction: 0.33, width: 66, height: 26, kind: 'cover' },
       { xFraction: 0.5, yFraction: 0.67, width: 66, height: 26, kind: 'cover' },
-    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.42, yFraction: 0.42 }, { id: 'ind-barrel-2', xFraction: 0.58, yFraction: 0.58 }] },
+    ], barrels: [{ id: 'ind-barrel-1', xFraction: 0.42, yFraction: 0.42 }, { id: 'ind-barrel-2', xFraction: 0.58, yFraction: 0.58 }], gasCylinders: [{ xFraction: 0.34, yFraction: 0.2 }, { xFraction: 0.66, yFraction: 0.8 }] },
   ],
   contaminated: [
     { id: 'contaminated-open-lab', name: 'Open Lab', theme: 'contaminated', obstacles: [
@@ -318,7 +432,7 @@ export function getArenaTheme(waveNumber: number): ArenaTheme {
   if (!Number.isInteger(waveNumber) || waveNumber < 1) {
     throw new RangeError('Wave number must be a positive integer.');
   }
-  const themeIndex = Math.floor((waveNumber - 1) / 10) % ARENA_THEME_CYCLE.length;
+  const themeIndex = Math.floor(waveNumber / 10) % ARENA_THEME_CYCLE.length;
   return ARENA_THEME_CYCLE[themeIndex]!;
 }
 
@@ -373,6 +487,10 @@ export function createArenaLayoutForLevel(levelId: number): ArenaLayoutDefinitio
       ...barrel,
       ...mapPoint(barrel.xFraction, barrel.yFraction),
     })),
+    gasCylinders: (baseLayout.gasCylinders ?? []).map((cylinder) => ({
+      ...cylinder,
+      ...mapPoint(cylinder.xFraction, cylinder.yFraction),
+    })),
   };
 }
 
@@ -381,15 +499,72 @@ export function createArenaObstacles(
   previousLayoutId?: string,
 ): ArenaObstacleEntity[] {
   const layout = createArenaLayoutForWave(waveNumber, previousLayoutId);
-  return layout.obstacles.map((obstacle) =>
-    obstacle.kind === 'barricade'
-      ? {
-          ...obstacle,
-          health: ARENA_INTERACTION_CONFIG.barricadeHealth,
-          maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
-        }
-      : { ...obstacle },
-  );
+  return createArenaObstacleEntities(layout.obstacles, layout.theme);
+}
+
+export function createArenaObstacleEntities(
+  obstacles: readonly ArenaObstacle[],
+  theme: ArenaThemeId,
+): ArenaObstacleEntity[] {
+  return obstacles.map((obstacle, index) => {
+    if (theme === 'industrial' && obstacle.kind === 'wall') {
+      return {
+        ...obstacle,
+        industrialMotion: {
+          originXFraction: obstacle.xFraction,
+          originYFraction: obstacle.yFraction,
+          angle: index % 2 === 0 ? 0 : Math.PI / 2,
+          amplitude: INDUSTRIAL_OBJECT_CONFIG.movingWall.amplitude,
+          phase: index * 1.73,
+          pathMode: index % 2 === 0 ? 'pingPong' : 'loop',
+        },
+      };
+    }
+
+    if (theme === 'industrial' && obstacle.kind === 'crate') {
+      return {
+        ...obstacle,
+        health: ARENA_INTERACTION_CONFIG.industrialCrateHealth,
+        maxHealth: ARENA_INTERACTION_CONFIG.industrialCrateHealth,
+      };
+    }
+
+    if (obstacle.kind === 'barricade' && theme !== 'industrial') {
+      return {
+        ...obstacle,
+        health: ARENA_INTERACTION_CONFIG.barricadeHealth,
+        maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
+      };
+    }
+
+    return { ...obstacle };
+  });
+}
+
+export function createIndustrialGasCylinders(
+  layout: ArenaLayoutDefinition,
+  width: number,
+  height: number,
+): IndustrialGasCylinderEntity[] {
+  if (layout.theme !== 'industrial') return [];
+  return (layout.gasCylinders ?? []).map((position, index) => {
+    const x = width * position.xFraction;
+    const y = height * position.yFraction;
+    return {
+      id: index + 1,
+      originX: x,
+      originY: y,
+      x,
+      y,
+      radius: INDUSTRIAL_OBJECT_CONFIG.gasCylinder.radius,
+      phase: 'idle',
+      directionX: 0,
+      directionY: 0,
+      remainingSeconds: 0,
+      cooldownSeconds: 0.8 + index * 1.1,
+      hitActorIds: [],
+    };
+  });
 }
 
 export function createExplosiveBarrels(
@@ -409,6 +584,7 @@ export function createExplosiveBarrels(
 export function getArenaCollisionObstacles(
   obstacles: readonly ArenaObstacleEntity[],
   barrels: readonly ExplosiveBarrelEntity[],
+  militaryObjects: readonly MilitaryOutpostEntity[] = [],
 ): ArenaObstacle[] {
   return [
     ...obstacles.filter((obstacle) =>
@@ -423,5 +599,141 @@ export function getArenaCollisionObstacles(
         height: barrel.radius * 2,
         kind: 'barrel',
       })),
+    ...militaryObjects
+      .filter((object) => object.kind !== 'razor-wire' && (
+        object.kind === 'abandoned-turret'
+          ? object.state !== 'destroyed'
+          : !object.destroyed
+      ))
+      .map((object): ArenaObstacle => ({
+        xFraction: object.xFraction,
+        yFraction: object.yFraction,
+        width: object.width,
+        height: object.height,
+        kind: object.kind === 'sandbag-barricade' ? 'barricade' : 'crate',
+      })),
   ];
+}
+
+export function createMilitaryOutpostObjects(
+  theme: ArenaThemeId,
+  arenaInstanceId = 'military',
+): MilitaryOutpostEntity[] {
+  if (theme !== 'military') return [];
+  const placements = [
+    {
+      kind: 'sandbag-barricade',
+      xFraction: 0.18,
+      yFraction: 0.5,
+      width: MILITARY_OBJECT_CONFIG.sandbag.width,
+      height: MILITARY_OBJECT_CONFIG.sandbag.height,
+    },
+    {
+      kind: 'military-ammo-crate',
+      xFraction: 0.9,
+      yFraction: 0.5,
+      width: MILITARY_OBJECT_CONFIG.ammoCrate.width,
+      height: MILITARY_OBJECT_CONFIG.ammoCrate.height,
+    },
+    {
+      kind: 'fuel-drum',
+      xFraction: 0.5,
+      yFraction: 0.1,
+      width: MILITARY_OBJECT_CONFIG.fuelDrum.width,
+      height: MILITARY_OBJECT_CONFIG.fuelDrum.height,
+    },
+    {
+      kind: 'razor-wire',
+      xFraction: 0.5,
+      yFraction: 0.9,
+      width: MILITARY_OBJECT_CONFIG.razorWire.width,
+      height: MILITARY_OBJECT_CONFIG.razorWire.height,
+    },
+    {
+      kind: 'abandoned-turret',
+      xFraction: 0.1,
+      yFraction: 0.83,
+      width: MILITARY_OBJECT_CONFIG.abandonedTurret.width,
+      height: MILITARY_OBJECT_CONFIG.abandonedTurret.height,
+    },
+    {
+      kind: 'military-supply-crate',
+      xFraction: 0.9,
+      yFraction: 0.83,
+      width: MILITARY_OBJECT_CONFIG.supplyCrate.width,
+      height: MILITARY_OBJECT_CONFIG.supplyCrate.height,
+    },
+  ] as const;
+  return placements.map((placement, index): MilitaryOutpostEntity => {
+    const base = {
+      id: `${arenaInstanceId}-${placement.kind}-${index + 1}`,
+      xFraction: placement.xFraction,
+      yFraction: placement.yFraction,
+      width: placement.width,
+      height: placement.height,
+      rotation: 0,
+    };
+    switch (placement.kind) {
+      case 'sandbag-barricade':
+        return {
+          ...base,
+          kind: placement.kind,
+          health: MILITARY_OBJECT_CONFIG.sandbag.health,
+          maxHealth: MILITARY_OBJECT_CONFIG.sandbag.health,
+          destroyed: false,
+          spillRemainingSeconds: 0,
+        };
+      case 'military-ammo-crate':
+        return {
+          ...base,
+          kind: placement.kind,
+          health: MILITARY_OBJECT_CONFIG.ammoCrate.health,
+          maxHealth: MILITARY_OBJECT_CONFIG.ammoCrate.health,
+          destroyed: false,
+          explosionRemainingSeconds: 0,
+          rewardSpawned: false,
+        };
+      case 'fuel-drum':
+        return {
+          ...base,
+          kind: placement.kind,
+          health: MILITARY_OBJECT_CONFIG.fuelDrum.health,
+          maxHealth: MILITARY_OBJECT_CONFIG.fuelDrum.health,
+          destroyed: false,
+          phase: 'idle',
+          phaseRemainingSeconds: 0,
+          blastDamageApplied: false,
+          rewardSpawned: false,
+        };
+      case 'razor-wire':
+        return {
+          ...base,
+          kind: placement.kind,
+          active: true,
+          remainingSeconds: MILITARY_OBJECT_CONFIG.razorWire.activeDurationSeconds,
+        };
+      case 'abandoned-turret':
+        return {
+          ...base,
+          kind: placement.kind,
+          health: MILITARY_OBJECT_CONFIG.abandonedTurret.health,
+          maxHealth: MILITARY_OBJECT_CONFIG.abandonedTurret.health,
+          state: 'broken',
+          reviveProgress: 0,
+          attackCooldownSeconds: 0,
+          facingAngle: 0,
+          muzzleFlashSeconds: 0,
+        };
+      case 'military-supply-crate':
+        return {
+          ...base,
+          kind: placement.kind,
+          health: MILITARY_OBJECT_CONFIG.supplyCrate.health,
+          maxHealth: MILITARY_OBJECT_CONFIG.supplyCrate.health,
+          destroyed: false,
+          destructionRemainingSeconds: 0,
+          rewardSpawned: false,
+        };
+    }
+  });
 }

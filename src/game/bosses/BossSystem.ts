@@ -235,12 +235,20 @@ function updateCharger(
       Math.sin(angle) * distance,
       state.arenaWidth,
       state.arenaHeight,
-      getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+      getArenaCollisionObstacles(
+        state.arenaObstacles,
+        state.barrels,
+        state.militaryObjects,
+      ),
     );
     const hitObstacle = getArenaObstacles(
       state.arenaWidth,
       state.arenaHeight,
-      getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+      getArenaCollisionObstacles(
+        state.arenaObstacles,
+        state.barrels,
+        state.militaryObjects,
+      ),
     )
       .some((obstacle) =>
         segmentIntersectsRectangle(boss, next, obstacle, boss.radius),
@@ -501,7 +509,11 @@ export function moveBoss(
         boss.radius,
         state.arenaWidth,
         state.arenaHeight,
-        getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+        getArenaCollisionObstacles(
+          state.arenaObstacles,
+          state.barrels,
+          state.militaryObjects,
+        ),
       );
       const dx = waypoint.x - boss.x;
       const dy = waypoint.y - boss.y;
@@ -515,7 +527,11 @@ export function moveBoss(
           movementSpeedMultiplier * deltaSeconds,
         state.arenaWidth,
         state.arenaHeight,
-        getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+        getArenaCollisionObstacles(
+          state.arenaObstacles,
+          state.barrels,
+          state.militaryObjects,
+        ),
       );
       boss.x = next.x;
       boss.y = next.y;

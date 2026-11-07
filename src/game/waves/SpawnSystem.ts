@@ -94,7 +94,11 @@ export function isValidSpawnPosition(
     getArenaObstacles(
       state.arenaWidth,
       state.arenaHeight,
-      getArenaCollisionObstacles(state.arenaObstacles, state.barrels),
+      getArenaCollisionObstacles(
+        state.arenaObstacles,
+        state.barrels,
+        state.militaryObjects,
+      ),
     ).some((obstacle) =>
       circleOverlapsRectangle(position, radius, obstacle),
     )

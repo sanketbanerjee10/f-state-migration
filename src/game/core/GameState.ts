@@ -14,11 +14,22 @@ import {
   ARENA_INTERACTION_CONFIG,
   createArenaLayoutForWave,
   createArenaLayoutForLevel,
+  createArenaObstacleEntities,
   getArenaCollisionObstacles,
+  createMilitaryOutpostObjects,
   type ArenaObstacleEntity,
   type ArenaThemeId,
   type ExplosiveBarrelEntity,
+  type MilitaryOutpostEntity,
+  createIndustrialGasCylinders,
+  type IndustrialGasCylinderEntity,
+  type OilFirePatchEntity,
 } from '../arena/ArenaSystem';
+import {
+  cloneContaminatedArenaEntity,
+  createContaminatedArenaObjects,
+  type ContaminatedArenaEntity,
+} from '../arena/ContaminatedArenaSystem';
 import { getWaveDifficulty } from '../waves/WaveDifficulty';
 import type { BossType } from '../bosses/BossSystem';
 import type {
@@ -179,7 +190,12 @@ export interface WaveProgressionState {
 export interface ArenaTransitionSource {
   readonly obstacles: readonly Readonly<ArenaObstacleEntity>[];
   readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+  readonly gasCylinders?: readonly Readonly<IndustrialGasCylinderEntity>[];
+  readonly oilFirePatches?: readonly Readonly<OilFirePatchEntity>[];
+  readonly contaminatedObjects?: readonly ContaminatedArenaEntity[];
+  readonly militaryObjects?: readonly Readonly<MilitaryOutpostEntity>[];
   readonly theme: ArenaThemeId;
+  readonly elapsedSeconds?: number;
 }
 
 export interface RunStatOption {
@@ -214,6 +230,10 @@ export interface PlayerEntity {
   spitterPoisonRemainingSeconds: number;
   spitterPoisonTickSeconds: number;
   spitterPoisonDamage: number;
+  industrialBurnRemainingSeconds: number;
+  industrialBurnTickSeconds: number;
+  militaryHazardCooldownSeconds: number;
+  spawnProtectionSeconds: number;
   alive: boolean;
 }
 
@@ -249,7 +269,16 @@ export interface ZombieEntity {
   eliteMaxShieldHealth?: number;
   eliteExplosionSeconds?: number;
   eliteExplosionDurationSeconds?: number;
+  industrialHazardCooldownSeconds?: number;
+  militaryHazardCooldownSeconds?: number;
+  targetMilitaryTurretId?: string;
+  militaryTurretTargetChecked?: boolean;
+  industrialBurnRemainingSeconds?: number;
+  industrialBurnTickSeconds?: number;
   eliteRarePointEligible?: boolean;
+  mutagenSpawnBuff?: boolean;
+  mutagenTemporaryBuffUntil?: number;
+  targetMutagenSpillId?: string;
   isBoss?: boolean;
   bossType?: BossType;
   bossAttackCooldownSeconds?: number;
@@ -351,7 +380,11 @@ export interface GameState {
   items: ItemOrbEntity[];
   hazards: HazardEntity[];
   arenaObstacles: ArenaObstacleEntity[];
+  militaryObjects: MilitaryOutpostEntity[];
   barrels: ExplosiveBarrelEntity[];
+  gasCylinders: IndustrialGasCylinderEntity[];
+  oilFirePatches: OilFirePatchEntity[];
+  contaminatedObjects: ContaminatedArenaEntity[];
   arenaTheme: ArenaThemeId;
   arenaTransitionFrom?: ArenaTransitionSource;
   impacts: ImpactEffectEntity[];
@@ -380,7 +413,11 @@ export interface GameStateSnapshot {
   readonly items: readonly Readonly<ItemOrbEntity>[];
   readonly hazards: readonly Readonly<HazardEntity>[];
   readonly arenaObstacles: readonly Readonly<ArenaObstacleEntity>[];
+  readonly militaryObjects: readonly Readonly<MilitaryOutpostEntity>[];
   readonly barrels: readonly Readonly<ExplosiveBarrelEntity>[];
+  readonly gasCylinders: readonly Readonly<IndustrialGasCylinderEntity>[];
+  readonly oilFirePatches: readonly Readonly<OilFirePatchEntity>[];
+  readonly contaminatedObjects: readonly ContaminatedArenaEntity[];
   readonly arenaTheme: ArenaThemeId;
   readonly arenaTransitionFrom?: ArenaTransitionSource;
   readonly impacts: readonly Readonly<ImpactEffectEntity>[];
@@ -444,7 +481,10 @@ export function createZombie(
     radius: GAME_VISUAL_CONFIG.entity[ZOMBIE_RADIUS_KEYS[type]],
     health: Math.round(stats.health * healthMultiplier),
     maxHealth: Math.round(stats.health * healthMultiplier),
-    movementSpeed: stats.movementSpeed * difficulty.speedMultiplier,
+    movementSpeed:
+      stats.movementSpeed *
+      WAVE_DIFFICULTY_CONFIG.baseEnemySpeedMultiplier *
+      difficulty.speedMultiplier,
     contactDamage: type === 'brute'
       ? stats.contactDamage
       : Math.min(
@@ -512,20 +552,19 @@ export function createGameState(
     spitterPoisonRemainingSeconds: 0,
     spitterPoisonTickSeconds: 0,
     spitterPoisonDamage: 0,
+    industrialBurnRemainingSeconds: 0,
+    industrialBurnTickSeconds: 0,
+    militaryHazardCooldownSeconds: 0,
+    spawnProtectionSeconds: 0,
     alive: true,
   };
   const initialWave = gameMode === 'level' ? campaignLevelId ?? 1 : 1;
   const initialLayout = gameMode === 'level'
     ? createArenaLayoutForLevel(initialWave)
     : createArenaLayoutForWave(initialWave);
-  const initialArenaObstacles = initialLayout.obstacles.map((obstacle) =>
-    obstacle.kind === 'barricade'
-      ? {
-          ...obstacle,
-          health: ARENA_INTERACTION_CONFIG.barricadeHealth,
-          maxHealth: ARENA_INTERACTION_CONFIG.barricadeHealth,
-        }
-      : { ...obstacle },
+  const initialArenaObstacles = createArenaObstacleEntities(
+    initialLayout.obstacles,
+    initialLayout.theme,
   );
   const initialBarrels = initialLayout.barrels.map((barrel, index) => ({
     ...barrel,
@@ -534,12 +573,25 @@ export function createGameState(
     maxHealth: ARENA_INTERACTION_CONFIG.barrelHealth,
     id: `${barrel.id}-${index}`,
   }));
+  const initialMilitaryObjects = createMilitaryOutpostObjects(
+    initialLayout.theme,
+    `${initialLayout.id}-${initialWave}`,
+  );
+  const initialContaminatedObjects = createContaminatedArenaObjects(
+    initialLayout,
+    width,
+    height,
+  );
   const playerSpawn = findCirclePositionInArena(
     player,
     playerRadius,
     width,
     height,
-    getArenaCollisionObstacles(initialArenaObstacles, initialBarrels),
+    getArenaCollisionObstacles(
+      initialArenaObstacles,
+      initialBarrels,
+      initialMilitaryObjects,
+    ),
   );
   player.x = playerSpawn.x;
   player.y = playerSpawn.y;
@@ -607,7 +659,11 @@ export function createGameState(
     items: [],
     hazards: [],
     arenaObstacles: initialArenaObstacles,
+    militaryObjects: initialMilitaryObjects,
     barrels: initialBarrels,
+    gasCylinders: createIndustrialGasCylinders(initialLayout, width, height),
+    oilFirePatches: [],
+    contaminatedObjects: initialContaminatedObjects,
     arenaTheme: initialLayout.theme,
     impacts: [],
     damageNumbers: [],
@@ -694,6 +750,7 @@ export function resizeGameState(
   const arenaObstacles = getArenaCollisionObstacles(
     state.arenaObstacles,
     state.barrels,
+    state.militaryObjects,
   );
   state.arenaWidth = width;
   state.arenaHeight = height;
@@ -728,6 +785,41 @@ export function resizeGameState(
     turret.x = resized.x;
     turret.y = resized.y;
   }
+  for (const cylinder of state.gasCylinders) {
+    cylinder.x *= scaleX;
+    cylinder.y *= scaleY;
+    cylinder.originX *= scaleX;
+    cylinder.originY *= scaleY;
+  }
+  for (const patch of state.oilFirePatches) {
+    patch.x *= scaleX;
+    patch.y *= scaleY;
+    patch.radius *= Math.min(scaleX, scaleY);
+  }
+  for (const entity of state.contaminatedObjects) {
+    entity.x *= scaleX;
+    entity.y *= scaleY;
+    if (entity.kind === 'contaminated-puddle') {
+      entity.width *= scaleX;
+      entity.height *= scaleY;
+      entity.radiusX *= Math.min(scaleX, scaleY);
+      entity.radiusY *= Math.min(scaleX, scaleY);
+    } else {
+      entity.width *= Math.min(scaleX, scaleY);
+      entity.height *= Math.min(scaleX, scaleY);
+    }
+    if (entity.kind === 'chemical-tank' && entity.cloud) {
+      entity.cloud.x *= scaleX;
+      entity.cloud.y *= scaleY;
+      entity.cloud.radiusX *= Math.min(scaleX, scaleY);
+      entity.cloud.radiusY *= Math.min(scaleX, scaleY);
+    }
+    if (entity.kind === 'mutagen-container' && entity.spill) {
+      entity.spill.radius *= Math.min(scaleX, scaleY);
+      entity.spill.radiusX *= Math.min(scaleX, scaleY);
+      entity.spill.radiusY *= Math.min(scaleX, scaleY);
+    }
+  }
 }
 
 export function createGameStateSnapshot(state: GameState): GameStateSnapshot {
@@ -748,14 +840,31 @@ export function createGameStateSnapshot(state: GameState): GameStateSnapshot {
     items: state.items.map((item) => ({ ...item })),
     hazards: state.hazards.map((hazard) => ({ ...hazard })),
     arenaObstacles: state.arenaObstacles.map((obstacle) => ({ ...obstacle })),
+    militaryObjects: state.militaryObjects.map((object) => ({ ...object })),
     barrels: state.barrels.map((barrel) => ({ ...barrel })),
+    gasCylinders: state.gasCylinders.map((cylinder) => ({
+      ...cylinder,
+      hitActorIds: [...cylinder.hitActorIds],
+    })),
+    oilFirePatches: state.oilFirePatches.map((patch) => ({ ...patch })),
+    contaminatedObjects: state.contaminatedObjects.map(cloneContaminatedArenaEntity),
     arenaTheme: state.arenaTheme,
     ...(state.arenaTransitionFrom
       ? {
           arenaTransitionFrom: {
             obstacles: state.arenaTransitionFrom.obstacles.map((obstacle) => ({ ...obstacle })),
             barrels: state.arenaTransitionFrom.barrels.map((barrel) => ({ ...barrel })),
+            gasCylinders: state.arenaTransitionFrom.gasCylinders?.map((cylinder) => ({
+              ...cylinder,
+              hitActorIds: [...cylinder.hitActorIds],
+            })),
+            oilFirePatches: state.arenaTransitionFrom.oilFirePatches?.map((patch) => ({ ...patch })),
+            contaminatedObjects: state.arenaTransitionFrom.contaminatedObjects?.map(
+              cloneContaminatedArenaEntity,
+            ),
+            militaryObjects: state.arenaTransitionFrom.militaryObjects?.map((object) => ({ ...object })),
             theme: state.arenaTransitionFrom.theme,
+            elapsedSeconds: state.arenaTransitionFrom.elapsedSeconds,
           },
         }
       : {}),

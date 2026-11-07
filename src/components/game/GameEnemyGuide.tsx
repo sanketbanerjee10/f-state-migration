@@ -20,6 +20,11 @@ import {
   createArenaLayoutForWave,
   createExplosiveBarrels,
 } from '@/game/arena/ArenaSystem';
+import {
+  renderIndustrialObjectBodies,
+  renderIndustrialObjectEffects,
+  type IndustrialVisualObject,
+} from '@/game/arenas/environments/industrial';
 import { renderArena } from '@/game/rendering/ArenaRenderer';
 import { drawZombie } from '@/game/rendering/ZombieRenderer';
 import { GameOrbGuideSection } from './GameOrbGuide';
@@ -109,7 +114,8 @@ const BOSS_GUIDE_DETAILS: Readonly<Record<BossType, {
 
 type SelectedGuideEntry =
   | { readonly kind: 'enemy'; readonly type: ZombieType }
-  | { readonly kind: 'boss'; readonly type: BossType };
+  | { readonly kind: 'boss'; readonly type: BossType }
+  | { readonly kind: 'arena'; readonly entry: ArenaGuideEntry };
 
 function getBossZombieType(bossType: BossType): ZombieType {
   return bossType === 'hordeCaller'
@@ -117,6 +123,146 @@ function getBossZombieType(bossType: BossType): ZombieType {
     : bossType === 'acidQueen'
       ? 'spitter'
       : 'brute';
+}
+
+type ArenaObjectPreviewKind =
+  | 'crate'
+  | 'barricade'
+  | 'wall'
+  | 'cover'
+  | 'barrel'
+  | IndustrialVisualObject['kind'];
+
+interface ArenaObjectGuideEntry {
+  readonly name: string;
+  readonly description: string;
+  readonly previewKind: ArenaObjectPreviewKind;
+}
+
+const ARENA_OBJECT_GUIDES: Readonly<Record<string, readonly ArenaObjectGuideEntry[]>> = {
+  military: [
+    { name: 'Crate', description: 'Stacked supply crates that create cover and break up sightlines.', previewKind: 'crate' },
+    { name: 'Barricade', description: 'Low barricades used to funnel movement and block rushes.', previewKind: 'barricade' },
+    { name: 'Wall', description: 'Solid concrete panels that hide lanes and create choke points.', previewKind: 'wall' },
+    { name: 'Cover', description: 'Shielding segments that give players a brief safe pocket.', previewKind: 'cover' },
+    { name: 'Barrel', description: 'Explosive drums that can wreck clusters if they are triggered.', previewKind: 'barrel' },
+  ],
+  industrial: [
+    { name: 'Oil Barrel', description: 'Heavy steel drums that can rupture with a dangerous fire burst.', previewKind: 'oil-barrel' },
+    { name: 'Gas Cylinder', description: 'Pressurised tanks that add a hazardous, high-velocity hazard pattern.', previewKind: 'gas-cylinder' },
+    { name: 'Electric Generator', description: 'Reactive power units that charge up and arc dangerous energy fields.', previewKind: 'electric-generator' },
+    { name: 'Moving Wall', description: 'Tracking industrial panels that shift and force pathing changes.', previewKind: 'moving-wall' },
+    { name: 'Steam Pipe', description: 'Vent stacks that warn, pulse, and eject hot bursts of steam.', previewKind: 'steam-pipe' },
+    { name: 'Industrial Crate', description: 'Reinforced storage containers with durable metal plating and loot drops.', previewKind: 'industrial-crate' },
+  ],
+  contaminated: [
+    { name: 'Crate', description: 'Loose supply crates that create a cluttered fighting lane.', previewKind: 'crate' },
+    { name: 'Barricade', description: 'Rusty barriers that split the arena and slow advances.', previewKind: 'barricade' },
+    { name: 'Wall', description: 'Contaminated concrete walls that force more deliberate routes.', previewKind: 'wall' },
+    { name: 'Cover', description: 'Patchwork cover sections for short-term protection.', previewKind: 'cover' },
+    { name: 'Barrel', description: 'Toxic drums that threaten nearby enemies and players.', previewKind: 'barrel' },
+  ],
+  urban: [
+    { name: 'Crate', description: 'Broken scavenged storage blocks and debris barriers.', previewKind: 'crate' },
+    { name: 'Barricade', description: 'Street debris used to block lanes and corner enemies.', previewKind: 'barricade' },
+    { name: 'Wall', description: 'Ruined masonry walls that create long sightlines and chokepoints.', previewKind: 'wall' },
+    { name: 'Cover', description: 'Scattered cover pieces that offer little but crucial shelter.', previewKind: 'cover' },
+    { name: 'Barrel', description: 'Old fuel containers that can detonate in close quarters.', previewKind: 'barrel' },
+  ],
+  bunker: [
+    { name: 'Crate', description: 'Utility crates stacked for defensive cover in the bunker corridors.', previewKind: 'crate' },
+    { name: 'Barricade', description: 'Tunnel barriers used to control movement and stall pursuit.', previewKind: 'barricade' },
+    { name: 'Wall', description: 'Concrete bulkheads that reinforce the underground lanes.', previewKind: 'wall' },
+    { name: 'Cover', description: 'Compact armor plates that break up sightlines and angles.', previewKind: 'cover' },
+    { name: 'Barrel', description: 'Stored explosive drums that make tight spaces especially risky.', previewKind: 'barrel' },
+  ],
+} as const;
+
+function getIndustrialGuideObject(kind: IndustrialVisualObject['kind']): IndustrialVisualObject {
+  const base = { id: `guide-${kind}`, x: 80, y: 48, width: 52, height: 34 };
+  switch (kind) {
+    case 'oil-barrel':
+      return { ...base, kind, height: 52, health: 100, maxHealth: 100, destroyed: false };
+    case 'gas-cylinder':
+      return { ...base, kind, width: 30, height: 58, phase: 'idle' };
+    case 'electric-generator':
+      return {
+        ...base, kind, phase: 'discharging', chargeProgress: 1,
+        dischargeProgress: 0.5, visualSeed: 11, dangerRadius: 40,
+      };
+    case 'moving-wall':
+      return { ...base, kind, width: 76, height: 28, movementIntensity: 0.68, travelAngle: 0.12 };
+    case 'steam-pipe':
+      return {
+        ...base, kind, width: 74, height: 34, phase: 'venting',
+        directionX: 1, directionY: 0, phaseProgress: 0.5, intensity: 0.85,
+      };
+    case 'industrial-crate':
+      return { ...base, kind, width: 58, height: 46, health: 100, maxHealth: 100, destroyed: false };
+  }
+}
+
+function ArenaObjectGuidePreview({
+  entry,
+  themeId,
+}: {
+  readonly entry: ArenaObjectGuideEntry;
+  readonly themeId: ArenaGuideEntry['theme']['id'];
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context) return;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (entry.previewKind === 'oil-barrel'
+      || entry.previewKind === 'gas-cylinder'
+      || entry.previewKind === 'electric-generator'
+      || entry.previewKind === 'moving-wall'
+      || entry.previewKind === 'steam-pipe'
+      || entry.previewKind === 'industrial-crate') {
+      const object = getIndustrialGuideObject(entry.previewKind);
+      renderIndustrialObjectBodies(context, [object], { timeSeconds: 0 });
+      renderIndustrialObjectEffects(context, [object], { timeSeconds: 0 });
+      return;
+    }
+
+    const isBarrel = entry.previewKind === 'barrel';
+    renderArena(context, canvas.width, canvas.height, {
+      obstacles: isBarrel ? [] : [{
+        xFraction: 0.5,
+        yFraction: 0.5,
+        width: entry.previewKind === 'barricade' ? 100 : 60,
+        height: entry.previewKind === 'barricade' ? 18 : 46,
+        kind: entry.previewKind,
+      }],
+      barrels: isBarrel ? [{
+        id: 'guide-barrel',
+        xFraction: 0.5,
+        yFraction: 0.5,
+        radius: 22,
+        health: 80,
+        maxHealth: 80,
+      }] : [],
+      theme: themeId,
+    });
+  }, [entry, themeId]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="game-arena-renderable-canvas"
+      width={160}
+      height={96}
+      aria-hidden="true"
+    />
+  );
+}
+
+function getArenaObjectCatalog(themeId: ArenaGuideEntry['theme']['id']) {
+  return ARENA_OBJECT_GUIDES[themeId] ?? ARENA_OBJECT_GUIDES.military;
 }
 
 function GameEnemyPortrait({
@@ -249,6 +395,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
   const selectedBossType = selectedGuideEntry?.kind === 'boss'
     ? selectedGuideEntry.type
     : null;
+  const selectedArenaEntry = selectedGuideEntry?.kind === 'arena'
+    ? selectedGuideEntry.entry
+    : null;
   const selectedDiscovered = selectedEnemyType
     ? discoveredEnemies.has(selectedEnemyType)
     : selectedBossType
@@ -267,7 +416,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
       ? selectedDiscovered
         ? getBossName(selectedBossType)
         : 'Unknown Boss'
-      : '';
+      : selectedArenaEntry
+        ? `${selectedArenaEntry.theme.name} renderables`
+        : '';
   const selectedPreview = selectedEnemyType ? (
     <GameEnemyPortrait
       type={selectedEnemyType}
@@ -279,6 +430,8 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
       discovered={selectedDiscovered}
       bossType={selectedBossType}
     />
+  ) : selectedArenaEntry ? (
+    <GameArenaPreview entry={selectedArenaEntry} />
   ) : null;
 
   useEffect(() => {
@@ -461,7 +614,13 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
           />
           <div className="game-arena-guide-grid">
             {ARENA_GUIDE_ENTRIES.map((entry, index) => (
-              <article className="game-arena-guide-card" key={entry.theme.id}>
+              <button
+                className="game-arena-guide-card"
+                type="button"
+                key={entry.theme.id}
+                aria-label={`View ${entry.theme.name} renderable objects`}
+                onClick={() => setSelectedGuideEntry({ kind: 'arena', entry })}
+              >
                 <div className="game-arena-guide-preview">
                   <GameArenaPreview entry={entry} />
                   <span className="game-arena-guide-layout-label">
@@ -478,7 +637,7 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                   <h3>{entry.theme.name}</h3>
                   <p>{entry.description}</p>
                 </div>
-              </article>
+              </button>
             ))}
           </div>
         </section>
@@ -489,7 +648,29 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
             preview={selectedPreview}
             onClose={() => setSelectedGuideEntry(null)}
           >
-            {selectedDiscovered && selectedDetails ? (
+            {selectedArenaEntry ? (
+              <>
+                <p>
+                  Objects that may appear in this environment. Object state and placement can vary by run.
+                </p>
+                <ul className="game-arena-renderables-list">
+                  {getArenaObjectCatalog(selectedArenaEntry.theme.id).map((item) => (
+                    <li key={item.previewKind} className="game-arena-renderable-item">
+                      <div className="game-arena-renderable-asset">
+                        <ArenaObjectGuidePreview
+                          entry={item}
+                          themeId={selectedArenaEntry.theme.id}
+                        />
+                      </div>
+                      <div className="game-arena-renderable-copy">
+                        <strong>{item.name}</strong>
+                        <span>{item.description}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : selectedDiscovered && selectedDetails ? (
               <>
                 <p>{selectedDetails.description}</p>
                 <p className="game-enemy-guide-ability">

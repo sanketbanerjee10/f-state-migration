@@ -11,6 +11,7 @@ import {
   type JoystickVector,
 } from './DualJoystickInput';
 import { renderGameScene } from '../rendering/Renderer';
+import { getArenaBackgroundCacheMetrics } from '../arenas/core/ArenaRenderer';
 import { EMPTY_RENDER_LAYERS, type RenderLayers } from '../rendering/RenderScene';
 import {
   createGameState,
@@ -28,6 +29,15 @@ import {
   createGameStateRenderLayers,
   getGameEntityCount,
 } from '../rendering/GameStateRenderer';
+import {
+  createGamePerformanceTimings,
+  GamePerformanceRecorder,
+  resetGamePerformanceTimings,
+  type GamePerformanceSnapshot,
+  type GamePerformanceTimings,
+  type GamePerformanceUiTimings,
+  type GamePerformanceCanvasMetrics,
+} from './GamePerformanceDiagnostics';
 
 export interface PlayerPosition {
   readonly x: number;
@@ -60,12 +70,22 @@ export class GameEngine {
   private readonly keyboardInput = new KeyboardInput();
   private readonly mouseAimInput = new MouseAimInput();
   private readonly dualJoystickInput = new DualJoystickInput();
+  private mobileControlElements: {
+    readonly movement: HTMLElement;
+    readonly aim: HTMLElement;
+  } | null = null;
   private mobileMovement: JoystickVector = { x: 0, y: 0 };
   private lastTouchTap: {
     readonly time: number;
     readonly x: number;
     readonly y: number;
   } | null = null;
+  private performanceRecorder: GamePerformanceRecorder | null = null;
+  private performanceTimings: GamePerformanceTimings | null = null;
+  private performanceCanvasResizeCount = 0;
+  private previousCallbackEndAt: number | null = null;
+  private previousCallbackDurationMs = 0;
+  private lastSnapshotBuildMs = 0;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -85,22 +105,11 @@ export class GameEngine {
     }
 
     this.context = context;
-    this.keyboardInput.attach(
-      this.canvas,
-      window,
-      mobileControls ? [mobileControls.movement, mobileControls.aim] : [],
-    );
+    this.keyboardInput.attach(this.canvas, window);
     this.mouseAimInput.attach(this.canvas, this.handleMousePosition);
     this.canvas.addEventListener('pointerdown', this.handleCanvasPointerDown);
     this.canvas.addEventListener('contextmenu', this.handleCanvasContextMenu);
-    if (mobileControls) {
-      this.dualJoystickInput.attach(
-        mobileControls.movement,
-        mobileControls.aim,
-        this.handleMobileMovement,
-        this.handleMobileAim,
-      );
-    }
+    if (mobileControls) this.setMobileControls(mobileControls);
     this.keyboardInput.setEnabled(false);
     this.mouseAimInput.setEnabled(false);
     this.dualJoystickInput.setEnabled(false);
@@ -154,8 +163,13 @@ export class GameEngine {
 
     const backingWidth = Math.max(1, Math.round(width * this.pixelRatio));
     const backingHeight = Math.max(1, Math.round(height * this.pixelRatio));
+    const dimensionsChanged =
+      this.canvas.width !== backingWidth || this.canvas.height !== backingHeight;
     if (this.canvas.width !== backingWidth) this.canvas.width = backingWidth;
     if (this.canvas.height !== backingHeight) this.canvas.height = backingHeight;
+    if (dimensionsChanged && this.performanceRecorder) {
+      this.performanceCanvasResizeCount += 1;
+    }
 
     this.render();
   }
@@ -179,6 +193,9 @@ export class GameEngine {
     this.isActive = true;
     this.setInputEnabled(true);
     this.previousFrameTime = null;
+    this.previousCallbackEndAt = null;
+    this.previousCallbackDurationMs = 0;
+    this.performanceRecorder?.startBrowserMonitoring();
     this.scheduleFrame();
   }
 
@@ -189,6 +206,9 @@ export class GameEngine {
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
     this.fpsFrameCount = 0;
+    this.previousCallbackEndAt = null;
+    this.previousCallbackDurationMs = 0;
+    this.performanceRecorder?.disconnectBrowserMonitoring();
     this.cancelFrame();
   }
 
@@ -203,6 +223,9 @@ export class GameEngine {
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
     this.fpsFrameCount = 0;
+    this.previousCallbackEndAt = null;
+    this.previousCallbackDurationMs = 0;
+    this.performanceRecorder?.startBrowserMonitoring();
     this.scheduleFrame();
   }
 
@@ -222,6 +245,11 @@ export class GameEngine {
     this.previousFrameTime = null;
     this.fpsWindowStart = null;
     this.fpsFrameCount = 0;
+    this.performanceRecorder?.reset();
+    this.performanceCanvasResizeCount = 0;
+    this.previousCallbackEndAt = null;
+    this.previousCallbackDurationMs = 0;
+    this.lastSnapshotBuildMs = 0;
     if (this.cssWidth > 0 && this.cssHeight > 0) {
       const logicalSize = this.getLogicalViewportSize(
         this.cssWidth,
@@ -261,13 +289,107 @@ export class GameEngine {
   }
 
   getGameState(): GameStateSnapshot | null {
-    return this.gameState
+    const startedAt = this.performanceRecorder ? performance.now() : 0;
+    const snapshot = this.gameState
       ? createGameStateSnapshot(this.gameState)
       : null;
+    if (this.performanceRecorder) {
+      this.lastSnapshotBuildMs = performance.now() - startedAt;
+    }
+    return snapshot;
+  }
+
+  getPerformanceSnapshotBuildMs(): number {
+    return this.lastSnapshotBuildMs;
+  }
+
+  setPerformanceDiagnosticsEnabled(enabled: boolean): void {
+    if (!import.meta.env.DEV) return;
+    if (!enabled) {
+      this.performanceRecorder?.disconnectBrowserMonitoring();
+      this.performanceRecorder = null;
+      this.performanceTimings = null;
+      this.previousCallbackEndAt = null;
+      this.previousCallbackDurationMs = 0;
+      return;
+    }
+    if (this.performanceRecorder) return;
+    this.performanceRecorder = new GamePerformanceRecorder();
+    this.performanceTimings = createGamePerformanceTimings();
+    this.performanceCanvasResizeCount = 0;
+    this.previousCallbackEndAt = null;
+    this.previousCallbackDurationMs = 0;
+    this.performanceRecorder.startBrowserMonitoring();
+    this.performanceRecorder.setCanvasMetrics(this.getPerformanceCanvasMetrics());
+    this.updatePerformanceBackgroundCacheMetrics();
+  }
+
+  getPerformanceDiagnostics(): GamePerformanceSnapshot | null {
+    this.performanceRecorder?.setCanvasMetrics(this.getPerformanceCanvasMetrics());
+    this.updatePerformanceBackgroundCacheMetrics();
+    return this.performanceRecorder?.getSnapshot() ?? null;
+  }
+
+  recordPerformanceUiPoll(
+    timings: GamePerformanceUiTimings,
+    startTime: number,
+    endTime: number,
+  ): void {
+    this.performanceRecorder?.recordUiPoll(
+      timings.snapshotBuildMs,
+      timings.pollWorkMs,
+      startTime,
+      endTime,
+    );
+  }
+
+  setPerformanceThresholds(thresholds: readonly [number, number, number]): void {
+    this.performanceRecorder?.setThresholds(thresholds);
+  }
+
+  exportPerformanceReport(): object {
+    if (!this.performanceRecorder) {
+      throw new Error('Enable performance diagnostics before exporting a report.');
+    }
+    this.updatePerformanceBackgroundCacheMetrics();
+    return this.performanceRecorder.exportReport(
+      this.canvas,
+      this.pixelRatio,
+      this.performanceCanvasResizeCount,
+    );
   }
 
   setKeyBindings(keyBindings: GameKeyBindings): void {
     this.keyboardInput.setKeyBindings(keyBindings);
+  }
+
+  setMobileControls(controls: {
+    readonly movement: HTMLElement;
+    readonly aim: HTMLElement;
+  } | null): void {
+    this.assertNotDestroyed();
+    if (
+      controls?.movement === this.mobileControlElements?.movement &&
+      controls?.aim === this.mobileControlElements?.aim
+    ) {
+      return;
+    }
+
+    this.dualJoystickInput.detach();
+    this.keyboardInput.setAdditionalElements(
+      controls ? [controls.movement, controls.aim] : [],
+    );
+    this.mobileControlElements = controls;
+    this.mobileMovement = { x: 0, y: 0 };
+    if (!controls) return;
+
+    this.dualJoystickInput.attach(
+      controls.movement,
+      controls.aim,
+      this.handleMobileMovement,
+      this.handleMobileAim,
+    );
+    this.dualJoystickInput.setEnabled(this.isActive && !document.hidden);
   }
 
   requestBomb(): void {
@@ -287,6 +409,7 @@ export class GameEngine {
 
   getMovementInput(): MovementVector {
     const keyboard = this.keyboardInput.getMovement();
+    if (!this.mobileControlElements) return keyboard;
     const x = keyboard.x + this.mobileMovement.x;
     const y = keyboard.y + this.mobileMovement.y;
     const magnitude = Math.hypot(x, y);
@@ -307,6 +430,8 @@ export class GameEngine {
     this.canvas.removeEventListener('pointerdown', this.handleCanvasPointerDown);
     this.canvas.removeEventListener('contextmenu', this.handleCanvasContextMenu);
     this.dualJoystickInput.detach();
+    this.mobileControlElements = null;
+    this.mobileMovement = { x: 0, y: 0 };
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     if (this.motionPreference && this.motionPreferenceListener) {
       this.motionPreference.removeEventListener(
@@ -316,6 +441,8 @@ export class GameEngine {
     }
     this.motionPreference = null;
     this.motionPreferenceListener = null;
+    this.performanceRecorder = null;
+    this.performanceTimings = null;
     this.context = null;
     this.isDestroyed = true;
   }
@@ -327,6 +454,9 @@ export class GameEngine {
       this.previousFrameTime = null;
       this.fpsWindowStart = null;
       this.fpsFrameCount = 0;
+      this.previousCallbackEndAt = null;
+      this.previousCallbackDurationMs = 0;
+      this.performanceRecorder?.disconnectBrowserMonitoring();
       return;
     }
 
@@ -335,6 +465,9 @@ export class GameEngine {
       this.previousFrameTime = null;
       this.fpsWindowStart = null;
       this.fpsFrameCount = 0;
+      this.previousCallbackEndAt = null;
+      this.previousCallbackDurationMs = 0;
+      this.performanceRecorder?.startBrowserMonitoring();
       this.scheduleFrame();
     }
   };
@@ -343,18 +476,55 @@ export class GameEngine {
     this.animationFrameId = null;
     if (!this.isActive || document.hidden) return;
 
+    const recorder = import.meta.env.DEV ? this.performanceRecorder : null;
+    const timings = recorder ? this.performanceTimings : null;
+    const callbackStartedAt = recorder ? performance.now() : 0;
+    const callbackGapMs = recorder && this.previousCallbackEndAt !== null
+      ? Math.max(0, callbackStartedAt - this.previousCallbackEndAt)
+      : 0;
+    if (timings) resetGamePerformanceTimings(timings);
+    if (timings) {
+      timings.rafSchedulingGapMs = callbackGapMs;
+      timings.previousCallbackDurationMs = this.previousCallbackDurationMs;
+    }
+    const frameIntervalMs = this.previousFrameTime === null
+      ? 0
+      : Math.max(0, timestamp - this.previousFrameTime);
     const elapsed = this.previousFrameTime === null
       ? 0
       : Math.min(
-          Math.max(0, (timestamp - this.previousFrameTime) / 1000),
+          frameIntervalMs / 1000,
           GAME_RUNTIME_CONFIG.maximumFrameDeltaSeconds,
         );
     this.previousFrameTime = timestamp;
 
+    const updateStartedAt = timings ? performance.now() : 0;
     this.update(elapsed);
+    if (timings) timings.updateMs = performance.now() - updateStartedAt;
+    const renderStartedAt = timings ? performance.now() : 0;
     this.render();
-    this.measureFps(timestamp);
+    if (timings) {
+      timings.renderMs = performance.now() - renderStartedAt;
+    }
+    if (import.meta.env.DEV) this.measureFps(timestamp);
+    if (timings) {
+      recorder?.recordFrame(
+        timestamp,
+        frameIntervalMs,
+        timings,
+        this.gameState,
+        callbackStartedAt,
+        this.getPerformanceCanvasMetrics(),
+      );
+    }
     this.scheduleFrame();
+    if (timings) {
+      this.previousCallbackDurationMs = timings.frameCallbackMs;
+      this.previousCallbackEndAt = performance.now();
+    } else {
+      this.previousCallbackDurationMs = 0;
+      this.previousCallbackEndAt = null;
+    }
   };
 
   private update(deltaSeconds: number): void {
@@ -375,9 +545,10 @@ export class GameEngine {
         useBomb: this.keyboardInput.consumeBombRequest(),
       },
       deltaSeconds,
+      this.performanceTimings ?? undefined,
     );
     this.simulatedSeconds = this.gameState.elapsedSeconds;
-    this.refreshRenderLayers();
+    this.refreshRenderLayers(this.performanceTimings ?? undefined);
   }
 
   private readonly handleMousePosition = (
@@ -474,10 +645,20 @@ export class GameEngine {
     this.render();
   };
 
-  private refreshRenderLayers(): void {
+  private refreshRenderLayers(performanceTimings?: GamePerformanceTimings): void {
+    const startedAt = performanceTimings ? performance.now() : 0;
     this.renderLayers = this.gameState
       ? createGameStateRenderLayers(this.gameState)
       : EMPTY_RENDER_LAYERS;
+    if (performanceTimings) {
+      performanceTimings.renderLayersMs += performance.now() - startedAt;
+    }
+  }
+
+  private updatePerformanceBackgroundCacheMetrics(): void {
+    this.performanceRecorder?.setArenaBackgroundCacheMetrics(
+      getArenaBackgroundCacheMetrics(),
+    );
   }
 
   private setInputEnabled(enabled: boolean): void {
@@ -514,29 +695,8 @@ export class GameEngine {
       viewportHeight,
       this.prefersReducedMotion ? 0 : this.simulatedSeconds,
       this.renderLayers,
+      this.performanceTimings ?? undefined,
     );
-  }
-
-  private measureFps(timestamp: number): void {
-    if (!this.onDiagnostics) return;
-
-    if (this.fpsWindowStart === null) {
-      this.fpsWindowStart = timestamp;
-      this.fpsFrameCount = 0;
-      return;
-    }
-
-    this.fpsFrameCount += 1;
-    const duration = timestamp - this.fpsWindowStart;
-    if (duration < 1000) return;
-
-    this.onDiagnostics({
-      fps: Math.round((this.fpsFrameCount * 1000) / duration),
-      entityCount:
-        this.gameState ? getGameEntityCount(this.gameState) : 0,
-    });
-    this.fpsWindowStart = timestamp;
-    this.fpsFrameCount = 0;
   }
 
   private scheduleFrame(): void {
@@ -556,6 +716,37 @@ export class GameEngine {
     if (this.animationFrameId === null) return;
     window.cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
+  }
+
+  private getPerformanceCanvasMetrics(): GamePerformanceCanvasMetrics {
+    return {
+      width: this.canvas.width,
+      height: this.canvas.height,
+      cssWidth: this.cssWidth,
+      cssHeight: this.cssHeight,
+      devicePixelRatio: this.pixelRatio,
+      resizeCount: this.performanceCanvasResizeCount,
+    };
+  }
+
+  private measureFps(timestamp: number): void {
+    if (!this.onDiagnostics) return;
+    if (this.fpsWindowStart === null) {
+      this.fpsWindowStart = timestamp;
+      this.fpsFrameCount = 0;
+      return;
+    }
+
+    this.fpsFrameCount += 1;
+    const duration = timestamp - this.fpsWindowStart;
+    if (duration < 1000) return;
+
+    this.onDiagnostics({
+      fps: Math.round((this.fpsFrameCount * 1000) / duration),
+      entityCount: this.gameState ? getGameEntityCount(this.gameState) : 0,
+    });
+    this.fpsWindowStart = timestamp;
+    this.fpsFrameCount = 0;
   }
 
   private getViewportScale(width: number, height: number): number {

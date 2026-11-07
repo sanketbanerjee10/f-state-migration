@@ -4891,11 +4891,18 @@ button.settings-key-row:hover {
 }
 
 .game-arena-guide-card {
+  display: block;
+  width: 100%;
   min-width: 0;
+  padding: 0;
   overflow: hidden;
   border: 1px solid var(--guide-line);
   border-radius: 13px;
   background: linear-gradient(145deg, rgb(var(--ah-purple-rgb) / 0.96), rgb(var(--ah-midnight-rgb) / 0.98));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   box-shadow: 0 8px 20px rgb(var(--ah-shadow-rgb) / 0.17);
   transition: transform 170ms ease, border-color 170ms ease;
 }
@@ -5287,12 +5294,14 @@ button.settings-key-row:hover {
   z-index: 1;
   inset: 50% auto auto 50%;
   box-sizing: border-box;
-  width: min(520px, calc(100% - 32px));
+  display: flex;
+  flex-direction: column;
+  width: min(920px, calc(100vw - 32px));
   max-height: calc(
     100dvh - 32px - env(safe-area-inset-top, 0px) -
       env(safe-area-inset-bottom, 0px)
   );
-  padding: clamp(18px, 4vw, 26px);
+  padding: clamp(14px, 2.5vw, 26px);
   overflow: auto;
   border: 1px solid rgb(var(--ah-lavender-rgb) / 34%);
   border-radius: 16px;
@@ -5344,6 +5353,8 @@ button.settings-key-row:hover {
 }
 
 .game-guide-item-dialog-preview {
+  flex: 0 0 auto;
+  max-height: min(28vh, 220px);
   overflow: hidden;
   border: 1px solid rgb(var(--ah-lavender-rgb) / 18%);
   border-radius: 12px;
@@ -5390,6 +5401,12 @@ button.settings-key-row:hover {
   padding-top: 16px;
 }
 
+.game-guide-item-dialog-copy:has(.game-arena-renderables-list) {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
 .game-guide-item-dialog-copy > p {
   margin: 0;
   color: var(--ah-muted);
@@ -5401,8 +5418,133 @@ button.settings-key-row:hover {
   margin-top: 14px !important;
 }
 
+.game-arena-renderables-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game-arena-renderable-item {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  min-height: 92px;
+  overflow: hidden;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 20%);
+  border-radius: 11px;
+  background:
+    linear-gradient(135deg, rgb(var(--ah-purple-rgb) / 14%), transparent 72%),
+    rgb(var(--ah-midnight-rgb) / 64%);
+}
+
+.game-arena-renderable-asset {
+  display: grid;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 90px;
+  place-items: center;
+  overflow: hidden;
+  border-right: 1px solid rgb(var(--ah-lavender-rgb) / 14%);
+  background:
+    radial-gradient(ellipse at center, rgb(var(--ah-purple-rgb) / 24%), transparent 72%),
+    rgb(var(--ah-midnight-rgb) / 52%);
+}
+
+.game-arena-renderable-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 96px;
+  object-fit: contain;
+}
+
+.game-arena-renderable-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.game-arena-renderable-copy strong {
+  color: var(--ah-cream);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.game-arena-renderable-copy span {
+  color: var(--ah-muted);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .game-guide-item-dialog-copy .game-enemy-guide-ability strong {
   color: var(--ah-blue);
+}
+
+@media (max-width: 700px) {
+  .game-guide-item-dialog {
+    width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    max-height: calc(
+      100dvh - 24px - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px)
+    );
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .game-guide-item-dialog-preview {
+    max-height: 20vh;
+  }
+
+  .game-guide-item-dialog-preview .game-arena-guide-preview {
+    max-height: 20vh;
+  }
+
+  .game-arena-renderables-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .game-arena-renderable-item {
+    grid-template-columns: clamp(82px, 24vw, 108px) minmax(0, 1fr);
+    min-height: 82px;
+  }
+
+  .game-arena-renderable-asset {
+    min-height: 80px;
+  }
+
+  .game-arena-renderable-copy {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .game-guide-item-dialog {
+    width: calc(100vw - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    max-height: calc(
+      100dvh - 16px - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px)
+    );
+    padding: 11px;
+  }
+
+  .game-arena-renderable-item {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .game-arena-renderable-copy strong {
+    font-size: 12px;
+  }
+
+  .game-arena-renderable-copy span {
+    font-size: 10px;
+  }
 }
 
 .game-guide-item-dialog-copy .game-enemy-guide-note {
