@@ -849,6 +849,532 @@
       "reviewKicker": "XÉT DUYỆT ĐƠN"
     }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY GIỚI THIỆU",
+      "taglineLead": "BÊN NGOÀI YÊN BÌNH.",
+      "taglineEmphasis": "BÊN TRONG HỖN LOẠN.",
+      "survival": "Chế độ sinh tồn",
+      "campaign": "Chiến dịch",
+      "devLevel": "Bắt đầu màn thử nghiệm",
+      "howToPlay": "Cách chơi",
+      "fieldGuides": "Cẩm nang",
+      "leaderboard": "Bảng xếp hạng",
+      "settings": "Cài đặt",
+      "communityLead": "SẢN PHẨM",
+      "communityTail": "DO CỘNG ĐỒNG TẠO RA",
+      "backToMenu": "Về menu",
+      "backToPauseMenu": "Về menu tạm dừng",
+      "carousel": "băng chuyền",
+      "stagesReached": "MÀN ĐÃ ĐẠT",
+      "statPoints": "ĐIỂM CHỈ SỐ",
+      "area": "KHU VỰC {{number}}",
+      "sector": "KHU VỰC CHIẾN DỊCH",
+      "stagesCleared": "ĐÃ VƯỢT {{count}}/10 MÀN",
+      "previousArea": "Khu vực trước",
+      "nextArea": "Khu vực tiếp",
+      "start": "Bắt đầu",
+      "locked": "Đã khóa",
+      "cleared": "✓ ĐÃ VƯỢT",
+      "boss": "TRÙM",
+      "current": "HIỆN TẠI",
+      "ready": "SẴN SÀNG",
+      "difficulty": "Độ khó {{difficulty}}/5",
+      "best": "TỐT NHẤT",
+      "maps": {
+        "Watchtower": "Tháp canh", "Barracks": "Doanh trại", "Perimeter": "Vành đai",
+        "Bunker": "Boong-ke", "Relay": "Trạm tiếp sóng", "Armory": "Kho vũ khí",
+        "Checkpoint": "Trạm kiểm soát", "Hangar": "Nhà chứa máy bay", "Rampart": "Lũy phòng thủ",
+        "Citadel": "Thành trì", "Foundry": "Xưởng đúc", "Crucible": "Lò luyện",
+        "Refinery": "Nhà máy lọc dầu", "Conveyor": "Băng chuyền", "Furnace": "Lò nung",
+        "Mill": "Nhà máy", "Smelter": "Lò luyện kim", "Generator": "Máy phát điện",
+        "Assembly": "Khu lắp ráp", "Forge": "Lò rèn", "Quarantine": "Khu cách ly",
+        "Wasteland": "Vùng hoang tàn", "Mire": "Đầm lầy", "Fallout": "Vùng nhiễm xạ",
+        "Blight": "Vùng dịch bệnh", "Hollow": "Hốc sâu", "Ruins": "Tàn tích",
+        "Toxicity": "Vùng độc hại", "Necropolis": "Thành phố chết", "Deadzone": "Vùng chết"
+      },
+      "areas": {
+        "military": "Tiền đồn quân sự",
+        "industrial": "Khu công nghiệp",
+        "contaminated": "Vùng ô nhiễm"
+      },
+      "campaignAreas": "Khu vực chiến dịch",
+      "areaLevels": "Màn {{area}}",
+      "mainMenu": "Menu chính",
+      "levelAction": "{{action}}: màn {{stage}}, {{area}}{{boss}}",
+      "bossSuffix": ", trùm {{name}}",
+      "lockedState": "ĐÃ KHÓA",
+      "resumeGame": "Tiếp tục chơi",
+      "closeCampaign": "Đóng chọn chiến dịch",
+      "closeLeaderboard": "Đóng bảng xếp hạng",
+      "closeGuides": "Đóng cẩm nang",
+      "closeSettings": "Đóng cài đặt"
+    },
+    "settings": {
+      "title": "Cài đặt", "categories": "Danh mục cài đặt",
+      "play": "Trò chơi", "playHint": "Trải nghiệm của bạn",
+      "controls": "Điều khiển", "controlsHint": "Phím và di chuyển",
+      "audio": "Âm thanh", "audioHint": "Nhạc và hiệu ứng",
+      "language": "Ngôn ngữ", "languageHint": "Ngôn ngữ hiển thị",
+      "makeItYours": "Tùy chỉnh theo ý bạn", "yourControls": "Điều khiển của bạn",
+      "setTheMood": "Chọn không khí", "chooseLanguage": "Chọn ngôn ngữ",
+      "touchControls": "Điều khiển cảm ứng", "joysticksQuestion": "Hiển thị cần điều khiển khi nào?",
+      "touchControlsVisibility": "Hiển thị điều khiển cảm ứng",
+      "auto": "Tự động", "always": "Luôn luôn", "never": "Không bao giờ",
+      "touchAutoHint": "Tự hiện điều khiển cảm ứng nếu thiết bị hỗ trợ.",
+      "touchAlwaysHint": "Luôn hiện điều khiển cảm ứng.",
+      "touchNeverHint": "Ẩn điều khiển cảm ứng; dùng bàn phím và chuột.",
+      "hudDensity": "Mật độ HUD", "battlefieldView": "Chọn cách hiển thị chiến trường.",
+      "standard": "Tiêu chuẩn", "compact": "Thu gọn",
+      "fullscreen": "Toàn màn hình", "fullscreenDescription": "Chọn cách mở trò chơi mặc định.",
+      "fullscreenOn": "Toàn màn hình", "fullscreenOnHint": "Chế độ đắm chìm",
+      "fullscreenOff": "Cửa sổ", "fullscreenOffHint": "Giữ điều khiển trình duyệt",
+      "pauseGame": "Tạm dừng trò chơi",
+      "keyBindings": "Gán phím", "pressKey": "Nhấn một phím", "pressKeyEllipsis": "NHẤN PHÍM…",
+      "placeTurret": "Đặt ụ súng", "leftDoubleOrRightClick": "NHẤP ĐÚP CHUỘT TRÁI HOẶC NHẤP CHUỘT PHẢI",
+      "keyCannotAssign": "Trình duyệt không cho phép gán phím này.",
+      "actions": {
+        "moveUp": "Đi lên", "moveDown": "Đi xuống",
+        "moveLeft": "Sang trái", "moveRight": "Sang phải", "useBomb": "Dùng bom"
+      },
+      "sectionPlay": "01 / TRÒ CHƠI", "sectionControls": "02 / ĐIỀU KHIỂN",
+      "sectionAudio": "03 / ÂM THANH", "sectionLanguage": "04 / NGÔN NGỮ",
+      "loadFailed": "Không tải được cài đặt trò chơi đã lưu: {{error}}",
+      "loadFailedSimple": "đã xảy ra lỗi không xác định",
+      "saveFailed": "Cài đặt chỉ thay đổi trong phiên này, không lưu được: {{error}}",
+      "saveFailedSimple": "đã xảy ra lỗi không xác định",
+      "cancelBinding": "Nhấn lại phím đang sáng để hủy. Nhấn Esc khi đang gán phím để hủy.",
+      "audioUnavailable": "Không có âm thanh: {{error}}",
+      "backgroundMusic": "Nhạc nền", "lateNightRadio": "Radio đêm khuya",
+      "volume": "Âm lượng", "musicVolume": "Âm lượng nhạc",
+      "lofiTracks": "Các bản lo-fi phát lần lượt.",
+      "musicUnavailable": "Không có nhạc — chưa cấu hình bản nhạc nào.",
+      "soundEffects": "Hiệu ứng âm thanh", "littleThings": "Những chi tiết nhỏ",
+      "effectsVolume": "Âm lượng hiệu ứng", "soundEffectFootnote": "Vật phẩm, sát thương và tín hiệu chiến đấu."
+    },
+    "hud": {
+      "runStatus": "Trạng thái trận", "wave": "ĐỢT", "waveProgress": "Tiến độ đợt",
+      "health": "MÁU", "low": "THẤP", "playerHealth": "Máu người chơi",
+      "score": "ĐIỂM", "eliminated": "ĐÃ HẠ", "bombs": "BOM",
+      "turrets": "Ụ SÚNG", "customWavePower": "Tăng sức mạnh đợt: {{name}}",
+      "power": "SỨC MẠNH", "activePlayerStats": "Chỉ số hiện tại",
+      "bossApproaching": "TRÙM ĐANG ĐẾN", "bossIntroduction": "Giới thiệu trùm",
+      "bossStatus": "Trạng thái trùm", "boss": "Trùm", "shielded": "CÓ KHIÊN",
+      "bossHealth": "Máu của {{name}}"
+    },
+    "touch": {
+      "controls": "Điều khiển cảm ứng",
+      "movement": "Cần di chuyển: Kéo để đi. Có thể dùng WASD hoặc phím mũi tên khi trò chơi được chọn.",
+      "aim": "Cần ngắm: Kéo để ngắm. Khi thả tay, hướng ngắm được giữ nguyên.",
+      "useBomb": "Dùng bom, còn {{count}}"
+    },
+    "pause": {
+      "title": "Đã tạm dừng", "actions": "Thao tác trò chơi", "quickAccess": "TRUY CẬP NHANH",
+      "resumeRun": "Tiếp tục trận", "jumpBack": "Trở lại chiến đấu",
+      "settings": "Cài đặt", "fieldGuide": "Cẩm nang", "restartRun": "Chơi lại trận",
+      "exitTutorial": "Thoát hướng dẫn", "mainMenu": "Menu chính",
+      "runStats": "Thống kê trận hiện tại", "currentRun": "TRẬN HIỆN TẠI",
+      "nightContinues": "Đêm vẫn tiếp diễn", "totalScore": "TỔNG ĐIỂM",
+      "pointsEarned": "Điểm đã nhận", "playerVitals": "TÌNH TRẠNG NGƯỜI CHƠI",
+      "criticalCondition": "Nguy kịch — hãy cảnh giác",
+      "battered": "Bị thương nhưng vẫn trụ vững",
+      "lookingGood": "Bạn đang làm rất tốt",
+      "survivalTime": "THỜI GIAN SINH TỒN",
+      "survivorDevelopment": "NÂNG CẤP NHÂN VẬT",
+      "pauseDetails": "Chi tiết menu tạm dừng", "coreAttributes": "Chỉ số chính",
+      "fineTuneBuild": "Tinh chỉnh nhân vật của bạn.",
+      "unlimitedStatsDev": "Điểm chỉ số không giới hạn trong chế độ thử nghiệm",
+      "unusedStatPoints": "Điểm chỉ số chưa dùng: {{count}}",
+      "rareAbilities": "Kỹ năng hiếm", "rarePerks": "Nâng cấp mạnh mẽ cho những đêm dài.",
+      "unlimitedRareDev": "Điểm kỹ năng hiếm không giới hạn trong chế độ thử nghiệm",
+      "unusedRarePoints": "Điểm hiếm chưa dùng: {{count}}",
+      "spendStatPoints": "Dùng điểm chỉ số", "rareUpgrades": "Nâng cấp hiếm",
+      "allocated": "+{{count}} đã phân bổ", "next": "Tiếp theo: {{effect}}",
+      "freeDev": "Miễn phí trong chế độ thử nghiệm", "statPointsCost": "{{count}} ĐC",
+      "decrease": "Giảm {{name}}", "increase": "Tăng {{name}}",
+      "rarityCommon": "thường", "rarityRare": "hiếm", "rarityEpic": "sử thi",
+      "level": "Cấp {{level}}/{{max}}", "unlimitedDev": "Không giới hạn trong chế độ thử nghiệm",
+      "maxLevel": "Cấp tối đa", "rarePointsCost": "{{count}} ĐH",
+      "locked": "Đã khóa: {{reason}}", "maximumLevelReached": "✦ Đã đạt cấp tối đa",
+      "refund": "Hoàn điểm {{name}}", "purchase": "Nâng cấp {{name}}",
+      "runUnavailable": "Trận chơi không khả dụng", "nextChapter": "Chương tiếp theo đang chờ bạn.",
+      "resumeWhenReady": "Tiếp tục khi bạn sẵn sàng.",
+      "resume": "Tiếp tục", "backToGame": "Quay lại trò chơi", "guides": "Cẩm nang"
+    },
+    "effects": {
+      "active": "Hiệu ứng đang có", "damage": "Sát thương", "rapidFire": "Bắn nhanh",
+      "shield": "Khiên", "magnet": "Nam châm hút cầu", "cursed": "Sức mạnh nguyền rủa",
+      "remaining": "{{name}}, còn {{count}} giây"
+    },
+    "tutorial": {
+      "ariaLabel": "Hướng dẫn trò chơi tương tác", "step": "Bước {{current}}/{{total}}",
+      "exerciseComplete": "Hoàn thành bài tập.",
+      "collectOrbOrSkip": "Nhặt một quả cầu hoặc bỏ qua bài tập.",
+      "moveOrSkip": "Di chuyển nhân vật hoặc bỏ qua bài tập.",
+      "aimOrSkip": "Đổi hướng ngắm hoặc bỏ qua bài tập.",
+      "confirmExit": "Xác nhận thoát hướng dẫn",
+      "exitPrompt": "Thoát hướng dẫn? Trận luyện tập này sẽ bị hủy.",
+      "keepPlaying": "Tiếp tục chơi", "exit": "Thoát hướng dẫn", "previous": "Trước",
+      "returnToMenu": "Về menu chính", "continue": "Tiếp tục", "skipExercise": "Bỏ qua bài tập",
+      "steps": {
+        "intro": {
+          "title": "Chào mừng đến đấu trường",
+          "description": "Sống sót qua càng nhiều đợt càng tốt. Giữ nhân vật sống sót, dọn sạch đấu trường và tận dụng mọi cơ hội để đổi vị trí."
+        },
+        "player": {
+          "title": "Nhân vật của bạn",
+          "description": "Nhân vật phát sáng là bạn. Máu hiển thị trên thanh tình trạng; hãy tránh xa zombie."
+        },
+        "movement": {
+          "title": "Di chuyển",
+          "description": "Dùng phím di chuyển đã cài đặt hoặc kéo cần trái trên màn hình cảm ứng. Có thể đổi phím trong Cài đặt. Hãy thử di chuyển một đoạn."
+        },
+        "aim": {
+          "title": "Ngắm và bắn",
+          "description": "Di chuột hoặc kéo cần phải để đổi hướng ngắm. Vũ khí tự bắn theo hướng đó. Hãy thử ngắm sang hướng khác."
+        },
+        "hud": {
+          "title": "Đọc HUD",
+          "description": "HUD theo dõi đợt, máu, số hạ gục, điểm, kẻ địch, bom và ụ súng. Dùng bom bằng phím hoặc nút cảm ứng. Nhấp chuột phải hoặc chạm đúp vào chỗ trống để đặt ụ súng. Hiệu ứng tạm thời hiện bên dưới HUD."
+        },
+        "enemies": {
+          "title": "Tìm hiểu kẻ địch",
+          "description": "Zombie đi bộ chậm nhưng khỏe. Zombie chạy nhỏ hơn, nhanh hơn và ít máu hơn. Luôn di chuyển và tránh xa nguy hiểm."
+        },
+        "obstacles": {
+          "title": "Tận dụng đấu trường",
+          "description": "Thùng và chướng ngại vật cản đường đi, thậm chí chặn đạn. Hãy vòng qua chúng để mở lối."
+        },
+        "powerups": {
+          "title": "Cầu tăng sức mạnh",
+          "description": "Cầu máu hồi tối đa 25 máu; cầu sát thương tăng gấp đôi sát thương trong 10 giây; bắn nhanh gấp đôi trong 8 giây; khiên hấp thụ 60 sát thương trong 12 giây. Mang tối đa 5 quả bom; mỗi quả gây 100 sát thương lên zombie gần đó. Mang tối đa 5 ụ súng; mỗi ụ bắn trong 12 giây sau khi đặt ở chỗ trống."
+        },
+        "collectOrb": {
+          "title": "Nhặt cầu",
+          "description": "Đi qua để nhặt cầu. Cứ hạ 2 zombie sẽ có một quả cầu rơi ra; hãy nhặt cầu phát sáng để xem hiệu ứng. Bom được giữ lại đến khi bạn sử dụng."
+        },
+        "waves": {
+          "title": "Vượt qua đợt",
+          "description": "Kẻ địch xuất hiện theo từng đợt. Hạ hết zombie để vượt đợt và nhận điểm thưởng."
+        },
+        "statPoints": {
+          "title": "Dùng điểm chỉ số",
+          "description": "Mỗi đợt hoàn thành nhận 1 điểm chỉ số. Mở menu tạm dừng để tăng sát thương, tốc độ bắn, máu tối đa hoặc tốc độ di chuyển. Nhấn dấu trừ để hoàn điểm đã dùng."
+        },
+        "pause": {
+          "title": "Tạm dừng và xem lại",
+          "description": "Menu tạm dừng hiển thị thống kê trận và hiệu ứng hiện tại. Nhấn Esc hoặc nút Tạm dừng để tiếp tục, đổi cài đặt, chơi lại hoặc về menu."
+        },
+        "completion": {
+          "title": "Bạn đã sẵn sàng",
+          "description": "Di chuyển bằng WASD hoặc phím mũi tên, ngắm bằng chuột và nhặt cầu để sống sót qua từng đợt. Về menu chính để bắt đầu trận sinh tồn mới."
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "Kỷ lục sinh tồn mọi thời đại, xếp theo số đợt vượt qua, điểm, số mạng hạ rồi đến thời gian.",
+      "loading": "Đang tải bảng xếp hạng…", "loadFailed": "Hiện không tải được bảng xếp hạng.",
+      "retrying": "Đang thử lại…", "retry": "Thử lại",
+      "empty": "Chưa có trận nào được gửi. Hãy là người đầu tiên lập kỷ lục.",
+      "player": "Người chơi", "cleared": "Đã vượt", "score": "Điểm", "kills": "Mạng hạ",
+      "time": "Thời gian", "reached": "Đạt {{wave}}", "title": "Bảng xếp hạng",
+      "entries": "{{count}} mục", "range": "{{start}}–{{end}}/{{total}}",
+      "previous": "Trước", "next": "Tiếp"
+    },
+    "submission": {
+      "title": "Gửi kết quả trận", "name": "Tên trên bảng xếp hạng",
+      "enterName": "Nhập tên để gửi điểm của bạn.",
+      "submitting": "Đang gửi…", "retry": "Gửi lại",
+      "submitted": "Đã gửi điểm", "submit": "Gửi điểm",
+      "success": "Đã gửi điểm. Trận của bạn đủ điều kiện vào bảng xếp hạng mọi thời đại.",
+      "failed": "Không gửi được điểm. Kiểm tra kết nối rồi thử lại."
+    },
+    "results": {
+      "practice": "Lượt luyện tập", "tutorialOver": "Đã kết thúc lượt hướng dẫn",
+      "practiceNotSubmitted": "Lượt luyện tập này không được gửi lên bảng xếp hạng.",
+      "restartTutorial": "Khởi động lại hướng dẫn", "stageCompleted": "Đã hoàn thành màn {{level}}",
+      "personalLevelScore": "Điểm màn của bạn", "levelScore": "ĐIỂM MÀN",
+      "bossDefeated": "ĐÃ HẠ TRÙM", "bossFallen": "Một mối đe dọa lớn nữa đã bị tiêu diệt.",
+      "stageStatistics": "Thống kê màn", "enemiesEliminated": "Kẻ địch đã hạ",
+      "completionTime": "Thời gian hoàn thành", "damageDealt": "Sát thương gây ra",
+      "campaignComplete": "ĐÃ HOÀN THÀNH CHIẾN DỊCH",
+      "campaignCompleteDescription": "Bạn đã vượt qua cả 30 màn. Các bản cập nhật sau có thể bổ sung màn mới.",
+      "thankYou": "CẢM ƠN BẠN ĐÃ SỐNG SÓT QUA ĐÊM",
+      "journeyContinues": "HÀNH TRÌNH VẪN TIẾP TỤC", "nextLevel": "Màn tiếp",
+      "levelSelection": "Chọn màn", "mainMenu": "Menu chính",
+      "notThisTime": "Lần <span>này thì không.</span>", "campaignStage": "Màn chiến dịch",
+      "currentStage": "MÀN HIỆN TẠI", "campaignStageName": "Màn chiến dịch",
+      "progressSafe": "Tiến trình của bạn vẫn an toàn.",
+      "progressSafeDescription": "Các màn đã mở khóa và kỷ lục trước đây vẫn còn. Bạn không mất gì cả.",
+      "nextRun": "BẠN SẼ VIẾT TIẾP CÂU CHUYỆN Ở TRẬN SAU",
+      "retryLevel": "Chơi lại màn", "finalScore": "Điểm cuối",
+      "campaignRunsSeparate": "Trận chiến dịch không tính vào kỷ lục Sinh tồn tiêu chuẩn.",
+      "campaignRun": "Trận chiến dịch", "notThisTimeLead": "Lần này",
+      "notThisTimeEmphasis": "thì không.", "stageNumber": "Màn {{level}}",
+      "replayLevel": "Chơi lại màn", "next": "Tiếp",
+      "waveReached": "Đợt đã đạt", "wavesCleared": "Đợt đã vượt",
+      "zombiesEliminated": "Zombie đã hạ", "timeSurvived": "Thời gian sống sót",
+      "playAgain": "Chơi lại"
+    },
+    "guides": {
+      "closeDetails": "Đóng chi tiết cẩm nang", "close": "Đóng",
+      "heroDescription": "Tìm hiểu các mối đe dọa, nắm rõ vật phẩm và chuẩn bị cho trận tiếp theo.",
+      "progress": "Đã nhận diện {{discovered}}/{{total}} kẻ địch và trùm",
+      "threatCompletion": "Tiến độ tìm hiểu mối đe dọa",
+      "identified": "Đã nhận diện {{count}}/{{total}} mục",
+      "threatIntel": "THÔNG TIN MỐI ĐE DỌA", "enemyCatalogue": "HỒ SƠ KẺ ĐỊCH",
+      "enemies": "Kẻ địch", "enemyDescription": "Những kẻ nhiễm bệnh bạn sẽ gặp trên chiến trường.",
+      "bossDossier": "HỒ SƠ MỐI ĐE DỌA CAO", "bosses": "Trùm",
+      "bossDescription": "Các thể đột biến lớn. Tìm hiểu cách chúng tấn công trước khi bị phát hiện.",
+      "arenaEnvironments": "MÔI TRƯỜNG TÁC CHIẾN", "arenas": "Đấu trường",
+      "arenaDescription": "Năm môi trường luân phiên trong chế độ Sinh tồn, mỗi nơi có bố cục chướng ngại khác nhau.",
+      "viewDetails": "Xem chi tiết {{name}}",
+      "viewUnknownEnemy": "Xem chi tiết kẻ địch chưa nhận diện",
+      "viewUnknownBoss": "Xem chi tiết trùm chưa nhận diện",
+      "unknownEnemy": "Kẻ địch chưa rõ", "unknownBoss": "Trùm chưa rõ", "unknown": "Chưa rõ",
+      "threatIdentified": "ĐÃ NHẬN DIỆN MỐI ĐE DỌA", "unknownContact": "ĐỐI TƯỢNG CHƯA RÕ",
+      "bossDossierTag": "HỒ SƠ TRÙM", "classifiedDossier": "HỒ SƠ MẬT",
+      "classified": "Thông tin mối đe dọa được bảo mật.",
+      "identifiedCount": "Đã nhận diện {{count}}/{{total}}",
+      "arenaRenderables": "Đối tượng trong {{name}}",
+      "viewArenaObjects": "Xem vật thể trong {{name}}",
+      "layout": "Bố cục {{name}}", "zone": "KHU VỰC {{number}}",
+      "waves": "ĐỢT {{start}}–{{end}}",
+      "arenaObjects": "Các vật thể có thể xuất hiện ở đây. Trạng thái và vị trí thay đổi theo từng trận.",
+      "classifiedIntel": "Hãy nhận diện mối đe dọa để xem thông tin.",
+      "eliteTipTitle": "MẸO SINH TỒN",
+      "eliteTip": "Cẩn thận với biến thể tinh nhuệ: chúng nguy hiểm hơn kẻ địch thường."
+    },
+    "orbs": {
+      "supplies": "VẬT PHẨM VÀ TĂNG SỨC MẠNH", "title": "Quả cầu",
+      "description": "Vật phẩm hữu ích có thể xoay chuyển trận đấu.",
+      "viewDetails": "Xem chi tiết {{name}}", "rare": "HIẾM",
+      "healthName": "Cầu máu", "healthDescription": "Hồi máu.",
+      "healthDetails": "Hồi 25 máu, không vượt quá mức tối đa.",
+      "damageName": "Cầu sát thương", "damageDescription": "Tăng sát thương đạn.",
+      "damageDetails": "Tăng gấp đôi sát thương đạn trong một khoảng thời gian.",
+      "rapidFireName": "Cầu bắn nhanh", "rapidFireDescription": "Tăng tốc độ bắn.",
+      "rapidFireDetails": "Tăng gấp đôi tốc độ bắn trong một khoảng thời gian.",
+      "shieldName": "Cầu khiên", "shieldDescription": "Hấp thụ sát thương nhận vào.",
+      "shieldDetails": "Tạo khiên hấp thụ sát thương trong một khoảng thời gian.",
+      "bombName": "Cầu bom", "bombDescription": "Thêm bom vào kho.",
+      "bombDetails": "Bom gây sát thương lên kẻ địch gần đó khi phát nổ.",
+      "magnetName": "Cầu nam châm", "magnetDescription": "Hút các quả cầu gần đó về phía bạn.",
+      "magnetDetails": "Hút cầu gần đó trong một khoảng thời gian.",
+      "turretName": "Cầu ụ súng", "turretDescription": "Triển khai ụ súng tự động.",
+      "turretDetails": "Ụ súng nhắm và bắn kẻ địch gần đó trong một khoảng thời gian.",
+      "cursedName": "Cầu nguyền rủa", "cursedDescription": "Khiến kẻ địch di chuyển nhanh hơn.",
+      "cursedDetails": "Tăng tốc độ di chuyển của kẻ địch trong một khoảng thời gian.",
+      "rareGoldName": "Cầu vàng hiếm", "rareGoldDescription": "Tặng 1 điểm hiếm.",
+      "rareGoldDetails": "Nhận 1 điểm hiếm."
+    },
+    "notifications": {
+      "discovered": "Đã phát hiện {{name}}",
+      "firstEncounter": "Đã ghi nhận lần chạm trán đầu tiên. Hãy cảnh giác.",
+      "campaignLocked": "Màn chiến dịch này đã khóa hoặc không khả dụng.",
+      "renderInitFailed": "Không thể khởi tạo màn hình trò chơi.",
+      "fullscreenExitFailed": "Không thể thoát chế độ toàn màn hình.",
+      "campaignProgressSaveFailed": "Không lưu được tiến trình chiến dịch: {{error}}",
+      "campaignProgressSaveFailedSimple": "Không lưu được tiến trình chiến dịch.",
+      "campaignPointsSaveFailed": "Không lưu được điểm chỉ số chiến dịch: {{error}}",
+      "campaignPointsSaveFailedSimple": "Không lưu được điểm chỉ số chiến dịch."
+    },
+    "canvas": {
+      "ariaLabel": "565 Zombie Sinh tồn. Di chuyển bằng phím đã cài đặt hoặc điều khiển cảm ứng. Ngắm bằng chuột hoặc cần ngắm. Vũ khí tự bắn theo hướng đã chọn. Nhặt bom rồi nhấn phím bom hoặc nút cảm ứng để dùng. Nhặt tối đa 5 ụ súng, sau đó nhấp chuột phải hoặc chạm đúp vào chỗ trống trong đấu trường để đặt.",
+      "notSupported": "Trình duyệt này không hỗ trợ hiển thị Canvas."
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "Không cập nhật được ngưỡng.",
+      "unavailable": "Không có dữ liệu chẩn đoán hiệu năng.",
+      "exportFailed": "Không xuất được dữ liệu chẩn đoán."
+    },
+    "arenaLayouts": {
+      "military-open-centre": "Trung tâm rộng",
+      "military-corridor-network": "Mạng lưới hành lang",
+      "military-scattered-cover": "Chướng ngại rải rác",
+      "military-central-structure": "Công trình trung tâm",
+      "industrial-open-centre": "Trung tâm rộng",
+      "industrial-cluster-split": "Cụm công nghiệp",
+      "industrial-corridor": "Lưới hành lang",
+      "industrial-rust-scrap": "Sắt vụn hoen gỉ",
+      "contaminated-open-lab": "Phòng thí nghiệm mở",
+      "contaminated-split-lab": "Phòng thí nghiệm chia đôi",
+      "contaminated-scattered-tanks": "Bể chứa rải rác",
+      "contaminated-central-structure": "Khu cách ly trung tâm",
+      "urban-open-road": "Đường rộng",
+      "urban-rubble-lane": "Ngõ đầy đổ nát",
+      "urban-ruined-block": "Khu nhà đổ nát",
+      "urban-roadblock-loop": "Vòng đường bị chặn",
+      "bunker-open-bay": "Khoang rộng",
+      "bunker-split-hall": "Sảnh chia đôi",
+      "bunker-core-structure": "Công trình lõi",
+      "bunker-perimeter-defence": "Phòng thủ vành đai"
+    },
+    "announcements": {
+      "bossEntered": "{{name}} đã xuất hiện", "bossDefeated": "Đã hạ {{name}}",
+      "level": "Màn {{level}}", "bossLevel": "Màn {{level}} · TRÙM",
+      "wave": "Đợt {{wave}}", "levelComplete": "HOÀN THÀNH MÀN", "runOver": "Trận đấu kết thúc"
+    },
+    "music": {
+      "toggle": "{{action}} nhạc", "pause": "Tạm dừng", "play": "Phát"
+    },
+    "pauseButton": {
+      "ariaLabel": "Tạm dừng trò chơi. Nhấn Esc hoặc P.", "title": "Tạm dừng (Esc)",
+      "label": "Tạm dừng (Esc)"
+    },
+    "bosses": {
+      "charger": "Kẻ Xung Kích", "acidQueen": "Nữ Hoàng Axit", "hordeCaller": "Kẻ Gọi Bầy",
+      "chargerSummary": "Đột biến khổng lồ chuyên lao tới với tốc độ cao.",
+      "chargerDescription": "Lấy đà rồi lao xuyên đấu trường.",
+      "chargerAbility": "Báo trước hướng lao; đâm vào chướng ngại sẽ bị choáng trong chốc lát.",
+      "acidQueenSummary": "Đột biến độc tấn công từ xa và kiểm soát địa hình.",
+      "acidQueenDescription": "Kiểm soát đấu trường bằng các đòn axit tầm xa.",
+      "acidQueenAbility": "Phun axit và tạo vũng độc được báo trước, tạm thời chặn khu vực.",
+      "hordeCallerSummary": "Kẻ triệu hồi được đồng bọn bảo vệ bằng khiên.",
+      "hordeCallerDescription": "Được khiên bảo vệ khi còn đồng bọn hỗ trợ.",
+      "hordeCallerAbility": "Gọi zombie hỗ trợ; hạ chúng để phá khiên và khiến trùm dễ bị tấn công."
+    },
+    "enemies": {
+      "walker": {
+        "name": "Zombie đi bộ", "summary": "Bám đuổi ổn định ở cự ly gần.",
+        "description": "Di chuyển chậm nhưng liên tục áp sát và tấn công gần.",
+        "ability": "Không có đòn đặc biệt. Luôn di chuyển để tránh bị bao vây."
+      },
+      "runner": {
+        "name": "Zombie chạy", "summary": "Tấn công nhanh nhưng yếu.",
+        "description": "Zombie yếu nhưng nhanh, dễ đuổi kịp nếu bạn chậm chân.",
+        "ability": "Sau 6 giây di chuyển bình thường, nó lao đi với tốc độ gấp đôi trong 2 giây. Không có dấu hiệu báo trước."
+      },
+      "brute": {
+        "name": "Zombie khổng lồ", "summary": "Zombie nhiều máu, sát thương cận chiến cao.",
+        "description": "Di chuyển chậm nhưng nhiều máu và đánh cận chiến rất mạnh.",
+        "ability": "Gây sát thương tiếp xúc lớn. Đừng để nó áp sát."
+      },
+      "spitter": {
+        "name": "Zombie phun axit", "summary": "Tấn công tầm xa bằng axit.",
+        "description": "Kẻ tấn công tầm xa cố giữ khoảng cách với bạn.",
+        "ability": "Bắn đạn axit nhanh khi bạn ở trong tầm."
+      },
+      "swarm": {
+        "name": "Bầy zombie", "summary": "Nhóm kẻ địch nhỏ và nhanh.",
+        "description": "Zombie nhỏ, nhanh, dễ bị bỏ sót khi đấu trường đông đúc.",
+        "ability": "Nhanh hơn Zombie chạy và né đạn với tốc độ gấp đôi; hồi chiêu 3 giây. Sau khi né, nó chậm còn một nửa rồi trở lại bình thường trong 2 giây."
+      },
+      "armoured": {
+        "name": "Zombie bọc giáp", "summary": "Zombie bền bỉ, giảm sát thương từ phía trước.",
+        "description": "Giảm sát thương nhận vào khi quay mặt về phía bạn.",
+        "ability": "Gây ít sát thương tiếp xúc hơn khi quay mặt về phía bạn; tránh tiếp cận trực diện."
+      },
+      "screamer": {
+        "name": "Zombie hú", "summary": "Triệu hồi quân tiếp viện.",
+        "description": "Luôn bám đuổi và nguy hiểm nhất khi đấu trường đông đúc.",
+        "ability": "Mỗi lần gọi một Zombie đi bộ; Kẻ Gọi Bầy triệu hồi gấp đôi."
+      },
+      "bloater": {
+        "name": "Zombie phình to", "summary": "Zombie lì đòn, để lại vũng axit.",
+        "description": "Chậm và khỏe, để lại một món quà nguy hiểm khi chết.",
+        "ability": "Khi bị hạ, nó phát nổ và tạo vũng axit gây sát thương."
+      },
+      "splitter": {
+        "name": "Zombie phân tách", "summary": "Tách thành nhiều kẻ địch nhỏ khi bị hạ.",
+        "description": "Biến một mối đe dọa thành nhiều kẻ địch.",
+        "ability": "Khi bị hạ, nó tách thành 4 zombie nhỏ thuộc Bầy zombie."
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": { "name": "Gấp đôi cầu", "description": "Cầu rơi thường xuyên gấp đôi." },
+      "fastWave": { "name": "Đợt nhanh", "description": "Kẻ địch di chuyển nhanh hơn 20%." },
+      "armouredInvasion": { "name": "Đợt quân bọc giáp", "description": "Zombie bọc giáp xuất hiện nhiều hơn." },
+      "eliteThreat": { "name": "Mối đe dọa tinh nhuệ", "description": "Tăng khả năng xuất hiện kẻ địch tinh nhuệ." },
+      "contamination": { "name": "Ô nhiễm", "description": "Zombie phình to và vũng axit nguy hiểm hơn." },
+      "reducedVisibility": { "name": "Giảm tầm nhìn", "description": "Bóng tối hạn chế tầm nhìn của bạn." },
+      "overrun": { "name": "Tràn ngập", "description": "Kẻ địch xuất hiện nhanh hơn." },
+      "heavyResistance": { "name": "Kháng cự mạnh", "description": "Zombie khổng lồ xuất hiện nhiều hơn." }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": { "name": "Sát thương vũ khí", "description": "Tăng sát thương của mỗi viên đạn.", "effect": "+10% sát thương cơ bản", "unit": "sát thương/phát" },
+        "shotsPerSecond": { "name": "Bắn nhanh", "description": "Bắn thường xuyên hơn mà vẫn tự ngắm.", "effect": "+8% tốc độ bắn cơ bản", "unit": "phát/giây" },
+        "maxHealth": { "name": "Máu tối đa", "description": "Tăng lượng máu tối đa.", "effect": "+10 máu tối đa", "unit": "máu" },
+        "movementSpeed": { "name": "Tốc độ di chuyển", "description": "Di chuyển nhanh hơn để né tránh và đổi vị trí.", "effect": "+3% tốc độ di chuyển cơ bản", "unit": "đơn vị/giây" }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "Hút máu", "description": "Hồi một phần máu theo sát thương vũ khí gây ra.",
+          "unlock": "Có sẵn từ đầu trận.",
+          "effects": ["Hồi 1% sát thương hợp lệ", "Hồi 2% sát thương hợp lệ", "Hồi 3% sát thương hợp lệ", "Hồi 4% sát thương hợp lệ", "Hồi 5% sát thương hợp lệ"]
+        },
+        "criticalMastery": {
+          "name": "Bậc thầy chí mạng", "description": "Tăng cơ hội đòn đánh gây sát thương chí mạng.",
+          "unlock": "Có sẵn từ đầu trận.",
+          "effects": ["+3% cơ hội chí mạng", "+6% cơ hội chí mạng", "+9% cơ hội chí mạng", "+12% cơ hội chí mạng", "+15% cơ hội chí mạng"]
+        },
+        "explosiveRounds": {
+          "name": "Đạn nổ", "description": "Đạn phát nổ khi va chạm, gây sát thương diện rộng.",
+          "unlock": "Có sẵn từ đầu trận.",
+          "effects": ["3% cơ hội phát nổ khi va chạm", "6% cơ hội phát nổ khi va chạm", "9% cơ hội phát nổ khi va chạm", "12% cơ hội phát nổ khi va chạm", "15% cơ hội phát nổ khi va chạm"]
+        },
+        "emergencyShield": {
+          "name": "Khiên khẩn cấp", "description": "Tạo khiên bảo vệ sau khi nhận sát thương.",
+          "unlock": "Có sẵn từ đầu trận.",
+          "effects": ["Khiên trong 1 giây", "Khiên trong 1,5 giây", "Khiên trong 2 giây", "Khiên trong 2,5 giây", "Khiên trong 3 giây"]
+        },
+        "orbMagnetism": {
+          "name": "Nam châm hút cầu", "description": "Hút các quả cầu gần đó về phía người chơi.",
+          "unlock": "Có sẵn từ đầu trận.",
+          "effects": ["Bán kính nhặt 60 đơn vị", "Bán kính nhặt 90 đơn vị", "Bán kính nhặt 120 đơn vị", "Bán kính nhặt 150 đơn vị", "Bán kính nhặt 180 đơn vị"]
+        },
+        "piercingRounds": {
+          "name": "Đạn xuyên", "description": "Đạn xuyên qua mục tiêu và trúng thêm kẻ địch.",
+          "unlock": "Mở khóa trong trận.",
+          "effects": ["Xuyên thêm 1 mục tiêu", "Xuyên thêm 2 mục tiêu", "Xuyên thêm 3 mục tiêu", "Xuyên thêm 4 mục tiêu", "Xuyên thêm 5 mục tiêu"]
+        },
+        "secondWind": {
+          "name": "Cơ hội thứ hai", "description": "Hồi máu một lần mỗi trận khi xuống dưới ngưỡng nguy kịch.",
+          "unlock": "Mở khóa trong trận.",
+          "effects": ["Hồi 10% máu", "Hồi 15% máu", "Hồi 20% máu"]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "Màn {{level}} — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "Tiền đồn quân sự",
+        "description": "Tiền đồn dưới ánh trăng với thùng tiếp tế, bao cát và chướng ngại vật có thể phá hủy."
+      },
+      "industrial": {
+        "name": "Khu công nghiệp",
+        "description": "Sàn nhà máy rộng, bị chia cắt bởi công trình bê tông và rào chắn gia cố."
+      },
+      "contaminated": {
+        "name": "Vùng ô nhiễm",
+        "description": "Vùng xanh hoang tàn với vật chắn rải rác và những lối đi trống nguy hiểm."
+      },
+      "urban": {
+        "name": "Thành phố đổ nát",
+        "description": "Đấu trường thành phố hoang tàn, nơi tường đổ và vật chắn định hình chiến trường."
+      },
+      "bunker": {
+        "name": "Boong-ke ngầm",
+        "description": "Khu phức hợp ngầm lạnh lẽo với phòng thủ bê tông và hành lang hẹp."
+      }
+    },
+    "arenaObjects": {
+      "crate": { "name": "Thùng hàng", "description": "Các thùng tiếp tế xếp chồng, tạo chỗ nấp và che khuất tầm nhìn." },
+      "barricade": { "name": "Chướng ngại", "description": "Vật chắn thấp giúp điều hướng di chuyển và cản đợt xung kích." },
+      "wall": { "name": "Tường", "description": "Tấm bê tông chắc chắn che lối đi và tạo điểm nghẽn." },
+      "cover": { "name": "Vật chắn", "description": "Vách chắn tạo ra khoảng an toàn tạm thời cho người chơi." },
+      "barrel": { "name": "Thùng", "description": "Thùng nổ có thể tiêu diệt cả nhóm kẻ địch nếu bị kích nổ." },
+      "oil-barrel": { "name": "Thùng dầu", "description": "Thùng thép lớn có thể vỡ và bùng cháy nguy hiểm." },
+      "gas-cylinder": { "name": "Bình khí", "description": "Bình chịu áp suất tạo ra vụ nổ nguy hiểm với tốc độ cao." },
+      "electric-generator": { "name": "Máy phát điện", "description": "Thiết bị tích điện rồi phóng ra vùng năng lượng nguy hiểm." },
+      "moving-wall": { "name": "Tường di chuyển", "description": "Các tấm chắn công nghiệp dịch chuyển, buộc bạn đổi đường đi." },
+      "steam-pipe": { "name": "Ống hơi nước", "description": "Ống thông hơi phát tín hiệu rồi phụt ra luồng hơi nóng." },
+      "industrial-crate": { "name": "Thùng công nghiệp", "description": "Thùng chứa gia cố bằng kim loại bền, có thể rơi vật phẩm." }
+    }
+  },
   "ui": {
     "dialogClose": "Đóng",
     "sheetClose": "Đóng",

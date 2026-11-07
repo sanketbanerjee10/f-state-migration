@@ -849,6 +849,531 @@
       "reviewKicker": "ANÁLISE DA CANDIDATURA"
     }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY APRESENTA",
+      "taglineLead": "CALMA POR FORA.",
+      "taglineEmphasis": "CAOS POR DENTRO.",
+      "survival": "Modo Sobrevivência",
+      "campaign": "Modo Campanha",
+      "devLevel": "Iniciar fase de desenvolvedor",
+      "howToPlay": "Como jogar",
+      "fieldGuides": "Guias de campo",
+      "leaderboard": "Classificação",
+      "settings": "Configurações",
+      "communityLead": "UMA",
+      "communityTail": "CRIAÇÃO DA COMUNIDADE",
+      "backToMenu": "Voltar ao menu",
+      "backToPauseMenu": "Voltar ao menu de pausa",
+      "carousel": "carrossel",
+      "stagesReached": "FASES ALCANÇADAS",
+      "statPoints": "PONTOS DE ATRIBUTO",
+      "area": "ÁREA {{number}}",
+      "sector": "SETOR DA CAMPANHA",
+      "stagesCleared": "{{count}} DE 10 FASES CONCLUÍDAS",
+      "previousArea": "Área anterior",
+      "nextArea": "Próxima área",
+      "start": "Iniciar",
+      "locked": "Bloqueado",
+      "cleared": "✓ CONCLUÍDA",
+      "boss": "CHEFE",
+      "current": "ATUAL",
+      "ready": "PRONTO",
+      "difficulty": "Dificuldade {{difficulty}} de 5",
+      "best": "MELHOR",
+      "maps": {
+        "Watchtower": "Torre de Vigia", "Barracks": "Quartel", "Perimeter": "Perímetro",
+        "Bunker": "Bunker", "Relay": "Transmissor", "Armory": "Arsenal",
+        "Checkpoint": "Ponto de Controle", "Hangar": "Hangar", "Rampart": "Baluarte",
+        "Citadel": "Cidadela", "Foundry": "Fundição", "Crucible": "Cadinho",
+        "Refinery": "Refinaria", "Conveyor": "Esteira", "Furnace": "Forno",
+        "Mill": "Moinho", "Smelter": "Fundidora", "Generator": "Gerador",
+        "Assembly": "Montagem", "Forge": "Forja", "Quarantine": "Quarentena",
+        "Wasteland": "Terra Devastada", "Mire": "Pântano", "Fallout": "Zona Radioativa",
+        "Blight": "Praga", "Hollow": "Cavidade", "Ruins": "Ruínas",
+        "Toxicity": "Área Tóxica", "Necropolis": "Necrópole", "Deadzone": "Zona Morta"
+      },
+      "areas": {
+        "military": "Posto Militar",
+        "industrial": "Complexo Industrial",
+        "contaminated": "Zona Contaminada"
+      },
+      "campaignAreas": "Áreas da campanha",
+      "areaLevels": "Fases de {{area}}",
+      "mainMenu": "Menu principal",
+      "levelAction": "{{action}} {{stage}}, {{area}}{{boss}}",
+      "bossSuffix": ", chefe {{name}}",
+      "lockedState": "BLOQUEADO",
+      "resumeGame": "Retomar jogo",
+      "closeCampaign": "Fechar seleção de campanha",
+      "closeLeaderboard": "Fechar classificação",
+      "closeGuides": "Fechar guias",
+      "closeSettings": "Fechar configurações"
+    },
+    "settings": {
+      "title": "Configurações", "categories": "Categorias de configuração",
+      "play": "Jogar", "playHint": "Sua experiência",
+      "controls": "Controles", "controlsHint": "Teclas e movimento",
+      "audio": "Áudio", "audioHint": "Música e efeitos",
+      "language": "Idioma", "languageHint": "Idioma de exibição",
+      "makeItYours": "Do seu jeito", "yourControls": "Seus controles",
+      "setTheMood": "Entre no clima", "chooseLanguage": "Escolha seu idioma",
+      "touchControls": "Controles por toque", "joysticksQuestion": "Quando os controles analógicos devem aparecer?",
+      "touchControlsVisibility": "Exibição dos controles por toque",
+      "auto": "Automático", "always": "Sempre", "never": "Nunca",
+      "touchAutoHint": "Exibe os controles por toque automaticamente em dispositivos compatíveis.",
+      "touchAlwaysHint": "Mantém os controles por toque visíveis durante todo o jogo.",
+      "touchNeverHint": "Oculta os controles por toque; use teclado e mouse.",
+      "hudDensity": "Densidade da interface", "battlefieldView": "Escolha a visualização do campo de batalha.",
+      "standard": "Padrão", "compact": "Compacta",
+      "fullscreen": "Tela cheia", "fullscreenDescription": "Escolha como o jogo deve abrir por padrão.",
+      "fullscreenOn": "Tela cheia", "fullscreenOnHint": "Experiência imersiva",
+      "fullscreenOff": "Em janela", "fullscreenOffHint": "Manter controles do navegador",
+      "pauseGame": "Pausar jogo",
+      "keyBindings": "Atalhos de teclado", "pressKey": "Pressione uma tecla", "pressKeyEllipsis": "PRESSIONE UMA TECLA…",
+      "placeTurret": "Posicionar torre", "leftDoubleOrRightClick": "CLIQUE DUPLO ESQUERDO OU CLIQUE DIREITO",
+      "keyCannotAssign": "Seu navegador não permite atribuir essa tecla.",
+      "actions": {
+        "moveUp": "Mover para cima", "moveDown": "Mover para baixo",
+        "moveLeft": "Mover para a esquerda", "moveRight": "Mover para a direita", "useBomb": "Usar bomba"
+      },
+      "sectionPlay": "01 / JOGAR", "sectionControls": "02 / CONTROLES",
+      "sectionAudio": "03 / ÁUDIO", "sectionLanguage": "04 / IDIOMA",
+      "loadFailed": "Não foi possível carregar as configurações salvas do jogo: {{error}}",
+      "loadFailedSimple": "ocorreu um erro desconhecido",
+      "saveFailed": "As configurações desta sessão foram alteradas, mas não puderam ser salvas: {{error}}",
+      "saveFailedSimple": "ocorreu um erro desconhecido",
+      "cancelBinding": "Clique novamente em uma tecla destacada para cancelar. Pressione Escape durante a atribuição para cancelar.",
+      "audioUnavailable": "Áudio indisponível: {{error}}",
+      "backgroundMusic": "Música de fundo", "lateNightRadio": "Rádio da madrugada",
+      "volume": "Volume", "musicVolume": "Volume da música",
+      "lofiTracks": "As faixas lo-fi tocam em sequência.",
+      "musicUnavailable": "Música indisponível — nenhuma faixa configurada.",
+      "soundEffects": "Efeitos sonoros", "littleThings": "Pequenos detalhes que importam",
+      "effectsVolume": "Volume dos efeitos", "soundEffectFootnote": "Sons de itens coletados, dano e combate."
+    },
+    "hud": {
+      "runStatus": "Status da partida", "wave": "ONDA", "waveProgress": "Progresso da onda",
+      "health": "VIDA", "low": "BAIXA", "playerHealth": "Vida do jogador",
+      "score": "PONTUAÇÃO", "eliminated": "ELIMINADOS", "bombs": "BOMBAS",
+      "turrets": "TORRES", "customWavePower": "Efeito especial da onda: {{name}}",
+      "power": "PODER", "activePlayerStats": "Atributos atuais do jogador",
+      "bossApproaching": "CHEFE SE APROXIMANDO", "bossIntroduction": "Apresentação do chefe",
+      "bossStatus": "Status do chefe", "boss": "Chefe", "shielded": "PROTEGIDO",
+      "bossHealth": "Vida de {{name}}"
+    },
+    "touch": {
+      "controls": "Controles por toque",
+      "movement": "Controle analógico de movimento. Arraste na direção desejada. WASD e as setas também funcionam quando a janela está em foco.",
+      "aim": "Controle analógico de mira. Arraste para mirar. Ao soltar, a última direção de mira é mantida.",
+      "useBomb": "Usar bomba, {{count}} restantes"
+    },
+    "pause": {
+      "title": "Jogo pausado", "actions": "Ações do jogo", "quickAccess": "ACESSO RÁPIDO",
+      "resumeRun": "Continuar partida", "jumpBack": "Voltar à ação",
+      "settings": "Configurações", "fieldGuide": "Guia de campo", "restartRun": "Reiniciar partida",
+      "exitTutorial": "Sair do tutorial", "mainMenu": "Menu principal",
+      "runStats": "Estatísticas da partida atual", "currentRun": "PARTIDA ATUAL",
+      "nightContinues": "A noite continua", "totalScore": "PONTUAÇÃO TOTAL",
+      "pointsEarned": "Pontos obtidos", "playerVitals": "STATUS DO JOGADOR",
+      "criticalCondition": "Estado crítico — fique atento",
+      "battered": "Machucado, mas ainda de pé",
+      "lookingGood": "Você está indo bem",
+      "survivalTime": "TEMPO DE SOBREVIVÊNCIA",
+      "survivorDevelopment": "EVOLUÇÃO DO SOBREVIVENTE",
+      "pauseDetails": "Detalhes do menu de pausa", "coreAttributes": "Atributos principais",
+      "fineTuneBuild": "Ajuste as habilidades do seu sobrevivente.",
+      "unlimitedStatsDev": "Pontos de atributo ilimitados no modo de desenvolvedor",
+      "unusedStatPoints": "{{count}} pontos de atributo não utilizados",
+      "rareAbilities": "Habilidades raras", "rarePerks": "Vantagens poderosas para noites longas.",
+      "unlimitedRareDev": "Pontos de habilidade rara ilimitados no modo de desenvolvedor",
+      "unusedRarePoints": "{{count}} pontos de habilidade rara não utilizados",
+      "spendStatPoints": "Usar pontos de atributo", "rareUpgrades": "Melhorias raras",
+      "allocated": "+{{count}} alocados", "next": "Próximo: {{effect}}",
+      "freeDev": "Grátis no modo de desenvolvedor", "statPointsCost": "{{count}} PA",
+      "decrease": "Diminuir {{name}}", "increase": "Aumentar {{name}}",
+      "rarityCommon": "comum", "rarityRare": "rara", "rarityEpic": "épica",
+      "level": "Nível {{level}}/{{max}}", "unlimitedDev": "Ilimitado no modo de desenvolvedor",
+      "maxLevel": "Nível máximo", "rarePointsCost": "{{count}} PR",
+      "locked": "Bloqueado: {{reason}}", "maximumLevelReached": "✦ Nível máximo atingido",
+      "refund": "Devolver {{name}}", "purchase": "Comprar {{name}}",
+      "runUnavailable": "Partida indisponível", "nextChapter": "Seu próximo capítulo está à espera.",
+      "resumeWhenReady": "Continue quando estiver pronto para voltar.",
+      "resume": "Continuar", "backToGame": "Voltar ao jogo", "guides": "Guias"
+    },
+    "effects": {
+      "active": "Efeitos ativos", "damage": "Dano", "rapidFire": "Tiro rápido",
+      "shield": "Escudo", "magnet": "Ímã de orbes", "cursed": "Poder amaldiçoado",
+      "remaining": "{{name}}, restam {{count}} segundos"
+    },
+    "tutorial": {
+      "ariaLabel": "Tutorial interativo do jogo", "step": "Etapa {{current}} de {{total}}",
+      "exerciseComplete": "Exercício concluído.",
+      "collectOrbOrSkip": "Colete um orbe ou pule este exercício.",
+      "moveOrSkip": "Mova seu sobrevivente ou pule este exercício.",
+      "aimOrSkip": "Mude a direção da mira ou pule este exercício.",
+      "confirmExit": "Confirmar saída do tutorial",
+      "exitPrompt": "Sair do tutorial? Esta partida de treino será descartada.",
+      "keepPlaying": "Continuar jogando", "exit": "Sair do tutorial", "previous": "Anterior",
+      "returnToMenu": "Voltar ao menu principal", "continue": "Continuar",
+      "skipExercise": "Pular exercício",
+      "steps": {
+        "intro": {
+          "title": "Boas-vindas à arena",
+          "description": "Sobreviva ao máximo de ondas possível. Mantenha seu sobrevivente vivo, limpe a arena e aproveite cada brecha para mudar de posição."
+        },
+        "player": {
+          "title": "Seu sobrevivente",
+          "description": "O personagem brilhante é você. Sua vida aparece na barra de status; evite o contato com os zumbis."
+        },
+        "movement": {
+          "title": "Movimente-se",
+          "description": "Use as teclas de movimento configuradas ou arraste o controle analógico esquerdo em telas sensíveis ao toque. Você pode alterar as teclas nas configurações. Mova-se um pouco para praticar."
+        },
+        "aim": {
+          "title": "Mire e atire",
+          "description": "Mova o mouse ou arraste o controle analógico direito para mirar. Sua arma dispara automaticamente nessa direção. Experimente mirar em outro lugar."
+        },
+        "hud": {
+          "title": "Entenda a interface",
+          "description": "A interface mostra ondas, vida, eliminações, pontuação, inimigos e suas bombas e torres. Use a tecla ou o botão de toque para lançar uma bomba. Clique com o botão direito ou toque duas vezes em um espaço livre para posicionar uma torre. Efeitos temporários coletados aparecem abaixo da interface."
+        },
+        "enemies": {
+          "title": "Conheça os inimigos",
+          "description": "Os caminhantes são mais lentos e resistentes. Os corredores são menores, mais rápidos e têm menos vida. Continue se movendo e mire para longe do perigo."
+        },
+        "obstacles": {
+          "title": "Use a arena",
+          "description": "Caixotes e barricadas bloqueiam a passagem e podem interromper seus disparos. Desvie deles para manter o caminho livre."
+        },
+        "powerups": {
+          "title": "Orbes de poder",
+          "description": "Vida recupera até 25 pontos; dano dobra o dano dos disparos por 10 s; tiro rápido dobra a cadência por 8 s; escudo absorve 60 de dano por 12 s. Colete até cinco bombas e use uma para causar 100 de dano a zumbis próximos sem obstáculos no caminho. Colete até cinco torres e clique com o botão direito ou toque duas vezes em um espaço livre para posicioná-las por 12 s."
+        },
+        "collectOrb": {
+          "title": "Colete um orbe",
+          "description": "Passe sobre um orbe para coletá-lo. Orbes aparecem a cada dois zumbis eliminados. Siga o brilho e colete um para ver seu efeito. As bombas ficam guardadas até você pressionar a tecla ou o botão de toque."
+        },
+        "waves": {
+          "title": "Conclua a onda",
+          "description": "Os inimigos chegam em ondas. Elimine todos os zumbis para concluir a onda e ganhar pontos extras."
+        },
+        "statPoints": {
+          "title": "Use pontos de atributo",
+          "description": "Cada onda concluída concede um ponto de atributo. Abra o menu de pausa para melhorar o dano da arma, a cadência de tiro, a vida máxima ou a velocidade de movimento. Use o botão de menos para devolver um ponto aplicado."
+        },
+        "pause": {
+          "title": "Pause e confira",
+          "description": "O menu de pausa mostra as estatísticas da partida e os efeitos ativos. Pause com Escape ou pelo botão de pausa; continue, ajuste as configurações, reinicie ou volte ao menu."
+        },
+        "completion": {
+          "title": "Você está pronto",
+          "description": "Mova-se com WASD ou as setas, mire com o mouse e colete orbes enquanto sobrevive a cada onda. Volte ao menu principal para iniciar uma nova partida normal."
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "Recordes históricos de sobrevivência, ordenados por ondas concluídas, pontuação, eliminações e tempo.",
+      "loading": "Carregando classificação…", "loadFailed": "Não foi possível carregar a classificação agora.",
+      "retrying": "Tentando novamente…", "retry": "Tentar novamente",
+      "empty": "Ainda não há partidas enviadas. Seja o primeiro a registrar uma pontuação.",
+      "player": "Jogador", "cleared": "Concluídas", "score": "Pontuação", "kills": "Eliminações",
+      "time": "Tempo", "reached": "Alcançou {{wave}}", "title": "Classificação",
+      "entries": "{{count}} registros", "range": "{{start}}–{{end}} de {{total}}",
+      "previous": "Anterior", "next": "Próxima"
+    },
+    "submission": {
+      "title": "Enviar sua partida", "name": "Nome na classificação",
+      "enterName": "Digite um nome para enviar sua pontuação.",
+      "submitting": "Enviando…", "retry": "Tentar enviar novamente",
+      "submitted": "Pontuação enviada", "submit": "Enviar pontuação",
+      "success": "Pontuação enviada. Sua partida agora pode aparecer na classificação histórica.",
+      "failed": "Não foi possível enviar a pontuação. Verifique sua conexão e tente novamente."
+    },
+    "results": {
+      "practice": "Partida de treino", "tutorialOver": "Fim do tutorial",
+      "practiceNotSubmitted": "Esta partida de treino é separada e não será enviada para a classificação.",
+      "restartTutorial": "Reiniciar tutorial", "stageCompleted": "Fase {{level}} concluída",
+      "personalLevelScore": "Pontuação pessoal da fase", "levelScore": "PONTUAÇÃO DA FASE",
+      "bossDefeated": "CHEFE DERROTADO", "bossFallen": "Mais uma grande ameaça foi derrotada.",
+      "stageStatistics": "Estatísticas da fase", "enemiesEliminated": "Inimigos eliminados",
+      "completionTime": "Tempo para concluir", "damageDealt": "Dano causado",
+      "campaignComplete": "CAMPANHA CONCLUÍDA",
+      "campaignCompleteDescription": "Você venceu as 30 fases. Novos níveis poderão chegar em uma atualização futura.",
+      "thankYou": "OBRIGADO POR SOBREVIVER À NOITE",
+      "journeyContinues": "A JORNADA CONTINUA", "nextLevel": "Próxima fase",
+      "levelSelection": "Seleção de fase", "mainMenu": "Menu principal",
+      "notThisTime": "Desta vez, <span>não.</span>", "campaignStage": "Fase da campanha",
+      "currentStage": "FASE ATUAL", "campaignStageName": "Fase da campanha",
+      "progressSafe": "Seu progresso está seguro.",
+      "progressSafeDescription": "As fases desbloqueadas e os recordes anteriores continuam aqui. Nada do que você conquistou foi perdido.",
+      "nextRun": "A PRÓXIMA PARTIDA ESTÁ EM SUAS MÃOS", "retryLevel": "Tentar fase novamente",
+      "finalScore": "Pontuação final",
+      "campaignRunsSeparate": "As partidas da campanha ficam separadas dos recordes do modo Sobrevivência.",
+      "campaignRun": "Partida da campanha", "notThisTimeLead": "Desta vez,",
+      "notThisTimeEmphasis": "não.", "stageNumber": "Fase {{level}}",
+      "replayLevel": "Rejogar fase", "next": "Próxima",
+      "waveReached": "Onda alcançada", "wavesCleared": "Ondas concluídas",
+      "zombiesEliminated": "Zumbis eliminados", "timeSurvived": "Tempo sobrevivido",
+      "playAgain": "Jogar novamente"
+    },
+    "guides": {
+      "closeDetails": "Fechar detalhes do guia", "close": "Fechar",
+      "heroDescription": "Conheça as ameaças à sua frente. Estude os inimigos, aprenda a usar seus recursos e prepare-se para a próxima partida.",
+      "progress": "{{discovered}} de {{total}} registros de inimigos e chefes identificados",
+      "threatCompletion": "Progresso das informações sobre ameaças",
+      "identified": "{{count}} / {{total}} registros identificados",
+      "threatIntel": "DADOS DE AMEAÇAS", "enemyCatalogue": "CATÁLOGO DE AMEAÇAS",
+      "enemies": "Inimigos", "enemyDescription": "Os infectados que você encontrará pelo caminho.",
+      "bossDossier": "ARQUIVO DE ALTA AMEAÇA", "bosses": "Chefes",
+      "bossDescription": "Mutações poderosas. Aprenda seus padrões antes que encontrem você.",
+      "arenaEnvironments": "AMBIENTES OPERACIONAIS", "arenas": "Arenas",
+      "arenaDescription": "Cinco ambientes se alternam nas ondas de Sobrevivência, cada um com obstáculos diferentes.",
+      "viewDetails": "Ver detalhes de {{name}}", "viewUnknownEnemy": "Ver detalhes do inimigo não identificado",
+      "viewUnknownBoss": "Ver detalhes do chefe não identificado",
+      "unknownEnemy": "Inimigo desconhecido", "unknownBoss": "Chefe desconhecido", "unknown": "Desconhecido",
+      "threatIdentified": "AMEAÇA IDENTIFICADA", "unknownContact": "CONTATO DESCONHECIDO",
+      "bossDossierTag": "ARQUIVO DO CHEFE", "classifiedDossier": "ARQUIVO CONFIDENCIAL",
+      "classified": "Os detalhes da ameaça são confidenciais.",
+      "identifiedCount": "{{count}} de {{total}} identificados",
+      "arenaRenderables": "Objetos de {{name}}", "viewArenaObjects": "Ver objetos de {{name}}",
+      "layout": "Layout de {{name}}", "zone": "ZONA {{number}}",
+      "waves": "ONDAS {{start}}–{{end}}",
+      "arenaObjects": "Objetos que podem aparecer neste ambiente. O estado e a posição variam a cada partida.",
+      "classifiedIntel": "As informações ficam indisponíveis até a ameaça ser identificada.",
+      "eliteTipTitle": "DICA DE SOBREVIVÊNCIA",
+      "eliteTip": "Cuidado com as variantes de elite: são mais perigosas que os inimigos comuns."
+    },
+    "orbs": {
+      "supplies": "SUPRIMENTOS E MELHORIAS", "title": "Orbes",
+      "description": "Itens úteis que podem virar o jogo.",
+      "viewDetails": "Ver detalhes de {{name}}", "rare": "RARO",
+      "healthName": "Orbe de Vida", "healthDescription": "Recupera vida.",
+      "healthDetails": "Recupera até 25 pontos de vida, respeitando o máximo.",
+      "damageName": "Orbe de Dano", "damageDescription": "Aumenta o dano dos projéteis.",
+      "damageDetails": "Dobra o dano dos projéteis por tempo limitado.",
+      "rapidFireName": "Orbe de Tiro Rápido", "rapidFireDescription": "Aumenta a cadência de tiro.",
+      "rapidFireDetails": "Dobra a cadência de tiro por tempo limitado.",
+      "shieldName": "Orbe de Escudo", "shieldDescription": "Absorve o dano recebido.",
+      "shieldDetails": "Adiciona um escudo que absorve dano por tempo limitado.",
+      "bombName": "Orbe de Bomba", "bombDescription": "Adiciona uma carga explosiva ao seu inventário.",
+      "bombDetails": "A bomba causa dano aos inimigos próximos ao explodir.",
+      "magnetName": "Orbe Magnético", "magnetDescription": "Atrai orbes próximos até você.",
+      "magnetDetails": "Atrai orbes próximos por tempo limitado.",
+      "turretName": "Orbe de Torre", "turretDescription": "Posiciona uma torre automática.",
+      "turretDetails": "A torre posicionada mira nos inimigos próximos e atira por tempo limitado.",
+      "cursedName": "Orbe Amaldiçoado", "cursedDescription": "Faz os inimigos se moverem mais rápido.",
+      "cursedDetails": "Aumenta a velocidade dos inimigos por tempo limitado.",
+      "rareGoldName": "Orbe de Ouro Raro", "rareGoldDescription": "Concede um Ponto Raro.",
+      "rareGoldDetails": "Concede um Ponto Raro."
+    },
+    "notifications": {
+      "discovered": "{{name}} descoberto",
+      "firstEncounter": "Primeiro encontro registrado. Fique alerta.",
+      "campaignLocked": "Essa fase da campanha está bloqueada ou indisponível.",
+      "renderInitFailed": "Não foi possível inicializar a tela do jogo.",
+      "fullscreenExitFailed": "Não foi possível sair do modo de tela cheia.",
+      "campaignProgressSaveFailed": "Não foi possível salvar o progresso da campanha: {{error}}",
+      "campaignProgressSaveFailedSimple": "Não foi possível salvar o progresso da campanha.",
+      "campaignPointsSaveFailed": "Não foi possível salvar os pontos de atributo da campanha: {{error}}",
+      "campaignPointsSaveFailedSimple": "Não foi possível salvar os pontos de atributo da campanha."
+    },
+    "canvas": {
+      "ariaLabel": "565 Zombie Survival. Use as teclas de movimento configuradas ou os controles por toque para se mover. Mire com o mouse ou o controle analógico de mira. A arma dispara automaticamente na direção escolhida. Colete bombas e pressione a tecla configurada ou o botão de toque para usá-las. Colete até cinco torres e clique com o botão direito ou toque duas vezes em um espaço livre da arena para posicioná-las.",
+      "notSupported": "Este navegador não oferece suporte à renderização em Canvas."
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "Não foi possível atualizar os limites.",
+      "unavailable": "O diagnóstico de desempenho está indisponível.",
+      "exportFailed": "Não foi possível exportar os diagnósticos."
+    },
+    "arenaLayouts": {
+      "military-open-centre": "Centro Aberto",
+      "military-corridor-network": "Rede de Corredores",
+      "military-scattered-cover": "Coberturas Dispersas",
+      "military-central-structure": "Estrutura Central",
+      "industrial-open-centre": "Centro Aberto",
+      "industrial-cluster-split": "Complexo Industrial",
+      "industrial-corridor": "Grade de Corredores",
+      "industrial-rust-scrap": "Sucata Enferrujada",
+      "contaminated-open-lab": "Laboratório Aberto",
+      "contaminated-split-lab": "Laboratório Dividido",
+      "contaminated-scattered-tanks": "Tanques Dispersos",
+      "contaminated-central-structure": "Contenção Central",
+      "urban-open-road": "Rua Aberta",
+      "urban-rubble-lane": "Rua com Escombros",
+      "urban-ruined-block": "Quadra em Ruínas",
+      "urban-roadblock-loop": "Circuito de Bloqueios",
+      "bunker-open-bay": "Baía Aberta",
+      "bunker-split-hall": "Salão Dividido",
+      "bunker-core-structure": "Estrutura Central",
+      "bunker-perimeter-defence": "Defesa do Perímetro"
+    },
+    "announcements": {
+      "bossEntered": "{{name}} entrou na arena", "bossDefeated": "{{name}} derrotado",
+      "level": "Fase {{level}}", "bossLevel": "Fase {{level}} · CHEFE",
+      "wave": "Onda {{wave}}", "levelComplete": "FASE CONCLUÍDA", "runOver": "Fim da partida"
+    },
+    "music": {
+      "toggle": "{{action}} música", "pause": "Pausar", "play": "Reproduzir"
+    },
+    "pauseButton": {
+      "ariaLabel": "Pausar o jogo. Pressione Escape ou P.", "title": "Pausar (Esc)",
+      "label": "Pausar (Esc)"
+    },
+    "bosses": {
+      "charger": "Investidor", "acidQueen": "Rainha Ácida", "hordeCaller": "Invocador da Horda",
+      "chargerSummary": "Um mutante enorme especializado em investidas em alta velocidade.",
+      "chargerDescription": "Um mutante enorme que ganha impulso antes de atravessar a arena em uma investida.",
+      "chargerAbility": "Indica a direção da investida; se atingir um obstáculo, fica atordoado por um instante.",
+      "acidQueenSummary": "Uma mutante tóxica que ataca de longe e controla o espaço.",
+      "acidQueenDescription": "Uma mutante tóxica que domina a arena com ataques de ácido à distância.",
+      "acidQueenAbility": "Espalha ácido e cria poças sinalizadas que bloqueiam áreas temporariamente.",
+      "hordeCallerSummary": "Um invocador protegido por seus reforços.",
+      "hordeCallerDescription": "Fica protegido por um escudo enquanto seus reforços permanecerem.",
+      "hordeCallerAbility": "Invoca zumbis de apoio. Derrote-os para remover o escudo e deixá-lo vulnerável."
+    },
+    "enemies": {
+      "walker": {
+        "name": "Errante", "summary": "Perseguidor constante de curta distância.",
+        "description": "Avança devagar e ataca quando chega perto.",
+        "ability": "Não tem ataque especial. Continue se movendo para a horda não cercar você."
+      },
+      "runner": {
+        "name": "Corredor", "summary": "Atacante rápido e frágil.",
+        "description": "Zumbi frágil, mas veloz, capaz de alcançar rapidamente um sobrevivente distraído.",
+        "ability": "Após 6 segundos em velocidade normal, avança ao dobro da velocidade por 2 segundos, sem aviso visível."
+      },
+      "brute": {
+        "name": "Brutamontes", "summary": "Zumbi robusto com muita vida e dano corpo a corpo.",
+        "description": "Zumbi lento e robusto, com mais vida e um golpe corpo a corpo devastador.",
+        "ability": "Causa muito dano ao encostar. Não deixe que ele alcance você."
+      },
+      "spitter": {
+        "name": "Cuspidor", "summary": "Atacante à distância que dispara ácido.",
+        "description": "Atacante à distância que tenta manter distância de você.",
+        "ability": "Dispara um projétil de ácido rápido quando você está ao alcance."
+      },
+      "swarm": {
+        "name": "Enxame", "summary": "Grupo de atacantes pequenos e velozes.",
+        "description": "Zumbis pequenos e rápidos, fáceis de não perceber em uma arena lotada.",
+        "ability": "É mais rápido que um Corredor e desvia de tiros em dobro da velocidade, com recarga de 3 segundos. Após cada desvio, fica duas vezes mais lento e recupera a velocidade normal em 2 segundos."
+      },
+      "armoured": {
+        "name": "Blindado", "summary": "Zumbi resistente que recebe menos dano pela frente.",
+        "description": "Zumbi resistente que reduz o dano recebido quando está de frente para você.",
+        "ability": "Recebe menos dano de contato quando está de frente para você; evite atacá-lo diretamente."
+      },
+      "screamer": {
+        "name": "Gritador", "summary": "Invocador que chama reforços.",
+        "description": "Perseguidor persistente, especialmente perigoso quando a arena está cheia.",
+        "ability": "Chama um Errante por vez; o Invocador da Horda chama o dobro."
+      },
+      "bloater": {
+        "name": "Inchado", "summary": "Zumbi resistente que deixa ácido perigoso.",
+        "description": "Zumbi lento e resistente que deixa uma surpresa perigosa ao morrer.",
+        "ability": "Ao ser derrotado, explode e deixa uma área de ácido que causa dano."
+      },
+      "splitter": {
+        "name": "Divisor", "summary": "Zumbi que se divide em inimigos menores.",
+        "description": "Zumbi traiçoeiro que transforma uma ameaça em várias.",
+        "ability": "Ao ser derrotado, divide-se em quatro zumbis Enxame menores."
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": { "name": "Orbes em dobro", "description": "Orbes aparecem duas vezes mais frequentemente." },
+      "fastWave": { "name": "Onda rápida", "description": "Os inimigos se movem 20% mais rápido." },
+      "armouredInvasion": { "name": "Invasão blindada", "description": "Inimigos Blindados aparecem com mais frequência." },
+      "eliteThreat": { "name": "Ameaça de elite", "description": "Inimigos de elite têm mais chance de aparecer." },
+      "contamination": { "name": "Contaminação", "description": "Os Inchados e suas áreas de ácido são mais perigosos." },
+      "reducedVisibility": { "name": "Visibilidade reduzida", "description": "A escuridão limita seu campo de visão." },
+      "overrun": { "name": "Invasão", "description": "Os inimigos chegam mais rápido." },
+      "heavyResistance": { "name": "Resistência pesada", "description": "Brutamontes aparecem com mais frequência." }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": { "name": "Dano da arma", "description": "Cause mais dano com cada projétil.", "effect": "+10% de dano base", "unit": "dano/disparo" },
+        "shotsPerSecond": { "name": "Tiro rápido", "description": "Atire com mais frequência sem perder a mira manual.", "effect": "+8% de cadência base", "unit": "disparos/segundo" },
+        "maxHealth": { "name": "Vida máxima", "description": "Aumenta sua vida máxima.", "effect": "+10 de vida máxima", "unit": "vida" },
+        "movementSpeed": { "name": "Velocidade de movimento", "description": "Mova-se mais rápido para desviar e mudar de posição.", "effect": "+3% de velocidade base", "unit": "unidades/segundo" }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "Roubo de vida", "description": "Recupera parte do dano causado pela arma.",
+          "unlock": "Disponível desde o início da partida.",
+          "effects": ["Recupera 1% do dano elegível", "Recupera 2% do dano elegível", "Recupera 3% do dano elegível", "Recupera 4% do dano elegível", "Recupera 5% do dano elegível"]
+        },
+        "criticalMastery": {
+          "name": "Maestria crítica", "description": "Aumenta a chance de os acertos da arma causarem dano crítico.",
+          "unlock": "Disponível desde o início da partida.",
+          "effects": ["+3% de chance crítica", "+6% de chance crítica", "+9% de chance crítica", "+12% de chance crítica", "+15% de chance crítica"]
+        },
+        "explosiveRounds": {
+          "name": "Munição explosiva", "description": "Os disparos explodem no impacto e causam dano em área.",
+          "unlock": "Disponível desde o início da partida.",
+          "effects": ["3% de chance de explodir no impacto", "6% de chance de explodir no impacto", "9% de chance de explodir no impacto", "12% de chance de explodir no impacto", "15% de chance de explodir no impacto"]
+        },
+        "emergencyShield": {
+          "name": "Escudo de emergência", "description": "Cria um escudo protetor depois que você sofre dano.",
+          "unlock": "Disponível desde o início da partida.",
+          "effects": ["Escudo por 1 segundo", "Escudo por 1,5 segundo", "Escudo por 2 segundos", "Escudo por 2,5 segundos", "Escudo por 3 segundos"]
+        },
+        "orbMagnetism": {
+          "name": "Magnetismo de orbes", "description": "Atrai orbes próximos até o jogador.",
+          "unlock": "Disponível desde o início da partida.",
+          "effects": ["Raio de coleta de 60 unidades", "Raio de coleta de 90 unidades", "Raio de coleta de 120 unidades", "Raio de coleta de 150 unidades", "Raio de coleta de 180 unidades"]
+        },
+        "piercingRounds": {
+          "name": "Munição perfurante", "description": "Os disparos atravessam alvos e atingem outros inimigos.",
+          "unlock": "Desbloqueado durante a partida.",
+          "effects": ["Atravessa mais 1 alvo", "Atravessa mais 2 alvos", "Atravessa mais 3 alvos", "Atravessa mais 4 alvos", "Atravessa mais 5 alvos"]
+        },
+        "secondWind": {
+          "name": "Último fôlego", "description": "Recupera vida uma vez por partida quando ela fica abaixo do limite crítico.",
+          "unlock": "Desbloqueado durante a partida.",
+          "effects": ["Recupera 10% de vida", "Recupera 15% de vida", "Recupera 20% de vida"]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "Fase {{level}} — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "Posto Militar",
+        "description": "Um posto sob o luar, com caixas de suprimentos, sacos de areia e barricadas destrutíveis."
+      },
+      "industrial": {
+        "name": "Complexo Industrial",
+        "description": "Uma grande área industrial dividida por estruturas de concreto e barreiras reforçadas."
+      },
+      "contaminated": {
+        "name": "Zona Contaminada",
+        "description": "Uma área esverdeada e desgastada, com coberturas dispersas e corredores abertos perigosos."
+      },
+      "urban": {
+        "name": "Cidade em Ruínas",
+        "description": "Uma arena urbana em ruínas, onde paredes destruídas e coberturas moldam o campo de batalha."
+      },
+      "bunker": {
+        "name": "Bunker Subterrâneo",
+        "description": "Um complexo subterrâneo frio, com defesas de concreto e corredores estreitos."
+      }
+    },
+    "arenaObjects": {
+      "crate": { "name": "Caixote", "description": "Caixas de suprimentos empilhadas que servem de cobertura e bloqueiam a visão." },
+      "barricade": { "name": "Barricada", "description": "Barricadas baixas que canalizam o movimento e bloqueiam investidas." },
+      "wall": { "name": "Parede", "description": "Painéis sólidos de concreto que bloqueiam corredores e criam gargalos." },
+      "cover": { "name": "Cobertura", "description": "Estruturas de proteção que oferecem um breve abrigo seguro." },
+      "barrel": { "name": "Barril", "description": "Tambores explosivos que podem eliminar grupos quando detonados." },
+      "oil-barrel": { "name": "Barril de óleo", "description": "Tambores pesados de aço que podem se romper e gerar uma explosão de fogo." },
+      "gas-cylinder": { "name": "Cilindro de gás", "description": "Tanques pressurizados que criam um padrão perigoso de jatos em alta velocidade." },
+      "electric-generator": { "name": "Gerador elétrico", "description": "Unidades de energia reativas que carregam e liberam campos elétricos perigosos." },
+      "moving-wall": { "name": "Parede móvel", "description": "Painéis industriais móveis que obrigam você a mudar de caminho." },
+      "steam-pipe": { "name": "Tubo de vapor", "description": "Dutos que alertam antes de liberar jatos de vapor quente." },
+      "industrial-crate": { "name": "Caixa industrial", "description": "Contêineres reforçados com placas metálicas resistentes que podem conter itens." }
+    }
+  },
   "ui": {
     "dialogClose": "Fechar",
     "sheetClose": "Fechar",

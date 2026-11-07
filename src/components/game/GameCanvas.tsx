@@ -1,4 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { Maximize, Minimize } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { GameEngine } from '@/game/core/GameEngine';
 import { GAME_TOUCH_CONTROLS_MEDIA_QUERY } from '@/game/core/GameConfig';
@@ -9,11 +11,9 @@ import {
   getMusicTrackName,
 } from '@/game/audio/GameAudioController';
 import {
-  getEnemyDisplayName,
   notifyNewBossDiscoveries,
   notifyNewEnemyDiscoveries,
 } from '@/game/discovery/EnemyDiscovery';
-import { getBossName } from '@/game/bosses/BossSystem';
 import type {
   GameStateSnapshot,
   GameMode,
@@ -25,6 +25,7 @@ import {
   readLevelCampaignProgress,
   saveLevelCampaignProgress,
 } from '@/game/core/LevelCampaign';
+import { formatGameKeyCode } from '@/game/core/GameSettings';
 import type { RareUpgradeId } from '@/game/upgrades';
 import type { GameMenuMode } from './GameMenuTypes';
 import { GameMusicPlayer } from './GameMusicPlayer';
@@ -33,6 +34,7 @@ import { GameMenuOverlay } from './GameMenuOverlay';
 import { GamePauseButton } from './GamePauseButton';
 import { GamePhaseOverlays } from './GamePhaseOverlays';
 import { GameTouchControls } from './GameTouchControls';
+import { useFullscreenState } from './useFullscreenState';
 import {
   GAME_TUTORIAL_STEPS,
   GameTutorialOverlay,
@@ -47,13 +49,30 @@ interface TutorialBaseline {
   readonly orbsCollected: number;
 }
 
+interface KeyboardLockNavigator extends Navigator {
+  readonly keyboard?: {
+    lock(keyCodes?: string[]): Promise<void>;
+    unlock(): void;
+  };
+}
+
 function getAngleDifference(left: number, right: number): number {
   return Math.atan2(Math.sin(left - right), Math.cos(left - right));
 }
 
 export function GameCanvas() {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fullscreenRequestPendingRef = useRef(false);
+  const fullscreenExitPendingRef = useRef(false);
+  const isActivelyPlayingRef = useRef(false);
+  const lastFullscreenEscapeToastAtRef = useRef(0);
+  const escapeHoldTimeoutRef = useRef<number | null>(null);
+  const escapeBurstResetTimeoutRef = useRef<number | null>(null);
+  const escapeTapCountRef = useRef(0);
+  const lastEscapeTapAtRef = useRef(0);
+  const escapeRepeatToastShownRef = useRef(false);
   const movementJoystickRef = useRef<HTMLButtonElement>(null);
   const aimJoystickRef = useRef<HTMLButtonElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
@@ -80,6 +99,7 @@ export function GameCanvas() {
   const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const isFullscreen = useFullscreenState();
   const [tutorialStepIndex, setTutorialStepIndex] = useState<number | null>(null);
   const [tutorialActionComplete, setTutorialActionComplete] = useState(false);
   const [confirmTutorialExit, setConfirmTutorialExit] = useState(false);
@@ -91,7 +111,11 @@ export function GameCanvas() {
   const currentCampaignRewardEligibleRef = useRef(true);
   const currentCampaignStartingRarePointsRef = useRef(0);
   const savedCampaignLevelIdRef = useRef<number | null>(null);
-  const { settings, error: settingsError, updateSettings } = useGameSettings();
+  const {
+    settings,
+    error: settingsError,
+    updateSettings,
+  } = useGameSettings();
   const [isResponsiveLayout, setIsResponsiveLayout] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -101,6 +125,68 @@ export function GameCanvas() {
   const shouldMountTouchControls =
     settings.touchControls === 'always' ||
     (settings.touchControls === 'auto' && isResponsiveLayout);
+
+  const requestGameFullscreen = () => {
+    const container = containerRef.current;
+    if (
+      !container ||
+      !document.fullscreenEnabled ||
+      document.fullscreenElement ||
+      fullscreenRequestPendingRef.current
+    ) {
+      return;
+    }
+
+    fullscreenRequestPendingRef.current = true;
+    void container.requestFullscreen().then(
+      () => {
+        fullscreenRequestPendingRef.current = false;
+      },
+      () => {
+        fullscreenRequestPendingRef.current = false;
+      },
+    );
+  };
+
+  const toggleGameFullscreen = () => {
+    if (document.fullscreenElement) {
+      exitGameFullscreen();
+    } else {
+      requestGameFullscreen();
+    }
+  };
+
+  const exitGameFullscreen = () => {
+    if (!document.fullscreenElement || fullscreenExitPendingRef.current) return;
+    fullscreenExitPendingRef.current = true;
+    void document.exitFullscreen().then(
+      () => {
+        fullscreenExitPendingRef.current = false;
+      },
+      () => {
+        fullscreenExitPendingRef.current = false;
+        toast.error(t('game.notifications.fullscreenExitFailed'));
+      },
+    );
+  };
+
+  useEffect(() => {
+    const keyboard = (navigator as KeyboardLockNavigator).keyboard;
+    const syncEscapeLock = () => {
+      if (document.fullscreenElement === containerRef.current) {
+        void keyboard?.lock(['Escape']).catch(() => undefined);
+      } else {
+        keyboard?.unlock();
+      }
+    };
+
+    document.addEventListener('fullscreenchange', syncEscapeLock);
+    syncEscapeLock();
+    return () => {
+      document.removeEventListener('fullscreenchange', syncEscapeLock);
+      keyboard?.unlock();
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -183,13 +269,10 @@ export function GameCanvas() {
             0,
             nextState.player.shotsFired - previous.shotsFired,
           );
-          const rapidFireActive = nextState.activeEffects.some(
-            (effect) => effect.type === 'rapidFire',
-          );
           for (let shot = 0; shot < newShots; shot += 1) {
             audioRef.current?.playCue(
               'shoot',
-              rapidFireActive ? 1 : 0.5,
+              1,
               shot * 0.08,
             );
           }
@@ -221,8 +304,10 @@ export function GameCanvas() {
             globalThis.localStorage,
             nextState.zombies.map((zombie) => zombie.type),
             (enemyType) => {
-              toast.success(`${getEnemyDisplayName(enemyType)} discovered`, {
-                description: 'First encounter recorded. Stay alert.',
+              toast.success(t('game.notifications.discovered', {
+                name: t(`game.enemies.${enemyType}.name`),
+              }), {
+                description: t('game.notifications.firstEncounter'),
                 duration: 3000,
                 className: 'game-discovery-toast',
               });
@@ -238,8 +323,10 @@ export function GameCanvas() {
               zombie.isBoss && zombie.bossType ? [zombie.bossType] : [],
             ),
             (bossType) => {
-              toast.success(`${getBossName(bossType)} discovered`, {
-                description: 'First encounter recorded. Stay alert.',
+              toast.success(t('game.notifications.discovered', {
+                name: t(`game.bosses.${bossType}`),
+              }), {
+                description: t('game.notifications.firstEncounter'),
                 duration: 3000,
                 className: 'game-discovery-toast',
               });
@@ -271,7 +358,7 @@ export function GameCanvas() {
       setRenderError(
         error instanceof Error
           ? error.message
-          : 'Unable to initialize the game rendering surface.',
+          : t('game.notifications.renderInitFailed'),
       );
       return;
     }
@@ -310,7 +397,7 @@ export function GameCanvas() {
     if (gameMode === 'level') {
       const progress = readLevelCampaignProgress();
       if (levelId === undefined || !canStartLevel(progress, levelId)) {
-        toast.error('That campaign level is locked or unavailable.');
+        toast.error(t('game.notifications.campaignLocked'));
         return;
       }
       saveLevelCampaignProgress(progress);
@@ -422,6 +509,7 @@ export function GameCanvas() {
   };
 
   const pauseRun = () => {
+    isActivelyPlayingRef.current = false;
     engineRef.current?.pause();
     audioRef.current?.pauseGameplay();
     syncGameState();
@@ -524,8 +612,8 @@ export function GameCanvas() {
     } catch (error) {
       toast.error(
         error instanceof Error
-          ? `Campaign progress could not be saved: ${error.message}`
-          : 'Campaign progress could not be saved.',
+          ? t('game.notifications.campaignProgressSaveFailed', { error: error.message })
+          : t('game.notifications.campaignProgressSaveFailedSimple'),
       );
     }
   }, [gameState]);
@@ -561,8 +649,8 @@ export function GameCanvas() {
     } catch (error) {
       toast.error(
         error instanceof Error
-          ? `Campaign Stat Points could not be saved: ${error.message}`
-          : 'Campaign Stat Points could not be saved.',
+          ? t('game.notifications.campaignPointsSaveFailed', { error: error.message })
+          : t('game.notifications.campaignPointsSaveFailedSimple'),
       );
     }
   };
@@ -606,7 +694,7 @@ export function GameCanvas() {
       setDiagnosticsError(null);
     } catch (error) {
       setDiagnosticsError(
-        error instanceof Error ? error.message : 'Unable to update thresholds.',
+        error instanceof Error ? error.message : t('game.diagnostics.thresholdUpdateFailed'),
       );
     }
   };
@@ -614,7 +702,7 @@ export function GameCanvas() {
   const exportDiagnostics = () => {
     try {
       const report = engineRef.current?.exportPerformanceReport();
-      if (!report) throw new Error('Performance diagnostics are unavailable.');
+      if (!report) throw new Error(t('game.diagnostics.unavailable'));
       const blob = new Blob([JSON.stringify(report, null, 2)], {
         type: 'application/json',
       });
@@ -627,7 +715,7 @@ export function GameCanvas() {
       setDiagnosticsError(null);
     } catch (error) {
       setDiagnosticsError(
-        error instanceof Error ? error.message : 'Unable to export diagnostics.',
+        error instanceof Error ? error.message : t('game.diagnostics.exportFailed'),
       );
     }
   };
@@ -635,6 +723,58 @@ export function GameCanvas() {
   const isTerminalPhase =
     gameState?.wave.phase === 'gameOver' ||
     gameState?.wave.phase === 'levelComplete';
+
+  isActivelyPlayingRef.current =
+    hasStarted &&
+    !isPaused &&
+    !isTerminalPhase &&
+    tutorialStepIndex === null;
+
+  useEffect(() => {
+    let wasGameFullscreen =
+      document.fullscreenElement === containerRef.current;
+    const handleFullscreenChange = () => {
+      const isGameFullscreen =
+        document.fullscreenElement === containerRef.current;
+      if (
+        wasGameFullscreen &&
+        !isGameFullscreen &&
+        isActivelyPlayingRef.current
+      ) {
+        if (
+          !fullscreenExitPendingRef.current &&
+          Date.now() - lastFullscreenEscapeToastAtRef.current > 750
+        ) {
+          toast.info(
+            t('game.notifications.fullscreenPauseShortcut', {
+              key: formatGameKeyCode(settings.alternatePauseKey),
+            }),
+          );
+        }
+        pauseRun();
+      }
+      wasGameFullscreen = isGameFullscreen;
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [settings.alternatePauseKey, t]);
+
+  const isGameInProgress =
+    hasStarted && gameState?.wave.phase !== 'levelComplete';
+
+  useEffect(() => {
+    if (!isGameInProgress) return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isGameInProgress]);
 
   useEffect(() => {
     if (!import.meta.env.DEV || !diagnosticsEnabled) return;
@@ -648,12 +788,79 @@ export function GameCanvas() {
   }, [diagnosticsEnabled, hasStarted, isPaused, isTerminalPhase]);
 
   useEffect(() => {
-    if (!hasStarted || isTerminalPhase) return;
-
-    const handlePauseShortcut = (event: KeyboardEvent) => {
+    const handleGameShortcut = (event: KeyboardEvent) => {
       if (
-        (event.code !== 'Escape' && event.code !== 'KeyP') ||
-        event.repeat
+        event.target instanceof Element &&
+        event.target.closest('.game-settings-panel')
+      ) {
+        return;
+      }
+
+      if (event.code === 'Escape') {
+        if (document.fullscreenElement) {
+          event.preventDefault();
+          if (!event.repeat && hasStarted && !isTerminalPhase) {
+            lastFullscreenEscapeToastAtRef.current = Date.now();
+            toast.info(
+              t('game.notifications.fullscreenPauseShortcut', {
+                key: formatGameKeyCode(settings.alternatePauseKey),
+              }),
+            );
+          }
+          if (event.repeat) {
+            if (!escapeRepeatToastShownRef.current) {
+              toast.info(t('game.notifications.fullscreenHoldEscape'));
+              escapeRepeatToastShownRef.current = true;
+            }
+          } else {
+            const now = Date.now();
+            if (now - lastEscapeTapAtRef.current <= 750) {
+              escapeTapCountRef.current += 1;
+            } else {
+              escapeTapCountRef.current = 1;
+              escapeRepeatToastShownRef.current = false;
+            }
+            lastEscapeTapAtRef.current = now;
+            if (
+              escapeTapCountRef.current >= 2 &&
+              !escapeRepeatToastShownRef.current
+            ) {
+              toast.info(t('game.notifications.fullscreenHoldEscape'));
+              escapeRepeatToastShownRef.current = true;
+            }
+            if (escapeBurstResetTimeoutRef.current !== null) {
+              window.clearTimeout(escapeBurstResetTimeoutRef.current);
+            }
+            escapeBurstResetTimeoutRef.current = window.setTimeout(() => {
+              escapeTapCountRef.current = 0;
+              lastEscapeTapAtRef.current = 0;
+              escapeRepeatToastShownRef.current = false;
+              escapeBurstResetTimeoutRef.current = null;
+            }, 900);
+            if (escapeHoldTimeoutRef.current !== null) {
+              window.clearTimeout(escapeHoldTimeoutRef.current);
+            }
+            escapeHoldTimeoutRef.current = window.setTimeout(() => {
+              escapeHoldTimeoutRef.current = null;
+              exitGameFullscreen();
+            }, 1200);
+          }
+        } else if (event.repeat) {
+          return;
+        }
+
+        if (event.repeat || !hasStarted || isTerminalPhase) return;
+        event.preventDefault();
+        if (isPaused) resumeRun();
+        else pauseRun();
+        return;
+      }
+
+      if (
+        event.code !== settings.alternatePauseKey ||
+        event.repeat ||
+        !hasStarted ||
+        isTerminalPhase
       ) {
         return;
       }
@@ -661,9 +868,28 @@ export function GameCanvas() {
       if (isPaused) resumeRun();
       else pauseRun();
     };
-    window.addEventListener('keydown', handlePauseShortcut);
-    return () => window.removeEventListener('keydown', handlePauseShortcut);
-  }, [hasStarted, isPaused, isTerminalPhase]);
+
+    const handleGameShortcutKeyUp = (event: KeyboardEvent) => {
+      if (event.code !== 'Escape') return;
+      if (escapeHoldTimeoutRef.current !== null) {
+        window.clearTimeout(escapeHoldTimeoutRef.current);
+        escapeHoldTimeoutRef.current = null;
+      }
+    };
+
+    window.addEventListener('keydown', handleGameShortcut, true);
+    window.addEventListener('keyup', handleGameShortcutKeyUp, true);
+    return () => {
+      window.removeEventListener('keydown', handleGameShortcut, true);
+      window.removeEventListener('keyup', handleGameShortcutKeyUp, true);
+      if (escapeHoldTimeoutRef.current !== null) {
+        window.clearTimeout(escapeHoldTimeoutRef.current);
+      }
+      if (escapeBurstResetTimeoutRef.current !== null) {
+        window.clearTimeout(escapeBurstResetTimeoutRef.current);
+      }
+    };
+  }, [hasStarted, isPaused, isTerminalPhase, settings.alternatePauseKey, t]);
 
   useEffect(() => {
     if (tutorialStepIndex === null || tutorialActionComplete || !gameState) return;
@@ -693,6 +919,13 @@ export function GameCanvas() {
     : isPaused && !isTerminalPhase
       ? 'pause'
       : null;
+  const showPauseButton =
+    hasStarted &&
+    !isPaused &&
+    gameState?.wave.phase === 'combat';
+  const showFullscreenButton =
+    menuMode === 'pause' ||
+    (isResponsiveLayout && (menuMode === 'main' || showPauseButton));
 
   return (
     <div
@@ -725,10 +958,10 @@ export function GameCanvas() {
           : '',
       ].filter(Boolean).join(' ')}
       tabIndex={0}
-        aria-label="565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key or the touch bomb button to use one. Collect up to five turrets, then right-click or double-tap an open spot in the arena to place one."
+        aria-label={t('game.canvas.ariaLabel')}
         onPointerDown={(event) => event.currentTarget.focus()}
       >
-        Canvas rendering is not supported by this browser.
+        {t('game.canvas.notSupported')}
       </canvas>
       {shouldMountTouchControls && (
         <GameTouchControls
@@ -761,8 +994,32 @@ export function GameCanvas() {
           }
         />
       )}
-      {hasStarted && !isPaused && gameState?.wave.phase === 'combat' && (
+      {showPauseButton && (
         <GamePauseButton onPause={pauseRun} />
+      )}
+      {showFullscreenButton && (
+        <button
+          className="game-fullscreen-button"
+          data-near-pause={showPauseButton}
+          type="button"
+          onClick={toggleGameFullscreen}
+          aria-label={t(
+            isFullscreen
+              ? 'game.fullscreenButton.exit'
+              : 'game.fullscreenButton.enter',
+          )}
+          title={t(
+            isFullscreen
+              ? 'game.fullscreenButton.exit'
+              : 'game.fullscreenButton.enter',
+          )}
+        >
+          {isFullscreen ? (
+            <Minimize aria-hidden="true" />
+          ) : (
+            <Maximize aria-hidden="true" />
+          )}
+        </button>
       )}
       {(!menuMode || menuMode === 'pause') && (
         <GameMusicPlayer

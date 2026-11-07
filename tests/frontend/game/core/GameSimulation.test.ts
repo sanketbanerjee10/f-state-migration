@@ -38,6 +38,7 @@ describe('game simulation', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
     state.arenaTheme = 'contaminated';
+    state.militaryObjects = [];
     state.player.x = 180;
     state.player.y = 160;
     state.player.fireCooldownSeconds = 10_000;
@@ -97,7 +98,7 @@ describe('game simulation', () => {
     )).toHaveLength(0);
   });
 
-  it('uses the turret barbed wire to damage players and zombies', () => {
+  it('keeps turret barbed wire harmless to players while damaging zombies', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
     const turret = getMilitaryTurret(state);
@@ -108,13 +109,18 @@ describe('game simulation', () => {
     state.player.y = wireY;
     state.player.fireCooldownSeconds = 10_000;
     const zombie = createZombie(10, 'walker', wireX, wireY);
-    state.zombies = [zombie];
     const playerHealth = state.player.health;
+
+    updateGameState(state, { movementX: 0, movementY: 0, aimAngle: 0 }, 0);
+    expect(state.player.health).toBe(playerHealth);
+
+    state.player.x = state.arenaWidth / 2;
+    state.player.y = state.arenaHeight / 2;
+    state.zombies = [zombie];
     const zombieHealth = zombie.health;
 
     updateGameState(state, { movementX: 0, movementY: 0, aimAngle: 0 }, 0);
 
-    expect(state.player.health).toBeLessThan(playerHealth);
     expect(zombie.health).toBeLessThan(zombieHealth);
   });
 
@@ -122,6 +128,7 @@ describe('game simulation', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
     const turret = getMilitaryTurret(state);
+    state.militaryObjects = [turret];
     const turretX = state.arenaWidth * turret.xFraction;
     const turretY = state.arenaHeight * turret.yFraction;
     turret.state = 'active';
@@ -314,6 +321,7 @@ describe('game simulation', () => {
   it('constrains player movement to arena bounds and slides against obstacles', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.militaryObjects = [];
     state.player.x = 340;
     state.player.y = 180;
 
@@ -351,6 +359,7 @@ describe('game simulation', () => {
   it('repeats the runner dash after six seconds and dashes for two seconds at double speed', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.militaryObjects = [];
     state.player.x = 100;
     state.player.y = 60;
     state.player.fireCooldownSeconds = 1_000;
@@ -381,6 +390,7 @@ describe('game simulation', () => {
   it('dodges incoming player shots at double speed and recovers from half speed', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.militaryObjects = [];
     state.player.x = 80;
     state.player.y = 270;
     state.player.fireCooldownSeconds = 1_000;
@@ -443,6 +453,7 @@ describe('game simulation', () => {
 
     const recoveryState = createGameState();
     suppressWaveSpawns(recoveryState);
+    recoveryState.militaryObjects = [];
     recoveryState.player.x = 100;
     recoveryState.player.y = 80;
     recoveryState.player.fireCooldownSeconds = 1_000;
@@ -572,6 +583,7 @@ describe('game simulation', () => {
       directionX: 1,
       directionY: 0,
     });
+    expect(state.projectiles[0].remainingSeconds).toBeCloseTo(1.05);
 
     updateGameState(
       state,
@@ -764,6 +776,7 @@ describe('game simulation', () => {
   it('fires spit every five seconds through cover and poisons a hit player', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.militaryObjects = [];
     state.arenaTheme = 'industrial';
     state.arenaObstacles = [{
       xFraction: 0.5,
@@ -971,8 +984,8 @@ describe('game simulation', () => {
       { movementX: 0, movementY: 0, aimAngle: 0 },
       0.05,
     );
-    expect(state.player.fireCooldownSeconds).toBeCloseTo(0.2);
-    expect(state.statistics.highestShotsPerSecond).toBe(5);
+    expect(state.player.fireCooldownSeconds).toBeCloseTo(0.25);
+    expect(state.statistics.highestShotsPerSecond).toBe(4);
 
     state.activeEffects = [{
       type: 'shield',
@@ -1030,6 +1043,7 @@ describe('game simulation', () => {
     suppressWaveSpawns(state);
     const nearby = createZombie(50, 'walker', state.player.x + 90, state.player.y);
     const distant = createZombie(51, 'runner', state.player.x + 240, state.player.y);
+    const nearbyHealth = nearby.health;
     state.zombies = [nearby, distant];
     state.items = [{
       id: 52,
@@ -1059,7 +1073,7 @@ describe('game simulation', () => {
     expect(state.bombs).toBe(0);
     expect(state.zombiesKilled).toBe(1);
     expect(state.statistics.walkerKills).toBe(1);
-    expect(state.statistics.totalDamageDealt).toBe(50);
+    expect(state.statistics.totalDamageDealt).toBe(nearbyHealth);
     expect(state.impacts.some((impact) => impact.kind === 'bomb')).toBe(true);
 
     state.items = [{

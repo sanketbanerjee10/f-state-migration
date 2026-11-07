@@ -84,7 +84,10 @@ describe('boss encounters', () => {
 
   it('telegraphs the Charger direction, dashes, and enters a stun on wall impact', () => {
     const state = createGameState();
-    const boss = createZombie(10, 'brute', 880, 270, 10);
+    state.arenaObstacles = [];
+    state.barrels = [];
+    state.militaryObjects = [];
+    const boss = createZombie(10, 'brute', 920, 270, 10);
     boss.radius = BOSS_CONFIG.radius;
     boss.isBoss = true;
     boss.bossType = 'charger';

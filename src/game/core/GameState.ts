@@ -182,6 +182,7 @@ export interface WaveProgressionState {
   bossUpgradeOpportunity: boolean;
   announcement: string;
   announcementSeconds: number;
+  arenaTransitionRemainingSeconds: number;
   transitionCountdownSeconds: number;
   pendingWaveNumber: number;
   lastArenaLayoutId?: string;
@@ -576,6 +577,7 @@ export function createGameState(
   const initialMilitaryObjects = createMilitaryOutpostObjects(
     initialLayout.theme,
     `${initialLayout.id}-${initialWave}`,
+    initialLayout,
   );
   const initialContaminatedObjects = createContaminatedArenaObjects(
     initialLayout,
@@ -691,6 +693,7 @@ export function createGameState(
       bossUpgradeOpportunity: false,
       announcement: 'Wave 1',
       announcementSeconds: 3,
+      arenaTransitionRemainingSeconds: 0,
       transitionCountdownSeconds: 0,
       pendingWaveNumber: initialWave,
       lastArenaLayoutId: initialLayout.id,

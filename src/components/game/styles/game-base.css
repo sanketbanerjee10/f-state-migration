@@ -17,6 +17,11 @@
   background: #17201e;
 }
 
+.game-canvas-frame:fullscreen {
+  width: 100vw;
+  height: 100dvh;
+}
+
 .game-canvas {
   display: block;
   width: 100%;
@@ -430,8 +435,8 @@
 
 .game-performance-tools {
   position: absolute;
-  top: calc(10px + env(safe-area-inset-top, 0px));
-  right: calc(10px + env(safe-area-inset-right, 0px));
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
   z-index: 20;
   max-width: min(620px, calc(100% - 20px));
   color: #d3e2da;

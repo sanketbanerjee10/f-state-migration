@@ -849,6 +849,814 @@
       "reviewKicker": "申請審査"
     }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY プレゼンツ",
+      "taglineLead": "外は静か。",
+      "taglineEmphasis": "中は混沌。",
+      "survival": "サバイバルモード",
+      "campaign": "キャンペーンモード",
+      "devLevel": "開発用レベルを開始",
+      "howToPlay": "遊び方",
+      "fieldGuides": "フィールドガイド",
+      "leaderboard": "ランキング",
+      "settings": "設定",
+      "communityLead": "コミュニティ",
+      "communityTail": "による作品",
+      "backToMenu": "メニューに戻る",
+      "backToPauseMenu": "ポーズメニューに戻る",
+      "carousel": "カルーセル",
+      "stagesReached": "到達ステージ",
+      "statPoints": "ステータスポイント",
+      "area": "エリア {{number}}",
+      "sector": "キャンペーン区域",
+      "stagesCleared": "全10ステージ中 {{count}} ステージクリア",
+      "previousArea": "前のエリア",
+      "nextArea": "次のエリア",
+      "start": "開始",
+      "locked": "ロック中",
+      "cleared": "✓ クリア",
+      "boss": "ボス",
+      "current": "現在",
+      "ready": "準備完了",
+      "difficulty": "難易度 {{difficulty}} / 5",
+      "best": "ベスト",
+      "maps": {
+        "Watchtower": "監視塔",
+        "Barracks": "兵舎",
+        "Perimeter": "外周",
+        "Bunker": "バンカー",
+        "Relay": "中継施設",
+        "Armory": "武器庫",
+        "Checkpoint": "検問所",
+        "Hangar": "格納庫",
+        "Rampart": "城壁",
+        "Citadel": "城塞",
+        "Foundry": "鋳造所",
+        "Crucible": "溶解炉",
+        "Refinery": "精製所",
+        "Conveyor": "搬送路",
+        "Furnace": "炉",
+        "Mill": "製粉所",
+        "Smelter": "製錬所",
+        "Generator": "発電機",
+        "Assembly": "組立工場",
+        "Forge": "鍛造所",
+        "Quarantine": "隔離区画",
+        "Wasteland": "荒野",
+        "Mire": "沼地",
+        "Fallout": "放射能汚染地帯",
+        "Blight": "疫病地帯",
+        "Hollow": "窪地",
+        "Ruins": "廃墟",
+        "Toxicity": "有毒地帯",
+        "Necropolis": "死者の都",
+        "Deadzone": "デッドゾーン"
+      },
+      "areas": {
+        "military": "軍事拠点",
+        "industrial": "工業施設",
+        "contaminated": "汚染区域"
+      },
+      "campaignAreas": "キャンペーンエリア",
+      "areaLevels": "{{area}}のレベル",
+      "mainMenu": "メインメニュー",
+      "levelAction": "{{action}} {{stage}}、{{area}}{{boss}}",
+      "bossSuffix": "、ボス：{{name}}",
+      "lockedState": "ロック中",
+      "resumeGame": "ゲームを再開",
+      "closeCampaign": "キャンペーン選択を閉じる",
+      "closeLeaderboard": "ランキングを閉じる",
+      "closeGuides": "ガイドを閉じる",
+      "closeSettings": "設定を閉じる"
+    },
+    "settings": {
+      "title": "設定",
+      "categories": "設定カテゴリ",
+      "play": "プレイ",
+      "playHint": "ゲーム体験",
+      "controls": "操作",
+      "controlsHint": "キーと移動",
+      "audio": "オーディオ",
+      "audioHint": "音楽と効果音",
+      "language": "言語",
+      "languageHint": "表示言語",
+      "makeItYours": "自分好みに設定",
+      "yourControls": "操作設定",
+      "setTheMood": "雰囲気を設定",
+      "chooseLanguage": "言語を選択",
+      "touchControls": "タッチ操作",
+      "joysticksQuestion": "ジョイスティックを表示するタイミング",
+      "touchControlsVisibility": "タッチ操作の表示",
+      "auto": "自動",
+      "always": "常に表示",
+      "never": "表示しない",
+      "touchAutoHint": "対応デバイスではタッチ操作を自動的に表示します。",
+      "touchAlwaysHint": "ゲーム中は常にタッチ操作を表示します。",
+      "touchNeverHint": "タッチ操作を隠し、キーボードとマウスを使います。",
+      "hudDensity": "HUDの密度",
+      "battlefieldView": "戦場の表示を選択します。",
+      "standard": "標準",
+      "compact": "コンパクト",
+      "fullscreen": "全画面表示",
+      "fullscreenDescription": "ゲームの起動時の表示方法を選択します。",
+      "fullscreenOn": "全画面表示",
+      "fullscreenOnHint": "画面に集中",
+      "fullscreenOff": "ウィンドウ表示",
+      "fullscreenOffHint": "ブラウザーの操作部を表示",
+      "pauseGame": "ゲームを一時停止",
+      "keyBindings": "キー割り当て",
+      "pressKey": "キーを押してください",
+      "pressKeyEllipsis": "キーを押してください…",
+      "placeTurret": "タレットを設置",
+      "leftDoubleOrRightClick": "左ダブルクリックまたは右クリック",
+      "keyCannotAssign": "このキーはブラウザー上で割り当てられません。",
+      "actions": {
+        "moveUp": "上へ移動",
+        "moveDown": "下へ移動",
+        "moveLeft": "左へ移動",
+        "moveRight": "右へ移動",
+        "useBomb": "爆弾を使う"
+      },
+      "sectionPlay": "01 / プレイ",
+      "sectionControls": "02 / 操作",
+      "sectionAudio": "03 / オーディオ",
+      "sectionLanguage": "04 / 言語",
+      "loadFailed": "保存済みのゲーム設定を読み込めませんでした：{{error}}",
+      "loadFailedSimple": "不明なエラーが発生しました",
+      "saveFailed": "設定はこのセッションで変更されましたが、保存できませんでした：{{error}}",
+      "saveFailedSimple": "不明なエラーが発生しました",
+      "cancelBinding": "強調表示されたキーをもう一度クリックすると取り消せます。割り当て中にEscapeキーを押しても取り消せます。",
+      "audioUnavailable": "オーディオを利用できません：{{error}}",
+      "backgroundMusic": "BGM",
+      "lateNightRadio": "深夜ラジオ",
+      "volume": "音量",
+      "musicVolume": "音楽の音量",
+      "lofiTracks": "Lo-fiトラックを順番に再生します。",
+      "musicUnavailable": "音楽を利用できません — トラックが設定されていません。",
+      "soundEffects": "効果音",
+      "littleThings": "細かな音も大切に",
+      "effectsVolume": "効果音の音量",
+      "soundEffectFootnote": "アイテム取得、ダメージ、戦闘の効果音。"
+    },
+    "hud": {
+      "runStatus": "プレイ状況",
+      "wave": "ウェーブ",
+      "waveProgress": "ウェーブの進行状況",
+      "health": "体力",
+      "low": "低",
+      "playerHealth": "プレイヤーの体力",
+      "score": "スコア",
+      "eliminated": "撃破数",
+      "bombs": "爆弾",
+      "turrets": "タレット",
+      "customWavePower": "特殊ウェーブ効果：{{name}}",
+      "power": "パワー",
+      "activePlayerStats": "プレイヤーの現在のステータス",
+      "bossApproaching": "ボス接近中",
+      "bossIntroduction": "ボス登場",
+      "bossStatus": "ボスの状態",
+      "boss": "ボス",
+      "shielded": "シールド中",
+      "bossHealth": "{{name}}の体力"
+    },
+    "touch": {
+      "controls": "タッチ操作",
+      "movement": "移動用ジョイスティック。動きたい方向へドラッグします。フォーカス中はWASDキーや矢印キーも使えます。",
+      "aim": "照準用ジョイスティック。狙いたい方向へドラッグします。指を離しても最後の照準方向を維持します。",
+      "useBomb": "爆弾を使う（残り{{count}}個）"
+    },
+    "pause": {
+      "title": "ゲーム一時停止中",
+      "actions": "ゲーム操作",
+      "quickAccess": "クイックアクセス",
+      "resumeRun": "ゲームを再開",
+      "jumpBack": "戦闘に戻る",
+      "settings": "設定",
+      "fieldGuide": "フィールドガイド",
+      "restartRun": "最初からやり直す",
+      "exitTutorial": "チュートリアルを終了",
+      "mainMenu": "メインメニュー",
+      "runStats": "今回のプレイ統計",
+      "currentRun": "今回のプレイ",
+      "nightContinues": "夜はまだ続く",
+      "totalScore": "合計スコア",
+      "pointsEarned": "獲得ポイント",
+      "playerVitals": "プレイヤーの状態",
+      "criticalCondition": "危険な状態 — 気を抜くな",
+      "battered": "傷だらけだが、まだ戦える",
+      "lookingGood": "いい調子だ",
+      "survivalTime": "生存時間",
+      "survivorDevelopment": "生存者の強化",
+      "pauseDetails": "ポーズメニューの詳細",
+      "coreAttributes": "基本能力",
+      "fineTuneBuild": "生存者の能力構成を調整します。",
+      "unlimitedStatsDev": "開発モードではステータスポイント無制限",
+      "unusedStatPoints": "未使用のステータスポイント：{{count}}",
+      "rareAbilities": "レア能力",
+      "rarePerks": "長い夜を乗り切る強力な能力。",
+      "unlimitedRareDev": "開発モードではレア能力ポイント無制限",
+      "unusedRarePoints": "未使用のレア能力ポイント：{{count}}",
+      "spendStatPoints": "ステータスポイントを使う",
+      "rareUpgrades": "レア強化",
+      "allocated": "+{{count}}割り当て済み",
+      "next": "次：{{effect}}",
+      "freeDev": "開発モードでは無料",
+      "statPointsCost": "{{count}} SP",
+      "decrease": "{{name}}を下げる",
+      "increase": "{{name}}を上げる",
+      "rarityCommon": "コモン",
+      "rarityRare": "レア",
+      "rarityEpic": "エピック",
+      "level": "レベル {{level}}/{{max}}",
+      "unlimitedDev": "開発モードでは無制限",
+      "maxLevel": "最大レベル",
+      "rarePointsCost": "{{count}} RP",
+      "locked": "ロック中：{{reason}}",
+      "maximumLevelReached": "✦ 最大レベル到達",
+      "refund": "{{name}}を払い戻す",
+      "purchase": "{{name}}を購入",
+      "runUnavailable": "プレイデータを利用できません",
+      "nextChapter": "次の章が待っている。",
+      "resumeWhenReady": "戻る準備ができたら再開してください。",
+      "resume": "再開",
+      "backToGame": "ゲームに戻る",
+      "guides": "ガイド"
+    },
+    "effects": {
+      "active": "有効な効果",
+      "damage": "ダメージ",
+      "rapidFire": "連射",
+      "shield": "シールド",
+      "magnet": "オーブ磁石",
+      "cursed": "呪いの力",
+      "remaining": "{{name}}：残り{{count}}秒"
+    },
+    "tutorial": {
+      "ariaLabel": "インタラクティブゲームチュートリアル",
+      "step": "{{total}}段階中{{current}}段階目",
+      "exerciseComplete": "練習完了。",
+      "collectOrbOrSkip": "オーブを拾うか、この練習をスキップしてください。",
+      "moveOrSkip": "生存者を動かすか、この練習をスキップしてください。",
+      "aimOrSkip": "照準の向きを変えるか、この練習をスキップしてください。",
+      "confirmExit": "チュートリアルを終了しますか？",
+      "exitPrompt": "チュートリアルを終了しますか？練習プレイは破棄されます。",
+      "keepPlaying": "プレイを続ける",
+      "exit": "チュートリアルを終了",
+      "previous": "戻る",
+      "returnToMenu": "メインメニューに戻る",
+      "continue": "続ける",
+      "skipExercise": "練習をスキップ",
+      "steps": {
+        "intro": {
+          "title": "アリーナへようこそ",
+          "description": "できるだけ多くのウェーブを生き延びましょう。生存者を守り、敵を倒し、隙を見て位置を変えましょう。"
+        },
+        "player": {
+          "title": "あなたの生存者",
+          "description": "光るキャラクターがあなたです。体力はステータスバーに表示されます。ゾンビに触れないようにしましょう。"
+        },
+        "movement": {
+          "title": "移動する",
+          "description": "設定した移動キーを使うか、タッチ画面では左のジョイスティックをドラッグします。キーは設定から変更できます。少し移動してみましょう。"
+        },
+        "aim": {
+          "title": "狙って撃つ",
+          "description": "マウスを動かすか、右のジョイスティックをドラッグして照準を変えます。武器はその方向へ自動で撃ちます。別の方向を狙ってみましょう。"
+        },
+        "hud": {
+          "title": "HUDの見方",
+          "description": "HUDにはウェーブ、体力、撃破数、スコア、敵、爆弾とタレットの所持数が表示されます。爆弾キーか画面の爆弾ボタンで爆弾を使います。空いている場所を右クリックまたはダブルタップするとタレットを設置できます。一時効果はHUDの下に表示されます。"
+        },
+        "enemies": {
+          "title": "敵を知る",
+          "description": "ウォーカーは遅い反面、頑丈です。ランナーは小さく速いものの、体力は低めです。動き続け、危険から離れるように狙いましょう。"
+        },
+        "obstacles": {
+          "title": "アリーナを活用する",
+          "description": "木箱やバリケードは移動を妨げ、弾を遮ることがあります。回り込んで射線を確保しましょう。"
+        },
+        "powerups": {
+          "title": "パワーアップオーブ",
+          "description": "体力は最大25回復、ダメージは10秒間2倍、連射は8秒間2倍、シールドは12秒間で60ダメージを吸収します。爆弾は最大5個まで所持でき、キーまたは画面ボタンで使うと、障害物のない近くのゾンビに100ダメージを与えます。タレットも最大5基まで所持でき、空き場所を右クリックまたはダブルタップすると12秒間設置できます。"
+        },
+        "collectOrb": {
+          "title": "オーブを拾う",
+          "description": "オーブの上を通ると拾えます。ゾンビを2体倒すごとにオーブが出現します。光るオーブを追って拾い、効果を確かめましょう。爆弾はキーか画面ボタンを押すまで保管されます。"
+        },
+        "waves": {
+          "title": "ウェーブをクリアする",
+          "description": "敵はウェーブごとに現れます。すべてのゾンビを倒すとクリアとなり、スコアボーナスを獲得できます。"
+        },
+        "statPoints": {
+          "title": "ステータスポイントを使う",
+          "description": "ウェーブをクリアするたびにステータスポイントを1獲得します。ポーズメニューで武器ダメージ、連射速度、最大体力、移動速度を強化できます。マイナスを押すと割り当てたポイントを戻せます。"
+        },
+        "pause": {
+          "title": "一時停止して確認する",
+          "description": "ポーズメニューではプレイ統計と有効な効果を確認できます。Escapeキーかポーズボタンで一時停止し、再開、設定変更、やり直し、メニューに戻る操作ができます。"
+        },
+        "completion": {
+          "title": "準備完了",
+          "description": "WASDキーまたは矢印キーで移動し、マウスで狙い、ウェーブを生き延びながらオーブを集めましょう。メインメニューに戻ると、新しい通常プレイを始められます。"
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "歴代のサバイバル記録です。クリアしたウェーブ数、スコア、撃破数、時間の順に順位が決まります。",
+      "loading": "ランキングを読み込み中…",
+      "loadFailed": "ランキングを読み込めません。",
+      "retrying": "再試行中…",
+      "retry": "再試行",
+      "empty": "まだ記録はありません。最初のスコアを登録しましょう。",
+      "player": "プレイヤー",
+      "cleared": "クリア",
+      "score": "スコア",
+      "kills": "撃破数",
+      "time": "時間",
+      "reached": "{{wave}}到達",
+      "title": "ランキング",
+      "entries": "{{count}}件",
+      "range": "{{total}}件中{{start}}～{{end}}件",
+      "previous": "前へ",
+      "next": "次へ"
+    },
+    "submission": {
+      "title": "プレイ記録を送信",
+      "name": "ランキング表示名",
+      "enterName": "スコアを送信する名前を入力してください。",
+      "submitting": "送信中…",
+      "retry": "送信を再試行",
+      "submitted": "スコアを送信しました",
+      "submit": "スコアを送信",
+      "success": "スコアを送信しました。歴代ランキングに掲載される対象になりました。",
+      "failed": "スコアを送信できませんでした。接続を確認して再試行してください。"
+    },
+    "results": {
+      "practice": "練習プレイ",
+      "tutorialOver": "チュートリアル終了",
+      "practiceNotSubmitted": "練習プレイは別扱いのため、ランキングには送信されません。",
+      "restartTutorial": "チュートリアルをやり直す",
+      "stageCompleted": "ステージ{{level}}クリア",
+      "personalLevelScore": "個人レベルスコア",
+      "levelScore": "レベルスコア",
+      "bossDefeated": "ボス撃破",
+      "bossFallen": "またひとつ、大きな脅威を倒した。",
+      "stageStatistics": "ステージ統計",
+      "enemiesEliminated": "敵の撃破数",
+      "completionTime": "クリア時間",
+      "damageDealt": "与えたダメージ",
+      "campaignComplete": "キャンペーン完了",
+      "campaignCompleteDescription": "全30ステージをクリアしました。今後のアップデートで新しいレベルが追加されるかもしれません。",
+      "thankYou": "夜を生き延びてくれてありがとう",
+      "journeyContinues": "旅は続く",
+      "nextLevel": "次のレベル",
+      "levelSelection": "レベル選択",
+      "mainMenu": "メインメニュー",
+      "notThisTime": "今回は<span>ここまで。</span>",
+      "campaignStage": "キャンペーンステージ",
+      "currentStage": "現在のステージ",
+      "campaignStageName": "キャンペーンステージ",
+      "progressSafe": "進行状況は保存されています。",
+      "progressSafeDescription": "解除済みステージと過去の記録は残っています。獲得したものは失われていません。",
+      "nextRun": "次の挑戦は、あなたの手で",
+      "retryLevel": "レベルを再挑戦",
+      "finalScore": "最終スコア",
+      "campaignRunsSeparate": "キャンペーンの記録は通常のサバイバル記録とは別に保存されます。",
+      "campaignRun": "キャンペーンプレイ",
+      "notThisTimeLead": "今回は",
+      "notThisTimeEmphasis": "ここまで。",
+      "stageNumber": "ステージ{{level}}",
+      "replayLevel": "レベルを再プレイ",
+      "next": "次へ",
+      "waveReached": "到達ウェーブ",
+      "wavesCleared": "クリアしたウェーブ",
+      "zombiesEliminated": "ゾンビ撃破数",
+      "timeSurvived": "生存時間",
+      "playAgain": "もう一度プレイ"
+    },
+    "guides": {
+      "closeDetails": "ガイドの詳細を閉じる",
+      "close": "閉じる",
+      "heroDescription": "待ち受ける脅威を知り、敵と資源を把握して、次のプレイに備えましょう。",
+      "progress": "敵とボス{{total}}件中{{discovered}}件を確認済み",
+      "threatCompletion": "脅威情報の確認状況",
+      "identified": "{{total}}件中{{count}}件を確認済み",
+      "threatIntel": "脅威情報",
+      "enemyCatalogue": "敵の一覧",
+      "enemies": "敵",
+      "enemyDescription": "戦場で遭遇する感染者たち。",
+      "bossDossier": "高脅威対象ファイル",
+      "bosses": "ボス",
+      "bossDescription": "強力な変異体です。見つかる前に攻撃パターンを把握しましょう。",
+      "arenaEnvironments": "作戦環境",
+      "arenas": "アリーナ",
+      "arenaDescription": "サバイバルのウェーブでは5つの環境が交替し、それぞれ異なる障害物が配置されています。",
+      "viewDetails": "{{name}}の詳細を見る",
+      "viewUnknownEnemy": "未確認の敵の詳細を見る",
+      "viewUnknownBoss": "未確認のボスの詳細を見る",
+      "unknownEnemy": "未確認の敵",
+      "unknownBoss": "未確認のボス",
+      "unknown": "未確認",
+      "threatIdentified": "脅威を確認",
+      "unknownContact": "正体不明の敵影",
+      "bossDossierTag": "ボス情報",
+      "classifiedDossier": "機密ファイル",
+      "classified": "脅威の詳細は機密扱いです。",
+      "identifiedCount": "{{total}}件中{{count}}件確認済み",
+      "arenaRenderables": "{{name}}のオブジェクト",
+      "viewArenaObjects": "{{name}}のオブジェクトを見る",
+      "layout": "{{name}}の配置",
+      "zone": "ゾーン{{number}}",
+      "waves": "ウェーブ{{start}}～{{end}}",
+      "arenaObjects": "この環境に出現するオブジェクトです。状態や配置はプレイごとに異なります。",
+      "classifiedIntel": "脅威を確認するまで情報は表示されません。",
+      "eliteTipTitle": "サバイバルのヒント",
+      "eliteTip": "エリート個体に注意。通常の敵より危険です。"
+    },
+    "orbs": {
+      "supplies": "補給品とパワーアップ",
+      "title": "オーブ",
+      "description": "戦況を変えるのに役立つアイテムです。",
+      "viewDetails": "{{name}}の詳細を見る",
+      "rare": "レア",
+      "healthName": "体力オーブ",
+      "healthDescription": "体力を回復します。",
+      "healthDetails": "体力を最大値まで、最大25回復します。",
+      "damageName": "ダメージオーブ",
+      "damageDescription": "弾のダメージを上げます。",
+      "damageDetails": "一定時間、弾のダメージが2倍になります。",
+      "rapidFireName": "連射オーブ",
+      "rapidFireDescription": "連射速度を上げます。",
+      "rapidFireDetails": "一定時間、連射速度が2倍になります。",
+      "shieldName": "シールドオーブ",
+      "shieldDescription": "受けるダメージを吸収します。",
+      "shieldDetails": "一定時間、受けるダメージを吸収するシールドを追加します。",
+      "bombName": "爆弾オーブ",
+      "bombDescription": "爆弾を所持品に追加します。",
+      "bombDetails": "爆弾が爆発すると、近くの敵にダメージを与えます。",
+      "magnetName": "磁石オーブ",
+      "magnetDescription": "近くのオーブを引き寄せます。",
+      "magnetDetails": "一定時間、近くのオーブを引き寄せます。",
+      "turretName": "タレットオーブ",
+      "turretDescription": "自動タレットを設置します。",
+      "turretDetails": "設置したタレットは近くの敵を狙い、一定時間攻撃します。",
+      "cursedName": "呪いのオーブ",
+      "cursedDescription": "敵の移動速度を上げます。",
+      "cursedDetails": "一定時間、敵の移動速度を上げます。",
+      "rareGoldName": "レアゴールドオーブ",
+      "rareGoldDescription": "レアポイントを1獲得します。",
+      "rareGoldDetails": "レアポイントを1獲得します。"
+    },
+    "notifications": {
+      "discovered": "{{name}}を発見",
+      "firstEncounter": "初遭遇を記録しました。警戒を続けてください。",
+      "campaignLocked": "このキャンペーンレベルはロック中か、利用できません。",
+      "renderInitFailed": "ゲームの描画を初期化できませんでした。",
+      "fullscreenExitFailed": "全画面表示を終了できませんでした。",
+      "campaignProgressSaveFailed": "キャンペーンの進行状況を保存できませんでした：{{error}}",
+      "campaignProgressSaveFailedSimple": "キャンペーンの進行状況を保存できませんでした。",
+      "campaignPointsSaveFailed": "キャンペーンのステータスポイントを保存できませんでした：{{error}}",
+      "campaignPointsSaveFailedSimple": "キャンペーンのステータスポイントを保存できませんでした。"
+    },
+    "canvas": {
+      "ariaLabel": "565 Zombie Survival。設定した移動キーまたはタッチ操作で移動します。マウスか照準ジョイスティックで狙います。武器は選択方向へ自動で発射します。爆弾を拾い、設定した爆弾キーまたは画面ボタンを押して使います。タレットは最大5基まで所持でき、アリーナの空き場所を右クリックまたはダブルタップすると設置できます。",
+      "notSupported": "このブラウザーはCanvas描画に対応していません。"
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "しきい値を更新できませんでした。",
+      "unavailable": "パフォーマンス診断を利用できません。",
+      "exportFailed": "診断データをエクスポートできませんでした。"
+    },
+    "arenaLayouts": {
+      "military-open-centre": "中央広場",
+      "military-corridor-network": "回廊網",
+      "military-scattered-cover": "点在する遮蔽物",
+      "military-central-structure": "中央構造物",
+      "industrial-open-centre": "中央広場",
+      "industrial-cluster-split": "工業区画",
+      "industrial-corridor": "回廊網",
+      "industrial-rust-scrap": "錆びた鉄くず",
+      "contaminated-open-lab": "開放研究所",
+      "contaminated-split-lab": "分割研究所",
+      "contaminated-scattered-tanks": "点在するタンク",
+      "contaminated-central-structure": "中央封鎖区画",
+      "urban-open-road": "開けた道路",
+      "urban-rubble-lane": "瓦礫の路地",
+      "urban-ruined-block": "崩壊した街区",
+      "urban-roadblock-loop": "道路封鎖ループ",
+      "bunker-open-bay": "開放区画",
+      "bunker-split-hall": "分割ホール",
+      "bunker-core-structure": "中枢構造物",
+      "bunker-perimeter-defence": "外周防衛線"
+    },
+    "announcements": {
+      "bossEntered": "{{name}}が出現",
+      "bossDefeated": "{{name}}を撃破",
+      "level": "レベル{{level}}",
+      "bossLevel": "レベル{{level}} · ボス",
+      "wave": "ウェーブ{{wave}}",
+      "levelComplete": "レベルクリア",
+      "runOver": "ゲームオーバー"
+    },
+    "music": {
+      "toggle": "音楽を{{action}}",
+      "pause": "一時停止",
+      "play": "再生"
+    },
+    "pauseButton": {
+      "ariaLabel": "ゲームを一時停止。EscapeまたはPキーを押してください。",
+      "title": "一時停止 (Esc)",
+      "label": "一時停止 (Esc)"
+    },
+    "bosses": {
+      "charger": "チャージャー",
+      "acidQueen": "アシッドクイーン",
+      "hordeCaller": "ホードコーラー",
+      "chargerSummary": "高速突進を得意とする巨大な変異体。",
+      "chargerDescription": "勢いをつけてアリーナを突進する巨大な変異体。",
+      "chargerAbility": "突進方向を予告します。障害物にぶつかると短時間ひるみます。",
+      "acidQueenSummary": "遠距離攻撃で空間を支配する有毒な変異体。",
+      "acidQueenDescription": "遠距離から酸を放ち、アリーナを支配する有毒な変異体。",
+      "acidQueenAbility": "酸を広範囲に放ち、予告後に一時的な酸溜まりを作ります。",
+      "hordeCallerSummary": "援軍に守られた召喚者。",
+      "hordeCallerDescription": "援軍が残っている間、シールドで守られます。",
+      "hordeCallerAbility": "ゾンビを援軍として召喚します。倒すとシールドが消え、無防備になります。"
+    },
+    "enemies": {
+      "walker": {
+        "name": "ウォーカー",
+        "summary": "着実に迫る近距離型の敵。",
+        "description": "ゆっくりと近づき、近距離から攻撃します。",
+        "ability": "特殊攻撃はありません。群れに囲まれないよう動き続けましょう。"
+      },
+      "runner": {
+        "name": "ランナー",
+        "summary": "素早いが耐久力の低い敵。",
+        "description": "耐久力は低いものの素早く、油断した生存者にすぐ追いつきます。",
+        "ability": "通常速度で6秒移動すると、2秒間、基本速度の2倍で突進します。突進前の目立った予告はありません。"
+      },
+      "brute": {
+        "name": "ブルート",
+        "summary": "体力と近接ダメージが高い大型ゾンビ。",
+        "description": "動きは遅いものの体力が高く、強力な近接攻撃を行います。",
+        "ability": "接触時のダメージが大きいため、近づけないようにしましょう。"
+      },
+      "spitter": {
+        "name": "スピッター",
+        "summary": "酸を放つ遠距離型の敵。",
+        "description": "距離を保ちながら攻撃する遠距離型の敵です。",
+        "ability": "射程内に入ると、速い酸の弾を撃ちます。"
+      },
+      "swarm": {
+        "name": "スウォーム",
+        "summary": "小型で素早い敵の群れ。",
+        "description": "小さく素早いゾンビで、敵が多いアリーナでは見落としやすくなります。",
+        "ability": "ランナーより速く移動し、3秒のクールダウンで通常の2倍の速さで弾を回避します。回避後は速度が半分になり、2秒かけて通常に戻ります。"
+      },
+      "armoured": {
+        "name": "アーマード",
+        "summary": "正面からのダメージを軽減する頑丈なゾンビ。",
+        "description": "こちらを向いている間、受けるダメージを軽減します。",
+        "ability": "正面を向いている間は接触ダメージが低下します。正面から近づくのは避けましょう。"
+      },
+      "screamer": {
+        "name": "スクリーマー",
+        "summary": "援軍を呼び寄せる召喚者。",
+        "description": "しつこく追跡し、アリーナが混雑すると特に危険です。",
+        "ability": "ウォーカーを1体ずつ呼びます。ホードコーラーはその2倍を召喚します。"
+      },
+      "bloater": {
+        "name": "ブローター",
+        "summary": "倒されると酸の危険地帯を残す頑丈なゾンビ。",
+        "description": "動きは遅く頑丈で、倒されると危険な置き土産を残します。",
+        "ability": "倒されると破裂し、ダメージを与える酸溜まりを作ります。"
+      },
+      "splitter": {
+        "name": "スプリッター",
+        "summary": "小型の敵に分裂するゾンビ。",
+        "description": "1体の脅威を複数に増やす厄介な敵です。",
+        "ability": "倒されると、4体の小型スウォームゾンビに分裂します。"
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": {
+        "name": "オーブ倍増",
+        "description": "オーブの出現率が2倍になります。"
+      },
+      "fastWave": {
+        "name": "高速ウェーブ",
+        "description": "敵の移動速度が20%上昇します。"
+      },
+      "armouredInvasion": {
+        "name": "アーマード襲来",
+        "description": "アーマードの出現率が上がります。"
+      },
+      "eliteThreat": {
+        "name": "エリートの脅威",
+        "description": "エリートの出現率が上がります。"
+      },
+      "contamination": {
+        "name": "汚染",
+        "description": "ブローターとその危険地帯がさらに危険になります。"
+      },
+      "reducedVisibility": {
+        "name": "視界不良",
+        "description": "暗闇によって視界が狭まります。"
+      },
+      "overrun": {
+        "name": "敵の猛攻",
+        "description": "敵がより速い間隔で出現します。"
+      },
+      "heavyResistance": {
+        "name": "重装の抵抗",
+        "description": "ブルートの出現率が上がります。"
+      }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": {
+          "name": "武器ダメージ",
+          "description": "弾1発ごとのダメージを増やします。",
+          "effect": "基本ダメージ +10%",
+          "unit": "ダメージ/発"
+        },
+        "shotsPerSecond": {
+          "name": "連射速度",
+          "description": "手動照準を維持したまま、より頻繁に発射します。",
+          "effect": "基本連射速度 +8%",
+          "unit": "発/秒"
+        },
+        "maxHealth": {
+          "name": "最大体力",
+          "description": "最大体力を増やします。",
+          "effect": "最大体力 +10",
+          "unit": "体力"
+        },
+        "movementSpeed": {
+          "name": "移動速度",
+          "description": "素早く移動して攻撃を避け、位置を変えます。",
+          "effect": "基本移動速度 +3%",
+          "unit": "ユニット/秒"
+        }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "ライフスティール",
+          "description": "武器で与えたダメージの一部を回復します。",
+          "unlock": "プレイ開始時から使用可能。",
+          "effects": [
+            "対象ダメージの1%を回復",
+            "対象ダメージの2%を回復",
+            "対象ダメージの3%を回復",
+            "対象ダメージの4%を回復",
+            "対象ダメージの5%を回復"
+          ]
+        },
+        "criticalMastery": {
+          "name": "クリティカル強化",
+          "description": "武器攻撃がクリティカルダメージを与える確率を上げます。",
+          "unlock": "プレイ開始時から使用可能。",
+          "effects": [
+            "クリティカル率 +3%",
+            "クリティカル率 +6%",
+            "クリティカル率 +9%",
+            "クリティカル率 +12%",
+            "クリティカル率 +15%"
+          ]
+        },
+        "explosiveRounds": {
+          "name": "炸裂弾",
+          "description": "弾が着弾時に爆発し、範囲ダメージを与えます。",
+          "unlock": "プレイ開始時から使用可能。",
+          "effects": [
+            "着弾時に3%の確率で爆発",
+            "着弾時に6%の確率で爆発",
+            "着弾時に9%の確率で爆発",
+            "着弾時に12%の確率で爆発",
+            "着弾時に15%の確率で爆発"
+          ]
+        },
+        "emergencyShield": {
+          "name": "緊急シールド",
+          "description": "ダメージを受けると防御シールドを作ります。",
+          "unlock": "プレイ開始時から使用可能。",
+          "effects": [
+            "1秒間シールドを展開",
+            "1.5秒間シールドを展開",
+            "2秒間シールドを展開",
+            "2.5秒間シールドを展開",
+            "3秒間シールドを展開"
+          ]
+        },
+        "orbMagnetism": {
+          "name": "オーブ磁力",
+          "description": "近くのオーブをプレイヤーに引き寄せます。",
+          "unlock": "プレイ開始時から使用可能。",
+          "effects": [
+            "取得範囲 60ユニット",
+            "取得範囲 90ユニット",
+            "取得範囲 120ユニット",
+            "取得範囲 150ユニット",
+            "取得範囲 180ユニット"
+          ]
+        },
+        "piercingRounds": {
+          "name": "貫通弾",
+          "description": "弾が標的を貫通し、さらに敵に命中します。",
+          "unlock": "プレイ中に解除。",
+          "effects": [
+            "追加で1体を貫通",
+            "追加で2体を貫通",
+            "追加で3体を貫通",
+            "追加で4体を貫通",
+            "追加で5体を貫通"
+          ]
+        },
+        "secondWind": {
+          "name": "起死回生",
+          "description": "体力が危険域を下回ると、1回だけ回復します。",
+          "unlock": "プレイ中に解除。",
+          "effects": [
+            "体力を10%回復",
+            "体力を15%回復",
+            "体力を20%回復"
+          ]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "ステージ{{level}} — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "軍事拠点",
+        "description": "月明かりに照らされた拠点。補給用の木箱、砂袋の遮蔽物、破壊可能なバリケードがあります。"
+      },
+      "industrial": {
+        "name": "工業施設",
+        "description": "コンクリート構造物と強化障壁が点在する、広大な工業フロアです。"
+      },
+      "contaminated": {
+        "name": "汚染区域",
+        "description": "遮蔽物が点在し、開けた危険な通路がある、荒廃した緑の区域です。"
+      },
+      "urban": {
+        "name": "廃墟の街",
+        "description": "崩れた壁や遮蔽物が戦場を形作る、廃墟の街のアリーナです。"
+      },
+      "bunker": {
+        "name": "地下バンカー",
+        "description": "コンクリートの防壁と狭い通路が続く、冷たい地下施設です。"
+      }
+    },
+    "arenaObjects": {
+      "crate": {
+        "name": "木箱",
+        "description": "積み重ねた補給箱が遮蔽物となり、視線を遮ります。"
+      },
+      "barricade": {
+        "name": "バリケード",
+        "description": "敵の動きを誘導し、突進を防ぐ低い障壁です。"
+      },
+      "wall": {
+        "name": "壁",
+        "description": "視界を遮り、狭い通路を作る頑丈なコンクリートパネルです。"
+      },
+      "cover": {
+        "name": "遮蔽物",
+        "description": "短時間身を守れる場所を作る防護パーツです。"
+      },
+      "barrel": {
+        "name": "ドラム缶",
+        "description": "起爆すると敵の集団を一掃できる爆発性のドラム缶です。"
+      },
+      "oil-barrel": {
+        "name": "オイル缶",
+        "description": "破裂すると危険な炎を噴き出す、頑丈な鋼鉄製のドラム缶です。"
+      },
+      "gas-cylinder": {
+        "name": "ガスボンベ",
+        "description": "高圧ガスが危険な高速の噴出を引き起こします。"
+      },
+      "electric-generator": {
+        "name": "発電機",
+        "description": "充電後に危険な電場を放つ、反応型の電源装置です。"
+      },
+      "moving-wall": {
+        "name": "可動壁",
+        "description": "移動して進路変更を迫る、工業用の追跡パネルです。"
+      },
+      "steam-pipe": {
+        "name": "蒸気管",
+        "description": "予告の後、断続的に高温の蒸気を噴き出す排気管です。"
+      },
+      "industrial-crate": {
+        "name": "工業用コンテナ",
+        "description": "頑丈な金属板で補強された保管容器で、戦利品が入っています。"
+      }
+    }
+  },
   "ui": {
     "dialogClose": "閉じる",
     "sheetClose": "閉じる",

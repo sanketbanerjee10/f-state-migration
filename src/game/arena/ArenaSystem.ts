@@ -100,7 +100,6 @@ export interface MilitaryFuelDrumEntity extends MilitaryOutpostObjectBase {
 export interface MilitaryRazorWireEntity extends MilitaryOutpostObjectBase {
   readonly kind: 'razor-wire';
   active: boolean;
-  remainingSeconds: number;
 }
 
 export interface MilitaryTurretEntity extends MilitaryOutpostObjectBase {
@@ -618,52 +617,137 @@ export function getArenaCollisionObstacles(
 export function createMilitaryOutpostObjects(
   theme: ArenaThemeId,
   arenaInstanceId = 'military',
+  layout?: ArenaLayoutDefinition,
 ): MilitaryOutpostEntity[] {
   if (theme !== 'military') return [];
-  const placements = [
-    {
-      kind: 'sandbag-barricade',
-      xFraction: 0.18,
-      yFraction: 0.5,
-      width: MILITARY_OBJECT_CONFIG.sandbag.width,
-      height: MILITARY_OBJECT_CONFIG.sandbag.height,
-    },
-    {
-      kind: 'military-ammo-crate',
-      xFraction: 0.9,
-      yFraction: 0.5,
-      width: MILITARY_OBJECT_CONFIG.ammoCrate.width,
-      height: MILITARY_OBJECT_CONFIG.ammoCrate.height,
-    },
-    {
-      kind: 'fuel-drum',
-      xFraction: 0.5,
-      yFraction: 0.1,
-      width: MILITARY_OBJECT_CONFIG.fuelDrum.width,
-      height: MILITARY_OBJECT_CONFIG.fuelDrum.height,
-    },
-    {
-      kind: 'razor-wire',
-      xFraction: 0.5,
-      yFraction: 0.9,
-      width: MILITARY_OBJECT_CONFIG.razorWire.width,
-      height: MILITARY_OBJECT_CONFIG.razorWire.height,
-    },
-    {
-      kind: 'abandoned-turret',
-      xFraction: 0.1,
-      yFraction: 0.83,
-      width: MILITARY_OBJECT_CONFIG.abandonedTurret.width,
-      height: MILITARY_OBJECT_CONFIG.abandonedTurret.height,
-    },
-    {
-      kind: 'military-supply-crate',
-      xFraction: 0.9,
-      yFraction: 0.83,
-      width: MILITARY_OBJECT_CONFIG.supplyCrate.width,
-      height: MILITARY_OBJECT_CONFIG.supplyCrate.height,
-    },
-  ] as const;
+  const referenceWidth = 960;
+  const referenceHeight = 540;
+  const random = createArenaRandom(`${arenaInstanceId}-${Math.random()}`);
+  const occupied: ArenaObstacle[] = [];
+  const candidatePoints = Array.from({ length: 43 }, (_, index) =>
+    0.08 + index * 0.02,
+  )
+    .flatMap((xFraction) =>
+      Array.from({ length: 33 }, (_, index) => 0.1 + index * 0.025)
+        .map((yFraction) => ({ xFraction, yFraction })),
+    );
+  const choosePosition = (width: number, height: number) => {
+    const candidates = [...candidatePoints];
+    for (let index = candidates.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(random() * (index + 1));
+      [candidates[index], candidates[swapIndex]] =
+        [candidates[swapIndex]!, candidates[index]!];
+    }
+
+    const isAvailable = (
+      { xFraction, yFraction }: { readonly xFraction: number; readonly yFraction: number },
+      checkLayout: boolean,
+    ): boolean => {
+      if (Math.abs(xFraction - 0.5) < 0.2 && Math.abs(yFraction - 0.5) < 0.2) {
+        return false;
+      }
+      if (xFraction * 320 < width / 2 ||
+          xFraction * 320 > 320 - width / 2 ||
+          yFraction * 320 < height / 2 ||
+          yFraction * 320 > 320 - height / 2) {
+        return false;
+      }
+      const overlaps = (other: ArenaObstacle): boolean =>
+        Math.abs(xFraction - other.xFraction) * referenceWidth <
+          (width + other.width) / 2 &&
+        Math.abs(yFraction - other.yFraction) * referenceHeight <
+          (height + other.height) / 2;
+      if (checkLayout && layout?.obstacles.some(overlaps)) return false;
+      if (layout?.barrels.some((barrel) => overlaps({
+        ...barrel,
+        width: MILITARY_OBJECT_CONFIG.razorWire.width / 2,
+        height: MILITARY_OBJECT_CONFIG.razorWire.width / 2,
+        kind: 'barrel',
+      }))) return false;
+      return !occupied.some(overlaps);
+    };
+    const position = candidates.find((candidate) => isAvailable(candidate, true));
+
+    if (!position) {
+      throw new Error(`Unable to place military outpost object in arena "${arenaInstanceId}".`);
+    }
+    return position;
+  };
+  const addPlacement = (
+    placements: MilitaryPlacement[],
+    kind: MilitaryPlacement['kind'],
+    width: number,
+    height: number,
+  ) => {
+    const position = choosePosition(width, height);
+    const placement = { ...position, kind, width, height, rotation: 0 };
+    placements.push(placement);
+    const turretWireClearance = kind === 'abandoned-turret'
+      ? MILITARY_OBJECT_CONFIG.abandonedTurret.wireOffset * 2
+      : 0;
+    occupied.push({
+      ...placement,
+      width: width + turretWireClearance,
+      height: height + turretWireClearance,
+      kind: 'wall',
+    });
+    return position;
+  };
+  const placements: MilitaryPlacement[] = [];
+  addPlacement(placements, 'sandbag-barricade',
+    MILITARY_OBJECT_CONFIG.sandbag.width, MILITARY_OBJECT_CONFIG.sandbag.height);
+  addPlacement(placements, 'military-ammo-crate',
+    MILITARY_OBJECT_CONFIG.ammoCrate.width, MILITARY_OBJECT_CONFIG.ammoCrate.height);
+  addPlacement(placements, 'fuel-drum',
+    MILITARY_OBJECT_CONFIG.fuelDrum.width, MILITARY_OBJECT_CONFIG.fuelDrum.height);
+  addPlacement(placements, 'military-supply-crate',
+    MILITARY_OBJECT_CONFIG.supplyCrate.width, MILITARY_OBJECT_CONFIG.supplyCrate.height);
+
+  for (let index = 0; index < 2; index += 1) {
+    addPlacement(placements, 'abandoned-turret',
+      MILITARY_OBJECT_CONFIG.abandonedTurret.width,
+      MILITARY_OBJECT_CONFIG.abandonedTurret.height);
+  }
+
+  const verticalGroups = Array.from({ length: 3 }, () => random() < 0.5);
+  if (verticalGroups.every(Boolean)) verticalGroups[0] = false;
+  if (verticalGroups.every((vertical) => !vertical)) verticalGroups[0] = true;
+
+  for (let groupIndex = 0; groupIndex < 3; groupIndex += 1) {
+    const vertical = verticalGroups[groupIndex]!;
+    const rowCount = random() < 0.5 ? 2 : 1;
+    const rowWidths = Array.from({ length: rowCount }, () =>
+      Math.round(MILITARY_OBJECT_CONFIG.razorWire.width * (0.7 + random() * 0.65)),
+    );
+    const rowThickness = MILITARY_OBJECT_CONFIG.razorWire.height;
+    const groupWidth = Math.max(...rowWidths);
+    const groupHeight = rowCount * rowThickness + Math.max(0, rowCount - 1) * 4;
+    const position = choosePosition(groupWidth, groupHeight);
+    rowWidths.forEach((width, rowIndex) => {
+      const rowOffset = (rowIndex - (rowCount - 1) / 2) *
+        (rowThickness + 4);
+      const xFraction = position.xFraction +
+        (vertical ? rowOffset / referenceWidth : 0);
+      const yFraction = position.yFraction +
+        (vertical ? 0 : rowOffset / referenceHeight);
+      const placement = {
+        kind: 'razor-wire' as const,
+        xFraction,
+        yFraction,
+        width,
+        height: rowThickness,
+        rotation: vertical ? Math.PI / 2 : 0,
+      };
+      placements.push(placement);
+      occupied.push({
+        ...placement,
+        width: vertical ? rowThickness : width,
+        height: vertical ? width : rowThickness,
+        kind: 'wall',
+      });
+    });
+  }
+
   return placements.map((placement, index): MilitaryOutpostEntity => {
     const base = {
       id: `${arenaInstanceId}-${placement.kind}-${index + 1}`,
@@ -671,7 +755,7 @@ export function createMilitaryOutpostObjects(
       yFraction: placement.yFraction,
       width: placement.width,
       height: placement.height,
-      rotation: 0,
+      rotation: placement.rotation,
     };
     switch (placement.kind) {
       case 'sandbag-barricade':
@@ -710,7 +794,6 @@ export function createMilitaryOutpostObjects(
           ...base,
           kind: placement.kind,
           active: true,
-          remainingSeconds: MILITARY_OBJECT_CONFIG.razorWire.activeDurationSeconds,
         };
       case 'abandoned-turret':
         return {
@@ -736,4 +819,28 @@ export function createMilitaryOutpostObjects(
         };
     }
   });
+}
+
+interface MilitaryPlacement {
+  readonly kind: MilitaryOutpostEntity['kind'];
+  readonly xFraction: number;
+  readonly yFraction: number;
+  readonly width: number;
+  readonly height: number;
+  readonly rotation: number;
+}
+
+function createArenaRandom(seed: string): () => number {
+  let state = 2_166_136_261;
+  for (let index = 0; index < seed.length; index += 1) {
+    state = Math.imul(state ^ seed.charCodeAt(index), 16_777_619);
+  }
+
+  return () => {
+    state += 0x6D2B79F5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4_294_967_296;
+  };
 }

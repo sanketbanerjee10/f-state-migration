@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import type { ZombieType } from '@/game/core/GameState';
 import {
   BOSS_TYPES,
-  getBossName,
   type BossType,
 } from '@/game/bosses/BossSystem';
 import {
   BOSS_DISCOVERY_TYPES,
-  ENEMY_DISCOVERY_LABELS,
   ENEMY_DISCOVERY_TYPES,
-  ENEMY_GUIDE_DETAILS,
   getEnemyDiscoveryStorage,
   readDiscoveredBosses,
   readDiscoveredEnemies,
@@ -36,14 +34,6 @@ interface GameEnemyGuideProps {
   readonly backLabel: string;
 }
 
-const ARENA_GUIDE_DETAILS = [
-  'A moonlit outpost with supply crates, sandbag cover, and destructible barricades.',
-  'A heavy industrial floor broken up by concrete structures and reinforced barriers.',
-  'A weathered green zone with scattered cover and dangerous open lanes.',
-  'A ruined city arena where broken walls and cover shape the battlefield.',
-  'A cold underground complex of concrete defenses and tight corridors.',
-] as const;
-
 const ARENA_GUIDE_ENTRIES = ARENA_THEME_CYCLE.map((theme, index) => {
   const waveNumber = index * 10 + 1;
   const layout = createArenaLayoutForWave(waveNumber);
@@ -52,7 +42,7 @@ const ARENA_GUIDE_ENTRIES = ARENA_THEME_CYCLE.map((theme, index) => {
     theme,
     waveNumber,
     layout,
-    description: ARENA_GUIDE_DETAILS[index]!,
+    description: `game.arenas.${theme.id}.description`,
   };
 });
 
@@ -89,28 +79,6 @@ interface GameEnemyPortraitProps {
   readonly discovered: boolean;
   readonly bossType?: BossType;
 }
-
-const BOSS_GUIDE_DETAILS: Readonly<Record<BossType, {
-  readonly summary: string;
-  readonly description: string;
-  readonly ability: string;
-}>> = {
-  charger: {
-    summary: 'A massive mutant built for high-speed charges.',
-    description: 'A massive mutant that builds momentum before charging across the arena.',
-    ability: 'Telegraphs its dash direction; colliding with an obstacle stuns it briefly.',
-  },
-  acidQueen: {
-    summary: 'A toxic mutant that attacks from range and controls space.',
-    description: 'A toxic mutant that controls the arena with ranged acid attacks.',
-    ability: 'Fires acid spreads and creates telegraphed pools that deny areas temporarily.',
-  },
-  hordeCaller: {
-    summary: 'A summoner shielded by its reinforcements.',
-    description: 'A summoner protected by a shield while its reinforcements remain.',
-    ability: 'Summons supporting zombies; defeat them to remove its shield and make it vulnerable.',
-  },
-};
 
 type SelectedGuideEntry =
   | { readonly kind: 'enemy'; readonly type: ZombieType }
@@ -341,6 +309,7 @@ function GuideSectionHeading({
     readonly denominator: number;
   };
 }) {
+  const { t } = useTranslation();
   return (
     <div className="game-guide-section-heading">
       <span className="game-guide-eyebrow">{eyebrow}</span>
@@ -366,6 +335,7 @@ function GuideSectionHeading({
 }
 
 export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
+  const { t } = useTranslation();
   const backButtonRef = useRef<HTMLButtonElement>(null);
   const [discoveredEnemies] = useState<Set<ZombieType>>(
     () => readDiscoveredEnemies(getEnemyDiscoveryStorage()),
@@ -403,21 +373,18 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
     : selectedBossType
       ? discoveredBosses.has(selectedBossType)
       : false;
-  const selectedDetails = selectedEnemyType
-    ? ENEMY_GUIDE_DETAILS[selectedEnemyType]
-    : selectedBossType
-      ? BOSS_GUIDE_DETAILS[selectedBossType]
-      : null;
   const selectedTitle = selectedEnemyType
     ? selectedDiscovered
-      ? ENEMY_DISCOVERY_LABELS[selectedEnemyType]
-      : 'Unknown Enemy'
+      ? t(`game.enemies.${selectedEnemyType}.name`)
+      : t('game.guides.unknownEnemy')
     : selectedBossType
       ? selectedDiscovered
-        ? getBossName(selectedBossType)
-        : 'Unknown Boss'
+        ? t(`game.bosses.${selectedBossType}`)
+        : t('game.guides.unknownBoss')
       : selectedArenaEntry
-        ? `${selectedArenaEntry.theme.name} renderables`
+        ? t('game.guides.arenaRenderables', {
+            name: t(`game.arenas.${selectedArenaEntry.theme.id}.name`),
+          })
         : '';
   const selectedPreview = selectedEnemyType ? (
     <GameEnemyPortrait
@@ -457,35 +424,40 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                 <p className="game-dialog-wordmark">
                   <GameFranchiseWordmark />
                 </p>
-                <h1 id="game-enemy-guide-title">Field Guides<span>.</span></h1>
+                <h1 id="game-enemy-guide-title">{t('game.menu.fieldGuides')}<span>.</span></h1>
               </div>
             </div>
             <p className="game-guide-hero-description">
-              Know what you’re up against. Study the threats, learn your
-              resources, and prepare for the next run.
+              {t('game.guides.heroDescription')}
             </p>
           </div>
 
           <div
             className="game-guide-progress"
             role="group"
-            aria-label={`${totalDiscoveries} of ${totalEntries} enemy and boss entries identified`}
+            aria-label={t('game.guides.progress', {
+              discovered: totalDiscoveries,
+              total: totalEntries,
+            })}
           >
             <div className="game-guide-progress-top">
-              <span>THREAT INTEL</span>
+              <span>{t('game.guides.threatIntel')}</span>
               <strong>{discoveryPercent}%</strong>
             </div>
             <div
               className="game-guide-progress-track"
               role="progressbar"
-              aria-label="Threat intelligence completion"
+              aria-label={t('game.guides.threatCompletion')}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={discoveryPercent}
             >
               <span style={{ width: `${discoveryPercent}%` }} />
             </div>
-            <p>{totalDiscoveries} / {totalEntries} entries identified</p>
+            <p>{t('game.guides.identifiedCount', {
+              count: totalDiscoveries,
+              total: totalEntries,
+            })}</p>
           </div>
         </div>
       </header>
@@ -499,9 +471,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
         >
           <GuideSectionHeading
             index="02"
-            eyebrow="THREAT CATALOGUE"
-            title="Enemies"
-            description="The infected you’ll encounter out in the field."
+            eyebrow={t('game.guides.enemyCatalogue')}
+            title={t('game.guides.enemies')}
+            description={t('game.guides.enemyDescription')}
             count={{
               numerator: discoveredCount,
               denominator: ENEMY_DISCOVERY_TYPES.length,
@@ -510,8 +482,7 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
           <div className="game-enemy-guide-grid">
             {ENEMY_DISCOVERY_TYPES.map((type) => {
               const discovered = discoveredEnemies.has(type);
-              const name = ENEMY_DISCOVERY_LABELS[type];
-              const details = ENEMY_GUIDE_DETAILS[type];
+              const name = t(`game.enemies.${type}.name`);
 
               return (
                 <button
@@ -519,23 +490,27 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                   type="button"
                   key={type}
                   aria-haspopup="dialog"
-                  aria-label={`View ${discovered ? name : 'unidentified enemy'} details`}
+                  aria-label={t(discovered
+                    ? 'game.guides.viewDetails'
+                    : 'game.guides.viewUnknownEnemy', { name })}
                   onClick={() => setSelectedGuideEntry({ kind: 'enemy', type })}
                 >
                   <GameEnemyPortrait type={type} discovered={discovered} />
                   <div className="game-enemy-guide-card-copy">
                     <div className="game-guide-card-meta">
-                      <span>{discovered ? 'THREAT IDENTIFIED' : 'UNKNOWN CONTACT'}</span>
+                      <span>{t(discovered
+                        ? 'game.guides.threatIdentified'
+                        : 'game.guides.unknownContact')}</span>
                       <span className="game-guide-card-status">
                         {discovered ? '●' : '◌'}
                       </span>
                     </div>
-                    <h3>{discovered ? name : 'Unknown'}</h3>
+                    <h3>{discovered ? name : t('game.guides.unknown')}</h3>
                     {discovered ? (
-                      <p>{details.summary}</p>
+                      <p>{t(`game.enemies.${type}.summary`)}</p>
                     ) : (
                       <p className="game-guide-locked-copy">
-                        Threat details are classified.
+                        {t('game.guides.classified')}
                       </p>
                     )}
                   </div>
@@ -551,9 +526,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
         >
           <GuideSectionHeading
             index="03"
-            eyebrow="HIGH-THREAT DOSSIER"
-            title="Bosses"
-            description="Major mutations. Learn their patterns before they find you."
+            eyebrow={t('game.guides.bossDossier')}
+            title={t('game.guides.bosses')}
+            description={t('game.guides.bossDescription')}
             count={{
               numerator: discoveredBossCount,
               denominator: BOSS_DISCOVERY_TYPES.length,
@@ -562,8 +537,7 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
           <div className="game-enemy-guide-grid game-enemy-guide-boss-grid">
             {BOSS_TYPES.map((bossType) => {
               const discovered = discoveredBosses.has(bossType);
-              const name = getBossName(bossType);
-              const details = BOSS_GUIDE_DETAILS[bossType];
+              const name = t(`game.bosses.${bossType}`);
               const type = getBossZombieType(bossType);
 
               return (
@@ -572,7 +546,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                   type="button"
                   key={bossType}
                   aria-haspopup="dialog"
-                  aria-label={`View ${discovered ? name : 'unidentified boss'} details`}
+                  aria-label={t(discovered
+                    ? 'game.guides.viewDetails'
+                    : 'game.guides.viewUnknownBoss', { name })}
                   onClick={() => setSelectedGuideEntry({ kind: 'boss', type: bossType })}
                 >
                   <GameEnemyPortrait
@@ -582,17 +558,19 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                   />
                   <div className="game-enemy-guide-card-copy">
                     <div className="game-guide-card-meta">
-                      <span>{discovered ? 'BOSS DOSSIER' : 'CLASSIFIED DOSSIER'}</span>
+                      <span>{t(discovered
+                        ? 'game.guides.bossDossierTag'
+                        : 'game.guides.classifiedDossier')}</span>
                       <span className="game-guide-card-status">
                         {discovered ? '●' : '◌'}
                       </span>
                     </div>
-                    <h3>{discovered ? name : 'Unknown'}</h3>
+                    <h3>{discovered ? name : t('game.guides.unknown')}</h3>
                     {discovered ? (
-                      <p>{details.summary}</p>
+                      <p>{t(`game.bosses.${bossType}Summary`)}</p>
                     ) : (
                       <p className="game-guide-locked-copy">
-                        Threat details are classified.
+                        {t('game.guides.classified')}
                       </p>
                     )}
                   </div>
@@ -608,9 +586,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
         >
           <GuideSectionHeading
             index="04"
-            eyebrow="OPERATIONAL ENVIRONMENTS"
-            title="Arenas"
-            description="Five environments rotate through Survival waves, each with varied obstacle layouts."
+            eyebrow={t('game.guides.arenaEnvironments')}
+            title={t('game.guides.arenas')}
+            description={t('game.guides.arenaDescription')}
           />
           <div className="game-arena-guide-grid">
             {ARENA_GUIDE_ENTRIES.map((entry, index) => (
@@ -618,24 +596,31 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                 className="game-arena-guide-card"
                 type="button"
                 key={entry.theme.id}
-                aria-label={`View ${entry.theme.name} renderable objects`}
+                aria-label={t('game.guides.viewArenaObjects', {
+                  name: t(`game.arenas.${entry.theme.id}.name`),
+                })}
                 onClick={() => setSelectedGuideEntry({ kind: 'arena', entry })}
               >
                 <div className="game-arena-guide-preview">
                   <GameArenaPreview entry={entry} />
                   <span className="game-arena-guide-layout-label">
-                    {entry.layout.name} layout
+                    {t('game.guides.layout', {
+                      name: t(`game.arenaLayouts.${entry.layout.id}`),
+                    })}
                   </span>
                   <span className="game-arena-guide-number">
-                    ZONE 0{index + 1}
+                    {t('game.guides.zone', { number: `0${index + 1}` })}
                   </span>
                 </div>
                 <div className="game-arena-guide-copy">
                   <p className="game-arena-guide-wave">
-                    WAVES {entry.waveNumber}–{entry.waveNumber + 9}
+                    {t('game.guides.waves', {
+                      start: entry.waveNumber,
+                      end: entry.waveNumber + 9,
+                    })}
                   </p>
-                  <h3>{entry.theme.name}</h3>
-                  <p>{entry.description}</p>
+                  <h3>{t(`game.arenas.${entry.theme.id}.name`)}</h3>
+                  <p>{t(entry.description)}</p>
                 </div>
               </button>
             ))}
@@ -651,7 +636,7 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
             {selectedArenaEntry ? (
               <>
                 <p>
-                  Objects that may appear in this environment. Object state and placement can vary by run.
+                  {t('game.guides.arenaObjects')}
                 </p>
                 <ul className="game-arena-renderables-list">
                   {getArenaObjectCatalog(selectedArenaEntry.theme.id).map((item) => (
@@ -663,32 +648,36 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                         />
                       </div>
                       <div className="game-arena-renderable-copy">
-                        <strong>{item.name}</strong>
-                        <span>{item.description}</span>
+                        <strong>{t(`game.arenaObjects.${item.previewKind}.name`)}</strong>
+                        <span>{t(`game.arenaObjects.${item.previewKind}.description`)}</span>
                       </div>
                     </li>
                   ))}
                 </ul>
               </>
-            ) : selectedDiscovered && selectedDetails ? (
+            ) : selectedDiscovered && (selectedEnemyType || selectedBossType) ? (
               <>
-                <p>{selectedDetails.description}</p>
+                <p>{t(selectedEnemyType
+                  ? `game.enemies.${selectedEnemyType}.description`
+                  : `game.bosses.${selectedBossType}Description`)}</p>
                 <p className="game-enemy-guide-ability">
-                  <strong>{selectedBossType ? 'COMBAT INTEL' : 'FIELD NOTE'}</strong>
-                  {selectedDetails.ability}
+                  <strong>{t(selectedBossType
+                    ? 'game.guides.combatIntel'
+                    : 'game.guides.fieldNote')}</strong>
+                  {t(selectedEnemyType
+                    ? `game.enemies.${selectedEnemyType}.ability`
+                    : `game.bosses.${selectedBossType}Ability`)}
                 </p>
               </>
             ) : (
-              <p>Threat intel remains classified.</p>
+              <p>{t('game.guides.classifiedIntel')}</p>
             )}
             {selectedEnemyType && (
               <aside className="game-enemy-guide-note">
                 <div>
-                  <strong>IN-GAME TIP // ELITE ENEMIES</strong>
+                  <strong>{t('game.guides.eliteTipTitle')}</strong>
                   <p>
-                    Elite enemies may be Fast, Shielded, Regenerating, or Explosive.
-                    Keep moving, watch for their trait, and prioritize threats that
-                    can corner you.
+                    {t('game.guides.eliteTip')}
                   </p>
                 </div>
               </aside>

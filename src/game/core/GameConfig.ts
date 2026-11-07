@@ -31,7 +31,7 @@ export const PLAYER_CONFIG = {
   movementSpeed: 165,
   startingHealth: 100,
   startingDamage: 25,
-  startingShotsPerSecond: 2.5,
+  startingShotsPerSecond: 2,
 } as const;
 
 export const GAME_INPUT_CONFIG = {
@@ -196,7 +196,6 @@ export const MILITARY_OBJECT_CONFIG = {
   razorWire: {
     width: 112,
     height: 34,
-    activeDurationSeconds: 45,
     damage: 9,
     damageIntervalSeconds: 0.85,
     slowMultiplier: 0.6,
@@ -283,6 +282,7 @@ export const GAME_COMBAT_CONFIG = {
   projectileDamage: PLAYER_CONFIG.startingDamage,
   projectileSpeed: 560,
   projectileLifetimeSeconds: 1.5,
+  playerProjectileRangeMultiplier: 0.7,
   shotsPerSecond: PLAYER_CONFIG.startingShotsPerSecond,
   playerHitCooldownSeconds: 0.65,
   zombieAttackCooldownSeconds: 0.8,
@@ -291,6 +291,11 @@ export const GAME_COMBAT_CONFIG = {
   collectionEffectDurationSeconds: 0.36,
   muzzleFlashDurationSeconds: 0.075,
 } as const;
+
+export const PLAYER_PROJECTILE_RANGE =
+  GAME_COMBAT_CONFIG.projectileSpeed *
+  GAME_COMBAT_CONFIG.projectileLifetimeSeconds *
+  GAME_COMBAT_CONFIG.playerProjectileRangeMultiplier;
 
 export const ENEMY_ABILITY_CONFIG = {
   spitter: {
@@ -328,7 +333,9 @@ export const GAME_PROGRESSION_CONFIG = {
   baseSpawnIntervalSeconds: 1,
   spawnIntervalDecreasePerWaveSeconds: 0.02,
   minimumSpawnIntervalSeconds: 0.5,
-  arenaTransitionSeconds: 3,
+  arenaTransitionSeconds: 1,
+  waveCountdownSeconds: 3,
+  intermissionShieldSeconds: 5,
   playerSpawnProtectionSeconds: 1.5,
   itemLifetimeSeconds: 12,
   maximumActiveItems: 3,

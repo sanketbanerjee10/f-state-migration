@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { GameSettings } from '@/game/core/GameSettings';
 import type {
   GameStateSnapshot,
@@ -67,6 +68,7 @@ export function GameMenuOverlay({
   highlightPauseMenu = false,
   tutorialMode = false,
 }: GameMenuOverlayProps) {
+  const { t } = useTranslation();
   const [view, setView] = useState<GameMenuView>(initialView);
   const overlayRef = useRef<HTMLElement>(null);
   const isMainMenu = mode === 'main';
@@ -99,7 +101,7 @@ export function GameMenuOverlay({
           : view === 'level-select' || isMainMenu
             ? 'game-menu-title'
             : 'game-paused-title';
-  const backLabel = isMainMenu ? 'Back to menu' : 'Back to pause menu';
+  const backLabel = t(isMainMenu ? 'game.menu.backToMenu' : 'game.menu.backToPauseMenu');
 
   return (
     <>
@@ -109,7 +111,7 @@ export function GameMenuOverlay({
         <button
           className="game-modal-backdrop game-pause-backdrop"
           type="button"
-          aria-label="Resume game"
+          aria-label={t('game.menu.resumeGame')}
           onClick={onResume}
         />
       )}
@@ -176,7 +178,7 @@ export function GameMenuOverlay({
             <button
               className="game-level-select-backdrop"
               type="button"
-              aria-label="Close campaign selection"
+              aria-label={t('game.menu.closeCampaign')}
               onClick={() => setView('home')}
             />
             <section
@@ -200,7 +202,7 @@ export function GameMenuOverlay({
           <button
             className="game-leaderboard-backdrop"
             type="button"
-            aria-label="Close leaderboard"
+            aria-label={t('game.menu.closeLeaderboard')}
             onClick={() => setView('home')}
           />
           <section
@@ -221,7 +223,7 @@ export function GameMenuOverlay({
           <button
             className="game-guide-backdrop"
             type="button"
-            aria-label="Close guides"
+            aria-label={t('game.menu.closeGuides')}
             onClick={() => setView('home')}
           />
           <section
@@ -245,7 +247,7 @@ export function GameMenuOverlay({
           <button
             className="game-settings-backdrop"
             type="button"
-            aria-label="Close settings"
+            aria-label={t('game.menu.closeSettings')}
             onClick={() => setView('home')}
           />
           <section

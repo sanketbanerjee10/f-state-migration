@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Music2, Pause, Play } from 'lucide-react';
 
 const TRACK_NAME_FADE_DURATION_MS = 180;
@@ -20,6 +21,7 @@ export function GameMusicPlayer({
   floating = false,
   dimmed = false,
 }: GameMusicPlayerProps) {
+  const { t } = useTranslation();
   const [displayedTrackName, setDisplayedTrackName] = useState(trackName);
   const [trackNameWidth, setTrackNameWidth] = useState<number | null>(null);
   const [trackNamePhase, setTrackNamePhase] = useState<
@@ -64,7 +66,9 @@ export function GameMusicPlayer({
       <button
         className="game-music-player"
         type="button"
-        aria-label={`${isPlaying ? 'Pause' : 'Play'} music`}
+        aria-label={t('game.music.toggle', {
+          action: t(isPlaying ? 'game.music.pause' : 'game.music.play'),
+        })}
         aria-pressed={isPlaying}
         disabled={!musicEnabled}
         onClick={onToggle}

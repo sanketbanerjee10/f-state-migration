@@ -4,6 +4,7 @@ import {
   ARENA_THEME_CYCLE,
   createArenaObstacles,
   createExplosiveBarrels,
+  createMilitaryOutpostObjects,
   getArenaLayoutPool,
   getArenaCollisionObstacles,
   getArenaTheme,
@@ -56,6 +57,26 @@ describe('arena system', () => {
     expect(industrialLayouts.every(({ obstacles }) =>
       obstacles.some(({ kind }) => kind === 'crate'),
     )).toBe(true);
+  });
+
+  it('varies military prop placement by arena and creates multi-row wire defenses', () => {
+    const layout = getArenaLayoutPool('military')[0]!;
+    const firstArena = createMilitaryOutpostObjects('military', 'arena-one', layout);
+    const repeatedArena = createMilitaryOutpostObjects('military', 'arena-one', layout);
+    const nextArena = createMilitaryOutpostObjects('military', 'arena-two', layout);
+    const wires = firstArena.filter((object) => object.kind === 'razor-wire');
+
+    expect(firstArena).not.toEqual(repeatedArena);
+    expect(firstArena.some((object, index) =>
+      object.xFraction !== nextArena[index]?.xFraction ||
+      object.yFraction !== nextArena[index]?.yFraction,
+    )).toBe(true);
+    expect(wires.length).toBeGreaterThanOrEqual(3);
+    expect(wires.length).toBeLessThanOrEqual(6);
+    expect(firstArena.filter((object) => object.kind === 'abandoned-turret')).toHaveLength(2);
+    expect(new Set(wires.map((wire) => wire.width)).size).toBeGreaterThan(1);
+    expect(wires.some((wire) => Math.abs(Math.sin(wire.rotation)) > 0.5)).toBe(true);
+    expect(wires.some((wire) => Math.abs(Math.sin(wire.rotation)) < 0.5)).toBe(true);
   });
 
   it('keeps spawn candidates valid around arena objects and rejects blocked positions', () => {

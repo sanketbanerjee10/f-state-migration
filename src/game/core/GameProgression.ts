@@ -196,6 +196,7 @@ export function prepareArenaForWave(
   state.militaryObjects = createMilitaryOutpostObjects(
     layout.theme,
     `${layout.id}-${waveNumber}`,
+    layout,
   );
   state.contaminatedObjects = createContaminatedArenaObjects(
     layout,
@@ -238,6 +239,7 @@ export function startWave(state: GameState, waveNumber: number): void {
   state.wave.pendingWaveNumber = waveNumber;
   state.wave.activeModifier = getWaveModifierForWave(waveNumber);
   state.wave.phase = 'combat';
+  state.wave.arenaTransitionRemainingSeconds = 0;
   state.wave.transitionCountdownSeconds = 0;
   state.arenaTransitionFrom = undefined;
   state.wave.enemyBudget = state.gameMode === 'level' && waveNumber % 10 === 0
@@ -282,9 +284,28 @@ export function advanceWaveProgression(
   );
 
   if (state.wave.phase === 'intermission') {
+    let countdownDeltaSeconds = deltaSeconds;
+    if (state.wave.arenaTransitionRemainingSeconds > 0) {
+      const transitionDeltaSeconds = Math.min(
+        countdownDeltaSeconds,
+        state.wave.arenaTransitionRemainingSeconds,
+      );
+      state.wave.arenaTransitionRemainingSeconds = Math.max(
+        0,
+        state.wave.arenaTransitionRemainingSeconds - transitionDeltaSeconds,
+      );
+      countdownDeltaSeconds -= transitionDeltaSeconds;
+      if (state.wave.arenaTransitionRemainingSeconds > 0) return;
+      state.wave.announcement = String(
+        GAME_PROGRESSION_CONFIG.waveCountdownSeconds,
+      );
+      state.wave.announcementSeconds =
+        GAME_PROGRESSION_CONFIG.waveCountdownSeconds;
+      if (countdownDeltaSeconds === 0) return;
+    }
     state.wave.transitionCountdownSeconds = Math.max(
       0,
-      state.wave.transitionCountdownSeconds - deltaSeconds,
+      state.wave.transitionCountdownSeconds - countdownDeltaSeconds,
     );
     state.wave.announcement = String(
       Math.max(1, Math.ceil(state.wave.transitionCountdownSeconds)),
@@ -509,12 +530,14 @@ export function completeWaveIfCleared(state: GameState): boolean {
   state.wave.currentWave = nextWave;
   state.wave.pendingWaveNumber = nextWave;
   state.wave.phase = 'intermission';
-  state.wave.transitionCountdownSeconds = ARENA_TRANSITION_SECONDS;
-  state.wave.announcement = String(ARENA_TRANSITION_SECONDS);
-  state.wave.announcementSeconds = ARENA_TRANSITION_SECONDS;
+  state.wave.arenaTransitionRemainingSeconds = ARENA_TRANSITION_SECONDS;
+  state.wave.transitionCountdownSeconds =
+    GAME_PROGRESSION_CONFIG.waveCountdownSeconds;
+  state.wave.announcement = '';
+  state.wave.announcementSeconds = 0;
   state.player.spawnProtectionSeconds =
     ARENA_TRANSITION_SECONDS +
-    GAME_PROGRESSION_CONFIG.playerSpawnProtectionSeconds;
+    GAME_PROGRESSION_CONFIG.intermissionShieldSeconds;
   prepareArenaForWave(state, nextWave, state.wave.lastArenaLayoutId);
   return true;
 }

@@ -215,11 +215,9 @@ export class GameSoundEffects {
     const source = context.createBufferSource();
     const gain = context.createGain();
     source.buffer = this.getCueBuffer(cue, context);
-    const cueVolume = cue === 'shoot' ? 0.4 : 1;
     gain.gain.setValueAtTime(
       this.settings.soundVolume ** 2 *
         MAX_SOUND_EFFECTS_VOLUME *
-        cueVolume *
         Math.min(1.4, Math.max(0, intensity)),
       context.currentTime,
     );

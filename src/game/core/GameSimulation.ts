@@ -175,11 +175,15 @@ function getMilitaryObjectBounds(
   state: GameState,
   object: MilitaryOutpostEntity,
 ): { readonly x: number; readonly y: number; readonly width: number; readonly height: number } {
+  const isVerticalWire = object.kind === 'razor-wire' &&
+    Math.abs(Math.sin(object.rotation)) > 0.5;
+  const width = isVerticalWire ? object.height : object.width;
+  const height = isVerticalWire ? object.width : object.height;
   return {
-    x: state.arenaWidth * object.xFraction - object.width / 2,
-    y: state.arenaHeight * object.yFraction - object.height / 2,
-    width: object.width,
-    height: object.height,
+    x: state.arenaWidth * object.xFraction - width / 2,
+    y: state.arenaHeight * object.yFraction - height / 2,
+    width,
+    height,
   };
 }
 
@@ -902,7 +906,7 @@ function applyMilitaryWireDamage(
       getMilitaryObjectBounds(state, object),
     ),
   );
-  const turretWire = state.militaryObjects.find((object) =>
+  const turretWire = !isPlayer && state.militaryObjects.find((object) =>
     object.kind === 'abandoned-turret' &&
     circleOverlapsRectangleBorder(
       actor,
@@ -968,10 +972,6 @@ function updateMilitaryOutpostObjects(
       continue;
     }
     if (object.kind === 'razor-wire') {
-      if (object.active) {
-        object.remainingSeconds = Math.max(0, object.remainingSeconds - deltaSeconds);
-        if (object.remainingSeconds === 0) object.active = false;
-      }
       continue;
     }
     if (object.kind === 'military-supply-crate') {
@@ -2668,7 +2668,9 @@ function fireProjectile(state: GameState): void {
     radius,
     damage,
     speed: GAME_COMBAT_CONFIG.projectileSpeed,
-    remainingSeconds: GAME_COMBAT_CONFIG.projectileLifetimeSeconds,
+    remainingSeconds:
+      GAME_COMBAT_CONFIG.projectileLifetimeSeconds *
+      GAME_COMBAT_CONFIG.playerProjectileRangeMultiplier,
     owner: 'player',
     kind: critical ? 'critical' : 'standard',
     ...(piercingLevel > 0
@@ -2901,13 +2903,39 @@ function moveZombie(
   const navigationObstacles = [...collisionObstacles];
   if (state.arenaTheme === 'military' &&
       distance > MILITARY_OBJECT_CONFIG.razorWire.zombieChargeDistance) {
+    const pathDistanceSquared = distance * distance;
+    let nearestWire: Extract<MilitaryOutpostEntity, { kind: 'razor-wire' }> | undefined;
+    let nearestWireDistance = Number.POSITIVE_INFINITY;
     for (const object of state.militaryObjects) {
       if (object.kind !== 'razor-wire' || !object.active) continue;
+      const wireOffsetX = state.arenaWidth * object.xFraction - zombie.x;
+      const wireOffsetY = state.arenaHeight * object.yFraction - zombie.y;
+      const pathProgress = (
+        wireOffsetX * deltaX + wireOffsetY * deltaY
+      ) / pathDistanceSquared;
+      if (pathProgress < 0 || pathProgress > 1) continue;
+      const nearestPathX = pathProgress * deltaX;
+      const nearestPathY = pathProgress * deltaY;
+      const pathOffset = Math.hypot(
+        wireOffsetX - nearestPathX,
+        wireOffsetY - nearestPathY,
+      );
+      if (pathOffset > Math.hypot(object.width / 2, object.height / 2) + zombie.radius ||
+          pathOffset >= nearestWireDistance) {
+        continue;
+      }
+      nearestWire = object;
+      nearestWireDistance = pathOffset;
+    }
+    if (nearestWire) {
+      const isVerticalWire = Math.abs(Math.sin(nearestWire.rotation)) > 0.5;
       navigationObstacles.push({
-        xFraction: object.xFraction,
-        yFraction: object.yFraction,
-        width: object.width + zombie.radius * 2,
-        height: object.height + zombie.radius * 2,
+        xFraction: nearestWire.xFraction,
+        yFraction: nearestWire.yFraction,
+        width: (isVerticalWire ? nearestWire.height : nearestWire.width) +
+          zombie.radius * 2,
+        height: (isVerticalWire ? nearestWire.width : nearestWire.height) +
+          zombie.radius * 2,
         kind: 'wall',
       });
     }

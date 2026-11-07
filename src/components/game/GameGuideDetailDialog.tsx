@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export function GameGuideDetailDialog({
   children,
   onClose,
 }: GameGuideDetailDialogProps) {
+  const { t } = useTranslation();
   const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
@@ -42,7 +44,7 @@ export function GameGuideDetailDialog({
       <button
         className="game-guide-item-backdrop"
         type="button"
-        aria-label="Close guide details"
+        aria-label={t('game.guides.closeDetails')}
         onClick={onClose}
       />
       <section
@@ -63,7 +65,7 @@ export function GameGuideDetailDialog({
             ref={closeButtonRef}
             className="game-guide-item-dialog-close"
             type="button"
-            aria-label="Close"
+            aria-label={t('game.guides.close')}
             onClick={onClose}
           >
             <X size={20} aria-hidden="true" />

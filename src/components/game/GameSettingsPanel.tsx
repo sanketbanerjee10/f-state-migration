@@ -1,5 +1,14 @@
-import { useState, type KeyboardEvent } from 'react';
+import { Fragment, useEffect, useState, type KeyboardEvent } from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LanguageFlag } from '@/components/LanguageSelector';
+import { LANGUAGE_STORAGE_KEY } from '@/i18n';
+import { GAME_TOUCH_CONTROLS_MEDIA_QUERY } from '@/game/core/GameConfig';
+import {
+  LANGUAGE_METADATA,
+  SUPPORTED_LANGUAGES,
+  isSupportedLanguage,
+} from '@/i18n/languages';
 import type { GameSettings } from '@/game/core/GameSettings';
 import {
   GAME_KEY_BINDING_ACTIONS,
@@ -19,23 +28,24 @@ interface GameSettingsPanelProps {
   readonly backLabel: string;
 }
 
-type SettingsSection = 'play' | 'controls' | 'audio';
+type SettingsSection = 'play' | 'controls' | 'audio' | 'language';
 
 const SECTIONS: {
   id: SettingsSection;
   icon: string;
-  label: string;
-  hint: string;
+  labelKey: string;
+  hintKey: string;
 }[] = [
-  { id: 'play', icon: '✳', label: 'Play', hint: 'Your experience' },
-  { id: 'controls', icon: '⌘', label: 'Controls', hint: 'Keys & movement' },
-  { id: 'audio', icon: '♫', label: 'Audio', hint: 'Music & effects' },
+  { id: 'play', icon: '✳', labelKey: 'play', hintKey: 'playHint' },
+  { id: 'controls', icon: '⌘', labelKey: 'controls', hintKey: 'controlsHint' },
+  { id: 'audio', icon: '♫', labelKey: 'audio', hintKey: 'audioHint' },
+  { id: 'language', icon: '文', labelKey: 'language', hintKey: 'languageHint' },
 ];
 
 const TOUCH_CONTROLS_HINTS: Record<GameSettings['touchControls'], string> = {
-  auto: 'Show touch controls automatically when the device supports them.',
-  always: 'Keep touch controls visible throughout the game.',
-  never: 'Hide touch controls; use keyboard and mouse instead.',
+  auto: 'touchAutoHint',
+  always: 'touchAlwaysHint',
+  never: 'touchNeverHint',
 };
 
 export function GameSettingsPanel({
@@ -46,14 +56,50 @@ export function GameSettingsPanel({
   onBack,
   backLabel,
 }: GameSettingsPanelProps) {
+  const { i18n, t } = useTranslation();
   const [activeSection, setActiveSection] =
     useState<SettingsSection>('play');
 
   const [capturingAction, setCapturingAction] =
     useState<GameKeyBindingAction | null>(null);
 
+  const [isCapturingPauseKey, setIsCapturingPauseKey] = useState(false);
   const [keyBindingError, setKeyBindingError] =
     useState<string | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY).matches,
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const responsiveQuery = window.matchMedia(GAME_TOUCH_CONTROLS_MEDIA_QUERY);
+    const updateDeviceType = () => {
+      setIsTouchDevice(responsiveQuery.matches);
+      if (responsiveQuery.matches) {
+        setActiveSection((section) =>
+          section === 'controls' ? 'play' : section,
+        );
+      }
+    };
+    updateDeviceType();
+    responsiveQuery.addEventListener('change', updateDeviceType);
+    return () =>
+      responsiveQuery.removeEventListener('change', updateDeviceType);
+  }, []);
+
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language ?? 'en';
+  const selectedLanguage = isSupportedLanguage(activeLanguage)
+    ? activeLanguage
+    : 'en';
+
+  const selectLanguage = (language: string) => {
+    if (!isSupportedLanguage(language)) return;
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    void i18n.changeLanguage(language);
+  };
 
   const captureKey = (
     event: KeyboardEvent<HTMLButtonElement>,
@@ -71,7 +117,7 @@ export function GameSettingsPanel({
     }
 
     if (!isSupportedGameKeyCode(event.code)) {
-      setKeyBindingError('This key cannot be assigned by your browser.');
+      setKeyBindingError(t('game.settings.keyCannotAssign'));
       return;
     }
 
@@ -87,9 +133,34 @@ export function GameSettingsPanel({
     setKeyBindingError(null);
   };
 
+  const captureAlternatePauseKey = (
+    event: KeyboardEvent<HTMLButtonElement>,
+  ) => {
+    if (!isCapturingPauseKey) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.code === 'Escape') {
+      setIsCapturingPauseKey(false);
+      setKeyBindingError(null);
+      return;
+    }
+
+    if (!isSupportedGameKeyCode(event.code)) {
+      setKeyBindingError(t('game.settings.keyCannotAssign'));
+      return;
+    }
+
+    onChange({ ...settings, alternatePauseKey: event.code });
+    setIsCapturingPauseKey(false);
+    setKeyBindingError(null);
+  };
+
   const changeSection = (section: SettingsSection) => {
     setActiveSection(section);
     setCapturingAction(null);
+    setIsCapturingPauseKey(false);
     setKeyBindingError(null);
   };
 
@@ -113,22 +184,24 @@ export function GameSettingsPanel({
             <p className="game-dialog-wordmark">
               <GameFranchiseWordmark />
             </p>
-            <h1 id="game-settings-title">Settings</h1>
+            <h1 id="game-settings-title">{t('game.settings.title')}</h1>
           </div>
         </div>
 
         <div className="settings-header-actions">
           {(error || audioError) && (
             <p className="settings-inline-error settings-header-error" role="alert">
-              {error || `Audio unavailable: ${audioError}`}
+              {error || t('game.settings.audioUnavailable', { error: audioError })}
             </p>
           )}
         </div>
       </header>
 
       <div className="settings-workspace">
-        <nav className="settings-nav" aria-label="Settings categories">
-          {SECTIONS.map((section) => (
+        <nav className="settings-nav" aria-label={t('game.settings.categories')}>
+          {SECTIONS.filter(
+            (section) => section.id !== 'controls' || !isTouchDevice,
+          ).map((section) => (
             <button
               key={section.id}
               type="button"
@@ -144,8 +217,8 @@ export function GameSettingsPanel({
               </span>
 
               <span className="settings-nav-copy">
-                <strong>{section.label}</strong>
-                <small>{section.hint}</small>
+                <strong>{t(`game.settings.${section.labelKey}`)}</strong>
+                <small>{t(`game.settings.${section.hintKey}`)}</small>
               </span>
 
               <span className="settings-nav-arrow" aria-hidden="true">
@@ -161,8 +234,8 @@ export function GameSettingsPanel({
             <div className="settings-section-view">
               <div className="settings-section-heading">
                 <div>
-                  <span className="settings-kicker">01 / PLAY</span>
-                  <h2>Make it yours</h2>
+                  <span className="settings-kicker">{t('game.settings.sectionPlay')}</span>
+                  <h2>{t('game.settings.makeItYours')}</h2>
                 </div>
                 <span className="settings-heading-decoration" aria-hidden="true">
                   ✳
@@ -174,20 +247,20 @@ export function GameSettingsPanel({
                   <div className="settings-card-heading">
                     <span className="settings-card-icon">☷</span>
                     <div>
-                      <h3>Touch controls</h3>
-                      <p>When should joysticks appear?</p>
+                      <h3>{t('game.settings.touchControls')}</h3>
+                      <p>{t('game.settings.joysticksQuestion')}</p>
                     </div>
                   </div>
 
                   <div
                     className="settings-choice-row"
                     role="group"
-                    aria-label="Touch controls visibility"
+                    aria-label={t('game.settings.touchControlsVisibility')}
                   >
                     {([
-                      ['auto', 'Auto'],
-                      ['always', 'Always'],
-                      ['never', 'Never'],
+                      ['auto', t('game.settings.auto')],
+                      ['always', t('game.settings.always')],
+                      ['never', t('game.settings.never')],
                     ] as const).map(([value, label]) => (
                       <button
                         key={value}
@@ -204,7 +277,7 @@ export function GameSettingsPanel({
                   </div>
 
                   <p className="settings-card-footnote">
-                    {TOUCH_CONTROLS_HINTS[settings.touchControls]}
+                    {t(`game.settings.${TOUCH_CONTROLS_HINTS[settings.touchControls]}`)}
                   </p>
                 </section>
 
@@ -212,8 +285,8 @@ export function GameSettingsPanel({
                   <div className="settings-card-heading">
                     <span className="settings-card-icon">▦</span>
                     <div>
-                      <h3>HUD density</h3>
-                      <p>Choose your battlefield view.</p>
+                      <h3>{t('game.settings.hudDensity')}</h3>
+                      <p>{t('game.settings.battlefieldView')}</p>
                     </div>
                   </div>
 
@@ -232,8 +305,7 @@ export function GameSettingsPanel({
                         <i />
                         <b />
                       </span>
-                      <strong>Standard</strong>
-                      <small>Full display</small>
+                      <strong>{t('game.settings.standard')}</strong>
                     </button>
 
                     <button
@@ -248,88 +320,128 @@ export function GameSettingsPanel({
                         <i />
                         <b />
                       </span>
-                      <strong>Compact</strong>
-                      <small>More room</small>
+                      <strong>{t('game.settings.compact')}</strong>
                     </button>
                   </div>
                 </section>
+
               </div>
             </div>
           )}
 
-          {activeSection === 'controls' && (
+          {activeSection === 'controls' && !isTouchDevice && (
             <div className="settings-section-view">
               <div className="settings-section-heading">
                 <div>
-                  <span className="settings-kicker">02 / CONTROLS</span>
-                  <h2>Your controls</h2>
+                  <span className="settings-kicker">{t('game.settings.sectionControls')}</span>
+                  <h2>{t('game.settings.yourControls')}</h2>
                 </div>
                 <span className="settings-heading-decoration" aria-hidden="true">
                   ⌘
                 </span>
               </div>
 
-              <section className="settings-card settings-controls-card">
-                <div className="settings-card-heading">
-                  <span className="settings-card-icon">⌨</span>
-                  <div>
-                    <h3>Keyboard bindings</h3>
-                    <p>Select an action, then press the key you want.</p>
-                  </div>
-                </div>
-
-                <div className="settings-key-grid" role="group" aria-label="Key bindings">
+              <section className="settings-controls">
+                <div className="settings-key-grid" role="group" aria-label={t('game.settings.keyBindings')}>
                   {Object.entries(GAME_KEY_BINDING_ACTIONS).map(
-                    ([action, label]) => {
+                    ([action]) => {
                       const typedAction = action as GameKeyBindingAction;
                       const isCapturing = capturingAction === typedAction;
 
                       return (
-                        <button
-                          key={action}
-                          type="button"
-                          className="settings-key-row"
-                          aria-label={`${label}: ${
-                            isCapturing
-                              ? 'Press a key'
-                              : formatGameKeyCode(
-                                  settings.keyBindings[typedAction],
-                                )
-                          }`}
-                          aria-pressed={isCapturing}
-                          data-capturing={isCapturing}
-                          onClick={() => {
-                            setCapturingAction((current) =>
-                              current === typedAction ? null : typedAction,
-                            );
-                            setKeyBindingError(null);
-                          }}
-                          onKeyDown={(event) =>
-                            captureKey(event, typedAction)
-                          }
-                        >
-                          <span>{label}</span>
-                          <kbd>
-                            {isCapturing
-                              ? 'PRESS KEY…'
-                              : formatGameKeyCode(
-                                  settings.keyBindings[typedAction],
-                                )}
-                          </kbd>
-                        </button>
+                        <Fragment key={action}>
+                          <button
+                            type="button"
+                            className="settings-key-row"
+                            aria-label={`${t(`game.settings.actions.${action}`)}: ${
+                              isCapturing
+                                ? t('game.settings.pressKey')
+                                : formatGameKeyCode(
+                                    settings.keyBindings[typedAction],
+                                  )
+                            }`}
+                            aria-pressed={isCapturing}
+                            data-capturing={isCapturing}
+                            onClick={() => {
+                              setCapturingAction((current) =>
+                                current === typedAction ? null : typedAction,
+                              );
+                              setIsCapturingPauseKey(false);
+                              setKeyBindingError(null);
+                            }}
+                            onKeyDown={(event) =>
+                              captureKey(event, typedAction)
+                            }
+                          >
+                            <span>{t(`game.settings.actions.${action}`)}</span>
+                            <kbd>
+                              {isCapturing
+                                ? t('game.settings.pressKeyEllipsis')
+                                : formatGameKeyCode(
+                                    settings.keyBindings[typedAction],
+                                  )}
+                            </kbd>
+                          </button>
+                          {typedAction === 'moveRight' && (
+                            <button
+                              type="button"
+                              className="settings-key-row"
+                              aria-label={`${t('game.settings.pauseGame')}: ${
+                                isCapturingPauseKey
+                                  ? t('game.settings.pressKey')
+                                  : formatGameKeyCode(settings.alternatePauseKey)
+                              }`}
+                              aria-pressed={isCapturingPauseKey}
+                              data-capturing={isCapturingPauseKey}
+                              onClick={() => {
+                                setIsCapturingPauseKey((capturing) => !capturing);
+                                setCapturingAction(null);
+                                setKeyBindingError(null);
+                              }}
+                              onKeyDown={captureAlternatePauseKey}
+                            >
+                              <span>{t('game.settings.pauseGame')}</span>
+                              <kbd>
+                                {isCapturingPauseKey
+                                  ? t('game.settings.pressKeyEllipsis')
+                                  : formatGameKeyCode(settings.alternatePauseKey)}
+                              </kbd>
+                            </button>
+                          )}
+                        </Fragment>
                       );
                     },
                   )}
 
                   <div className="settings-key-row settings-key-static">
-                    <span>Place turret</span>
-                    <kbd>RIGHT CLICK / DOUBLE TAP</kbd>
+                    <span>{t('game.settings.placeTurret')}</span>
+                    <span
+                      className="settings-mouse-shortcuts"
+                      role="img"
+                      aria-label={`${t('game.settings.placeTurret')}: ${t('game.settings.leftDoubleOrRightClick')}`}
+                    >
+                      <span className="settings-mouse-shortcut settings-mouse-left-double">
+                        <svg viewBox="0 0 24 30" aria-hidden="true">
+                          <path d="M12 2a8 8 0 0 0-8 8v10a8 8 0 0 0 16 0V10a8 8 0 0 0-8-8Z" />
+                          <path d="M12 2v12m-8-4h8m0-8v10m-3-7h3" />
+                          <path className="settings-mouse-left-button" d="M5 10a7 7 0 0 1 7-7v10H5z" />
+                        </svg>
+                        <b aria-hidden="true">×2</b>
+                      </span>
+                      <span className="settings-mouse-shortcut-separator" aria-hidden="true">/</span>
+                      <span className="settings-mouse-shortcut">
+                        <svg viewBox="0 0 24 30" aria-hidden="true">
+                          <path d="M12 2a8 8 0 0 0-8 8v10a8 8 0 0 0 16 0V10a8 8 0 0 0-8-8Z" />
+                          <path d="M12 2v12m-8-4h8" />
+                          <path className="settings-mouse-right-button" d="M12 3a7 7 0 0 1 7 7v3h-7z" />
+                        </svg>
+                      </span>
+                    </span>
                   </div>
                 </div>
 
                 <p className="settings-controls-hint">
-                  Click a highlighted key again to cancel. Press Escape while
-                  assigning to cancel.
+                  {t('game.settings.cancelBinding')}
                 </p>
 
                 {keyBindingError && (
@@ -345,8 +457,8 @@ export function GameSettingsPanel({
             <div className="settings-section-view">
               <div className="settings-section-heading">
                 <div>
-                  <span className="settings-kicker">03 / AUDIO</span>
-                  <h2>Set the mood</h2>
+                  <span className="settings-kicker">{t('game.settings.sectionAudio')}</span>
+                  <h2>{t('game.settings.setTheMood')}</h2>
                 </div>
                 <span className="settings-heading-decoration" aria-hidden="true">
                   ♫
@@ -366,8 +478,8 @@ export function GameSettingsPanel({
 
                   <div className="settings-audio-title">
                     <div>
-                      <h3>Background music</h3>
-                      <p>Late-night radio</p>
+                      <h3>{t('game.settings.backgroundMusic')}</h3>
+                      <p>{t('game.settings.lateNightRadio')}</p>
                     </div>
 
                     <button
@@ -375,7 +487,7 @@ export function GameSettingsPanel({
                       className="settings-toggle"
                       role="switch"
                       aria-checked={settings.musicEnabled}
-                      aria-label="Background music"
+                      aria-label={t('game.settings.backgroundMusic')}
                       disabled={GAME_MUSIC_TRACKS.length === 0}
                       onClick={() =>
                         onChange({
@@ -390,7 +502,7 @@ export function GameSettingsPanel({
 
                   <div className="settings-volume">
                     <div className="settings-volume-label">
-                      <label htmlFor="settings-music-volume">Volume</label>
+                      <label htmlFor="settings-music-volume">{t('game.settings.volume')}</label>
                       <output htmlFor="settings-music-volume">
                         {Math.round(settings.musicVolume * 100)}%
                       </output>
@@ -403,7 +515,7 @@ export function GameSettingsPanel({
                       max="1"
                       step="0.05"
                       value={settings.musicVolume}
-                      aria-label="Music volume"
+                      aria-label={t('game.settings.musicVolume')}
                       onChange={(event) =>
                         onChange({
                           ...settings,
@@ -415,8 +527,8 @@ export function GameSettingsPanel({
 
                   <p className="settings-card-footnote">
                     {GAME_MUSIC_TRACKS.length > 0
-                      ? 'Lo-fi tracks play one after another.'
-                      : 'Music unavailable — no tracks configured.'}
+                      ? t('game.settings.lofiTracks')
+                      : t('game.settings.musicUnavailable')}
                   </p>
                 </section>
 
@@ -432,8 +544,8 @@ export function GameSettingsPanel({
 
                   <div className="settings-audio-title">
                     <div>
-                      <h3>Sound effects</h3>
-                      <p>Little things that matter</p>
+                      <h3>{t('game.settings.soundEffects')}</h3>
+                      <p>{t('game.settings.littleThings')}</p>
                     </div>
 
                     <button
@@ -441,7 +553,7 @@ export function GameSettingsPanel({
                       className="settings-toggle"
                       role="switch"
                       aria-checked={settings.soundEnabled}
-                      aria-label="Sound effects"
+                      aria-label={t('game.settings.soundEffects')}
                       onClick={() =>
                         onChange({
                           ...settings,
@@ -455,7 +567,7 @@ export function GameSettingsPanel({
 
                   <div className="settings-volume">
                     <div className="settings-volume-label">
-                      <label htmlFor="settings-effects-volume">Volume</label>
+                      <label htmlFor="settings-effects-volume">{t('game.settings.volume')}</label>
                       <output htmlFor="settings-effects-volume">
                         {Math.round(settings.soundVolume * 100)}%
                       </output>
@@ -468,7 +580,7 @@ export function GameSettingsPanel({
                       max="1"
                       step="0.05"
                       value={settings.soundVolume}
-                      aria-label="Effects volume"
+                      aria-label={t('game.settings.effectsVolume')}
                       onChange={(event) =>
                         onChange({
                           ...settings,
@@ -479,9 +591,40 @@ export function GameSettingsPanel({
                   </div>
 
                   <p className="settings-card-footnote">
-                    Item pickups, damage and combat cues.
+                    {t('game.settings.soundEffectFootnote')}
                   </p>
                 </section>
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'language' && (
+            <div className="settings-section-view">
+              <div className="settings-section-heading">
+                <div>
+                  <span className="settings-kicker">{t('game.settings.sectionLanguage')}</span>
+                  <h2>{t('game.settings.chooseLanguage')}</h2>
+                </div>
+              </div>
+
+              <div className="settings-language-options" role="group" aria-label={t('game.settings.chooseLanguage')}>
+                {LANGUAGE_METADATA.filter((language) =>
+                  SUPPORTED_LANGUAGES.includes(language.code),
+                ).map((language) => (
+                  <button
+                    key={language.code}
+                    type="button"
+                    className="settings-language-option"
+                    aria-pressed={selectedLanguage === language.code}
+                    data-selected={selectedLanguage === language.code}
+                    onClick={() => selectLanguage(language.code)}
+                  >
+                    <LanguageFlag code={language.code} />
+                    <span>
+                      {language.nativeName}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           )}

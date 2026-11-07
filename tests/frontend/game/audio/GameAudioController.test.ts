@@ -84,9 +84,13 @@ describe('game music playlist', () => {
       soundEffects.unlock();
       soundEffects.playCue('collection');
       expect(outputGains.at(-1)).toBeCloseTo(0.12);
+      soundEffects.playCue('shoot');
+      expect(outputGains.at(-1)).toBeCloseTo(0.12);
 
       soundEffects.setSettings({ ...DEFAULT_GAME_SETTINGS, soundVolume: 0.5 });
       soundEffects.playCue('collection');
+      expect(outputGains.at(-1)).toBeCloseTo(0.03);
+      soundEffects.playCue('shoot');
       expect(outputGains.at(-1)).toBeCloseTo(0.03);
     } finally {
       soundEffects.dispose();

@@ -111,6 +111,7 @@
 
 .game-menu-actions button:focus-visible,
 .game-pause-button:focus-visible,
+.game-fullscreen-button:focus-visible,
 .game-setting-option:focus-visible {
   outline: 2px solid var(--ah-pink);
   outline-offset: 3px;
@@ -149,6 +150,55 @@
     transform 160ms ease,
     width 500ms ease,
     gap 500ms ease;
+}
+
+.game-fullscreen-button {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  z-index: 10;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 42%);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgb(var(--ah-purple-rgb) / 24%), transparent 75%),
+    rgb(var(--ah-midnight-rgb) / 82%);
+  box-shadow:
+    0 3px 12px rgb(var(--ah-shadow-rgb) / 52%),
+    inset 0 1px rgb(var(--ah-white-rgb) / 8%);
+  color: var(--ah-cream);
+  cursor: pointer;
+  opacity: 0.3;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.game-fullscreen-button[data-near-pause='true'] {
+  right: 62px;
+}
+
+.game-fullscreen-button svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2;
+}
+
+.game-fullscreen-button:hover,
+.game-fullscreen-button:focus-visible {
+  border-color: var(--ah-pink);
+  background:
+    linear-gradient(145deg, rgb(var(--ah-pink-rgb) / 20%), transparent 75%),
+    rgb(var(--ah-midnight-rgb) / 96%);
+  opacity: 1;
 }
 
 .game-pause-button svg {
@@ -200,6 +250,26 @@
 }
 
 @media (max-width: 760px), (pointer: coarse) {
+  .game-fullscreen-button {
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+  }
+
+  .game-fullscreen-button[data-near-pause='true'] {
+    top: calc(56px + env(safe-area-inset-top, 0px));
+    right: 10px;
+  }
+
+  .game-fullscreen-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
   .game-pause-button {
     top: calc(10px + env(safe-area-inset-top, 0px));
     right: 10px;
@@ -3196,6 +3266,68 @@
   gap: 14px;
 }
 
+.settings-language-options {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 9px;
+}
+
+.settings-language-option {
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid color-mix(in srgb, var(--ah-lavender) 28%, transparent);
+  border-radius: 8px;
+  color: var(--ah-muted);
+  background: color-mix(in srgb, var(--ah-midnight) 35%, transparent);
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.settings-language-option .language-selector-flag {
+  width: 22px;
+  height: 15px;
+  flex: 0 0 22px;
+  border: 0;
+}
+
+.settings-language-option span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-language-option:hover {
+  color: var(--ah-cream);
+  border-color: color-mix(in srgb, var(--ah-pink) 60%, transparent);
+  background: color-mix(in srgb, var(--ah-pink) 9%, transparent);
+}
+
+.settings-language-option[data-selected='true'] {
+  color: var(--ah-cream);
+  border-color: var(--ah-pink);
+  background:
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--ah-pink) 20%, transparent),
+      color-mix(in srgb, var(--ah-purple) 10%, transparent)
+    );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ah-pink) 18%, transparent);
+}
+
 .settings-card {
   min-width: 0;
   min-height: max-content;
@@ -3378,19 +3510,14 @@
   width: 24px;
 }
 
-/* Keyboard controls */
 
-.settings-controls-card {
+
+.settings-controls {
   width: 100%;
-  align-self: stretch;
-  padding: 18px 20px;
-}
-
-.settings-controls-card .settings-card-heading {
-  margin-bottom: 14px;
 }
 
 .settings-key-grid {
+  width: 100%;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3437,12 +3564,12 @@ button.settings-key-row:hover {
   max-width: 48%;
   padding: 5px 7px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--ah-cream) 25%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ah-pink) 35%, transparent);
   border-bottom-width: 2px;
   border-radius: 6px;
-  color: var(--ah-cream);
-  background: color-mix(in srgb, var(--ah-cream) 7%, transparent);
-  font: 700 9px var(--app-font-mono);
+  color: var(--ah-pink);
+  background: color-mix(in srgb, var(--ah-pink) 7%, transparent);
+  font: 400 9px var(--app-font-mono);
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3462,13 +3589,51 @@ button.settings-key-row:hover {
 }
 
 .settings-key-static {
+  grid-column: 1 / -1;
   border-style: dashed;
   opacity: 0.8;
 }
 
-.settings-key-static kbd {
-  min-width: 74px;
-  font-size: 8px;
+.settings-mouse-shortcuts {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ah-cream);
+}
+
+.settings-mouse-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ah-lavender);
+  font: 700 9px var(--app-font-mono);
+}
+
+.settings-mouse-shortcut-separator {
+  color: var(--ah-muted);
+  font-size: 9px;
+}
+
+.settings-mouse-shortcut svg {
+  width: 18px;
+  height: 22px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.settings-mouse-shortcut .settings-mouse-left-button {
+  fill: color-mix(in srgb, var(--ah-pink) 45%, transparent);
+  stroke: var(--ah-pink);
+}
+
+.settings-mouse-shortcut .settings-mouse-right-button {
+  fill: color-mix(in srgb, var(--ah-blue) 45%, transparent);
+  stroke: var(--ah-blue);
 }
 
 .settings-controls-hint {
@@ -3804,10 +3969,6 @@ button.settings-key-row:hover {
     margin-bottom: 8px;
   }
 
-  .settings-controls-card {
-    padding: 14px;
-  }
-
 }
 
 @media (max-width: 430px) {
@@ -3951,18 +4112,6 @@ button.settings-key-row:hover {
     font-size: 8px;
   }
 
-  .settings-controls-card {
-    padding: 11px 9px;
-  }
-
-  .settings-controls-card .settings-card-heading {
-    margin-bottom: 10px;
-  }
-
-  .settings-key-grid {
-    gap: 6px;
-  }
-
   .settings-key-row {
     min-height: 37px;
     padding: 5px 6px;
@@ -3979,9 +4128,13 @@ button.settings-key-row:hover {
     font-size: 8px;
   }
 
-  .settings-key-static kbd {
-    min-width: 59px;
-    font-size: 7px;
+  .settings-mouse-shortcuts {
+    gap: 7px;
+  }
+
+  .settings-mouse-shortcut svg {
+    width: 16px;
+    height: 20px;
   }
 
   .settings-controls-hint {

@@ -149,6 +149,7 @@ describe('wave modifiers', () => {
 
   it('keeps the active-enemy workload bounded during a high-pressure wave', () => {
     const state = createGameState();
+    state.militaryObjects = [];
     state.wave.activeModifier = 'overrun';
     state.wave.enemyBudget = 100;
     state.wave.enemiesSpawned = 36;

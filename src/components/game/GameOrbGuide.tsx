@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { GameItemType } from '@/game/core/GameState';
 import { drawOrb } from '@/game/rendering/OrbRenderer';
 import { GameGuideDetailDialog } from './GameGuideDetailDialog';
@@ -14,58 +15,6 @@ const GAME_ITEM_TYPES = [
   'cursed',
   'rareGold',
 ] as const satisfies readonly GameItemType[];
-
-const ORB_GUIDE_DETAILS: Readonly<Record<GameItemType, {
-  readonly name: string;
-  readonly description: string;
-  readonly details: string;
-}>> = {
-  health: {
-    name: 'Health Orb',
-    description: 'Restores health.',
-    details: 'Restores 25 health, up to your maximum.',
-  },
-  damage: {
-    name: 'Damage Orb',
-    description: 'Boosts projectile damage.',
-    details: 'Doubles your projectile damage for a limited time.',
-  },
-  rapidFire: {
-    name: 'Rapid Fire Orb',
-    description: 'Speeds up your firing rate.',
-    details: 'Doubles your firing rate for a limited time.',
-  },
-  shield: {
-    name: 'Shield Orb',
-    description: 'Absorbs incoming damage.',
-    details: 'Adds a shield that absorbs incoming damage for a limited time.',
-  },
-  bomb: {
-    name: 'Bomb Orb',
-    description: 'Adds an explosive charge to your inventory.',
-    details: 'A bomb damages nearby enemies when detonated.',
-  },
-  magnet: {
-    name: 'Magnet Orb',
-    description: 'Draws nearby orbs toward you.',
-    details: 'Pulls nearby orbs toward you for a limited time.',
-  },
-  turret: {
-    name: 'Turret Orb',
-    description: 'Deploys an automated turret.',
-    details: 'A deployed turret targets nearby enemies and fires for a limited time.',
-  },
-  cursed: {
-    name: 'Cursed Orb',
-    description: 'Makes enemies move faster.',
-    details: 'Increases enemy movement speed for a limited time.',
-  },
-  rareGold: {
-    name: 'Rare Gold Orb',
-    description: 'Awards one Rare Point.',
-    details: 'Grants one Rare Point.',
-  },
-};
 
 interface GameOrbPortraitProps {
   readonly type: GameItemType;
@@ -108,6 +57,7 @@ function GameOrbPortrait({ type }: GameOrbPortraitProps) {
 }
 
 export function GameOrbGuideSection() {
+  const { t } = useTranslation();
   const [selectedOrb, setSelectedOrb] = useState<GameItemType | null>(null);
 
   return (
@@ -116,19 +66,20 @@ export function GameOrbGuideSection() {
       aria-labelledby="game-orb-guide-title"
     >
       <div className="game-guide-section-heading">
-        <span className="game-guide-eyebrow">SUPPLIES &amp; POWER-UPS</span>
+        <span className="game-guide-eyebrow">{t('game.orbs.supplies')}</span>
         <div className="game-guide-section-heading-row">
           <div className="game-guide-section-index" aria-hidden="true">01</div>
-          <h2 id="game-orb-guide-title">Orbs</h2>
+          <h2 id="game-orb-guide-title">{t('game.orbs.title')}</h2>
         </div>
         <p className="game-guide-section-description">
-          Useful pickups that can turn the tide of a run.
+          {t('game.orbs.description')}
         </p>
       </div>
 
       <div className="game-orb-guide-grid">
         {GAME_ITEM_TYPES.map((type) => {
-          const details = ORB_GUIDE_DETAILS[type];
+          const name = t(`game.orbs.${type}Name`);
+          const description = t(`game.orbs.${type}Description`);
 
           return (
             <button
@@ -136,18 +87,18 @@ export function GameOrbGuideSection() {
               type="button"
               key={type}
               aria-haspopup="dialog"
-              aria-label={`View ${details.name} details`}
+              aria-label={t('game.orbs.viewDetails', { name })}
               onClick={() => setSelectedOrb(type)}
             >
               <GameOrbPortrait type={type} />
               <div className="game-orb-guide-card-copy">
                 <div className="game-orb-guide-name">
-                  <h3>{details.name}</h3>
+                  <h3>{name}</h3>
                   {type === 'rareGold' && (
-                    <span className="game-orb-guide-rare-label">RARE</span>
+                    <span className="game-orb-guide-rare-label">{t('game.orbs.rare')}</span>
                   )}
                 </div>
-                <p>{details.description}</p>
+                <p>{description}</p>
               </div>
             </button>
           );
@@ -155,11 +106,11 @@ export function GameOrbGuideSection() {
       </div>
       {selectedOrb && (
         <GameGuideDetailDialog
-          title={ORB_GUIDE_DETAILS[selectedOrb].name}
+          title={t(`game.orbs.${selectedOrb}Name`)}
           preview={<GameOrbPortrait type={selectedOrb} />}
           onClose={() => setSelectedOrb(null)}
         >
-          <p>{ORB_GUIDE_DETAILS[selectedOrb].details}</p>
+          <p>{t(`game.orbs.${selectedOrb}Details`)}</p>
         </GameGuideDetailDialog>
       )}
     </section>

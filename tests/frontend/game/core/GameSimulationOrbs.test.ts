@@ -76,6 +76,7 @@ describe('orb simulation', () => {
   it('places up to five turrets and preserves inventory when a spot is obstructed', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.militaryObjects = [];
     state.turrets = 5;
 
     expect(placeSupportTurret(state, state.player.x, state.player.y)).toBe(false);
@@ -220,6 +221,12 @@ describe('orb simulation', () => {
     const cursedState = createGameState();
     suppressWaveSpawns(normalState);
     suppressWaveSpawns(cursedState);
+    normalState.arenaObstacles = [];
+    cursedState.arenaObstacles = [];
+    normalState.barrels = [];
+    cursedState.barrels = [];
+    normalState.militaryObjects = [];
+    cursedState.militaryObjects = [];
     normalState.zombies = [createZombie(70, 'walker', 480, 100)];
     cursedState.zombies = [createZombie(70, 'walker', 480, 100)];
     cursedState.activeEffects = [{
@@ -255,6 +262,12 @@ describe('orb simulation', () => {
     const fastWaveState = createGameState();
     suppressWaveSpawns(normalState);
     suppressWaveSpawns(fastWaveState);
+    normalState.arenaObstacles = [];
+    fastWaveState.arenaObstacles = [];
+    normalState.barrels = [];
+    fastWaveState.barrels = [];
+    normalState.militaryObjects = [];
+    fastWaveState.militaryObjects = [];
     normalState.zombies = [createZombie(71, 'walker', 480, 100)];
     fastWaveState.zombies = [createZombie(71, 'walker', 480, 100)];
     fastWaveState.wave.activeModifier = 'fastWave';

@@ -14,7 +14,7 @@ import {
   createZombie,
   getRunStatOptions,
 } from '@/game/core/GameState';
-import { PLAYER_CONFIG } from '@/game/core/GameConfig';
+import { PLAYER_CONFIG, PLAYER_PROJECTILE_RANGE } from '@/game/core/GameConfig';
 import { circleOverlapsRectangle, getArenaObstacles } from '@/game/core/ArenaGeometry';
 import { updateGameState } from '@/game/core/GameSimulation';
 import {
@@ -130,7 +130,7 @@ describe('wave progression and stat points', () => {
     expect(state.statistics.highestWaveCleared).toBe(1);
     expect(state.statistics.upgradePoints).toBe(3);
     expect(state.projectiles).toHaveLength(0);
-    expect(state.wave.announcement).toBe('3');
+    expect(state.wave.announcement).toBe('');
     expect(getRunStatOptions(state.player)).toHaveLength(4);
   });
 
@@ -142,9 +142,12 @@ describe('wave progression and stat points', () => {
     expect(state.wave).toMatchObject({
       currentWave: 2,
       phase: 'intermission',
+      arenaTransitionRemainingSeconds: 1,
       transitionCountdownSeconds: 3,
-      announcement: '3',
+      announcement: '',
+      announcementSeconds: 0,
     });
+    expect(state.player.spawnProtectionSeconds).toBe(6);
     expect(state.statistics.highestWaveReached).toBe(1);
     expect(state.statistics.highestWaveCleared).toBe(1);
     expect(state.statistics.upgradePoints).toBe(3);
@@ -164,6 +167,12 @@ describe('wave progression and stat points', () => {
     expect(state.player.health).toBe(50);
     state.zombies = [];
 
+    advanceWaveProgression(state, 0.5);
+    expect(state.wave.arenaTransitionRemainingSeconds).toBe(0.5);
+    expect(state.wave.announcement).toBe('');
+    advanceWaveProgression(state, 0.5);
+    expect(state.wave.arenaTransitionRemainingSeconds).toBe(0);
+    expect(state.wave.announcement).toBe('3');
     advanceWaveProgression(state, 1);
     expect(state.wave.announcement).toBe('2');
     expect(state.wave.phase).toBe('intermission');
@@ -260,7 +269,7 @@ describe('wave progression and stat points', () => {
     );
 
     expect(state.player.damage).toBeGreaterThan(25);
-    expect(state.player.shotsPerSecond).toBeGreaterThan(2.5);
+    expect(state.player.shotsPerSecond).toBeGreaterThan(2);
     expect(state.statistics.statAllocations.damage).toBe(1);
     expect(state.statistics.standardCurrency).toMatchObject({
       earned: 6,
@@ -318,12 +327,20 @@ describe('wave progression and stat points', () => {
     const state = createGameState();
     grantStandardPoints(state, 2);
     adjustRunStat(state, 'shotsPerSecond', 1);
-    expect(state.player.shotsPerSecond).toBe(2.7);
-    expect(state.statistics.highestShotsPerSecond).toBe(2.7);
+    expect(state.player.shotsPerSecond).toBe(2.16);
+    expect(state.statistics.highestShotsPerSecond).toBe(2.16);
     adjustRunStat(state, 'movementSpeed', 1);
     expect(state.player.movementSpeed).toBeCloseTo(169.95);
     expect(state.statistics.upgradesSelected).toBe(2);
     expect(state.statistics.upgradePoints).toBe(0);
+  });
+
+  it('starts with the reduced firing rate and projectile range', () => {
+    const state = createGameState();
+
+    expect(PLAYER_CONFIG.startingShotsPerSecond).toBe(2);
+    expect(state.player.shotsPerSecond).toBe(2);
+    expect(PLAYER_PROJECTILE_RANGE).toBe(588);
   });
 
   it('uses base-relative formulas at unlimited levels and preserves active fire cooldown', () => {
@@ -331,7 +348,7 @@ describe('wave progression and stat points', () => {
     grantStandardPoints(state, 101);
     state.player.fireCooldownSeconds = 0.37;
     adjustRunStat(state, 'shotsPerSecond', 1);
-    expect(state.player.shotsPerSecond).toBe(2.7);
+    expect(state.player.shotsPerSecond).toBe(2.16);
     expect(state.player.fireCooldownSeconds).toBe(0.37);
     expect(getNormalAttributeValue('damage', 25, 10)).toBe(50);
     expect(getNormalAttributeValue('damage', 25, 50)).toBe(150);
@@ -347,6 +364,7 @@ describe('wave progression and stat points', () => {
       available: 0,
       spent: 101,
     });
+
   });
 
   it('uses configured per-level costs and refunds the recorded amount', () => {

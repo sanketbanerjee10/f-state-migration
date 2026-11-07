@@ -29,6 +29,7 @@ describe('game settings persistence', () => {
         ...DEFAULT_GAME_SETTINGS.keyBindings,
         moveUp: 'KeyI',
       },
+      alternatePauseKey: 'KeyQ',
       musicEnabled: false,
       soundEnabled: true,
       musicVolume: 0.6,
@@ -64,6 +65,15 @@ describe('game settings persistence', () => {
           }),
       }).keyBindings,
     ).toEqual(DEFAULT_GAME_SETTINGS.keyBindings);
+  });
+
+  it('defaults the configurable pause shortcut to P for older saved settings', () => {
+    expect(
+      loadGameSettings({
+        getItem: () =>
+          JSON.stringify({ touchControls: 'auto', hudDensity: 'standard' }),
+      }).alternatePauseKey,
+    ).toBe('KeyP');
   });
 
   it('ignores the removed turret key in older saved bindings', () => {
@@ -120,7 +130,7 @@ describe('game settings persistence', () => {
       moveDown: 'NumpadAdd',
       moveLeft: 'Comma',
       moveRight: 'BracketLeft',
-      useBomb: 'Escape',
+      useBomb: 'NumpadSubtract',
     };
 
     expect(
@@ -164,12 +174,35 @@ describe('game settings persistence', () => {
             touchControls: 'auto',
             hudDensity: 'standard',
             keyBindings: {
+              ...DEFAULT_GAME_SETTINGS.keyBindings,
+              useBomb: 'Escape',
+            },
+          }),
+      }),
+    ).toThrow('Saved game settings are invalid.');
+    expect(() =>
+      loadGameSettings({
+        getItem: () =>
+          JSON.stringify({
+            touchControls: 'auto',
+            hudDensity: 'standard',
+            keyBindings: {
               moveUp: 'KeyW',
               moveDown: 'KeyS',
               moveLeft: 'KeyA',
               moveRight: 'KeyD',
               useBomb: '',
             },
+          }),
+      }),
+    ).toThrow('Saved game settings are invalid.');
+    expect(() =>
+      loadGameSettings({
+        getItem: () =>
+          JSON.stringify({
+            touchControls: 'auto',
+            hudDensity: 'standard',
+            alternatePauseKey: 'Escape',
           }),
       }),
     ).toThrow('Saved game settings are invalid.');

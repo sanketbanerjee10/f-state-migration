@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bomb } from 'lucide-react';
 
 interface GameTouchControlsProps {
@@ -20,18 +21,19 @@ export function GameTouchControls({
   movementRef,
   aimRef,
 }: GameTouchControlsProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={`game-mobile-controls ${active ? '' : 'game-mobile-controls-hidden'}`}
       role="group"
-      aria-label="Touch controls"
+      aria-label={t('game.touch.controls')}
     >
       <div className="game-mobile-control">
         <button
           ref={movementRef}
           className={`game-joystick game-joystick-movement${highlightMovement ? ' game-joystick-highlighted' : ''}`}
           type="button"
-          aria-label="Movement joystick. Drag in a direction to move. WASD or arrow keys also work when focused."
+          aria-label={t('game.touch.movement')}
         >
           <span className="game-joystick-knob" aria-hidden="true" />
         </button>
@@ -40,7 +42,7 @@ export function GameTouchControls({
         <button
           className="game-bomb-button"
           type="button"
-          aria-label={`Use bomb, ${bombs} remaining`}
+          aria-label={t('game.touch.useBomb', { count: bombs })}
           disabled={bombs <= 0}
           onClick={onUseBomb}
         >
@@ -50,7 +52,7 @@ export function GameTouchControls({
           ref={aimRef}
           className={`game-joystick game-joystick-aim${highlightAim ? ' game-joystick-highlighted' : ''}`}
           type="button"
-          aria-label="Aim joystick. Drag in a direction to aim. Releasing keeps the last aim direction."
+          aria-label={t('game.touch.aim')}
         >
           <span className="game-joystick-knob" aria-hidden="true" />
         </button>

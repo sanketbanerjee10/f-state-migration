@@ -1,14 +1,7 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ActiveTemporaryEffect } from '@/game/core/GameState';
 import { drawOrbGlyph } from '@/game/rendering/OrbRenderer';
-
-const EFFECT_PRESENTATION = {
-  damage: { label: 'Damage' },
-  rapidFire: { label: 'Rapid fire' },
-  shield: { label: 'Shield' },
-  magnet: { label: 'Orb magnet' },
-  cursed: { label: 'Cursed power' },
-} as const;
 
 interface GameActiveEffectIconProps {
   readonly type: ActiveTemporaryEffect['type'];
@@ -40,12 +33,13 @@ interface GameActiveEffectsProps {
 }
 
 export function GameActiveEffects({ effects }: GameActiveEffectsProps) {
+  const { t } = useTranslation();
   if (effects.length === 0) return null;
 
   return (
-    <ul className="game-hud-effects" aria-label="Active effects">
+    <ul className="game-hud-effects" aria-label={t('game.effects.active')}>
       {effects.map((effect) => {
-        const presentation = EFFECT_PRESENTATION[effect.type];
+        const label = t(`game.effects.${effect.type}`);
         const secondsRemaining = Math.ceil(effect.remainingSeconds);
         const durationPercent = effect.durationSeconds > 0
           ? Math.max(
@@ -66,12 +60,15 @@ export function GameActiveEffects({ effects }: GameActiveEffectsProps) {
               `game-effect-${effect.type}`,
               expiring ? 'game-effect-expiring' : '',
             ].filter(Boolean).join(' ')}
-            aria-label={`${presentation.label}, ${secondsRemaining} seconds remaining`}
+            aria-label={t('game.effects.remaining', {
+              name: label,
+              count: secondsRemaining,
+            })}
           >
             <span className="game-effect-icon" aria-hidden="true">
               <GameActiveEffectIcon type={effect.type} />
             </span>
-            <span className="game-effect-name">{presentation.label}</span>
+            <span className="game-effect-name">{label}</span>
             <strong className="game-effect-time">{secondsRemaining}s</strong>
             <span
               className="game-effect-duration"

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   isLeaderboardEligibleGameMode,
   type GameStateSnapshot,
@@ -10,6 +11,7 @@ interface GameScoreSubmissionProps {
 }
 
 export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
+  const { t } = useTranslation();
   const [playerName, setPlayerName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const submission = useSubmitGameScore();
@@ -20,7 +22,7 @@ export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
     event.preventDefault();
     const normalizedName = playerName.trim();
     if (!normalizedName) {
-      setNameError('Enter a name to submit your score.');
+      setNameError(t('game.submission.enterName'));
       return;
     }
 
@@ -38,9 +40,9 @@ export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
 
   return (
     <section className="game-score-submission" aria-labelledby="game-submit-score-title">
-      <h2 id="game-submit-score-title">Submit your run</h2>
+      <h2 id="game-submit-score-title">{t('game.submission.title')}</h2>
       <form onSubmit={submit}>
-        <label htmlFor="game-player-name">Leaderboard name</label>
+        <label htmlFor="game-player-name">{t('game.submission.name')}</label>
         <div className="game-score-submit-row">
           <input
             id="game-player-name"
@@ -59,26 +61,26 @@ export function GameScoreSubmission({ gameState }: GameScoreSubmissionProps) {
             disabled={submission.isPending || submission.isSuccess}
           >
             {submission.isPending
-              ? 'Submitting…'
+              ? t('game.submission.submitting')
               : submission.isError
-                ? 'Retry submission'
+                ? t('game.submission.retry')
                 : submission.isSuccess
-                  ? 'Score submitted'
-                  : 'Submit score'}
+                  ? t('game.submission.submitted')
+                  : t('game.submission.submit')}
           </button>
         </div>
       </form>
       {nameError && <p className="game-score-error" role="alert">{nameError}</p>}
       {submission.isSuccess && (
         <p className="game-score-success" role="status">
-          Score submitted. Your run is now eligible for the all-time leaderboard.
+          {t('game.submission.success')}
         </p>
       )}
       {submission.isError && (
         <p className="game-score-error" role="alert">
           {submission.error instanceof Error
             ? submission.error.message
-            : 'Score submission failed. Check your connection and retry.'}
+            : t('game.submission.failed')}
         </p>
       )}
     </section>

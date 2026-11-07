@@ -74,6 +74,538 @@
     "dashboard": {
       "workspace": "Leadership / Applications", "title": "Migration applications", "subtitle": "Review requests and manage State 565 destinations.", "refresh": "Refresh", "overviewFailed": "Failed to load overview metrics.", "overviewTitle": "Application totals", "all": "All applications", "awaiting": "Awaiting review", "approved": "Approved", "rejected": "Rejected", "allianceAdded": "Alliance added.", "allianceUpdated": "Alliance updated.", "requestFailed": "The request could not be completed.", "allianceAction": "{{tag}} {{action}}.", "destinations": "DESTINATIONS", "allianceManagement": "Alliance management", "publicHint": "Active destinations appear on the public application.", "addAlliance": "Add alliance", "alliancesFailed": "Failed to load alliances.", "noAlliances": "No destination alliances configured yet.", "displayOrder": "Display order {{n}} · Shown on application", "hidden": "Hidden from application", "editAlliance": "Edit {{tag}}", "addDestination": "Add destination alliance", "tag": "Tag", "allianceName": "Alliance name", "displayOrderLabel": "Display order", "saveAlliance": "Save alliance", "tierNameRequired": "Tier name is required.", "tierMinRequired": "Minimum score must be a non-negative number.", "tierPassesRequired": "Passes required must be at least 1.", "tierSaved": "Tier threshold for \"{{name}}\" {{operation}} successfully.", "tierFailed": "Failed to update threshold.", "scoringTiers": "SCORING & TIERS", "tierTitle": "Migration Tier Thresholds", "tierDescription": "Configurable score boundaries and pass requirements evaluated for every applicant.", "addThreshold": "Add threshold", "thresholdFailed": "Failed to load tier thresholds.", "tierColumn": "Tier", "minColumn": "Min Score Threshold", "passesColumn": "Base Passes Required", "actions": "Actions", "points": "points", "passes": "migration passes", "editThreshold": "Edit threshold", "addTierTitle": "Add migration tier threshold", "configureTier": "Configure {{name}} Tier", "tierName": "Tier Name", "minimumScore": "Minimum Score Threshold", "minimumPasses": "Base Migration Passes Required", "saveThreshold": "Save threshold", "exportNoFile": "The export returned no file.", "exportFailed": "The export could not be completed.", "preparing": "Preparing…", "export": "Export filtered CSV", "searchPlaceholder": "Search applications by in-game name", "searchName": "Search in-game name", "state": "State #", "allTiers": "All tiers", "allStatuses": "All statuses", "allAlliances": "All alliances", "sort": "Sort", "sortSubmitted": "Submitted", "sortF1": "F1 power", "sortKills": "Kills", "sortDirection": "Sort {{direction}}", "loadingApps": "Loading applications", "appsFailed": "Failed to load applications.", "noMatches": "No applications match this view", "filterHint": "Try changing or clearing your filters.", "requestType": "Request Type", "stateColumn": "State", "tierBreakdown": "Tier Breakdown", "preference": "Preference", "rep": "Rep:", "tierPlayerCount": "{{count}} {{tier}} player(s)", "statusUpdated": "Application marked {{status}}.", "statusFailed": "Failed to update status.", "review": "Application review", "application": "Application", "loadingDetails": "Loading application…", "detailsFailed": "Failed to load application details.", "decision": "Application Decision", "currentStatus": "Current: {{status}}", "pendingStatus": "● Pending", "groupMigration": "Group Migration:", "groupUnderRep": "{{count}} people migrating together under representative {{representative}}.", "preferenceListed": "Preferred alliances", "noPreference": "No preference listed", "tiersBreakdown": "Player Tiers Breakdown", "reason": "Reason for migrating", "reference": "Character reference", "comments": "Additional comments", "profile": "APPLICANT PLAYER PROFILE", "rosterCount": "GROUP ROSTER ({{count}} PEOPLE)", "primary": "Primary Applicant / Rep", "memberIndex": "Group Member #{{index}}", "manual": "Manual", "detailState": "State:", "detailPower": "Power:", "detailF1": "F1:", "detailKills": "Kills:", "detailAlliance": "Alliance:", "detailStruct": "Struct:", "detailTech": "Tech:", "detailTroop": "Troop:", "detailHero": "Hero:", "detailVehicle": "Vehicle:", "expandHint": "Click to view full text in modal", "expand": "Expand", "displayOrderOnly": "Display order {{n}}", "shown": "Shown on application", "activated": "activated", "deactivated": "deactivated", "inbox": "INBOX", "alliancesFilter": "Alliance filter", "tierFilter": "Tier filter", "statusFilter": "Status filter", "ascending": "ascending", "descending": "descending", "tierPlayerCount_one": "{{count}} {{tier}} player", "tierPlayerCount_other": "{{count}} {{tier}} players", "paginationSummary": "Showing {{start}}?{{end}} of {{total}}", "pageSummary": "Page {{page}} of {{totalPages}}", "settingsTitle": "Portal Settings (Alliances & Tier Thresholds)", "dismissNotice": "Dismiss notice", "submittedAt": "Submitted {{date}}", "groupRepresentative": "Group representative", "currentState": "Current state", "currentAlliance": "Current alliance", "stateNumber": "State {{state}}", "noneListed": "None listed", "reviewKicker": "APPLICATION REVIEW" }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY PRESENTS",
+      "taglineLead": "CALM OUTSIDE.",
+      "taglineEmphasis": "CHAOS INSIDE.",
+      "survival": "Survival Mode",
+      "campaign": "Campaign Mode",
+      "devLevel": "Start Dev Level",
+      "howToPlay": "How to Play",
+      "fieldGuides": "Field Guides",
+      "leaderboard": "Leaderboard",
+      "settings": "Settings",
+      "communityLead": "A",
+      "communityTail": "COMMUNITY CREATION",
+      "backToMenu": "Back to menu",
+      "backToPauseMenu": "Back to pause menu",
+      "carousel": "carousel",
+      "stagesReached": "STAGES REACHED",
+      "statPoints": "STAT POINTS",
+      "area": "AREA {{number}}",
+      "sector": "CAMPAIGN SECTOR",
+      "stagesCleared": "{{count}} OF 10 STAGES CLEARED",
+      "previousArea": "Previous area",
+      "nextArea": "Next area",
+      "start": "Start",
+      "locked": "Locked",
+      "cleared": "✓ CLEARED",
+      "boss": "BOSS",
+      "current": "CURRENT",
+      "ready": "READY",
+      "difficulty": "Difficulty {{difficulty}} out of 5",
+      "best": "BEST",
+      "maps": {
+        "Watchtower": "Watchtower", "Barracks": "Barracks", "Perimeter": "Perimeter",
+        "Bunker": "Bunker", "Relay": "Relay", "Armory": "Armory",
+        "Checkpoint": "Checkpoint", "Hangar": "Hangar", "Rampart": "Rampart",
+        "Citadel": "Citadel", "Foundry": "Foundry", "Crucible": "Crucible",
+        "Refinery": "Refinery", "Conveyor": "Conveyor", "Furnace": "Furnace",
+        "Mill": "Mill", "Smelter": "Smelter", "Generator": "Generator",
+        "Assembly": "Assembly", "Forge": "Forge", "Quarantine": "Quarantine",
+        "Wasteland": "Wasteland", "Mire": "Mire", "Fallout": "Fallout",
+        "Blight": "Blight", "Hollow": "Hollow", "Ruins": "Ruins",
+        "Toxicity": "Toxicity", "Necropolis": "Necropolis", "Deadzone": "Deadzone"
+      },
+      "areas": {
+        "military": "Military Outpost",
+        "industrial": "Industrial Complex",
+        "contaminated": "Contaminated Zone"
+      },
+      "campaignAreas": "Campaign areas",
+      "areaLevels": "{{area}} levels",
+      "mainMenu": "Main menu",
+      "levelAction": "{{action}} {{stage}}, {{area}}{{boss}}",
+      "bossSuffix": ", boss {{name}}",
+      "lockedState": "LOCKED",
+      "resumeGame": "Resume game",
+      "closeCampaign": "Close campaign selection",
+      "closeLeaderboard": "Close leaderboard",
+      "closeGuides": "Close guides",
+      "closeSettings": "Close settings"
+    },
+    "settings": {
+      "title": "Settings", "categories": "Settings categories",
+      "play": "Play", "playHint": "Your experience",
+      "controls": "Controls", "controlsHint": "Keys & movement",
+      "audio": "Audio", "audioHint": "Music & effects",
+      "language": "Language", "languageHint": "Display language",
+      "makeItYours": "Make it yours", "yourControls": "Your controls",
+      "setTheMood": "Set the mood", "chooseLanguage": "Choose your language",
+      "touchControls": "Touch controls", "joysticksQuestion": "When should joysticks appear?",
+      "touchControlsVisibility": "Touch controls visibility",
+      "auto": "Auto", "always": "Always", "never": "Never",
+      "touchAutoHint": "Show touch controls automatically when the device supports them.",
+      "touchAlwaysHint": "Keep touch controls visible throughout the game.",
+      "touchNeverHint": "Hide touch controls; use keyboard and mouse instead.",
+      "hudDensity": "HUD density", "battlefieldView": "Choose your battlefield view.",
+      "standard": "Standard",
+      "compact": "Compact",
+      "pauseGame": "Pause Game",
+      "keyBindings": "Key bindings", "pressKey": "Press a key", "pressKeyEllipsis": "PRESS KEY…",
+      "placeTurret": "Place turret",
+      "leftDoubleOrRightClick": "DOUBLE LEFT-CLICK OR RIGHT-CLICK",
+      "keyCannotAssign": "This key cannot be assigned by your browser.",
+      "actions": {
+        "moveUp": "Move up", "moveDown": "Move down",
+        "moveLeft": "Move left", "moveRight": "Move right", "useBomb": "Use bomb"
+      },
+      "sectionPlay": "01 / PLAY", "sectionControls": "02 / CONTROLS",
+      "sectionAudio": "03 / AUDIO", "sectionLanguage": "04 / LANGUAGE",
+      "loadFailed": "Unable to load saved game settings: {{error}}",
+      "loadFailedSimple": "an unknown error occurred",
+      "saveFailed": "Settings changed for this session but could not be saved: {{error}}",
+      "saveFailedSimple": "an unknown error occurred",
+      "cancelBinding": "Click a highlighted key again to cancel. Press Escape while assigning to cancel.",
+      "audioUnavailable": "Audio unavailable: {{error}}",
+      "backgroundMusic": "Background music", "lateNightRadio": "Late-night radio",
+      "volume": "Volume", "musicVolume": "Music volume",
+      "lofiTracks": "Lo-fi tracks play one after another.",
+      "musicUnavailable": "Music unavailable — no tracks configured.",
+      "soundEffects": "Sound effects", "littleThings": "Little things that matter",
+      "effectsVolume": "Effects volume", "soundEffectFootnote": "Item pickups, damage and combat cues."
+    },
+    "hud": {
+      "runStatus": "Run status", "wave": "WAVE", "waveProgress": "Wave progress",
+      "health": "HEALTH", "low": "LOW", "playerHealth": "Player health",
+      "score": "SCORE", "eliminated": "ELIMINATED", "bombs": "BOMBS",
+      "turrets": "TURRETS", "customWavePower": "Custom wave power: {{name}}",
+      "power": "POWER", "activePlayerStats": "Active player stats",
+      "bossApproaching": "BOSS APPROACHING", "bossIntroduction": "Boss introduction",
+      "bossStatus": "Boss status", "boss": "Boss", "shielded": "SHIELDED",
+      "bossHealth": "{{name}} health"
+    },
+    "touch": {
+      "controls": "Touch controls",
+      "movement": "Movement joystick. Drag in a direction to move. WASD or arrow keys also work when focused.",
+      "aim": "Aim joystick. Drag in a direction to aim. Releasing keeps the last aim direction.",
+      "useBomb": "Use bomb, {{count}} remaining"
+    },
+    "pause": {
+      "title": "Game paused", "actions": "Game actions", "quickAccess": "QUICK ACCESS",
+      "resumeRun": "Resume run", "jumpBack": "Jump back into the action",
+      "settings": "Settings", "fieldGuide": "Field guide", "restartRun": "Restart run",
+      "exitTutorial": "Exit tutorial", "mainMenu": "Main menu",
+      "runStats": "Current run statistics", "currentRun": "CURRENT RUN",
+      "nightContinues": "The night continues", "totalScore": "TOTAL SCORE",
+      "pointsEarned": "Points earned", "playerVitals": "PLAYER VITALS",
+      "criticalCondition": "Critical condition — stay sharp",
+      "battered": "A little battered, still standing",
+      "lookingGood": "Looking good out there",
+      "survivalTime": "SURVIVAL TIME",
+      "survivorDevelopment": "SURVIVOR DEVELOPMENT",
+      "pauseDetails": "Pause menu details", "coreAttributes": "Core attributes",
+      "fineTuneBuild": "Fine-tune your survivor's build.",
+      "firingRange": "Firing range", "firingRangeDescription": "Maximum distance your projectiles travel.",
+      "rangeUnit": "units",
+      "unlimitedStatsDev": "Unlimited stat points in dev mode",
+      "unusedStatPoints": "{{count}} unused stat points",
+      "rareAbilities": "Rare abilities", "rarePerks": "Powerful perks for the long nights.",
+      "unlimitedRareDev": "Unlimited rare ability points in dev mode",
+      "unusedRarePoints": "{{count}} unused rare ability points",
+      "spendStatPoints": "Spend stat points", "rareUpgrades": "Rare upgrades",
+      "allocated": "+{{count}} allocated", "next": "Next: {{effect}}",
+      "freeDev": "Free in Dev mode", "statPointsCost": "{{count}} SP",
+      "decrease": "Decrease {{name}}", "increase": "Increase {{name}}",
+      "rarityCommon": "common", "rarityRare": "rare", "rarityEpic": "epic",
+      "level": "Level {{level}}/{{max}}", "unlimitedDev": "Unlimited in Dev mode",
+      "maxLevel": "Max level", "rarePointsCost": "{{count}} RP",
+      "locked": "Locked: {{reason}}", "maximumLevelReached": "✦ Maximum level reached",
+      "refund": "Refund {{name}}", "purchase": "Purchase {{name}}",
+      "runUnavailable": "Run unavailable", "nextChapter": "Your next chapter is waiting.",
+      "resumeWhenReady": "Resume when you're ready to return.",
+      "resume": "Resume", "backToGame": "Back to the game", "guides": "Guides"
+    },
+    "effects": {
+      "active": "Active effects", "damage": "Damage", "rapidFire": "Rapid fire",
+      "shield": "Shield", "magnet": "Orb magnet", "cursed": "Cursed power",
+      "remaining": "{{name}}, {{count}} seconds remaining"
+    },
+    "tutorial": {
+      "ariaLabel": "Interactive game tutorial", "step": "Step {{current}} of {{total}}",
+      "exerciseComplete": "Exercise complete.",
+      "collectOrbOrSkip": "Collect an orb, or skip this exercise.",
+      "moveOrSkip": "Move your survivor, or skip this exercise.",
+      "aimOrSkip": "Change your aim direction, or skip this exercise.",
+      "confirmExit": "Confirm tutorial exit",
+      "exitPrompt": "Exit the tutorial? This practice run will be discarded.",
+      "keepPlaying": "Keep playing", "exit": "Exit tutorial", "previous": "Previous",
+      "returnToMenu": "Return to main menu", "continue": "Continue",
+      "skipExercise": "Skip exercise",
+      "steps": {
+        "intro": {
+          "title": "Welcome to the arena",
+          "description": "Survive as many waves as you can. Keep your survivor alive, clear the arena, and use every opening to reposition."
+        },
+        "player": {
+          "title": "Your survivor",
+          "description": "The glowing character is you. Your health is shown in the Vitals bar, so avoid contact with zombies."
+        },
+        "movement": {
+          "title": "Move around",
+          "description": "Use your configured movement keys, or drag the left joystick on touchscreens. You can rebind keys in Settings. Move a short distance to practise."
+        },
+        "aim": {
+          "title": "Aim and fire",
+          "description": "Point the mouse or drag the right joystick to change aim. Your weapon fires automatically in that direction. Try aiming somewhere new."
+        },
+        "hud": {
+          "title": "Read the HUD",
+          "description": "Wave, Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Use the bomb key or touch bomb button to use a bomb. Right-click or double-tap an open spot to deploy a turret. Collected temporary effects appear beneath the HUD."
+        },
+        "enemies": {
+          "title": "Know your enemies",
+          "description": "Walkers are slower and tougher. Runners are smaller, faster, and have less health. Keep moving and aim away from danger."
+        },
+        "obstacles": {
+          "title": "Use the arena",
+          "description": "Crates and barricades block movement and can interrupt shots. Steer around them to create a clear path."
+        },
+        "powerups": {
+          "title": "Power-up orbs",
+          "description": "Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key or touch bomb button to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, then right-click or double-tap an open spot to place one for 12 seconds."
+        },
+        "collectOrb": {
+          "title": "Collect an orb",
+          "description": "Walk over an orb to collect it. Orbs drop after every two zombie eliminations; follow a glowing orb and collect one to see its effect. Bombs are stored until you press the bomb key or touch bomb button."
+        },
+        "waves": {
+          "title": "Clear the wave",
+          "description": "Enemies arrive in waves. Defeat every zombie to clear a wave and earn its score bonus."
+        },
+        "statPoints": {
+          "title": "Spend stat points",
+          "description": "Each cleared wave earns one stat point. Open the pause menu to spend points on weapon damage, fire rate, maximum health, or movement speed. Use minus to refund an allocated point."
+        },
+        "pause": {
+          "title": "Pause and review",
+          "description": "The pause menu shows run statistics and active effects. Pause with Escape or the Pause button; resume, adjust settings, restart, or return to the menu."
+        },
+        "completion": {
+          "title": "You are ready",
+          "description": "Move with WASD or arrow keys, aim with the mouse, and collect orbs while surviving each wave. Return to the main menu to start a fresh normal run."
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "All-time survival records, ranked by waves cleared, score, kills, then time.",
+      "loading": "Loading leaderboard…", "loadFailed": "Unable to load leaderboard right now.",
+      "retrying": "Retrying…", "retry": "Retry",
+      "empty": "No runs have been submitted yet. Be the first to set a score.",
+      "player": "Player", "cleared": "Cleared", "score": "Score", "kills": "Kills",
+      "time": "Time", "reached": "Reached {{wave}}", "title": "Leaderboard",
+      "entries": "{{count}} entries", "range": "{{start}}–{{end}} of {{total}}",
+      "previous": "Previous", "next": "Next"
+    },
+    "submission": {
+      "title": "Submit your run", "name": "Leaderboard name",
+      "enterName": "Enter a name to submit your score.",
+      "submitting": "Submitting…", "retry": "Retry submission",
+      "submitted": "Score submitted", "submit": "Submit score",
+      "success": "Score submitted. Your run is now eligible for the all-time leaderboard.",
+      "failed": "Score submission failed. Check your connection and retry."
+    },
+    "results": {
+      "practice": "Practice session", "tutorialOver": "Tutorial round over",
+      "practiceNotSubmitted": "This practice run is separate and will not be submitted to the leaderboard.",
+      "restartTutorial": "Restart tutorial", "stageCompleted": "Stage {{level}} Completed",
+      "personalLevelScore": "Personal level score", "levelScore": "LEVEL SCORE",
+      "bossDefeated": "BOSS DEFEATED", "bossFallen": "Another major threat has fallen.",
+      "stageStatistics": "Stage statistics", "enemiesEliminated": "Enemies eliminated",
+      "completionTime": "Completion time", "damageDealt": "Damage dealt",
+      "campaignComplete": "THE CAMPAIGN IS COMPLETE",
+      "campaignCompleteDescription": "You've made it through all 30 stages. More levels may arrive in a future update.",
+      "thankYou": "THANK YOU FOR SURVIVING THE NIGHT",
+      "journeyContinues": "THE JOURNEY CONTINUES", "nextLevel": "Next level",
+      "levelSelection": "Level selection", "mainMenu": "Main menu",
+      "notThisTime": "Not this <span>time.</span>", "campaignStage": "Campaign stage",
+      "currentStage": "CURRENT STAGE", "campaignStageName": "Campaign stage",
+      "progressSafe": "Your progress is safe.",
+      "progressSafeDescription": "Your unlocked stages and previous records are still here. Nothing you've earned has been lost.",
+      "nextRun": "THE NEXT RUN IS YOURS TO WRITE", "retryLevel": "Retry Level",
+      "finalScore": "Final score",
+      "campaignRunsSeparate": "Campaign runs are kept separate from standard Survival records.",
+      "campaignRun": "Campaign run", "notThisTimeLead": "Not this",
+      "notThisTimeEmphasis": "time.", "stageNumber": "Stage {{level}}",
+      "replayLevel": "Replay Level", "next": "Next",
+      "waveReached": "Wave reached", "wavesCleared": "Waves cleared",
+      "zombiesEliminated": "Zombies eliminated", "timeSurvived": "Time survived",
+      "playAgain": "Play again"
+    },
+    "guides": {
+      "closeDetails": "Close guide details", "close": "Close",
+      "heroDescription": "Know what you’re up against. Study the threats, learn your resources, and prepare for the next run.",
+      "progress": "{{discovered}} of {{total}} enemy and boss entries identified",
+      "threatCompletion": "Threat intelligence completion",
+      "identified": "{{count}} / {{total}} entries identified",
+      "threatIntel": "THREAT INTEL", "enemyCatalogue": "THREAT CATALOGUE",
+      "enemies": "Enemies", "enemyDescription": "The infected you’ll encounter out in the field.",
+      "bossDossier": "HIGH-THREAT DOSSIER", "bosses": "Bosses",
+      "bossDescription": "Major mutations. Learn their patterns before they find you.",
+      "arenaEnvironments": "OPERATIONAL ENVIRONMENTS", "arenas": "Arenas",
+      "arenaDescription": "Five environments rotate through Survival waves, each with varied obstacle layouts.",
+      "viewDetails": "View {{name}} details", "viewUnknownEnemy": "View unidentified enemy details",
+      "viewUnknownBoss": "View unidentified boss details",
+      "unknownEnemy": "Unknown Enemy", "unknownBoss": "Unknown Boss", "unknown": "Unknown",
+      "threatIdentified": "THREAT IDENTIFIED", "unknownContact": "UNKNOWN CONTACT",
+      "bossDossierTag": "BOSS DOSSIER", "classifiedDossier": "CLASSIFIED DOSSIER",
+      "classified": "Threat details are classified.",
+      "identifiedCount": "{{count}} of {{total}} identified",
+      "arenaRenderables": "{{name}} renderables", "viewArenaObjects": "View {{name}} renderable objects",
+      "layout": "{{name}} layout", "zone": "ZONE {{number}}",
+      "waves": "WAVES {{start}}–{{end}}",
+      "arenaObjects": "Objects that may appear in this environment. Object state and placement can vary by run.",
+      "classifiedIntel": "Threat information is unavailable until it has been identified.",
+      "eliteTipTitle": "SURVIVAL TIP",
+      "eliteTip": "Watch for elite variants: they are more dangerous than standard enemies."
+    },
+    "orbs": {
+      "supplies": "SUPPLIES & POWER-UPS", "title": "Orbs",
+      "description": "Useful pickups that can turn the tide of a run.",
+      "viewDetails": "View {{name}} details", "rare": "RARE",
+      "healthName": "Health Orb", "healthDescription": "Restores health.",
+      "healthDetails": "Restores 25 health, up to your maximum.",
+      "damageName": "Damage Orb", "damageDescription": "Boosts projectile damage.",
+      "damageDetails": "Doubles your projectile damage for a limited time.",
+      "rapidFireName": "Rapid Fire Orb", "rapidFireDescription": "Speeds up your firing rate.",
+      "rapidFireDetails": "Doubles your firing rate for a limited time.",
+      "shieldName": "Shield Orb", "shieldDescription": "Absorbs incoming damage.",
+      "shieldDetails": "Adds a shield that absorbs incoming damage for a limited time.",
+      "bombName": "Bomb Orb", "bombDescription": "Adds an explosive charge to your inventory.",
+      "bombDetails": "A bomb damages nearby enemies when detonated.",
+      "magnetName": "Magnet Orb", "magnetDescription": "Draws nearby orbs toward you.",
+      "magnetDetails": "Pulls nearby orbs toward you for a limited time.",
+      "turretName": "Turret Orb", "turretDescription": "Deploys an automated turret.",
+      "turretDetails": "A deployed turret targets nearby enemies and fires for a limited time.",
+      "cursedName": "Cursed Orb", "cursedDescription": "Makes enemies move faster.",
+      "cursedDetails": "Increases enemy movement speed for a limited time.",
+      "rareGoldName": "Rare Gold Orb", "rareGoldDescription": "Awards one Rare Point.",
+      "rareGoldDetails": "Grants one Rare Point."
+    },
+    "notifications": {
+      "discovered": "{{name}} discovered",
+      "firstEncounter": "First encounter recorded. Stay alert.",
+      "campaignLocked": "That campaign level is locked or unavailable.",
+      "renderInitFailed": "Unable to initialize the game rendering surface.",
+      "fullscreenExitFailed": "Unable to exit fullscreen mode.",
+      "fullscreenHoldEscape": "Hold Esc to exit fullscreen.",
+      "fullscreenPauseShortcut": "Press {{key}} to pause the game in fullscreen mode.",
+      "campaignProgressSaveFailed": "Campaign progress could not be saved: {{error}}",
+      "campaignProgressSaveFailedSimple": "Campaign progress could not be saved.",
+      "campaignPointsSaveFailed": "Campaign Stat Points could not be saved: {{error}}",
+      "campaignPointsSaveFailedSimple": "Campaign Stat Points could not be saved."
+    },
+    "canvas": {
+      "ariaLabel": "565 Zombie Survival. Use your configured movement keys or touch controls to move. Aim with the mouse or aim joystick. The weapon fires automatically in the selected direction. Collect bombs and press your configured bomb key or the touch bomb button to use one. Collect up to five turrets, then right-click or double-tap an open spot in the arena to place one.",
+      "notSupported": "Canvas rendering is not supported by this browser."
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "Unable to update thresholds.",
+      "unavailable": "Performance diagnostics are unavailable.",
+      "exportFailed": "Unable to export diagnostics."
+    },
+    "arenaLayouts": {
+      "military-open-centre": "Open Centre",
+      "military-corridor-network": "Corridor Network",
+      "military-scattered-cover": "Scattered Cover",
+      "military-central-structure": "Central Structure",
+      "industrial-open-centre": "Open Centre",
+      "industrial-cluster-split": "Industrial Cluster",
+      "industrial-corridor": "Corridor Grid",
+      "industrial-rust-scrap": "Rust Scrap",
+      "contaminated-open-lab": "Open Lab",
+      "contaminated-split-lab": "Split Laboratory",
+      "contaminated-scattered-tanks": "Scattered Tanks",
+      "contaminated-central-structure": "Central Containment",
+      "urban-open-road": "Open Road",
+      "urban-rubble-lane": "Rubble Lane",
+      "urban-ruined-block": "Ruined Block",
+      "urban-roadblock-loop": "Roadblock Loop",
+      "bunker-open-bay": "Open Bay",
+      "bunker-split-hall": "Split Hall",
+      "bunker-core-structure": "Core Structure",
+      "bunker-perimeter-defence": "Perimeter Defence"
+    },
+    "announcements": {
+      "bossEntered": "{{name}} has entered", "bossDefeated": "{{name}} defeated",
+      "level": "Level {{level}}", "bossLevel": "Level {{level}} · BOSS",
+      "wave": "Wave {{wave}}", "levelComplete": "LEVEL COMPLETE", "runOver": "Run over"
+    },
+    "music": {
+      "toggle": "{{action}} music", "pause": "Pause", "play": "Play"
+    },
+    "pauseButton": {
+      "ariaLabel": "Pause game. Press Escape or P.", "title": "Pause (Esc)",
+      "label": "Pause (Esc)"
+    },
+    "fullscreenButton": {
+      "enter": "Enter fullscreen",
+      "exit": "Exit fullscreen"
+    },
+    "bosses": {
+      "charger": "The Charger", "acidQueen": "Acid Queen", "hordeCaller": "Horde Caller",
+      "chargerSummary": "A massive mutant built for high-speed charges.",
+      "chargerDescription": "A massive mutant that builds momentum before charging across the arena.",
+      "chargerAbility": "Telegraphs its dash direction; colliding with an obstacle stuns it briefly.",
+      "acidQueenSummary": "A toxic mutant that attacks from range and controls space.",
+      "acidQueenDescription": "A toxic mutant that controls the arena with ranged acid attacks.",
+      "acidQueenAbility": "Fires acid spreads and creates telegraphed pools that deny areas temporarily.",
+      "hordeCallerSummary": "A summoner shielded by its reinforcements.",
+      "hordeCallerDescription": "A summoner protected by a shield while its reinforcements remain.",
+      "hordeCallerAbility": "Summons supporting zombies; defeat them to remove its shield and make it vulnerable."
+    },
+    "enemies": {
+      "walker": {
+        "name": "Walker", "summary": "A steady, close-range pursuer.",
+        "description": "A slow, steady pursuer that closes in and attacks at close range.",
+        "ability": "No special attack. Keep moving so the horde cannot surround you."
+      },
+      "runner": {
+        "name": "Runner", "summary": "A fast, fragile attacker.",
+        "description": "A fragile but fast zombie that can quickly catch a drifting survivor.",
+        "ability": "After 6 seconds at normal speed, dashes at twice its base speed for 2 seconds. It gives no visible warning before charging."
+      },
+      "brute": {
+        "name": "Brute", "summary": "A heavily built zombie with high health and melee damage.",
+        "description": "A slow, heavily built zombie with more health and a punishing melee hit.",
+        "ability": "Heavy contact damage. Avoid letting it reach you."
+      },
+      "spitter": {
+        "name": "Spitter", "summary": "A ranged attacker that fires acid.",
+        "description": "A ranged attacker that tries to hold its ground away from you.",
+        "ability": "Fires a fast acid projectile when you are within range."
+      },
+      "swarm": {
+        "name": "Swarm", "summary": "A group of small, fast attackers.",
+        "description": "Small, quick zombies that are easy to overlook in a crowded arena.",
+        "ability": "Moves faster than a Runner and dodges incoming shots at double speed, with a 3-second cooldown. After each dodge, it slows to half speed and recovers to normal over 2 seconds."
+      },
+      "armoured": {
+        "name": "Armoured", "summary": "A durable zombie with reduced frontal damage.",
+        "description": "A durable zombie that reduces the damage it deals when facing you.",
+        "ability": "Deals less contact damage when its front faces you; avoid direct approaches."
+      },
+      "screamer": {
+        "name": "Screamer", "summary": "A summoner that calls reinforcements.",
+        "description": "A persistent pursuer that is most dangerous when the arena is crowded.",
+        "ability": "Calls one walker reinforcement at a time; the Horde Caller summons twice as many."
+      },
+      "bloater": {
+        "name": "Bloater", "summary": "A tough zombie that leaves an acid hazard.",
+        "description": "A slow, tough zombie that leaves a dangerous parting gift.",
+        "ability": "Bursts into a damaging acid hazard when defeated."
+      },
+      "splitter": {
+        "name": "Splitter", "summary": "A zombie that divides into smaller enemies.",
+        "description": "A tricky zombie that turns one threat into several.",
+        "ability": "Splits into four smaller Swarm zombies when defeated."
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": { "name": "Double Orbs", "description": "Orbs drop twice as often." },
+      "fastWave": { "name": "Fast Wave", "description": "Enemies move 20% faster." },
+      "armouredInvasion": { "name": "Armoured Invasion", "description": "Armoured enemies are more common." },
+      "eliteThreat": { "name": "Elite Threat", "description": "Elite enemies are more likely to appear." },
+      "contamination": { "name": "Contamination", "description": "Bloaters and their hazards are more dangerous." },
+      "reducedVisibility": { "name": "Reduced Visibility", "description": "Darkness limits how far you can see." },
+      "overrun": { "name": "Overrun", "description": "Enemies arrive more quickly." },
+      "heavyResistance": { "name": "Heavy Resistance", "description": "Brutes are more common." }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": { "name": "Weapon damage", "description": "Deal more damage with every projectile.", "effect": "+10% base damage", "unit": "damage/shot" },
+        "shotsPerSecond": { "name": "Rapid fire", "description": "Fire more often while keeping manual aim.", "effect": "+8% base fire rate", "unit": "shots/second" },
+        "maxHealth": { "name": "Maximum health", "description": "Increase your maximum health.", "effect": "+10 max health", "unit": "health" },
+        "movementSpeed": { "name": "Movement speed", "description": "Move faster to dodge and reposition.", "effect": "+3% base movement speed", "unit": "units/second" }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "Lifesteal", "description": "Heal a portion of weapon damage dealt.",
+          "unlock": "Unlocked from the start of the run.",
+          "effects": ["Heal 1% of eligible damage", "Heal 2% of eligible damage", "Heal 3% of eligible damage", "Heal 4% of eligible damage", "Heal 5% of eligible damage"]
+        },
+        "criticalMastery": {
+          "name": "Critical Mastery", "description": "Increase the chance for weapon hits to deal critical damage.",
+          "unlock": "Unlocked from the start of the run.",
+          "effects": ["+3% critical chance", "+6% critical chance", "+9% critical chance", "+12% critical chance", "+15% critical chance"]
+        },
+        "explosiveRounds": {
+          "name": "Explosive Rounds", "description": "Rounds explode on impact for splash damage.",
+          "unlock": "Unlocked from the start of the run.",
+          "effects": ["3% chance to explode on impact", "6% chance to explode on impact", "9% chance to explode on impact", "12% chance to explode on impact", "15% chance to explode on impact"]
+        },
+        "emergencyShield": {
+          "name": "Emergency Shield", "description": "Creates a protective shield after taking damage.",
+          "unlock": "Unlocked from the start of the run.",
+          "effects": ["Shield for 1 second", "Shield for 1.5 seconds", "Shield for 2 seconds", "Shield for 2.5 seconds", "Shield for 3 seconds"]
+        },
+        "orbMagnetism": {
+          "name": "Orb Magnetism", "description": "Pull nearby orbs toward the player.",
+          "unlock": "Unlocked from the start of the run.",
+          "effects": ["60-unit pickup radius", "90-unit pickup radius", "120-unit pickup radius", "150-unit pickup radius", "180-unit pickup radius"]
+        },
+        "piercingRounds": {
+          "name": "Piercing Rounds", "description": "Shots continue through targets and hit additional enemies.",
+          "unlock": "Unlocks during the run.",
+          "effects": ["Pierce 1 additional target", "Pierce 2 additional targets", "Pierce 3 additional targets", "Pierce 4 additional targets", "Pierce 5 additional targets"]
+        },
+        "secondWind": {
+          "name": "Second Wind", "description": "Restore health once per run when below a critical threshold.",
+          "unlock": "Unlocks during the run.",
+          "effects": ["Restore 10% health", "Restore 15% health", "Restore 20% health"]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "Stage {{level}} — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "Military Outpost",
+        "description": "A moonlit outpost with supply crates, sandbag cover, and destructible barricades."
+      },
+      "industrial": {
+        "name": "Industrial Complex",
+        "description": "A heavy industrial floor broken up by concrete structures and reinforced barriers."
+      },
+      "contaminated": {
+        "name": "Contaminated Zone",
+        "description": "A weathered green zone with scattered cover and dangerous open lanes."
+      },
+      "urban": {
+        "name": "Ruined City",
+        "description": "A ruined city arena where broken walls and cover shape the battlefield."
+      },
+      "bunker": {
+        "name": "Underground Bunker",
+        "description": "A cold underground complex of concrete defenses and tight corridors."
+      }
+    },
+    "arenaObjects": {
+      "crate": { "name": "Crate", "description": "Stacked supply crates that create cover and break up sightlines." },
+      "barricade": { "name": "Barricade", "description": "Low barricades used to funnel movement and block rushes." },
+      "wall": { "name": "Wall", "description": "Solid concrete panels that hide lanes and create choke points." },
+      "cover": { "name": "Cover", "description": "Shielding segments that give players a brief safe pocket." },
+      "barrel": { "name": "Barrel", "description": "Explosive drums that can wreck clusters if they are triggered." },
+      "oil-barrel": { "name": "Oil Barrel", "description": "Heavy steel drums that can rupture with a dangerous fire burst." },
+      "gas-cylinder": { "name": "Gas Cylinder", "description": "Pressurised tanks that add a hazardous, high-velocity hazard pattern." },
+      "electric-generator": { "name": "Electric Generator", "description": "Reactive power units that charge up and arc dangerous energy fields." },
+      "moving-wall": { "name": "Moving Wall", "description": "Tracking industrial panels that shift and force pathing changes." },
+      "steam-pipe": { "name": "Steam Pipe", "description": "Vent stacks that warn, pulse, and eject hot bursts of steam." },
+      "industrial-crate": { "name": "Industrial Crate", "description": "Reinforced storage containers with durable metal plating and loot drops." }
+    }
+  },
   "ui": {
     "dialogClose": "Close", "sheetClose": "Close", "sidebar": "Sidebar", "sidebarDescription": "Displays the mobile sidebar.", "toggleSidebar": "Toggle Sidebar", "pagination": "pagination", "previousPage": "Go to previous page", "previous": "Previous", "nextPage": "Go to next page", "next": "Next", "morePages": "More pages", "breadcrumb": "breadcrumb", "more": "More", "previousSlide": "Previous slide", "nextSlide": "Next slide", "spinnerLoading": "Loading", "carousel": "carousel", "slide": "slide"
   }

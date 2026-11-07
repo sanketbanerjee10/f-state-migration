@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import confetti from 'canvas-confetti';
 import type { GameStateSnapshot } from '@/game/core/GameState';
 import { isLeaderboardEligibleGameMode } from '@/game/core/GameState';
+import { getBossForWave } from '@/game/bosses/BossSystem';
 import { getLevelDefinition } from '@/game/core/LevelCampaign';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
 
@@ -27,6 +29,7 @@ export function GamePhaseOverlays({
   onReturnToMenu,
   tutorialMode = false,
 }: GamePhaseOverlaysProps) {
+  const { t } = useTranslation();
   const isBossClear =
     !tutorialMode &&
     gameState?.gameMode === 'level' &&
@@ -66,6 +69,38 @@ export function GamePhaseOverlays({
   }, [isBossClear]);
 
   if (!gameState) return null;
+  const campaignLevel = gameState.campaignLevelId === null
+    ? undefined
+    : getLevelDefinition(gameState.campaignLevelId);
+  const campaignBossType = gameState.campaignLevelId === null
+    ? undefined
+    : getBossForWave(gameState.campaignLevelId)?.type;
+  const campaignStageName = campaignLevel
+    ? campaignBossType
+      ? t(`game.bosses.${campaignBossType}`)
+      : t(`game.menu.maps.${campaignLevel.mapName}`)
+    : t('game.results.campaignStageName');
+  const announcement = gameState.wave.announcement;
+  const bossName = gameState.wave.bossType
+    ? t(`game.bosses.${gameState.wave.bossType}`)
+    : '';
+  const localizedAnnouncement = announcement === 'Run over'
+    ? t('game.announcements.runOver')
+    : announcement === 'LEVEL COMPLETE'
+      ? t('game.announcements.levelComplete')
+      : /^Wave \d+$/.test(announcement)
+        ? t('game.announcements.wave', { wave: announcement.replace('Wave ', '') })
+        : /^Level \d+( · BOSS)?$/.test(announcement)
+          ? t(announcement.endsWith('BOSS')
+              ? 'game.announcements.bossLevel'
+              : 'game.announcements.level', {
+              level: announcement.match(/\d+/)?.[0],
+            })
+          : gameState.wave.bossType && announcement.endsWith(' has entered')
+            ? t('game.announcements.bossEntered', { name: bossName })
+            : gameState.wave.bossType && announcement.endsWith(' defeated')
+              ? t('game.announcements.bossDefeated', { name: bossName })
+              : announcement;
 
   return (
     <>
@@ -95,23 +130,23 @@ export function GamePhaseOverlays({
         >
           {tutorialMode ? (
             <>
-              <p className="game-panel-eyebrow">Practice session</p>
-              <h1 id="game-over-title">Tutorial round over</h1>
-              <p>This practice run is separate and will not be submitted to the leaderboard.</p>
+              <p className="game-panel-eyebrow">{t('game.results.practice')}</p>
+              <h1 id="game-over-title">{t('game.results.tutorialOver')}</h1>
+              <p>{t('game.results.practiceNotSubmitted')}</p>
               <div className="game-menu-actions game-result-actions">
                 <button
                   className="game-menu-primary"
                   type="button"
                   onClick={onPlayAgain}
                 >
-                  Restart tutorial
+                  {t('game.results.restartTutorial')}
                 </button>
                 <button
                   className="game-menu-secondary"
                   type="button"
                   onClick={onReturnToMenu}
                 >
-                  Exit tutorial
+                  {t('game.tutorial.exit')}
                 </button>
               </div>
             </>
@@ -130,41 +165,41 @@ export function GamePhaseOverlays({
                       <GameFranchiseWordmark />
                     </p>
                     <h1 id="level-complete-title" className="afterhours-campaign-result__title">
-                      Stage {gameState.campaignLevelId ?? '—'} Completed
+                      {t('game.results.stageCompleted', { level: gameState.campaignLevelId ?? '—' })}
                     </h1>
                   </header>
 
-                  <section className="afterhours-campaign-result__score" aria-label="Personal level score">
+                  <section className="afterhours-campaign-result__score" aria-label={t('game.results.personalLevelScore')}>
                     <div className="afterhours-campaign-result__score-topline">
-                      <span aria-hidden="true">✦</span> LEVEL SCORE <span aria-hidden="true">✦</span>
+                      <span aria-hidden="true">✦</span> {t('game.results.levelScore')} <span aria-hidden="true">✦</span>
                     </div>
                     <strong>{gameState.score.toLocaleString()}</strong>
                   </section>
 
                   {gameState.campaignLevelId !== null &&
                     gameState.campaignLevelId % 10 === 0 && (
-                      <section className="afterhours-campaign-result__boss" role="status" aria-label="Boss defeated">
+                      <section className="afterhours-campaign-result__boss" role="status" aria-label={t('game.results.bossDefeated')}>
                         <span className="afterhours-campaign-result__boss-icon" aria-hidden="true">✧</span>
                         <div>
-                          <strong>BOSS DEFEATED</strong>
-                          <p>Another major threat has fallen.</p>
+                          <strong>{t('game.results.bossDefeated')}</strong>
+                          <p>{t('game.results.bossFallen')}</p>
                         </div>
                         <span className="afterhours-campaign-result__boss-sparkle" aria-hidden="true">✦</span>
                       </section>
                     )}
 
-                  <section className="afterhours-campaign-result__stats" aria-label="Stage statistics">
+                  <section className="afterhours-campaign-result__stats" aria-label={t('game.results.stageStatistics')}>
                     <dl className="afterhours-campaign-result__stat-grid">
                       <div className="afterhours-campaign-result__stat">
-                        <dt>Enemies eliminated</dt>
+                        <dt>{t('game.results.enemiesEliminated')}</dt>
                         <dd>{gameState.statistics.zombiesKilled.toLocaleString()}</dd>
                       </div>
                       <div className="afterhours-campaign-result__stat">
-                        <dt>Completion time</dt>
+                        <dt>{t('game.results.completionTime')}</dt>
                         <dd>{formatSeconds(gameState.statistics.survivalSeconds)}</dd>
                       </div>
                       <div className="afterhours-campaign-result__stat">
-                        <dt>Damage dealt</dt>
+                        <dt>{t('game.results.damageDealt')}</dt>
                         <dd>{Math.round(gameState.statistics.totalDamageDealt).toLocaleString()}</dd>
                       </div>
                     </dl>
@@ -174,8 +209,8 @@ export function GamePhaseOverlays({
                     <section className="afterhours-campaign-result__final" role="status">
                       <span aria-hidden="true">✦</span>
                       <div>
-                        <strong>THE CAMPAIGN IS COMPLETE</strong>
-                        <p>You've made it through all 30 stages. More levels may arrive in a future update.</p>
+                        <strong>{t('game.results.campaignComplete')}</strong>
+                        <p>{t('game.results.campaignCompleteDescription')}</p>
                       </div>
                       <span aria-hidden="true">✦</span>
                     </section>
@@ -184,21 +219,21 @@ export function GamePhaseOverlays({
                   <footer className="afterhours-campaign-result__footer">
                     <p className="afterhours-campaign-result__footer-note">
                       <span aria-hidden="true">☾</span>
-                      {gameState.campaignLevelId === 30 ? 'THANK YOU FOR SURVIVING THE NIGHT' : 'THE JOURNEY CONTINUES'}
+                      {t(gameState.campaignLevelId === 30 ? 'game.results.thankYou' : 'game.results.journeyContinues')}
                     </p>
                     <div className="game-menu-actions game-result-actions afterhours-campaign-result__actions afterhours-campaign-result__actions--clear">
                       <button className="game-pause-action game-pause-action-muted" type="button" onClick={onPlayAgain}>
                         <span className="game-pause-action-icon" aria-hidden="true">↻</span>
-                        <span>Replay Level</span>
+                        <span>{t('game.results.replayLevel')}</span>
                       </button>
                       <button className="game-pause-action" type="button" onClick={onLevelSelection}>
                         <span className="game-pause-action-icon" aria-hidden="true">▤</span>
-                        <span>Level Select</span>
+                        <span>{t('game.results.levelSelection')}</span>
                       </button>
                       {gameState.campaignLevelId !== null && gameState.campaignLevelId < 30 && (
                         <button className="game-pause-action afterhours-campaign-result__action-primary" type="button" onClick={onNextLevel}>
                           <span className="game-pause-action-icon" aria-hidden="true">→</span>
-                          <span>Next</span>
+                          <span>{t('game.results.next')}</span>
                         </button>
                       )}
                     </div>
@@ -219,16 +254,16 @@ export function GamePhaseOverlays({
                       <GameFranchiseWordmark />
                     </p>
                     <h1 id="game-over-title" className="afterhours-campaign-result__title">
-                      Not this <span>time.</span>
+                      {t('game.results.notThisTimeLead')} <span>{t('game.results.notThisTimeEmphasis')}</span>
                     </h1>
                   </header>
 
-                  <section className="afterhours-campaign-result__stage" aria-label="Campaign stage">
+                  <section className="afterhours-campaign-result__stage" aria-label={t('game.results.campaignStage')}>
                     <div className="afterhours-campaign-result__stage-symbol" aria-hidden="true">☾</div>
                     <div className="afterhours-campaign-result__stage-copy">
-                      <span className="afterhours-campaign-result__stage-kicker">CURRENT STAGE</span>
-                      <h2>Stage {gameState.campaignLevelId ?? '—'}</h2>
-                      <p>{getLevelDefinition(gameState.campaignLevelId ?? 1)?.name ?? 'Campaign stage'}</p>
+                      <span className="afterhours-campaign-result__stage-kicker">{t('game.results.currentStage')}</span>
+                      <h2>{t('game.results.stageNumber', { level: gameState.campaignLevelId ?? '—' })}</h2>
+                      <p>{campaignStageName}</p>
                     </div>
                     <span className="afterhours-campaign-result__stage-mark" aria-hidden="true">✳</span>
                   </section>
@@ -241,27 +276,27 @@ export function GamePhaseOverlays({
                       </svg>
                     </span>
                     <div>
-                      <strong>Your progress is safe.</strong>
-                      <p>Your unlocked stages and previous records are still here. Nothing you've earned has been lost.</p>
+                      <strong>{t('game.results.progressSafe')}</strong>
+                      <p>{t('game.results.progressSafeDescription')}</p>
                     </div>
                   </section>
 
                   <footer className="afterhours-campaign-result__footer">
                     <p className="afterhours-campaign-result__footer-note">
-                      <span aria-hidden="true">☾</span> THE NEXT RUN IS YOURS TO WRITE
+                      <span aria-hidden="true">☾</span> {t('game.results.nextRun')}
                     </p>
                     <div className="game-menu-actions game-result-actions afterhours-campaign-result__actions afterhours-campaign-result__actions--attempt">
                       <button className="game-pause-action afterhours-campaign-result__action-primary" type="button" onClick={onPlayAgain}>
                         <span className="game-pause-action-icon" aria-hidden="true">↻</span>
-                        <span>Retry Level</span>
+                        <span>{t('game.results.retryLevel')}</span>
                       </button>
                       <button className="game-pause-action" type="button" onClick={onLevelSelection}>
                         <span className="game-pause-action-icon" aria-hidden="true">▤</span>
-                        <span>Level Selection</span>
+                        <span>{t('game.results.levelSelection')}</span>
                       </button>
                       <button className="game-pause-action game-pause-action-muted" type="button" onClick={onReturnToMenu}>
                         <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
-                        <span>Main Menu</span>
+                        <span>{t('game.results.mainMenu')}</span>
                       </button>
                     </div>
                   </footer>
@@ -292,10 +327,10 @@ export function GamePhaseOverlays({
                   </div>
                 </header>
 
-                <section className="afterhours-run-summary__score" aria-label="Final score">
+                <section className="afterhours-run-summary__score" aria-label={t('game.results.finalScore')}>
                   <div className="afterhours-run-summary__score-topline">
                     <span className="afterhours-run-summary__score-icon" aria-hidden="true">✦</span>
-                    <span>FINAL SCORE</span>
+                    <span>{t('game.results.finalScore')}</span>
                     <span className="afterhours-run-summary__score-icon" aria-hidden="true">✦</span>
                   </div>
                   <strong>{gameState.score.toLocaleString()}</strong>
@@ -303,7 +338,7 @@ export function GamePhaseOverlays({
 
                 {!isLeaderboardEligibleGameMode(gameState.gameMode) && (
                   <p className="afterhours-run-summary__mode-note" role="status">
-                    Campaign runs are kept separate from standard Survival records.
+                    {t('game.results.campaignRunsSeparate')}
                   </p>
                 )}
 
@@ -312,19 +347,19 @@ export function GamePhaseOverlays({
                 >
                   <dl className="afterhours-run-summary__stat-grid">
                     <div className="afterhours-run-summary__stat">
-                      <dt>Wave reached</dt>
+                      <dt>{t('game.results.waveReached')}</dt>
                       <dd>{gameState.statistics.highestWaveReached}</dd>
                     </div>
                     <div className="afterhours-run-summary__stat">
-                      <dt>Waves cleared</dt>
+                      <dt>{t('game.results.wavesCleared')}</dt>
                       <dd>{gameState.statistics.highestWaveCleared}</dd>
                     </div>
                     <div className="afterhours-run-summary__stat">
-                      <dt>Zombies eliminated</dt>
+                      <dt>{t('game.results.zombiesEliminated')}</dt>
                       <dd>{gameState.statistics.zombiesKilled.toLocaleString()}</dd>
                     </div>
                     <div className="afterhours-run-summary__stat">
-                      <dt>Time survived</dt>
+                      <dt>{t('game.results.timeSurvived')}</dt>
                       <dd>{formatSeconds(gameState.statistics.survivalSeconds)}</dd>
                     </div>
                   </dl>
@@ -338,7 +373,7 @@ export function GamePhaseOverlays({
                       onClick={onReturnToMenu}
                     >
                       <span className="afterhours-run-summary__action-icon afterhours-run-summary__action-icon--muted" aria-hidden="true">⌂</span>
-                      <span>Main menu</span>
+                      <span>{t('game.results.mainMenu')}</span>
                     </button>
                     <button
                       className="game-menu-primary afterhours-run-summary__play"
@@ -346,7 +381,7 @@ export function GamePhaseOverlays({
                       onClick={onPlayAgain}
                     >
                       <span className="afterhours-run-summary__action-icon" aria-hidden="true">↻</span>
-                      <span>Play again</span>
+                      <span>{t('game.results.playAgain')}</span>
                     </button>
                   </div>
                 </footer>
@@ -357,7 +392,7 @@ export function GamePhaseOverlays({
       )}
       {gameState.wave.announcementSeconds > 0 && (
         <div className="game-wave-announcement" aria-live="polite">
-          {gameState.wave.announcement}
+          {localizedAnnouncement}
         </div>
       )}
     </>

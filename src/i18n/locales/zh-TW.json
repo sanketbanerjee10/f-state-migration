@@ -849,6 +849,814 @@
       "reviewKicker": "申請審核"
     }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY 出品",
+      "taglineLead": "外表平靜。",
+      "taglineEmphasis": "內心混亂。",
+      "survival": "生存模式",
+      "campaign": "戰役模式",
+      "devLevel": "開始測試關卡",
+      "howToPlay": "玩法說明",
+      "fieldGuides": "戰場指南",
+      "leaderboard": "排行榜",
+      "settings": "設定",
+      "communityLead": "社群",
+      "communityTail": "共同創作",
+      "backToMenu": "返回選單",
+      "backToPauseMenu": "返回暫停選單",
+      "carousel": "輪播",
+      "stagesReached": "已到達關卡",
+      "statPoints": "屬性點",
+      "area": "區域 {{number}}",
+      "sector": "戰役區域",
+      "stagesCleared": "已通關 {{count}}/10 關",
+      "previousArea": "上個區域",
+      "nextArea": "下個區域",
+      "start": "開始",
+      "locked": "已鎖定",
+      "cleared": "✓ 已通關",
+      "boss": "首領",
+      "current": "當前",
+      "ready": "就緒",
+      "difficulty": "難度 {{difficulty}}/5",
+      "best": "最佳",
+      "maps": {
+        "Watchtower": "瞭望塔",
+        "Barracks": "兵營",
+        "Perimeter": "外圍",
+        "Bunker": "地堡",
+        "Relay": "中繼站",
+        "Armory": "軍械庫",
+        "Checkpoint": "檢查站",
+        "Hangar": "機庫",
+        "Rampart": "壁壘",
+        "Citadel": "城堡",
+        "Foundry": "鑄造廠",
+        "Crucible": "熔爐",
+        "Refinery": "煉油廠",
+        "Conveyor": "傳送帶",
+        "Furnace": "爐窯",
+        "Mill": "磨坊",
+        "Smelter": "冶煉爐",
+        "Generator": "發電機",
+        "Assembly": "裝配區",
+        "Forge": "鍛造廠",
+        "Quarantine": "隔離區",
+        "Wasteland": "荒地",
+        "Mire": "泥沼",
+        "Fallout": "輻射區",
+        "Blight": "疫區",
+        "Hollow": "空洞",
+        "Ruins": "廢墟",
+        "Toxicity": "毒區",
+        "Necropolis": "亡者之城",
+        "Deadzone": "死亡地帶"
+      },
+      "areas": {
+        "military": "軍事哨站",
+        "industrial": "工業園區",
+        "contaminated": "汙染區"
+      },
+      "campaignAreas": "戰役區域",
+      "areaLevels": "{{area}}關卡",
+      "mainMenu": "主選單",
+      "levelAction": "{{action}}：{{stage}}，{{area}}{{boss}}",
+      "bossSuffix": "，首領{{name}}",
+      "lockedState": "已鎖定",
+      "resumeGame": "繼續遊戲",
+      "closeCampaign": "關閉戰役選擇",
+      "closeLeaderboard": "關閉排行榜",
+      "closeGuides": "關閉指南",
+      "closeSettings": "關閉設定"
+    },
+    "settings": {
+      "title": "設定",
+      "categories": "設定分類",
+      "play": "遊戲",
+      "playHint": "遊戲體驗",
+      "controls": "控制",
+      "controlsHint": "按鍵與移動",
+      "audio": "音訊",
+      "audioHint": "音樂與音效",
+      "language": "語言",
+      "languageHint": "顯示語言",
+      "makeItYours": "自定義體驗",
+      "yourControls": "控制設定",
+      "setTheMood": "選擇氛圍",
+      "chooseLanguage": "選擇語言",
+      "touchControls": "觸控操作",
+      "joysticksQuestion": "何時顯示虛擬搖桿？",
+      "touchControlsVisibility": "觸控操作顯示方式",
+      "auto": "自動",
+      "always": "始終",
+      "never": "從不",
+      "touchAutoHint": "裝置支援時自動顯示觸控操作。",
+      "touchAlwaysHint": "始終顯示觸控操作。",
+      "touchNeverHint": "隱藏觸控操作，改用鍵盤和滑鼠。",
+      "hudDensity": "介面密度",
+      "battlefieldView": "選擇戰場檢視。",
+      "standard": "標準",
+      "compact": "緊湊",
+      "fullscreen": "全屏",
+      "fullscreenDescription": "選擇遊戲預設的開啟方式。",
+      "fullscreenOn": "全屏",
+      "fullscreenOnHint": "沉浸式檢視",
+      "fullscreenOff": "視窗模式",
+      "fullscreenOffHint": "保留瀏覽器控制元件",
+      "pauseGame": "暫停遊戲",
+      "keyBindings": "按鍵繫結",
+      "pressKey": "按下一個鍵",
+      "pressKeyEllipsis": "按下按鍵…",
+      "placeTurret": "放置炮塔",
+      "leftDoubleOrRightClick": "滑鼠左鍵連點兩下或按一下右鍵",
+      "keyCannotAssign": "瀏覽器不允許繫結此按鍵。",
+      "actions": {
+        "moveUp": "向上移動",
+        "moveDown": "向下移動",
+        "moveLeft": "向左移動",
+        "moveRight": "向右移動",
+        "useBomb": "使用炸彈"
+      },
+      "sectionPlay": "01 / 遊戲",
+      "sectionControls": "02 / 控制",
+      "sectionAudio": "03 / 音訊",
+      "sectionLanguage": "04 / 語言",
+      "loadFailed": "無法載入已儲存的遊戲設定：{{error}}",
+      "loadFailedSimple": "發生未知錯誤",
+      "saveFailed": "設定僅在本次會話中生效，無法儲存：{{error}}",
+      "saveFailedSimple": "發生未知錯誤",
+      "cancelBinding": "再次點選高亮按鍵可取消。繫結時按 Esc 取消。",
+      "audioUnavailable": "音訊不可用：{{error}}",
+      "backgroundMusic": "背景音樂",
+      "lateNightRadio": "深夜電臺",
+      "volume": "音量",
+      "musicVolume": "音樂音量",
+      "lofiTracks": "Lo-fi 曲目將依次播放。",
+      "musicUnavailable": "音樂不可用 — 尚未配置曲目。",
+      "soundEffects": "音效",
+      "littleThings": "細節也重要",
+      "effectsVolume": "音效音量",
+      "soundEffectFootnote": "拾取物品、受傷和戰鬥提示音。"
+    },
+    "hud": {
+      "runStatus": "本局狀態",
+      "wave": "波次",
+      "waveProgress": "波次進度",
+      "health": "生命值",
+      "low": "偏低",
+      "playerHealth": "玩家生命值",
+      "score": "得分",
+      "eliminated": "擊殺",
+      "bombs": "炸彈",
+      "turrets": "炮塔",
+      "customWavePower": "自定義波次強化：{{name}}",
+      "power": "戰力",
+      "activePlayerStats": "玩家當前屬性",
+      "bossApproaching": "首領即將來襲",
+      "bossIntroduction": "首領介紹",
+      "bossStatus": "首領狀態",
+      "boss": "首領",
+      "shielded": "護盾保護中",
+      "bossHealth": "{{name}}生命值"
+    },
+    "touch": {
+      "controls": "觸控操作",
+      "movement": "移動搖桿：拖動即可移動。也可在遊戲獲得焦點時使用 WASD 或方向鍵。",
+      "aim": "瞄準搖桿：拖動即可瞄準。鬆開後會保持當前瞄準方向。",
+      "useBomb": "使用炸彈，剩餘 {{count}} 個"
+    },
+    "pause": {
+      "title": "遊戲已暫停",
+      "actions": "遊戲操作",
+      "quickAccess": "快捷入口",
+      "resumeRun": "繼續本局",
+      "jumpBack": "返回戰鬥",
+      "settings": "設定",
+      "fieldGuide": "戰場指南",
+      "restartRun": "重新開始",
+      "exitTutorial": "退出教程",
+      "mainMenu": "主選單",
+      "runStats": "本局統計",
+      "currentRun": "當前對局",
+      "nightContinues": "夜幕仍在延續",
+      "totalScore": "總得分",
+      "pointsEarned": "獲得積分",
+      "playerVitals": "玩家狀態",
+      "criticalCondition": "情況危急 — 保持警惕",
+      "battered": "受了點傷，但仍能堅持",
+      "lookingGood": "狀態不錯",
+      "survivalTime": "生存時間",
+      "survivorDevelopment": "倖存者成長",
+      "pauseDetails": "暫停選單詳情",
+      "coreAttributes": "核心屬性",
+      "fineTuneBuild": "調整你的角色配置。",
+      "unlimitedStatsDev": "測試模式：屬性點無限",
+      "unusedStatPoints": "未使用屬性點：{{count}}",
+      "rareAbilities": "稀有能力",
+      "rarePerks": "助你熬過漫漫長夜的強力加成。",
+      "unlimitedRareDev": "測試模式：稀有能力點無限",
+      "unusedRarePoints": "未使用稀有點數：{{count}}",
+      "spendStatPoints": "使用屬性點",
+      "rareUpgrades": "稀有升級",
+      "allocated": "+{{count}} 已分配",
+      "next": "下一級：{{effect}}",
+      "freeDev": "測試模式中免費",
+      "statPointsCost": "{{count}} 屬性點",
+      "decrease": "降低{{name}}",
+      "increase": "提高{{name}}",
+      "rarityCommon": "普通",
+      "rarityRare": "稀有",
+      "rarityEpic": "史詩",
+      "level": "等級 {{level}}/{{max}}",
+      "unlimitedDev": "測試模式中無限",
+      "maxLevel": "最高等級",
+      "rarePointsCost": "{{count}} 稀有點",
+      "locked": "已鎖定：{{reason}}",
+      "maximumLevelReached": "✦ 已達到最高等級",
+      "refund": "退還{{name}}點數",
+      "purchase": "升級{{name}}",
+      "runUnavailable": "本局不可用",
+      "nextChapter": "下一章正等待你開啟。",
+      "resumeWhenReady": "準備好後即可繼續。",
+      "resume": "繼續",
+      "backToGame": "返回遊戲",
+      "guides": "指南"
+    },
+    "effects": {
+      "active": "生效中的效果",
+      "damage": "傷害",
+      "rapidFire": "快速射擊",
+      "shield": "護盾",
+      "magnet": "能量球磁鐵",
+      "cursed": "詛咒之力",
+      "remaining": "{{name}}，剩餘 {{count}} 秒"
+    },
+    "tutorial": {
+      "ariaLabel": "互動遊戲教程",
+      "step": "第 {{current}}/{{total}} 步",
+      "exerciseComplete": "練習完成。",
+      "collectOrbOrSkip": "拾取一個能量球，或跳過此練習。",
+      "moveOrSkip": "移動你的倖存者，或跳過此練習。",
+      "aimOrSkip": "改變瞄準方向，或跳過此練習。",
+      "confirmExit": "確認退出教程",
+      "exitPrompt": "要退出教程嗎？本次練習對局將被丟棄。",
+      "keepPlaying": "繼續遊戲",
+      "exit": "退出教程",
+      "previous": "上一步",
+      "returnToMenu": "返回主選單",
+      "continue": "繼續",
+      "skipExercise": "跳過練習",
+      "steps": {
+        "intro": {
+          "title": "歡迎來到競技場",
+          "description": "儘可能多地撐過幾波敵人。保護自己、清空競技場，並抓住機會調整位置。"
+        },
+        "player": {
+          "title": "你的倖存者",
+          "description": "發光的角色就是你。生命值顯示在狀態列中，注意避開殭屍。"
+        },
+        "movement": {
+          "title": "移動",
+          "description": "使用已設定的移動鍵，或在觸屏上拖動左側搖桿。可以在設定中重新繫結按鍵。試著移動一小段距離。"
+        },
+        "aim": {
+          "title": "瞄準並射擊",
+          "description": "移動滑鼠或拖動右側搖桿來調整瞄準方向。武器會自動朝該方向射擊。試著瞄準別處。"
+        },
+        "hud": {
+          "title": "認識遊戲介面",
+          "description": "介面會顯示波次、生命值、擊殺數、得分、敵人、炸彈和炮塔數量。按炸彈鍵或觸控按鈕使用炸彈。對空地右鍵或雙擊可放置炮塔。拾取的臨時效果會顯示在介面下方。"
+        },
+        "enemies": {
+          "title": "瞭解敵人",
+          "description": "行屍速度較慢但更耐打。奔跑者體型更小、速度更快，生命值也更低。保持移動，遠離危險。"
+        },
+        "obstacles": {
+          "title": "利用競技場",
+          "description": "箱子和路障會阻擋移動，也可能擋住子彈。繞開它們，開闢道路。"
+        },
+        "powerups": {
+          "title": "強化能量球",
+          "description": "生命球最多恢復 25 點生命；傷害提升持續 10 秒；射速翻倍持續 8 秒；護盾吸收 60 點傷害並持續 12 秒。最多攜帶 5 枚炸彈，對附近無遮擋的殭屍造成 100 點傷害。最多攜帶 5 座炮塔，放置後持續射擊 12 秒。"
+        },
+        "collectOrb": {
+          "title": "拾取能量球",
+          "description": "走過能量球即可拾取。每擊殺兩隻殭屍會掉落一個能量球；跟隨發光的球並拾取，檢視其效果。炸彈會保留在揹包中，直到你使用。"
+        },
+        "waves": {
+          "title": "清除這一波",
+          "description": "敵人會分波出現。擊敗所有殭屍即可通關並獲得額外得分。"
+        },
+        "statPoints": {
+          "title": "使用屬性點",
+          "description": "每通關一波可獲得 1 點屬性點。開啟暫停選單，提升武器傷害、射速、最大生命值或移動速度。按減號可退還已分配的點數。"
+        },
+        "pause": {
+          "title": "暫停並檢視",
+          "description": "暫停選單會顯示本局統計和生效中的效果。按 Esc 或暫停按鈕，可繼續、調整設定、重新開始或返回選單。"
+        },
+        "completion": {
+          "title": "你已準備就緒",
+          "description": "使用 WASD 或方向鍵移動，用滑鼠瞄準，並在每波敵人中拾取能量球、努力生存。返回主選單即可開始新的生存模式對局。"
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "生存歷史記錄按通關波次、得分、擊殺數和用時排序。",
+      "loading": "正在載入排行榜…",
+      "loadFailed": "暫時無法載入排行榜。",
+      "retrying": "正在重試…",
+      "retry": "重試",
+      "empty": "還沒有提交對局記錄。來取得第一個高分吧。",
+      "player": "玩家",
+      "cleared": "通關",
+      "score": "得分",
+      "kills": "擊殺",
+      "time": "用時",
+      "reached": "到達 {{wave}}",
+      "title": "排行榜",
+      "entries": "{{count}} 條記錄",
+      "range": "第 {{start}}–{{end}} 條，共 {{total}} 條",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
+    "submission": {
+      "title": "提交本局成績",
+      "name": "排行榜名稱",
+      "enterName": "輸入名稱以提交成績。",
+      "submitting": "正在提交…",
+      "retry": "重新提交",
+      "submitted": "成績已提交",
+      "submit": "提交成績",
+      "success": "成績已提交。本局現在有資格進入歷史排行榜。",
+      "failed": "成績提交失敗。請檢查網路連線後重試。"
+    },
+    "results": {
+      "practice": "練習對局",
+      "tutorialOver": "教程對局結束",
+      "practiceNotSubmitted": "練習對局不會提交到排行榜。",
+      "restartTutorial": "重新開始教程",
+      "stageCompleted": "第 {{level}} 關已完成",
+      "personalLevelScore": "本關得分",
+      "levelScore": "本關得分",
+      "bossDefeated": "首領已擊敗",
+      "bossFallen": "又一個強大的威脅倒下了。",
+      "stageStatistics": "關卡統計",
+      "enemiesEliminated": "擊殺敵人",
+      "completionTime": "完成時間",
+      "damageDealt": "造成傷害",
+      "campaignComplete": "戰役已完成",
+      "campaignCompleteDescription": "你已完成全部 30 關。未來更新可能會加入更多關卡。",
+      "thankYou": "感謝你在這一夜中倖存下來",
+      "journeyContinues": "旅程仍將繼續",
+      "nextLevel": "下一關",
+      "levelSelection": "選擇關卡",
+      "mainMenu": "主選單",
+      "notThisTime": "這<span>次不行。</span>",
+      "campaignStage": "戰役關卡",
+      "currentStage": "當前關卡",
+      "campaignStageName": "戰役關卡",
+      "progressSafe": "你的進度安全無虞。",
+      "progressSafeDescription": "已解鎖關卡和過往記錄都還在，沒有任何成果丟失。",
+      "nextRun": "下一場由你書寫",
+      "retryLevel": "重試本關",
+      "finalScore": "最終得分",
+      "campaignRunsSeparate": "戰役對局與標準生存模式記錄分開計算。",
+      "campaignRun": "戰役對局",
+      "notThisTimeLead": "這次",
+      "notThisTimeEmphasis": "不行。",
+      "stageNumber": "第 {{level}} 關",
+      "replayLevel": "重玩本關",
+      "next": "下一步",
+      "waveReached": "到達波次",
+      "wavesCleared": "通關波次",
+      "zombiesEliminated": "擊殺殭屍",
+      "timeSurvived": "生存時間",
+      "playAgain": "再玩一次"
+    },
+    "guides": {
+      "closeDetails": "關閉指南詳情",
+      "close": "關閉",
+      "heroDescription": "瞭解戰場威脅，熟悉可用資源，為下一場戰鬥做好準備。",
+      "progress": "已識別 {{discovered}}/{{total}} 個敵人與首領",
+      "threatCompletion": "威脅情報完成度",
+      "identified": "已識別 {{count}}/{{total}} 項",
+      "threatIntel": "威脅情報",
+      "enemyCatalogue": "威脅圖鑑",
+      "enemies": "敵人",
+      "enemyDescription": "你將在戰場上遭遇的感染者。",
+      "bossDossier": "高危目標檔案",
+      "bosses": "首領",
+      "bossDescription": "強大的變異體。趁它們發現你之前，先摸清行動模式。",
+      "arenaEnvironments": "作戰環境",
+      "arenas": "競技場",
+      "arenaDescription": "生存模式會在五種環境間輪換，每種都有不同的障礙佈局。",
+      "viewDetails": "檢視{{name}}詳情",
+      "viewUnknownEnemy": "檢視未知敵人詳情",
+      "viewUnknownBoss": "檢視未知首領詳情",
+      "unknownEnemy": "未知敵人",
+      "unknownBoss": "未知首領",
+      "unknown": "未知",
+      "threatIdentified": "威脅已識別",
+      "unknownContact": "未知目標",
+      "bossDossierTag": "首領檔案",
+      "classifiedDossier": "機密檔案",
+      "classified": "威脅詳情屬於機密。",
+      "identifiedCount": "已識別 {{count}}/{{total}} 項",
+      "arenaRenderables": "{{name}}可見物件",
+      "viewArenaObjects": "檢視{{name}}中的物件",
+      "layout": "{{name}}佈局",
+      "zone": "區域 {{number}}",
+      "waves": "第 {{start}}–{{end}} 波",
+      "arenaObjects": "此環境中可能出現的物件。每局的物件狀態和位置可能不同。",
+      "classifiedIntel": "識別威脅後才能檢視相關情報。",
+      "eliteTipTitle": "生存提示",
+      "eliteTip": "小心精英變種：它們比普通敵人更危險。"
+    },
+    "orbs": {
+      "supplies": "補給與強化",
+      "title": "能量球",
+      "description": "有用的拾取物，可能扭轉戰局。",
+      "viewDetails": "檢視{{name}}詳情",
+      "rare": "稀有",
+      "healthName": "生命球",
+      "healthDescription": "恢復生命值。",
+      "healthDetails": "恢復 25 點生命值，不超過生命上限。",
+      "damageName": "傷害球",
+      "damageDescription": "提升彈丸傷害。",
+      "damageDetails": "在一段時間內使彈丸傷害翻倍。",
+      "rapidFireName": "速射球",
+      "rapidFireDescription": "提高射速。",
+      "rapidFireDetails": "在一段時間內使射速翻倍。",
+      "shieldName": "護盾球",
+      "shieldDescription": "吸收受到的傷害。",
+      "shieldDetails": "獲得護盾，在一段時間內吸收受到的傷害。",
+      "bombName": "炸彈球",
+      "bombDescription": "為揹包新增一枚炸彈。",
+      "bombDetails": "引爆炸彈可對附近敵人造成傷害。",
+      "magnetName": "磁力球",
+      "magnetDescription": "將附近的能量球吸向你。",
+      "magnetDetails": "在一段時間內吸引附近的能量球。",
+      "turretName": "炮塔球",
+      "turretDescription": "部署自動炮塔。",
+      "turretDetails": "炮塔會瞄準附近敵人並持續射擊一段時間。",
+      "cursedName": "詛咒球",
+      "cursedDescription": "使敵人移動速度加快。",
+      "cursedDetails": "在一段時間內提高敵人的移動速度。",
+      "rareGoldName": "稀有金球",
+      "rareGoldDescription": "獲得 1 點稀有點數。",
+      "rareGoldDetails": "獲得 1 點稀有點數。"
+    },
+    "notifications": {
+      "discovered": "已發現{{name}}",
+      "firstEncounter": "已記錄首次遭遇。保持警惕。",
+      "campaignLocked": "該戰役關卡已鎖定或不可用。",
+      "renderInitFailed": "無法初始化遊戲畫面。",
+      "fullscreenExitFailed": "無法退出全屏模式。",
+      "campaignProgressSaveFailed": "無法儲存戰役進度：{{error}}",
+      "campaignProgressSaveFailedSimple": "無法儲存戰役進度。",
+      "campaignPointsSaveFailed": "無法儲存戰役屬性點：{{error}}",
+      "campaignPointsSaveFailedSimple": "無法儲存戰役屬性點。"
+    },
+    "canvas": {
+      "ariaLabel": "565 殭屍生存。使用設定的移動按鍵或觸控操作來移動。用滑鼠或瞄準搖桿瞄準，武器會自動朝選定方向射擊。拾取炸彈後，按設定的炸彈鍵或觸控按鈕使用。最多拾取五座炮塔，然後在競技場空地右鍵或雙擊放置。",
+      "notSupported": "此瀏覽器不支援 Canvas 渲染。"
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "無法更新閾值。",
+      "unavailable": "效能診斷不可用。",
+      "exportFailed": "無法匯出診斷資訊。"
+    },
+    "arenaLayouts": {
+      "military-open-centre": "開闊中心",
+      "military-corridor-network": "走廊網路",
+      "military-scattered-cover": "分散掩體",
+      "military-central-structure": "中央建築",
+      "industrial-open-centre": "開闊中心",
+      "industrial-cluster-split": "工業叢集",
+      "industrial-corridor": "走廊網格",
+      "industrial-rust-scrap": "鏽蝕廢料",
+      "contaminated-open-lab": "開放實驗室",
+      "contaminated-split-lab": "分隔實驗室",
+      "contaminated-scattered-tanks": "分散儲罐",
+      "contaminated-central-structure": "中央隔離區",
+      "urban-open-road": "開闊道路",
+      "urban-rubble-lane": "廢墟小巷",
+      "urban-ruined-block": "廢棄街區",
+      "urban-roadblock-loop": "路障環道",
+      "bunker-open-bay": "開放艙室",
+      "bunker-split-hall": "分隔大廳",
+      "bunker-core-structure": "核心建築",
+      "bunker-perimeter-defence": "外圍防禦"
+    },
+    "announcements": {
+      "bossEntered": "{{name}}已登場",
+      "bossDefeated": "{{name}}已被擊敗",
+      "level": "第 {{level}} 關",
+      "bossLevel": "第 {{level}} 關 · 首領",
+      "wave": "第 {{wave}} 波",
+      "levelComplete": "關卡完成",
+      "runOver": "本局結束"
+    },
+    "music": {
+      "toggle": "{{action}}音樂",
+      "pause": "暫停",
+      "play": "播放"
+    },
+    "pauseButton": {
+      "ariaLabel": "暫停遊戲。按 Esc 或 P。",
+      "title": "暫停（Esc）",
+      "label": "暫停（Esc）"
+    },
+    "bosses": {
+      "charger": "衝鋒者",
+      "acidQueen": "酸液女王",
+      "hordeCaller": "屍潮召喚者",
+      "chargerSummary": "擅長高速衝鋒的巨型變異體。",
+      "chargerDescription": "積蓄衝勢後橫穿整個競技場。",
+      "chargerAbility": "衝刺前會顯示方向；撞上障礙後會短暫眩暈。",
+      "acidQueenSummary": "擅長遠端攻擊和控制戰場的劇毒變異體。",
+      "acidQueenDescription": "使用遠端酸液攻擊控制競技場。",
+      "acidQueenAbility": "噴射酸液，並生成有預警、可暫時封鎖區域的酸池。",
+      "hordeCallerSummary": "有援軍保護並獲得護盾的召喚者。",
+      "hordeCallerDescription": "只要援軍還在，護盾就會保護它。",
+      "hordeCallerAbility": "召喚殭屍援軍；擊敗援軍即可破除護盾，讓它暴露弱點。"
+    },
+    "enemies": {
+      "walker": {
+        "name": "行屍",
+        "summary": "穩定地近距離追擊。",
+        "description": "行動緩慢但會持續逼近，並在近距離發動攻擊。",
+        "ability": "沒有特殊攻擊。保持移動，避免被屍群包圍。"
+      },
+      "runner": {
+        "name": "奔跑者",
+        "summary": "速度快但較脆弱。",
+        "description": "脆弱但速度很快，稍一停頓就可能被追上。",
+        "ability": "以正常速度移動 6 秒後，會以兩倍基礎速度衝刺 2 秒。衝鋒前沒有明顯預警。"
+      },
+      "brute": {
+        "name": "蠻兵",
+        "summary": "血量高，近戰傷害強。",
+        "description": "行動緩慢、體格壯碩，血量更高，近戰攻擊也更致命。",
+        "ability": "接觸時會造成大量傷害。不要讓它靠近。"
+      },
+      "spitter": {
+        "name": "噴吐者",
+        "summary": "從遠處噴射酸液攻擊。",
+        "description": "會盡量與你保持距離的遠端攻擊者。",
+        "ability": "進入射程後會發射快速酸液彈。"
+      },
+      "swarm": {
+        "name": "屍群",
+        "summary": "由大量小型快速敵人組成。",
+        "description": "體型小、速度快，在擁擠的競技場裡容易被忽略。",
+        "ability": "速度比奔跑者更快，能以兩倍速度躲避來襲子彈，冷卻 3 秒。每次閃避後速度減半，並在 2 秒內恢復正常。"
+      },
+      "armoured": {
+        "name": "裝甲屍",
+        "summary": "十分耐打，正面受到的傷害較低。",
+        "description": "正面朝向你時受到的傷害會減少。",
+        "ability": "正面朝向你時接觸傷害較低；避免從正面接近。"
+      },
+      "screamer": {
+        "name": "尖嘯者",
+        "summary": "會召喚援軍。",
+        "description": "會持續追擊，競技場越擁擠就越危險。",
+        "ability": "每次召喚一隻行屍；屍潮召喚者能召喚兩倍數量。"
+      },
+      "bloater": {
+        "name": "膨脹者",
+        "summary": "耐打，死亡後會留下酸液危險區。",
+        "description": "行動緩慢且十分耐打，死前還會留下危險的“禮物”。",
+        "ability": "被擊敗時會爆裂，形成造成傷害的酸液危險區。"
+      },
+      "splitter": {
+        "name": "分裂者",
+        "summary": "死亡時會分裂成更小的敵人。",
+        "description": "棘手的殭屍，會把一個威脅變成多個。",
+        "ability": "被擊敗時會分裂成四隻較小的屍群殭屍。"
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": {
+        "name": "雙倍能量球",
+        "description": "能量球掉落頻率翻倍。"
+      },
+      "fastWave": {
+        "name": "快速波次",
+        "description": "敵人移動速度提高 20%。"
+      },
+      "armouredInvasion": {
+        "name": "裝甲入侵",
+        "description": "裝甲敵人出現得更頻繁。"
+      },
+      "eliteThreat": {
+        "name": "精英威脅",
+        "description": "精英敵人出現的機率更高。"
+      },
+      "contamination": {
+        "name": "汙染",
+        "description": "膨脹者及其危險區域更加致命。"
+      },
+      "reducedVisibility": {
+        "name": "視野受限",
+        "description": "黑暗會限制你的視野範圍。"
+      },
+      "overrun": {
+        "name": "敵潮壓境",
+        "description": "敵人出現得更快。"
+      },
+      "heavyResistance": {
+        "name": "強力抵抗",
+        "description": "蠻兵出現得更頻繁。"
+      }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": {
+          "name": "武器傷害",
+          "description": "提高每枚彈丸造成的傷害。",
+          "effect": "基礎傷害 +10%",
+          "unit": "傷害/發"
+        },
+        "shotsPerSecond": {
+          "name": "快速射擊",
+          "description": "保持手動瞄準的同時提高射速。",
+          "effect": "基礎射速 +8%",
+          "unit": "發/秒"
+        },
+        "maxHealth": {
+          "name": "最大生命值",
+          "description": "提高最大生命值。",
+          "effect": "最大生命值 +10",
+          "unit": "生命值"
+        },
+        "movementSpeed": {
+          "name": "移動速度",
+          "description": "加快移動，以便躲避和調整位置。",
+          "effect": "基礎移動速度 +3%",
+          "unit": "單位/秒"
+        }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "生命汲取",
+          "description": "根據武器造成的傷害恢復部分生命值。",
+          "unlock": "本局開始時已解鎖。",
+          "effects": [
+            "恢復有效傷害的 1%",
+            "恢復有效傷害的 2%",
+            "恢復有效傷害的 3%",
+            "恢復有效傷害的 4%",
+            "恢復有效傷害的 5%"
+          ]
+        },
+        "criticalMastery": {
+          "name": "暴擊精通",
+          "description": "提高武器命中造成暴擊的機率。",
+          "unlock": "本局開始時已解鎖。",
+          "effects": [
+            "暴擊率 +3%",
+            "暴擊率 +6%",
+            "暴擊率 +9%",
+            "暴擊率 +12%",
+            "暴擊率 +15%"
+          ]
+        },
+        "explosiveRounds": {
+          "name": "爆炸彈藥",
+          "description": "彈藥命中時爆炸，造成範圍傷害。",
+          "unlock": "本局開始時已解鎖。",
+          "effects": [
+            "命中時爆炸機率 3%",
+            "命中時爆炸機率 6%",
+            "命中時爆炸機率 9%",
+            "命中時爆炸機率 12%",
+            "命中時爆炸機率 15%"
+          ]
+        },
+        "emergencyShield": {
+          "name": "應急護盾",
+          "description": "受傷後生成保護護盾。",
+          "unlock": "本局開始時已解鎖。",
+          "effects": [
+            "護盾持續 1 秒",
+            "護盾持續 1.5 秒",
+            "護盾持續 2 秒",
+            "護盾持續 2.5 秒",
+            "護盾持續 3 秒"
+          ]
+        },
+        "orbMagnetism": {
+          "name": "能量球磁力",
+          "description": "將附近的能量球吸向玩家。",
+          "unlock": "本局開始時已解鎖。",
+          "effects": [
+            "拾取半徑 60 單位",
+            "拾取半徑 90 單位",
+            "拾取半徑 120 單位",
+            "拾取半徑 150 單位",
+            "拾取半徑 180 單位"
+          ]
+        },
+        "piercingRounds": {
+          "name": "穿甲彈",
+          "description": "子彈穿透目標並命中後續敵人。",
+          "unlock": "本局中解鎖。",
+          "effects": [
+            "額外穿透 1 個目標",
+            "額外穿透 2 個目標",
+            "額外穿透 3 個目標",
+            "額外穿透 4 個目標",
+            "額外穿透 5 個目標"
+          ]
+        },
+        "secondWind": {
+          "name": "第二次機會",
+          "description": "生命值低於危急閾值時，每局可恢復一次生命值。",
+          "unlock": "本局中解鎖。",
+          "effects": [
+            "恢復 10% 生命值",
+            "恢復 15% 生命值",
+            "恢復 20% 生命值"
+          ]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "第 {{level}} 關 — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "軍事哨站",
+        "description": "月光下的哨站設有補給箱、沙袋掩體和可摧毀路障。"
+      },
+      "industrial": {
+        "name": "工業園區",
+        "description": "厚重的工業區域被混凝土建築和加固屏障分隔。"
+      },
+      "contaminated": {
+        "name": "汙染區",
+        "description": "荒廢的綠色區域，掩體分散，開闊通道暗藏危險。"
+      },
+      "urban": {
+        "name": "廢棄城市",
+        "description": "破牆與掩體共同塑造戰場的廢棄城市競技場。"
+      },
+      "bunker": {
+        "name": "地下地堡",
+        "description": "冰冷的地下設施，設有混凝土防禦工事和狹窄走廊。"
+      }
+    },
+    "arenaObjects": {
+      "crate": {
+        "name": "箱子",
+        "description": "堆疊的補給箱可提供掩體並遮擋視線。"
+      },
+      "barricade": {
+        "name": "路障",
+        "description": "低矮路障可引導移動並阻擋衝鋒。"
+      },
+      "wall": {
+        "name": "牆體",
+        "description": "堅固的混凝土牆板可遮擋通道並形成狹窄路口。"
+      },
+      "cover": {
+        "name": "掩體",
+        "description": "防護隔板可提供短暫的安全空間。"
+      },
+      "barrel": {
+        "name": "油桶",
+        "description": "引爆後可重創成群敵人的爆炸桶。"
+      },
+      "oil-barrel": {
+        "name": "燃油桶",
+        "description": "厚重的鋼桶破裂後會引發危險的火焰爆發。"
+      },
+      "gas-cylinder": {
+        "name": "燃氣罐",
+        "description": "高壓氣罐會引發危險的高速爆炸。"
+      },
+      "electric-generator": {
+        "name": "發電機",
+        "description": "蓄能後會釋放危險電弧的電力裝置。"
+      },
+      "moving-wall": {
+        "name": "移動牆體",
+        "description": "會移動的工業牆板將迫使你改變路線。"
+      },
+      "steam-pipe": {
+        "name": "蒸汽管道",
+        "description": "通風管會發出預警，隨後噴出高溫蒸汽。"
+      },
+      "industrial-crate": {
+        "name": "工業箱",
+        "description": "帶有耐用金屬護板、可能掉落戰利品的加固儲物箱。"
+      }
+    }
+  },
   "ui": {
     "dialogClose": "關閉",
     "sheetClose": "關閉",

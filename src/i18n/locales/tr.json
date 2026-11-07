@@ -849,6 +849,567 @@
       "reviewKicker": "BAŞVURU İNCELEMESİ"
     }
   },
+  "game": {
+    "menu": {
+      "presentedBy": "SANKEYYY SUNAR",
+      "taglineLead": "DIŞARISI SAKİN.",
+      "taglineEmphasis": "İÇERİSİ KAOS.",
+      "survival": "Hayatta Kalma",
+      "campaign": "Sefer",
+      "devLevel": "Test bölümünü başlat",
+      "howToPlay": "Nasıl oynanır",
+      "fieldGuides": "Rehberler",
+      "leaderboard": "Sıralama",
+      "settings": "Ayarlar",
+      "communityLead": "BİR",
+      "communityTail": "TOPLULUK YAPIMI",
+      "backToMenu": "Menüye dön",
+      "backToPauseMenu": "Duraklatma menüsüne dön",
+      "carousel": "karusel",
+      "stagesReached": "ULAŞILAN BÖLÜMLER",
+      "statPoints": "ÖZELLİK PUANLARI",
+      "area": "BÖLGE {{number}}",
+      "sector": "SEFER BÖLGESİ",
+      "stagesCleared": "10 BÖLÜMDEN {{count}} TANESİ TAMAMLANDI",
+      "previousArea": "Önceki bölge",
+      "nextArea": "Sonraki bölge",
+      "start": "Başla",
+      "locked": "Kilitli",
+      "cleared": "✓ TAMAMLANDI",
+      "boss": "PATRON",
+      "current": "MEVCUT",
+      "ready": "HAZIR",
+      "difficulty": "Zorluk: {{difficulty}}/5",
+      "best": "EN İYİ",
+      "maps": {
+        "Watchtower": "Gözetleme Kulesi", "Barracks": "Kışla", "Perimeter": "Çevre",
+        "Bunker": "Sığınak", "Relay": "Aktarıcı", "Armory": "Cephanelik",
+        "Checkpoint": "Kontrol Noktası", "Hangar": "Hangar", "Rampart": "Sur",
+        "Citadel": "Hisar", "Foundry": "Dökümhane", "Crucible": "Pota",
+        "Refinery": "Rafineri", "Conveyor": "Konveyör", "Furnace": "Fırın",
+        "Mill": "Değirmen", "Smelter": "Eritme Ocağı", "Generator": "Jeneratör",
+        "Assembly": "Montaj", "Forge": "Demirhane", "Quarantine": "Karantina",
+        "Wasteland": "Çorak Arazi", "Mire": "Bataklık", "Fallout": "Serpinti",
+        "Blight": "Çürüme", "Hollow": "Oyuk", "Ruins": "Harabeler",
+        "Toxicity": "Zehir", "Necropolis": "Ölüler Şehri", "Deadzone": "Ölüm Bölgesi"
+      },
+      "areas": {
+        "military": "Askerî Karakol",
+        "industrial": "Sanayi Kompleksi",
+        "contaminated": "Kirlenmiş Bölge"
+      },
+      "campaignAreas": "Sefer bölgeleri",
+      "areaLevels": "{{area}} seviyeleri",
+      "mainMenu": "Ana menü",
+      "levelAction": "{{action}}: {{stage}}, {{area}}{{boss}}",
+      "bossSuffix": ", patron: {{name}}",
+      "lockedState": "KİLİTLİ",
+      "resumeGame": "Oyuna dön",
+      "closeCampaign": "Sefer seçimini kapat",
+      "closeLeaderboard": "Sıralamayı kapat",
+      "closeGuides": "Rehberleri kapat",
+      "closeSettings": "Ayarları kapat"
+    },
+    "settings": {
+      "title": "Ayarlar", "categories": "Ayar kategorileri",
+      "play": "Oyun", "playHint": "Oyun deneyimin",
+      "controls": "Kontroller", "controlsHint": "Tuşlar ve hareket",
+      "audio": "Ses", "audioHint": "Müzik ve efektler",
+      "language": "Dil", "languageHint": "Ekran dili",
+      "makeItYours": "Sana göre ayarla", "yourControls": "Kontrollerin",
+      "setTheMood": "Modunu seç", "chooseLanguage": "Dilini seç",
+      "touchControls": "Dokunmatik kontroller", "joysticksQuestion": "Kontroller ne zaman gösterilsin?",
+      "touchControlsVisibility": "Dokunmatik kontrol görünürlüğü",
+      "auto": "Otomatik", "always": "Her zaman", "never": "Asla",
+      "touchAutoHint": "Cihaz destekliyorsa dokunmatik kontrolleri göster.",
+      "touchAlwaysHint": "Dokunmatik kontrolleri hep göster.",
+      "touchNeverHint": "Kontrolleri gizle, klavye ve fare kullan.",
+      "hudDensity": "Oyun arayüzü yoğunluğu", "battlefieldView": "Savaş alanı görünümünü seç.",
+      "standard": "Standart", "compact": "Kompakt",
+      "fullscreen": "Tam ekran",
+      "fullscreenDescription": "Oyunun nasıl açılacağını seç.",
+      "fullscreenOn": "Tam ekran",
+      "fullscreenOnHint": "Sürükleyici görünüm",
+      "fullscreenOff": "Pencereli",
+      "fullscreenOffHint": "Tarayıcı kontrollerini göster",
+      "keyBindings": "Tuş atamaları", "pressKey": "Bir tuşa bas",
+      "pauseGame": "Oyunu duraklat",
+      "pressKeyEllipsis": "TUŞA BAS…",
+      "placeTurret": "Taret yerleştir", "leftDoubleOrRightClick": "ÇİFT SOL TIK VEYA SAĞ TIK",
+      "keyCannotAssign": "Tarayıcı bu tuşun atanmasına izin vermiyor.",
+      "actions": {
+        "moveUp": "Yukarı git", "moveDown": "Aşağı git",
+        "moveLeft": "Sola git", "moveRight": "Sağa git",
+        "useBomb": "Bomba kullan"
+      },
+      "sectionPlay": "01 / OYUN", "sectionControls": "02 / KONTROLLER",
+      "sectionAudio": "03 / SES", "sectionLanguage": "04 / DİL",
+      "loadFailed": "Kayıtlı oyun ayarları yüklenemedi: {{error}}",
+      "loadFailedSimple": "bilinmeyen hata",
+      "saveFailed": "Ayarlar bu oturum için değişti ancak kaydedilemedi: {{error}}",
+      "saveFailedSimple": "bilinmeyen hata",
+      "cancelBinding": "İptal etmek için vurgulanan tuşa tekrar bas. Atama sırasında Esc'ye bas.",
+      "audioUnavailable": "Ses kullanılamıyor: {{error}}",
+      "backgroundMusic": "Arka plan müziği", "lateNightRadio": "Gece radyosu",
+      "volume": "Ses düzeyi", "musicVolume": "Müzik düzeyi",
+      "lofiTracks": "Lo-fi parçalar sırayla çalar.",
+      "musicUnavailable": "Müzik kullanılamıyor; parça eklenmemiş.",
+      "soundEffects": "Ses efektleri", "littleThings": "Küçük ama önemli ayrıntılar",
+      "effectsVolume": "Efekt düzeyi",
+      "soundEffectFootnote": "Eşyalar, hasar ve çatışma sesleri."
+    },
+    "hud": {
+      "runStatus": "Oyun durumu", "wave": "DALGA", "waveProgress": "Dalga ilerlemesi",
+      "health": "SAĞLIK", "low": "DÜŞÜK", "playerHealth": "Oyuncu sağlığı",
+      "score": "PUAN", "eliminated": "ÖLDÜRÜLEN", "bombs": "BOMBA",
+      "turrets": "TARET", "customWavePower": "Dalga güçlendirmesi: {{name}}",
+      "power": "GÜÇ", "activePlayerStats": "Oyuncu istatistikleri",
+      "bossApproaching": "PATRON YAKLAŞIYOR", "bossIntroduction": "Patron tanıtımı",
+      "bossStatus": "Patron durumu", "boss": "Patron", "shielded": "KALKANLI",
+      "bossHealth": "{{name}} sağlığı"
+    },
+    "touch": {
+      "controls": "Dokunmatik kontroller",
+      "movement": "Hareket çubuğu: Sürükleyerek ilerle. WASD veya yön tuşlarını da kullanabilirsin.",
+      "aim": "Nişan çubuğu: Sürükleyerek nişan al. Bırakınca yön korunur.",
+      "useBomb": "Bomba kullan; kalan: {{count}}"
+    },
+    "pause": {
+      "title": "Oyun duraklatıldı", "actions": "Oyun eylemleri", "quickAccess": "HIZLI ERİŞİM",
+      "resumeRun": "Oyuna devam et", "jumpBack": "Aksiyona dön",
+      "settings": "Ayarlar", "fieldGuide": "Saha rehberi", "restartRun": "Oyunu yeniden başlat",
+      "exitTutorial": "Eğitimden çık", "mainMenu": "Ana menü",
+      "runStats": "Mevcut oyun istatistikleri", "currentRun": "MEVCUT OYUN",
+      "nightContinues": "Gece devam ediyor", "totalScore": "TOPLAM PUAN",
+      "pointsEarned": "Kazanılan puan", "playerVitals": "OYUNCU DURUMU",
+      "criticalCondition": "Kritik durum — dikkatli ol",
+      "battered": "Yaralısın ama ayaktasın",
+      "lookingGood": "İyi gidiyorsun",
+      "survivalTime": "HAYATTA KALMA SÜRESİ",
+      "survivorDevelopment": "HAYATTA KALAN GELİŞİMİ",
+      "pauseDetails": "Duraklatma menüsü ayrıntıları", "coreAttributes": "Temel özellikler",
+      "fineTuneBuild": "Karakterini geliştir.",
+      "unlimitedStatsDev": "Test modunda sınırsız özellik puanı",
+      "unusedStatPoints": "Kullanılmamış özellik puanı: {{count}}",
+      "rareAbilities": "Nadir yetenekler", "rarePerks": "Uzun gecelerde işine yarayan avantajlar.",
+      "unlimitedRareDev": "Test modunda sınırsız nadir yetenek puanı",
+      "unusedRarePoints": "Kullanılmamış nadir puan: {{count}}",
+      "spendStatPoints": "Özellik puanı harca", "rareUpgrades": "Nadir geliştirmeler",
+      "allocated": "+{{count}} ayrıldı", "next": "Sonraki: {{effect}}",
+      "freeDev": "Test modunda ücretsiz", "statPointsCost": "{{count}} ÖP",
+      "decrease": "{{name}} azalt", "increase": "{{name}} artır",
+      "rarityCommon": "yaygın", "rarityRare": "nadir", "rarityEpic": "destansı",
+      "level": "Seviye {{level}}/{{max}}",
+      "unlimitedDev": "Test modunda sınırsız", "maxLevel": "Maksimum seviye",
+      "rarePointsCost": "{{count}} NP", "locked": "Kilitli: {{reason}}",
+      "maximumLevelReached": "✦ En yüksek seviyeye ulaşıldı",
+      "refund": "{{name}} puanını iade et", "purchase": "{{name}} geliştir",
+      "runUnavailable": "Oyun kullanılamıyor",
+      "nextChapter": "Sıradaki bölüm seni bekliyor.",
+      "resumeWhenReady": "Hazır olduğunda devam et.",
+      "resume": "Devam et", "backToGame": "Oyuna dön", "guides": "Rehberler"
+    },
+    "effects": {
+      "active": "Etkin etkiler", "damage": "Hasar",
+      "rapidFire": "Hızlı ateş", "shield": "Kalkan",
+      "magnet": "Küre mıknatısı", "cursed": "Lanetli güç",
+      "remaining": "{{name}}: {{count}} saniye kaldı"
+    },
+    "tutorial": {
+      "ariaLabel": "Etkileşimli oyun eğitimi",
+      "step": "{{current}}/{{total}}. adım",
+      "exerciseComplete": "Alıştırma tamamlandı.",
+      "collectOrbOrSkip": "Bir küre topla veya bu alıştırmayı geç.",
+      "moveOrSkip": "Karakterini hareket ettir veya alıştırmayı geç.",
+      "aimOrSkip": "Nişan yönünü değiştir veya alıştırmayı geç.",
+      "confirmExit": "Eğitimden çıkışı onayla",
+      "exitPrompt": "Eğitimden çıkılsın mı? Bu alıştırma oyunu silinecek.",
+      "keepPlaying": "Oynamaya devam et", "exit": "Eğitimden çık",
+      "previous": "Önceki", "returnToMenu": "Ana menüye dön",
+      "continue": "Devam et", "skipExercise": "Alıştırmayı geç",
+      "steps": {
+        "intro": {
+          "title": "Arenaya hoş geldin",
+          "description": "Mümkün olduğunca çok dalga dayan. Hayatta kal, arenayı temizle ve yer değiştirmek için fırsatları kullan."
+        },
+        "player": {
+          "title": "Karakterin",
+          "description": "Parlayan karakter sensin. Sağlığın durum çubuğunda görünür; zombilerden uzak dur."
+        },
+        "movement": {
+          "title": "Hareket et",
+          "description": "Atadığın tuşları kullan veya dokunmatik ekranda sol çubuğu sürükle. Tuşları Ayarlar'dan değiştirebilirsin. Biraz hareket ederek dene."
+        },
+        "aim": {
+          "title": "Nişan al ve ateş et",
+          "description": "Fareyi yönelt veya sağ çubuğu sürükleyerek nişan al. Silahın o yöne otomatik ateş eder. Farklı bir yöne nişan al."
+        },
+        "hud": {
+          "title": "Oyun arayüzünü tanı",
+          "description": "Dalga, sağlık, öldürülenler, puan, düşmanlar, bomba ve taret sayıları oyunu takip etmene yardım eder. Bomba tuşunu veya dokunmatik düğmeyi kullan. Boş bir yere sağ tıklayarak ya da çift dokunarak taret yerleştir. Geçici etkiler arayüzün altında görünür."
+        },
+        "enemies": {
+          "title": "Düşmanlarını tanı",
+          "description": "Yürüyenler yavaş ve dayanıklıdır. Koşucular daha küçük, hızlı ve daha az sağlıklıdır. Hareket etmeye devam et ve tehlikeden uzaklaş."
+        },
+        "obstacles": {
+          "title": "Arenayı kullan",
+          "description": "Sandıklar ve barikatlar hareketi engelleyip atışları kesebilir. Yol açmak için etraflarından dolaş."
+        },
+        "powerups": {
+          "title": "Güçlendirme küreleri",
+          "description": "Sağlık en fazla 25 yeniler; hasar 10 sn boyunca ikiye katlanır; hızlı ateş 8 sn sürer; kalkan 12 sn boyunca 60 hasarı emer. En fazla 5 bomba topla; yakındaki zombilere 100 hasar verir. En fazla 5 taret taşı; boş bir yere koyduğunda 12 sn ateş eder."
+        },
+        "collectOrb": {
+          "title": "Küre topla",
+          "description": "Üzerinden geçerek küreyi al. Her iki zombi öldürmesinde bir küre düşer. Parlayan küreyi alıp etkisini gör. Bombalar, kullanana kadar envanterinde kalır."
+        },
+        "waves": {
+          "title": "Dalgayı tamamla",
+          "description": "Düşmanlar dalgalar hâlinde gelir. Dalgayı bitirip ek puan kazanmak için tüm zombileri yen."
+        },
+        "statPoints": {
+          "title": "Özellik puanlarını harca",
+          "description": "Tamamlanan her dalga 1 özellik puanı verir. Duraklatma menüsünde silah hasarını, atış hızını, maksimum sağlığı veya hareket hızını artır. Eksi düğmesi harcanan puanı geri alır."
+        },
+        "pause": {
+          "title": "Duraklat ve gözden geçir",
+          "description": "Duraklatma menüsünde oyun istatistiklerini ve etkin etkileri gör. Esc veya Duraklat düğmesine basarak devam et, ayarları değiştir, oyunu yeniden başlat ya da menüye dön."
+        },
+        "completion": {
+          "title": "Hazırsın",
+          "description": "WASD veya yön tuşlarıyla hareket et, fareyle nişan al ve dalgalarda hayatta kalırken küreleri topla. Yeni bir oyun için ana menüye dön."
+        }
+      }
+    },
+    "leaderboard": {
+      "ranking": "Tüm zamanların rekorları; dalga, puan, öldürme ve süreye göre sıralanır.",
+      "loading": "Sıralama yükleniyor…",
+      "loadFailed": "Sıralama şu anda yüklenemiyor.",
+      "retrying": "Yeniden deneniyor…", "retry": "Yeniden dene",
+      "empty": "Henüz oyun gönderilmedi. İlk rekoru sen kır!",
+      "player": "Oyuncu", "cleared": "Tamamlanan", "score": "Puan",
+      "kills": "Öldürme", "time": "Süre", "reached": "{{wave}}. dalgaya ulaşıldı",
+      "title": "Sıralama", "entries": "{{count}} kayıt",
+      "range": "{{start}}–{{end}} / {{total}}",
+      "previous": "Önceki", "next": "Sonraki"
+    },
+    "submission": {
+      "title": "Oyunu gönder", "name": "Sıralama adı",
+      "enterName": "Puanını göndermek için bir ad gir.",
+      "submitting": "Gönderiliyor…", "retry": "Yeniden gönder",
+      "submitted": "Puan gönderildi", "submit": "Puanı gönder",
+      "success": "Puan gönderildi. Artık tüm zamanlar sıralamasına girebilirsin.",
+      "failed": "Puan gönderilemedi. Bağlantını kontrol edip yeniden dene."
+    },
+    "results": {
+      "practice": "Alıştırma", "tutorialOver": "Eğitim oyunu bitti",
+      "practiceNotSubmitted": "Alıştırma oyunu sıralamaya gönderilmez.",
+      "restartTutorial": "Eğitimi yeniden başlat",
+      "stageCompleted": "{{level}}. bölüm tamamlandı",
+      "personalLevelScore": "Bölüm puanın", "levelScore": "BÖLÜM PUANI",
+      "bossDefeated": "PATRON YENİLDİ",
+      "bossFallen": "Büyük bir tehdit daha ortadan kalktı.",
+      "stageStatistics": "Bölüm istatistikleri",
+      "enemiesEliminated": "Öldürülen düşman", "completionTime": "Tamamlama süresi",
+      "damageDealt": "Verilen hasar", "campaignComplete": "SEFER TAMAMLANDI",
+      "campaignCompleteDescription": "30 bölümün tamamını bitirdin. Gelecek güncellemelerde yeni bölümler gelebilir.",
+      "thankYou": "GECEYİ ATLATTIĞIN İÇİN TEŞEKKÜRLER",
+      "journeyContinues": "YOLCULUK DEVAM EDİYOR",
+      "nextLevel": "Sonraki seviye", "levelSelection": "Seviye seçimi",
+      "mainMenu": "Ana menü", "notThisTime": "Bu <span>kez olmadı.</span>",
+      "campaignStage": "Sefer bölümü", "currentStage": "MEVCUT BÖLÜM",
+      "campaignStageName": "Sefer bölümü", "progressSafe": "İlerlemen güvende.",
+      "progressSafeDescription": "Açtığın bölümler ve eski rekorların duruyor. Hiçbir şeyini kaybetmedin.",
+      "nextRun": "SIRADAKİ OYUNUN HİKÂYESİ SANA AİT",
+      "retryLevel": "Seviyeyi yeniden dene", "finalScore": "Son puan",
+      "campaignRunsSeparate": "Sefer oyunları, Hayatta Kalma rekorlarından ayrı tutulur.",
+      "campaignRun": "Sefer oyunu", "notThisTimeLead": "Bu kez",
+      "notThisTimeEmphasis": "olmadı.", "stageNumber": "{{level}}. bölüm",
+      "replayLevel": "Seviyeyi yeniden oyna", "next": "Sonraki",
+      "waveReached": "Ulaşılan dalga", "wavesCleared": "Tamamlanan dalga",
+      "zombiesEliminated": "Öldürülen zombi", "timeSurvived": "Hayatta kalma süresi",
+      "playAgain": "Yeniden oyna"
+    },
+    "guides": {
+      "closeDetails": "Rehber ayrıntılarını kapat", "close": "Kapat",
+      "heroDescription": "Tehditleri tanı, kaynaklarını öğren ve sonraki oyuna hazırlan.",
+      "progress": "{{total}} düşman ve patrondan {{discovered}} tanesi tanındı",
+      "threatCompletion": "Tehdit bilgisi tamamlanma durumu",
+      "identified": "{{count}}/{{total}} kayıt tanındı",
+      "threatIntel": "TEHDİT BİLGİSİ", "enemyCatalogue": "TEHDİT KATALOĞU",
+      "enemies": "Düşmanlar", "enemyDescription": "Sahada karşılaşacağın enfekteler.",
+      "bossDossier": "YÜKSEK TEHDİT DOSYASI", "bosses": "Patronlar",
+      "bossDescription": "Büyük mutasyonlar. Seni bulmadan hareketlerini öğren.",
+      "arenaEnvironments": "OPERASYON BÖLGELERİ", "arenas": "Arenalar",
+      "arenaDescription": "Hayatta Kalma'da beş ortam farklı engel düzenleriyle sırayla gelir.",
+      "viewDetails": "{{name}} ayrıntılarını gör",
+      "viewUnknownEnemy": "Tanımlanamayan düşmanın ayrıntılarını gör",
+      "viewUnknownBoss": "Tanımlanamayan patronun ayrıntılarını gör",
+      "unknownEnemy": "Bilinmeyen düşman", "unknownBoss": "Bilinmeyen patron",
+      "unknown": "Bilinmiyor", "threatIdentified": "TEHDİT TANINDI",
+      "unknownContact": "BİLİNMEYEN TEMAS", "bossDossierTag": "PATRON DOSYASI",
+      "classifiedDossier": "GİZLİ DOSYA",
+      "classified": "Tehdit ayrıntıları gizli.",
+      "identifiedCount": "{{count}}/{{total}} tanındı",
+      "arenaRenderables": "{{name}} nesneleri",
+      "viewArenaObjects": "{{name}} nesnelerini gör",
+      "layout": "{{name}} düzeni", "zone": "BÖLGE {{number}}",
+      "waves": "DALGALAR {{start}}–{{end}}",
+      "arenaObjects": "Bu ortamda çıkabilecek nesneler. Durumları ve yerleri oyuna göre değişir.",
+      "classifiedIntel": "Bilgi için önce tehdidi tanımalısın.",
+      "eliteTipTitle": "HAYATTA KALMA İPUCU",
+      "eliteTip": "Elit düşmanlara dikkat et; standart düşmanlardan daha tehlikelidirler."
+    },
+    "orbs": {
+      "supplies": "İKMALLER VE GÜÇLENDİRMELER",
+      "title": "Küreler", "description": "Oyunun gidişatını değiştirebilecek faydalı eşyalar.",
+      "viewDetails": "{{name}} ayrıntılarını gör", "rare": "NADİR",
+      "healthName": "Sağlık Küresi", "healthDescription": "Sağlık yeniler.",
+      "healthDetails": "Maksimum sağlığı aşmadan 25 sağlık yeniler.",
+      "damageName": "Hasar Küresi", "damageDescription": "Mermi hasarını artırır.",
+      "damageDetails": "Mermi hasarını kısa süreliğine ikiye katlar.",
+      "rapidFireName": "Hızlı Ateş Küresi", "rapidFireDescription": "Atış hızını artırır.",
+      "rapidFireDetails": "Atış hızını kısa süreliğine ikiye katlar.",
+      "shieldName": "Kalkan Küresi", "shieldDescription": "Gelen hasarı emer.",
+      "shieldDetails": "Kısa süreliğine gelen hasarı emen kalkan verir.",
+      "bombName": "Bomba Küresi", "bombDescription": "Envanterine bomba ekler.",
+      "bombDetails": "Bomba patlayınca yakındaki düşmanlara hasar verir.",
+      "magnetName": "Mıknatıs Küresi", "magnetDescription": "Yakındaki küreleri sana çeker.",
+      "magnetDetails": "Yakındaki küreleri kısa süreliğine sana çeker.",
+      "turretName": "Taret Küresi", "turretDescription": "Otomatik taret yerleştirir.",
+      "turretDetails": "Taret, yakındaki düşmanlara kısa süre ateş eder.",
+      "cursedName": "Lanetli Küre", "cursedDescription": "Düşmanları hızlandırır.",
+      "cursedDetails": "Düşmanların hareket hızını kısa süreliğine artırır.",
+      "rareGoldName": "Nadir Altın Küre",
+      "rareGoldDescription": "Bir Nadir Puan verir.",
+      "rareGoldDetails": "Bir Nadir Puan kazandırır."
+    },
+    "notifications": {
+      "discovered": "{{name}} keşfedildi",
+      "firstEncounter": "İlk karşılaşma kaydedildi. Dikkatli ol.",
+      "campaignLocked": "Bu sefer seviyesi kilitli veya kullanılamıyor.",
+      "renderInitFailed": "Oyun görüntüleme alanı başlatılamadı.",
+      "fullscreenExitFailed": "Tam ekrandan çıkılamadı.",
+      "campaignProgressSaveFailed": "Sefer ilerlemesi kaydedilemedi: {{error}}",
+      "campaignProgressSaveFailedSimple": "Sefer ilerlemesi kaydedilemedi.",
+      "campaignPointsSaveFailed": "Sefer özellik puanları kaydedilemedi: {{error}}",
+      "campaignPointsSaveFailedSimple": "Sefer özellik puanları kaydedilemedi."
+    },
+    "canvas": {
+      "ariaLabel": "565 Zombi Hayatta Kalma. Hareket etmek için atadığın tuşları veya dokunmatik kontrolleri kullan. Fareyle ya da nişan çubuğuyla nişan al. Silah seçilen yöne otomatik ateş eder. Bomba topla ve kullanmak için atadığın tuşa ya da dokunmatik bomba düğmesine bas. En fazla beş taret topla; arenada boş bir yere sağ tıkla veya çift dokunarak yerleştir.",
+      "notSupported": "Bu tarayıcı Canvas görüntülemeyi desteklemiyor."
+    },
+    "diagnostics": {
+      "thresholdUpdateFailed": "Eşikler güncellenemedi.",
+      "unavailable": "Performans tanılaması kullanılamıyor.",
+      "exportFailed": "Tanılama verileri dışa aktarılamadı."
+    },
+    "arenaLayouts": {
+      "military-open-centre": "Açık Merkez",
+      "military-corridor-network": "Koridor Ağı",
+      "military-scattered-cover": "Dağınık Siperler",
+      "military-central-structure": "Merkezî Yapı",
+      "industrial-open-centre": "Açık Merkez",
+      "industrial-cluster-split": "Sanayi Kümesi",
+      "industrial-corridor": "Koridor Ağı",
+      "industrial-rust-scrap": "Paslı Hurda",
+      "contaminated-open-lab": "Açık Laboratuvar",
+      "contaminated-split-lab": "Bölünmüş Laboratuvar",
+      "contaminated-scattered-tanks": "Dağınık Tanklar",
+      "contaminated-central-structure": "Merkezî Muhafaza",
+      "urban-open-road": "Açık Cadde",
+      "urban-rubble-lane": "Enkazlı Sokak",
+      "urban-ruined-block": "Yıkık Blok",
+      "urban-roadblock-loop": "Barikatlı Yol",
+      "bunker-open-bay": "Açık Hangar",
+      "bunker-split-hall": "Bölünmüş Salon",
+      "bunker-core-structure": "Merkezî Yapı",
+      "bunker-perimeter-defence": "Çevre Savunması"
+    },
+    "announcements": {
+      "bossEntered": "{{name}} sahaya girdi",
+      "bossDefeated": "{{name}} yenildi",
+      "level": "Seviye {{level}}",
+      "bossLevel": "Seviye {{level}} · PATRON",
+      "wave": "Dalga {{wave}}",
+      "levelComplete": "SEVİYE TAMAMLANDI",
+      "runOver": "Oyun bitti"
+    },
+    "music": {
+      "toggle": "Müziği {{action}}",
+      "pause": "Duraklat", "play": "Oynat"
+    },
+    "pauseButton": {
+      "ariaLabel": "Oyunu duraklat. Esc veya P'ye bas.",
+      "title": "Duraklat (Esc)", "label": "Duraklat (Esc)"
+    },
+    "bosses": {
+      "charger": "Hücumcu", "acidQueen": "Asit Kraliçesi",
+      "hordeCaller": "Sürü Çağıran",
+      "chargerSummary": "Hızlı hücumlar için mutasyona uğramış dev.",
+      "chargerDescription": "Arenada hücuma geçmeden önce hız kazanır.",
+      "chargerAbility": "Hücum yönünü belli eder; engele çarparsa kısa süre sersemler.",
+      "acidQueenSummary": "Uzaktan saldıran ve alanı kontrol eden zehirli mutant.",
+      "acidQueenDescription": "Uzaktan asit saldırılarıyla arenayı kontrol eder.",
+      "acidQueenAbility": "Asit saçar ve alanları kısa süre kapatan birikintiler oluşturur.",
+      "hordeCallerSummary": "Takviyeleri yanındayken kalkanla korunan çağırıcı.",
+      "hordeCallerDescription": "Takviyeleri hayattayken kalkanı onu korur.",
+      "hordeCallerAbility": "Zombi takviyesi çağırır. Kalkanını kaldırıp savunmasız bırakmak için onları yen."
+    },
+    "enemies": {
+      "walker": {
+        "name": "Yürüyen", "summary": "Yakından ağır ağır takip eder.",
+        "description": "Yavaşça yaklaşır ve yakın mesafede saldırır.",
+        "ability": "Özel saldırısı yok. Sürünün seni çevrelemesini önlemek için hareket et."
+      },
+      "runner": {
+        "name": "Koşucu", "summary": "Hızlı ama dayanıksız saldırgan.",
+        "description": "Hızlı ve dayanıksızdır; hareketsiz kalırsan hemen yetişir.",
+        "ability": "6 sn normal hızda ilerledikten sonra 2 sn boyunca iki kat hızla koşar. Hücum etmeden önce uyarı vermez."
+      },
+      "brute": {
+        "name": "İri Zombi", "summary": "Sağlığı yüksek, yakın dövüşte güçlü zombi.",
+        "description": "Yavaş ve iridir; sağlığı yüksek, yakın dövüş darbesi güçlüdür.",
+        "ability": "Temas ettiğinde ağır hasar verir. Yaklaşmasına izin verme."
+      },
+      "spitter": {
+        "name": "Asitçi", "summary": "Asit tükürerek uzaktan saldırır.",
+        "description": "Senden uzakta durmaya çalışan menzilli saldırgan.",
+        "ability": "Menziline girdiğinde hızlı bir asit mermisi fırlatır."
+      },
+      "swarm": {
+        "name": "Sürü", "summary": "Küçük ve hızlı saldırganlardan oluşur.",
+        "description": "Kalabalık arenada gözden kaçabilecek küçük, hızlı zombiler.",
+        "ability": "Koşucudan hızlıdır ve 3 sn bekleme süresiyle atışlardan iki kat hızla kaçar. Kaçtıktan sonra yarı hıza düşer, 2 sn içinde normale döner."
+      },
+      "armoured": {
+        "name": "Zırhlı", "summary": "Önden daha az hasar alan dayanıklı zombi.",
+        "description": "Önü sana dönükken aldığı hasarı azaltır.",
+        "ability": "Önü sana dönükken temas hasarı düşüktür; doğrudan yaklaşma."
+      },
+      "screamer": {
+        "name": "Çığlıkçı", "summary": "Takviye çağıran bir zombi.",
+        "description": "Israrla takip eder; arena kalabalıklaştıkça tehlikeli olur.",
+        "ability": "Her seferinde bir Yürüyen çağırır. Sürü Çağıran iki katını çağırır."
+      },
+      "bloater": {
+        "name": "Şişkin", "summary": "Öldüğünde asit tehlikesi bırakan dayanıklı zombi.",
+        "description": "Yavaş ve dayanıklıdır; ölürken tehlikeli bir sürpriz bırakır.",
+        "ability": "Yenildiğinde hasar veren asit birikintisi oluşturur."
+      },
+      "splitter": {
+        "name": "Bölünen", "summary": "Öldüğünde küçük düşmanlara ayrılır.",
+        "description": "Tek tehdidi birkaç düşmana dönüştürür.",
+        "ability": "Yenildiğinde dört küçük Sürü zombisine ayrılır."
+      }
+    },
+    "modifiers": {
+      "doubleOrbs": { "name": "Çift Küre", "description": "Küreler iki kat sık düşer." },
+      "fastWave": { "name": "Hızlı Dalga", "description": "Düşmanlar %20 daha hızlı hareket eder." },
+      "armouredInvasion": { "name": "Zırhlı İstilası", "description": "Zırhlı düşmanlar daha sık çıkar." },
+      "eliteThreat": { "name": "Elit Tehdidi", "description": "Elit düşmanların çıkma olasılığı artar." },
+      "contamination": { "name": "Kirlenme", "description": "Şişkinler ve asitleri daha tehlikelidir." },
+      "reducedVisibility": { "name": "Az Görüş", "description": "Karanlık görüş mesafeni kısıtlar." },
+      "overrun": { "name": "Baskın", "description": "Düşmanlar daha sık gelir." },
+      "heavyResistance": { "name": "Yoğun Direniş", "description": "İri zombiler daha sık çıkar." }
+    },
+    "upgrades": {
+      "attributes": {
+        "damage": {
+          "name": "Silah hasarı", "description": "Her merminin verdiği hasarı artır.",
+          "effect": "+%10 temel hasar", "unit": "hasar/atış"
+        },
+        "shotsPerSecond": {
+          "name": "Hızlı ateş", "description": "Nişanını korurken daha sık ateş et.",
+          "effect": "+%8 temel atış hızı", "unit": "atış/sn"
+        },
+        "maxHealth": {
+          "name": "Maksimum sağlık", "description": "Maksimum sağlığını artır.",
+          "effect": "+10 maksimum sağlık", "unit": "sağlık"
+        },
+        "movementSpeed": {
+          "name": "Hareket hızı", "description": "Kaçmak ve yer değiştirmek için hızlan.",
+          "effect": "+%3 temel hareket hızı", "unit": "birim/sn"
+        }
+      },
+      "rare": {
+        "lifesteal": {
+          "name": "Can Çalma", "description": "Silah hasarının bir kısmıyla iyileş.",
+          "unlock": "Oyunun başından itibaren açık.",
+          "effects": ["Uygun hasarın %1'ini yenile", "Uygun hasarın %2'sini yenile", "Uygun hasarın %3'ünü yenile", "Uygun hasarın %4'ünü yenile", "Uygun hasarın %5'ini yenile"]
+        },
+        "criticalMastery": {
+          "name": "Kritik Vuruş Ustalığı", "description": "Silah vuruşlarının kritik hasar verme olasılığını artır.",
+          "unlock": "Oyunun başından itibaren açık.",
+          "effects": ["+%3 kritik vuruş şansı", "+%6 kritik vuruş şansı", "+%9 kritik vuruş şansı", "+%12 kritik vuruş şansı", "+%15 kritik vuruş şansı"]
+        },
+        "explosiveRounds": {
+          "name": "Patlayıcı Mermiler", "description": "Mermiler çarpınca patlayarak alan hasarı verir.",
+          "unlock": "Oyunun başından itibaren açık.",
+          "effects": ["Çarpınca patlama olasılığı %3", "Çarpınca patlama olasılığı %6", "Çarpınca patlama olasılığı %9", "Çarpınca patlama olasılığı %12", "Çarpınca patlama olasılığı %15"]
+        },
+        "emergencyShield": {
+          "name": "Acil Durum Kalkanı", "description": "Hasar alınca koruyucu kalkan oluşturur.",
+          "unlock": "Oyunun başından itibaren açık.",
+          "effects": ["1 sn kalkan", "1,5 sn kalkan", "2 sn kalkan", "2,5 sn kalkan", "3 sn kalkan"]
+        },
+        "orbMagnetism": {
+          "name": "Küre Mıknatısı", "description": "Yakındaki küreleri sana çeker.",
+          "unlock": "Oyunun başından itibaren açık.",
+          "effects": ["60 birim toplama yarıçapı", "90 birim toplama yarıçapı", "120 birim toplama yarıçapı", "150 birim toplama yarıçapı", "180 birim toplama yarıçapı"]
+        },
+        "piercingRounds": {
+          "name": "Delici Mermiler", "description": "Atışlar hedefleri delip başka düşmanlara da isabet eder.",
+          "unlock": "Oyun sırasında açılır.",
+          "effects": ["1 ek hedefi del", "2 ek hedefi del", "3 ek hedefi del", "4 ek hedefi del", "5 ek hedefi del"]
+        },
+        "secondWind": {
+          "name": "İkinci Şans", "description": "Kritik durumdayken oyun başına bir kez sağlık yenile.",
+          "unlock": "Oyun sırasında açılır.",
+          "effects": ["Sağlığın %10'unu yenile", "Sağlığın %15'ini yenile", "Sağlığın %20'sini yenile"]
+        }
+      }
+    },
+    "campaign": {
+      "levelName": "{{level}}. Bölüm — {{name}}"
+    },
+    "arenas": {
+      "military": {
+        "name": "Askerî Karakol",
+        "description": "Ay ışığındaki karakolda ikmal sandıkları, kum torbaları ve yıkılabilir barikatlar bulunur."
+      },
+      "industrial": {
+        "name": "Sanayi Kompleksi",
+        "description": "Beton yapılar ve güçlendirilmiş engellerle bölünmüş bir sanayi alanı."
+      },
+      "contaminated": {
+        "name": "Kirlenmiş Bölge",
+        "description": "Dağınık siperleri ve tehlikeli açık yolları olan yıpranmış, yeşil bir bölge."
+      },
+      "urban": {
+        "name": "Yıkık Şehir",
+        "description": "Yıkık duvarların ve siperlerin savaş alanını şekillendirdiği bir arena."
+      },
+      "bunker": {
+        "name": "Yeraltı Sığınağı",
+        "description": "Beton savunmalı ve dar koridorlu, soğuk bir yeraltı kompleksi."
+      }
+    },
+    "arenaObjects": {
+      "crate": { "name": "Sandık", "description": "Siper oluşturan ve görüşü kesen ikmal sandıkları." },
+      "barricade": { "name": "Barikat", "description": "Hareketi yönlendiren ve hücumları durduran alçak engeller." },
+      "wall": { "name": "Duvar", "description": "Görüşü kesen ve geçişleri daraltan beton paneller." },
+      "cover": { "name": "Siper", "description": "Kısa süreli güvenli alan sağlayan koruyucu bölmeler." },
+      "barrel": { "name": "Varil", "description": "Patlayınca düşman kümelerini dağıtan variller." },
+      "oil-barrel": { "name": "Petrol Varili", "description": "Patlayıp tehlikeli bir alev topuna dönüşebilen ağır çelik variller." },
+      "gas-cylinder": { "name": "Gaz Tüpü", "description": "Tehlikeli ve hızlı yayılan patlamalara yol açabilecek basınçlı tüpler." },
+      "electric-generator": { "name": "Elektrik Jeneratörü", "description": "Dolup tehlikeli enerji alanları oluşturan güç üniteleri." },
+      "moving-wall": { "name": "Hareketli Duvar", "description": "Hareket ederek yolunu değiştirmeni gerektiren sanayi panelleri." },
+      "steam-pipe": { "name": "Buhar Borusu", "description": "Uyarı verip sıcak buhar püskürten havalandırma bacaları." },
+      "industrial-crate": { "name": "Sanayi Sandığı", "description": "Dayanıklı metal kaplamalı, ganimet bırakabilen güçlendirilmiş kasalar." }
+    }
+  },
   "ui": {
     "dialogClose": "Kapat",
     "sheetClose": "Kapat",

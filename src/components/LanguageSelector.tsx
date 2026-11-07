@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-function LanguageFlag({ code }: { code: SupportedLanguage }) {
+export function LanguageFlag({ code }: { code: SupportedLanguage }) {
   const flagProps = {
     className: 'language-selector-flag',
     viewBox: '0 0 24 16',

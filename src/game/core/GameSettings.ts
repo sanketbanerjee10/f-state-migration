@@ -51,7 +51,8 @@ function isGameKeyBindings(value: unknown): value is GameKeyBindings {
   const actions = Object.keys(GAME_KEY_BINDING_ACTIONS);
   return actions.every((action) =>
     typeof bindings[action] === 'string' &&
-    isSupportedGameKeyCode(bindings[action]),
+    isSupportedGameKeyCode(bindings[action]) &&
+    bindings[action] !== 'Escape',
   );
 }
 
@@ -59,6 +60,7 @@ export interface GameSettings {
   readonly touchControls: TouchControlsSetting;
   readonly hudDensity: HudDensitySetting;
   readonly keyBindings: GameKeyBindings;
+  readonly alternatePauseKey: string;
   readonly musicEnabled: boolean;
   readonly soundEnabled: boolean;
   readonly musicVolume: number;
@@ -69,6 +71,7 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
   touchControls: 'auto',
   hudDensity: 'standard',
   keyBindings: DEFAULT_GAME_KEY_BINDINGS,
+  alternatePauseKey: 'KeyP',
   musicEnabled: true,
   soundEnabled: true,
   musicVolume: 0.5,
@@ -96,6 +99,8 @@ export function loadGameSettings(storage: Pick<Storage, 'getItem'>): GameSetting
   const soundEnabled = settings.soundEnabled ?? DEFAULT_GAME_SETTINGS.soundEnabled;
   const musicVolume = settings.musicVolume ?? DEFAULT_GAME_SETTINGS.musicVolume;
   const soundVolume = settings.soundVolume ?? DEFAULT_GAME_SETTINGS.soundVolume;
+  const alternatePauseKey =
+    settings.alternatePauseKey ?? DEFAULT_GAME_SETTINGS.alternatePauseKey;
   const savedKeyBindings = settings.keyBindings;
   let keyBindings: unknown = DEFAULT_GAME_SETTINGS.keyBindings;
   if (typeof savedKeyBindings === 'object' && savedKeyBindings !== null) {
@@ -115,6 +120,9 @@ export function loadGameSettings(storage: Pick<Storage, 'getItem'>): GameSetting
     (settings.hudDensity !== 'compact' &&
       settings.hudDensity !== 'standard') ||
     !isGameKeyBindings(keyBindings) ||
+    typeof alternatePauseKey !== 'string' ||
+    !isSupportedGameKeyCode(alternatePauseKey) ||
+    alternatePauseKey === 'Escape' ||
     typeof musicEnabled !== 'boolean' ||
     typeof soundEnabled !== 'boolean' ||
     typeof musicVolume !== 'number' ||
@@ -132,6 +140,7 @@ export function loadGameSettings(storage: Pick<Storage, 'getItem'>): GameSetting
     touchControls: settings.touchControls,
     hudDensity: settings.hudDensity,
     keyBindings,
+    alternatePauseKey,
     musicEnabled,
     soundEnabled,
     musicVolume,

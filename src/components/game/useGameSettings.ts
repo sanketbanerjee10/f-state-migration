@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DEFAULT_GAME_SETTINGS,
   loadGameSettings,
@@ -9,24 +10,31 @@ import {
 export interface GameSettingsState {
   readonly settings: GameSettings;
   readonly error: string | null;
+  readonly loaded: boolean;
   readonly updateSettings: (settings: GameSettings) => void;
 }
 
 export function useGameSettings(): GameSettingsState {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState(DEFAULT_GAME_SETTINGS);
   const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
       setSettings(loadGameSettings(window.localStorage));
     } catch (loadError) {
       setError(
-        loadError instanceof Error
-          ? loadError.message
-          : 'Unable to load saved game settings.',
+        t('game.settings.loadFailed', {
+          error: loadError instanceof Error
+            ? loadError.message
+            : t('game.settings.loadFailedSimple'),
+        }),
       );
+    } finally {
+      setLoaded(true);
     }
-  }, []);
+  }, [t]);
 
   const updateSettings = useCallback((nextSettings: GameSettings) => {
     setSettings(nextSettings);
@@ -35,12 +43,14 @@ export function useGameSettings(): GameSettingsState {
       setError(null);
     } catch (saveError) {
       setError(
-        saveError instanceof Error
-          ? `Settings changed for this session but could not be saved: ${saveError.message}`
-          : 'Settings changed for this session but could not be saved.',
+        t('game.settings.saveFailed', {
+          error: saveError instanceof Error
+            ? saveError.message
+            : t('game.settings.saveFailedSimple'),
+        }),
       );
     }
-  }, []);
+  }, [t]);
 
-  return { settings, error, updateSettings };
+  return { settings, error, loaded, updateSettings };
 }

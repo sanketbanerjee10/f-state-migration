@@ -731,7 +731,7 @@ export function createGameStateRenderLayers(state: GameState): RenderLayers {
                 0,
                 Math.min(
                   1,
-                  1 - state.wave.transitionCountdownSeconds /
+                  1 - state.wave.arenaTransitionRemainingSeconds /
                     ARENA_TRANSITION_SECONDS,
                 ),
               ),

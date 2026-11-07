@@ -50,6 +50,7 @@ function shootObject(
   object: MilitaryOutpostEntity,
   damage = 2_000,
 ): void {
+  state.militaryObjects = [object];
   const x = state.arenaWidth * object.xFraction;
   const y = state.arenaHeight * object.yFraction;
   state.projectiles = [{
@@ -69,14 +70,15 @@ function shootObject(
 }
 
 describe('Military Outpost gameplay', () => {
-  it('creates six military-only objects and adds only solid objects to collision', () => {
+  it('creates varied military defenses and adds only solid objects to collision', () => {
     const objects = createMilitaryOutpostObjects('military', 'test-arena-1');
-    expect(objects).toHaveLength(6);
-    expect(new Set(objects.map((object) => object.id)).size).toBe(6);
+    expect(objects.filter((object) => object.kind === 'abandoned-turret')).toHaveLength(2);
+    expect(objects.filter((object) => object.kind === 'razor-wire').length).toBeGreaterThanOrEqual(3);
+    expect(new Set(objects.map((object) => object.id)).size).toBe(objects.length);
     expect(createMilitaryOutpostObjects('industrial')).toEqual([]);
 
     for (const layout of getArenaLayoutPool('military')) {
-      const layoutObjects = createMilitaryOutpostObjects('military', layout.id);
+      const layoutObjects = createMilitaryOutpostObjects('military', layout.id, layout);
       for (const object of layoutObjects) {
         const x = 1200 * object.xFraction;
         const y = 720 * object.yFraction;
@@ -111,7 +113,7 @@ describe('Military Outpost gameplay', () => {
 
     const state = createMilitaryTestState();
     const collisionObjects = getArenaCollisionObstacles([], [], state.militaryObjects);
-    expect(collisionObjects).toHaveLength(5);
+    expect(collisionObjects).toHaveLength(6);
 
     const projectile = {
       id: 0,
@@ -154,6 +156,7 @@ describe('Military Outpost gameplay', () => {
   it('blocks spitter shots on military structures while razor wire remains passable and damaging', () => {
     const state = createMilitaryTestState();
     const sandbag = findObject(state, 'sandbag-barricade');
+    state.militaryObjects = [sandbag];
     const x = state.arenaWidth * sandbag.xFraction;
     const y = state.arenaHeight * sandbag.yFraction;
     state.player.x = x + 150;
@@ -190,6 +193,36 @@ describe('Military Outpost gameplay', () => {
     expect(wireState.player.health).toBe(wireHealth - MILITARY_OBJECT_CONFIG.razorWire.damage);
   });
 
+  it('keeps map razor wire active and damaging after 45 seconds', () => {
+    const state = createMilitaryTestState();
+    const wire = findObject(state, 'razor-wire');
+    updateGameState(state, IDLE_INPUT, 46);
+    expect(wire.active).toBe(true);
+
+    const wireX = state.arenaWidth * wire.xFraction;
+    const wireY = state.arenaHeight * wire.yFraction;
+    state.player.x = wireX;
+    state.player.y = wireY;
+    const health = state.player.health;
+    updateGameState(state, IDLE_INPUT, 0.1);
+    expect(state.player.health).toBe(health - MILITARY_OBJECT_CONFIG.razorWire.damage);
+  });
+
+  it('uses the vertical wire footprint for player damage', () => {
+    const state = createMilitaryTestState();
+    const wire = findObject(state, 'razor-wire');
+    wire.rotation = Math.PI / 2;
+    state.militaryObjects = [wire];
+    state.player.x = state.arenaWidth * wire.xFraction +
+      wire.height / 2 + state.player.radius - 1;
+    state.player.y = state.arenaHeight * wire.yFraction;
+    const health = state.player.health;
+
+    updateGameState(state, IDLE_INPUT, 0.1);
+
+    expect(state.player.health).toBe(health - MILITARY_OBJECT_CONFIG.razorWire.damage);
+  });
+
   it('slows movement through destroyed sandbags and active razor wire', () => {
     const slowedState = createMilitaryTestState();
     const sandbag = findObject(slowedState, 'sandbag-barricade');
@@ -203,31 +236,38 @@ describe('Military Outpost gameplay', () => {
 
     const sandbagX = slowedState.arenaWidth * sandbag.xFraction;
     const sandbagY = slowedState.arenaHeight * sandbag.yFraction;
+    const clearSandbagX = clearState.arenaWidth * clearSandbag.xFraction;
+    const clearSandbagY = clearState.arenaHeight * clearSandbag.yFraction;
     slowedState.player.x = sandbagX;
     slowedState.player.y = sandbagY;
-    clearState.player.x = sandbagX;
-    clearState.player.y = sandbagY;
+    clearState.player.x = clearSandbagX;
+    clearState.player.y = clearSandbagY;
     updateGameState(slowedState, { ...IDLE_INPUT, movementX: 1 }, 0.1);
     updateGameState(clearState, { ...IDLE_INPUT, movementX: 1 }, 0.1);
     expect(slowedState.player.x - sandbagX).toBeCloseTo(
-      (clearState.player.x - sandbagX) * MILITARY_OBJECT_CONFIG.sandbag.slowMultiplier,
+      (clearState.player.x - clearSandbagX) *
+        MILITARY_OBJECT_CONFIG.sandbag.slowMultiplier,
       4,
     );
 
     const wireState = createMilitaryTestState();
     const inactiveWireState = createMilitaryTestState();
     const wire = findObject(wireState, 'razor-wire');
-    findObject(inactiveWireState, 'razor-wire').active = false;
+    const inactiveWire = findObject(inactiveWireState, 'razor-wire');
+    inactiveWire.active = false;
     const wireX = wireState.arenaWidth * wire.xFraction;
     const wireY = wireState.arenaHeight * wire.yFraction;
+    const inactiveWireX = inactiveWireState.arenaWidth * inactiveWire.xFraction;
+    const inactiveWireY = inactiveWireState.arenaHeight * inactiveWire.yFraction;
     wireState.player.x = wireX;
     wireState.player.y = wireY;
-    inactiveWireState.player.x = wireX;
-    inactiveWireState.player.y = wireY;
+    inactiveWireState.player.x = inactiveWireX;
+    inactiveWireState.player.y = inactiveWireY;
     updateGameState(wireState, { ...IDLE_INPUT, movementX: 1 }, 0.1);
     updateGameState(inactiveWireState, { ...IDLE_INPUT, movementX: 1 }, 0.1);
     expect(wireState.player.x - wireX).toBeCloseTo(
-      (inactiveWireState.player.x - wireX) * MILITARY_OBJECT_CONFIG.razorWire.slowMultiplier,
+      (inactiveWireState.player.x - inactiveWireX) *
+        MILITARY_OBJECT_CONFIG.razorWire.slowMultiplier,
       4,
     );
   });
@@ -281,6 +321,7 @@ describe('Military Outpost gameplay', () => {
   it('automatically revives, fires, and clears zombie targets when a turret is destroyed', () => {
     const state = createMilitaryTestState();
     const turret = findObject(state, 'abandoned-turret');
+    state.militaryObjects = [turret];
     const x = state.arenaWidth * turret.xFraction;
     const y = state.arenaHeight * turret.yFraction;
     state.player.x = x + 40;

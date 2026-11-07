@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { useGameLeaderboard } from '@/lib/gameApi';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
@@ -17,8 +18,10 @@ function formatSeconds(seconds: number): string {
 
 export function GameLeaderboardPanel({
   onBack,
-  backLabel = 'Back to menu',
+  backLabel,
 }: GameLeaderboardPanelProps) {
+  const { t } = useTranslation();
+  const resolvedBackLabel = backLabel ?? t('game.menu.backToMenu');
   const [offset, setOffset] = useState(0);
   const leaderboard = useGameLeaderboard({ limit: PAGE_SIZE, offset });
   const page = leaderboard.data;
@@ -32,7 +35,7 @@ export function GameLeaderboardPanel({
               className="game-level-back-button"
               type="button"
               onClick={onBack}
-              aria-label={backLabel}
+              aria-label={resolvedBackLabel}
               autoFocus
             >
               <ChevronLeft size={22} aria-hidden="true" />
@@ -42,23 +45,21 @@ export function GameLeaderboardPanel({
             <p className="game-dialog-wordmark">
               <GameFranchiseWordmark />
             </p>
-            <h1 id="game-leaderboard-title">Leaderboard</h1>
+            <h1 id="game-leaderboard-title">{t('game.leaderboard.title')}</h1>
           </div>
         </div>
       </header>
-      <p className="game-leaderboard-ranking">
-        All-time survival records, ranked by waves cleared, score, kills, then time.
-      </p>
+      <p className="game-leaderboard-ranking">{t('game.leaderboard.ranking')}</p>
       {leaderboard.isPending ? (
         <p className="game-leaderboard-message" role="status">
-          Loading leaderboard…
+          {t('game.leaderboard.loading')}
         </p>
       ) : leaderboard.isError ? (
         <div className="game-leaderboard-message" role="alert">
           <p>
             {leaderboard.error instanceof Error
               ? leaderboard.error.message
-              : 'Unable to load leaderboard right now.'}
+              : t('game.leaderboard.loadFailed')}
           </p>
           <button
             className="game-menu-secondary"
@@ -66,12 +67,12 @@ export function GameLeaderboardPanel({
             disabled={leaderboard.isFetching}
             onClick={() => void leaderboard.refetch()}
           >
-            {leaderboard.isFetching ? 'Retrying…' : 'Retry'}
+            {t(leaderboard.isFetching ? 'game.leaderboard.retrying' : 'game.leaderboard.retry')}
           </button>
         </div>
       ) : page && page.items.length === 0 ? (
         <p className="game-leaderboard-message" role="status">
-          No runs have been submitted yet. Be the first to set a score.
+          {t('game.leaderboard.empty')}
         </p>
       ) : page ? (
         <>
@@ -80,11 +81,11 @@ export function GameLeaderboardPanel({
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <th scope="col">Player</th>
-                  <th scope="col">Cleared</th>
-                  <th scope="col">Score</th>
-                  <th scope="col">Kills</th>
-                  <th scope="col">Time</th>
+                  <th scope="col">{t('game.leaderboard.player')}</th>
+                  <th scope="col">{t('game.leaderboard.cleared')}</th>
+                  <th scope="col">{t('game.leaderboard.score')}</th>
+                  <th scope="col">{t('game.leaderboard.kills')}</th>
+                  <th scope="col">{t('game.leaderboard.time')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,7 +105,7 @@ export function GameLeaderboardPanel({
                       <td>
                         <strong>{entry.playerName}</strong>
                         <span className="game-leaderboard-reached">
-                          Reached {entry.waveReached}
+                          {t('game.leaderboard.reached', { wave: entry.waveReached })}
                         </span>
                       </td>
                       <td>{entry.waveCleared}</td>
@@ -120,8 +121,12 @@ export function GameLeaderboardPanel({
           <div className="game-leaderboard-pagination">
             <span>
               {page.total === 0
-                ? '0 entries'
-                : `${offset + 1}–${offset + page.items.length} of ${page.total}`}
+                ? t('game.leaderboard.entries', { count: 0 })
+                : t('game.leaderboard.range', {
+                    start: offset + 1,
+                    end: offset + page.items.length,
+                    total: page.total,
+                  })}
             </span>
             <div>
               <button
@@ -130,7 +135,7 @@ export function GameLeaderboardPanel({
                 disabled={offset === 0 || leaderboard.isFetching}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
               >
-                Previous
+                {t('game.leaderboard.previous')}
               </button>
               <button
                 className="game-menu-secondary"
@@ -143,7 +148,7 @@ export function GameLeaderboardPanel({
                 }
                 onClick={() => setOffset(Math.min(MAX_LEADERBOARD_OFFSET, offset + PAGE_SIZE))}
               >
-                Next
+                {t('game.leaderboard.next')}
               </button>
             </div>
           </div>

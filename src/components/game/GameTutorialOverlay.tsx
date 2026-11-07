@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type GameTutorialAction = 'movement' | 'aim' | 'orb';
 export type GameTutorialHighlight =
@@ -23,117 +24,104 @@ export interface GameTutorialStep {
 export const GAME_TUTORIAL_STEPS: readonly GameTutorialStep[] = [
   {
     id: 'intro',
-    title: 'Welcome to the arena',
-    description:
-      'Survive as many waves as you can. Keep your survivor alive, clear the arena, and use every opening to reposition.',
+    title: 'game.tutorial.steps.intro.title',
+    description: 'game.tutorial.steps.intro.description',
     action: null,
     highlight: 'arena',
     simulate: false,
   },
   {
     id: 'player',
-    title: 'Your survivor',
-    description:
-      'The glowing character is you. Your health is shown in the Vitals bar, so avoid contact with zombies.',
+    title: 'game.tutorial.steps.player.title',
+    description: 'game.tutorial.steps.player.description',
     action: null,
     highlight: 'player',
     simulate: false,
   },
   {
     id: 'movement',
-    title: 'Move around',
-    description:
-      'Use your configured movement keys, or drag the left joystick on touchscreens. You can rebind keys in Settings. Move a short distance to practise.',
+    title: 'game.tutorial.steps.movement.title',
+    description: 'game.tutorial.steps.movement.description',
     action: 'movement',
     highlight: 'movement',
     simulate: true,
   },
   {
     id: 'aim',
-    title: 'Aim and fire',
-    description:
-      'Point the mouse or drag the right joystick to change aim. Your weapon fires automatically in that direction. Try aiming somewhere new.',
+    title: 'game.tutorial.steps.aim.title',
+    description: 'game.tutorial.steps.aim.description',
     action: 'aim',
     highlight: 'aim',
     simulate: true,
   },
   {
     id: 'hud',
-    title: 'Read the HUD',
-    description:
-      'Wave, Vitals, Eliminated, Score, Hostiles, and your bomb and turret inventories track the run. Use the bomb key or touch bomb button to use a bomb. Right-click or double-tap an open spot to deploy a turret. Collected temporary effects appear beneath the HUD.',
+    title: 'game.tutorial.steps.hud.title',
+    description: 'game.tutorial.steps.hud.description',
     action: null,
     highlight: 'hud',
     simulate: false,
   },
   {
     id: 'enemies',
-    title: 'Know your enemies',
-    description:
-      'Walkers are slower and tougher. Runners are smaller, faster, and have less health. Keep moving and aim away from danger.',
+    title: 'game.tutorial.steps.enemies.title',
+    description: 'game.tutorial.steps.enemies.description',
     action: null,
     highlight: 'arena',
     simulate: true,
   },
   {
     id: 'obstacles',
-    title: 'Use the arena',
-    description:
-      'Crates and barricades block movement and can interrupt shots. Steer around them to create a clear path.',
+    title: 'game.tutorial.steps.obstacles.title',
+    description: 'game.tutorial.steps.obstacles.description',
     action: null,
     highlight: 'arena',
     simulate: false,
   },
   {
     id: 'powerups',
-    title: 'Power-up orbs',
-    description:
-      'Health restores up to 25 health; damage doubles shot damage for 10s; rapid fire doubles shots for 8s; shield absorbs 60 damage for 12s. Collect up to five bombs, then press the bomb key or touch bomb button to deal 100 damage to nearby unobstructed zombies. Collect up to five turrets, then right-click or double-tap an open spot to place one for 12 seconds.',
+    title: 'game.tutorial.steps.powerups.title',
+    description: 'game.tutorial.steps.powerups.description',
     action: null,
     highlight: 'hud',
     simulate: false,
   },
   {
     id: 'collect-orb',
-    title: 'Collect an orb',
-    description:
-      'Walk over an orb to collect it. Orbs drop after every two zombie eliminations; follow a glowing orb and collect one to see its effect. Bombs are stored until you press the bomb key or touch bomb button.',
+    title: 'game.tutorial.steps.collectOrb.title',
+    description: 'game.tutorial.steps.collectOrb.description',
     action: 'orb',
     highlight: 'orb',
     simulate: true,
   },
   {
     id: 'waves',
-    title: 'Clear the wave',
-    description:
-      'Enemies arrive in waves. Defeat every zombie to clear a wave and earn its score bonus.',
+    title: 'game.tutorial.steps.waves.title',
+    description: 'game.tutorial.steps.waves.description',
     action: null,
     highlight: 'hud',
     simulate: false,
   },
   {
     id: 'stat-points',
-    title: 'Spend stat points',
-    description:
-      'Each cleared wave earns one stat point. Open the pause menu to spend points on weapon damage, fire rate, maximum health, or movement speed. Use minus to refund an allocated point.',
+    title: 'game.tutorial.steps.statPoints.title',
+    description: 'game.tutorial.steps.statPoints.description',
     action: null,
     highlight: 'pause',
     simulate: false,
   },
   {
     id: 'pause',
-    title: 'Pause and review',
-    description:
-      'The pause menu shows run statistics and active effects. Pause with Escape or the Pause button; resume, adjust settings, restart, or return to the menu.',
+    title: 'game.tutorial.steps.pause.title',
+    description: 'game.tutorial.steps.pause.description',
     action: null,
     highlight: 'pause',
     simulate: false,
   },
   {
     id: 'completion',
-    title: 'You are ready',
-    description:
-      'Move with WASD or arrow keys, aim with the mouse, and collect orbs while surviving each wave. Return to the main menu to start a fresh normal run.',
+    title: 'game.tutorial.steps.completion.title',
+    description: 'game.tutorial.steps.completion.description',
     action: null,
     highlight: null,
     simulate: false,
@@ -169,6 +157,7 @@ export function GameTutorialOverlay({
   onExitConfirm,
   onReturnToMenu,
 }: GameTutorialOverlayProps) {
+  const { t } = useTranslation();
   useEffect(() => {
     if (!confirmExit) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -181,35 +170,35 @@ export function GameTutorialOverlay({
   return (
     <section
       className="game-tutorial"
-      aria-label="Interactive game tutorial"
+      aria-label={t('game.tutorial.ariaLabel')}
       aria-live="polite"
     >
       <div className="game-tutorial-heading">
         <p className="game-panel-eyebrow">
-          Step {stepNumber} of {totalSteps}
+          {t('game.tutorial.step', { current: stepNumber, total: totalSteps })}
         </p>
-        <h2>{step.title}</h2>
+        <h2>{t(step.title)}</h2>
       </div>
-      <p className="game-tutorial-description">{step.description}</p>
+      <p className="game-tutorial-description">{t(step.description)}</p>
       {step.action && (
         <p className={`game-tutorial-status ${actionComplete ? 'is-complete' : ''}`}>
           {actionComplete
-            ? 'Exercise complete.'
+            ? t('game.tutorial.exerciseComplete')
             : step.action === 'orb'
-              ? 'Collect an orb, or skip this exercise.'
+              ? t('game.tutorial.collectOrbOrSkip')
               : step.action === 'movement'
-                ? 'Move your survivor, or skip this exercise.'
-                : 'Change your aim direction, or skip this exercise.'}
+                ? t('game.tutorial.moveOrSkip')
+                : t('game.tutorial.aimOrSkip')}
         </p>
       )}
       {confirmExit ? (
-        <div className="game-tutorial-confirm" role="group" aria-label="Confirm tutorial exit">
-          <p>Exit the tutorial? This practice run will be discarded.</p>
+        <div className="game-tutorial-confirm" role="group" aria-label={t('game.tutorial.confirmExit')}>
+          <p>{t('game.tutorial.exitPrompt')}</p>
           <button className="game-tutorial-secondary" type="button" onClick={onExitCancel}>
-            Keep playing
+            {t('game.tutorial.keepPlaying')}
           </button>
           <button className="game-tutorial-danger" type="button" onClick={onExitConfirm}>
-            Exit tutorial
+            {t('game.tutorial.exit')}
           </button>
         </div>
       ) : (
@@ -220,7 +209,7 @@ export function GameTutorialOverlay({
               type="button"
               onClick={onPrevious}
             >
-              Previous
+              {t('game.tutorial.previous')}
             </button>
           )}
           {step.id === 'completion' ? (
@@ -229,7 +218,7 @@ export function GameTutorialOverlay({
               type="button"
               onClick={onReturnToMenu}
             >
-              Return to main menu
+              {t('game.tutorial.returnToMenu')}
             </button>
           ) : step.action ? (
             actionComplete ? (
@@ -238,7 +227,7 @@ export function GameTutorialOverlay({
                 type="button"
                 onClick={onNext}
               >
-                Continue
+                {t('game.tutorial.continue')}
               </button>
             ) : (
               <button
@@ -246,7 +235,7 @@ export function GameTutorialOverlay({
                 type="button"
                 onClick={onSkip}
               >
-                Skip exercise
+                {t('game.tutorial.skipExercise')}
               </button>
             )
           ) : (
@@ -255,7 +244,7 @@ export function GameTutorialOverlay({
               type="button"
               onClick={onNext}
             >
-              Continue
+              {t('game.tutorial.continue')}
             </button>
           )}
           {step.id !== 'completion' && (
@@ -264,7 +253,7 @@ export function GameTutorialOverlay({
               type="button"
               onClick={onExitRequest}
             >
-              Exit tutorial
+              {t('game.tutorial.exit')}
             </button>
           )}
         </div>
