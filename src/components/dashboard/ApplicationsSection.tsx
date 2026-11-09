@@ -344,13 +344,13 @@ export function ApplicationsSection({
                   <td>{app.currentAlliance || '—'}</td>
                   <td>
                     {(() => {
-                      const counts = (app as any).tierCounts;
+                      const counts = app.tierCounts;
                       const hasCounts =
                         counts &&
-                        (counts.Elite > 0 ||
-                          counts.Advanced > 0 ||
-                          counts.Medium > 0 ||
-                          counts.Regular > 0);
+                        ((counts.Elite ?? 0) > 0 ||
+                          (counts.Advanced ?? 0) > 0 ||
+                          (counts.Medium ?? 0) > 0 ||
+                          (counts.Regular ?? 0) > 0);
                       const effectiveCounts = hasCounts
                         ? counts
                         : {

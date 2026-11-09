@@ -118,6 +118,14 @@ export interface GroupMemberInput {
      */
   currentAlliance: string;
   isScreenshotVerified: boolean;
+  t10ResearchComplete?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 99
+     * @nullable
+     */
+  t10ResearchPercent?: number | null;
+  migrationTier?: MigrationTier;
 }
 
 export interface MigrationApplicationInput {
@@ -207,13 +215,15 @@ export interface MigrationApplicationInput {
      */
   modVehiclePower: number;
   isScreenshotVerified: boolean;
-  /** @maxItems 99 */
-  groupMembers?: GroupMemberInput[];
+  t10ResearchComplete?: boolean;
   /**
-     * @maxLength 40
+     * @minimum 0
+     * @maximum 99
      * @nullable
      */
-  characterReference: string | null;
+  t10ResearchPercent?: number | null;
+  /** @maxItems 99 */
+  groupMembers?: GroupMemberInput[];
   /**
      * @maxLength 1000
      * @nullable
@@ -332,17 +342,30 @@ export interface ApplicationPlayer {
   kills: number;
   currentAlliance: string;
   isScreenshotVerified: boolean;
+  t10ResearchComplete: boolean;
+  /**
+     * @minimum 0
+     * @maximum 99
+     * @nullable
+     */
+  t10ResearchPercent: number | null;
   createdAt: string;
   /** @nullable */
   migrationScore?: number | null;
+  migrationTier: MigrationTier;
 }
 
 export type AdminApplication = AdminApplicationSummary & ({
   migrationReason: string;
   /** @nullable */
-  characterReference: string | null;
-  /** @nullable */
   additionalComments: string | null;
+  t10ResearchComplete: boolean;
+  /**
+     * @minimum 0
+     * @maximum 99
+     * @nullable
+     */
+  t10ResearchPercent: number | null;
   players?: ApplicationPlayer[];
 });
 

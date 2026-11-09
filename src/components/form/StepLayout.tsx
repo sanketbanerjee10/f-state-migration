@@ -45,7 +45,8 @@ export function StepLayout({
   return (
     <main className="form-shell wizard-shell" data-testid="wizard-step-shell">
       <PageHeader
-        showBackButton={false}
+        backHref="/"
+        backLabel=""
         eyebrow={<><span style={{ color: '#657486' }}>{t('pages.about565.state')} /</span> {t('wizard.layout.signup')}</>}
         title={draft.editingApplicationId ? t('wizard.layout.editTitle') : t('wizard.layout.applyTitle')}
         description={
@@ -171,6 +172,10 @@ export function StepLayout({
           <span>·</span>
           <Link href="/about" style={{ color: '#94c4f2', textDecoration: 'none' }}>
             {t('common.navigation.about')}
+          </Link>
+          <span>·</span>
+          <Link href="/game" style={{ color: '#94c4f2', textDecoration: 'none' }}>
+            Mini game
           </Link>
         </div>
         <div style={{ textAlign: 'center' }}>{t('wizard.layout.credit')}</div>

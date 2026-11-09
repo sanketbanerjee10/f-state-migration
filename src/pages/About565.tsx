@@ -72,7 +72,7 @@ export function About565() {
   return (
     <main className="form-shell about565" data-testid="about-565-page">
       <PageHeader
-        backLabel={t('common.navigation.backToApplication')}
+        backLabel=""
         eyebrow={<>{t('pages.about565.state')} <span style={{ color: '#657486' }}>/ {t('pages.about565.aboutUs')}</span></>}
         title={<>{t('pages.about565.heroLead')}<br /><span>{t('pages.about565.heroTitle')}</span></>}
         description={t('pages.about565.heroCopy')}
@@ -277,8 +277,12 @@ export function About565() {
         >
           <span>{t('pages.about565.portal')}</span>
           <span>·</span>
-          <Link href="/" className="about-inline-link">
+          <Link href="/apply" className="about-inline-link">
             {t('pages.about565.application')}
+          </Link>
+          <span>·</span>
+          <Link href="/game" className="about-inline-link">
+            Mini game
           </Link>
         </div>
 

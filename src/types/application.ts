@@ -15,7 +15,6 @@ export interface MigrationApplication {
   migrationType: MigrationType;
   groupRepresentative: string | null;
   migrationReason: string;
-  characterReference?: string | null;
   additionalComments: string | null;
 }
 
@@ -34,6 +33,8 @@ export interface GroupMember {
   modVehiclePower: string;
   kills: string;
   currentAlliance: string;
+  t10ResearchComplete: boolean | null;
+  t10ResearchPercent: string;
   screenshotFileName?: string;
   isScreenshotVerified: boolean;
 }

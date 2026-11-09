@@ -1,11 +1,16 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Modal } from '../../components/Dialogs';
 import { StepLayout } from '../../components/form/StepLayout';
 import { DismissibleToast } from '../../components/DismissibleToast';
 import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, useLiveTierThresholds } from '../../lib/migrationScore';
-import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
+import {
+  hasApplicationDraftData,
+  useApplicationDraft,
+  type StepErrors,
+} from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import type { OcrDiagnostics } from '../../lib/ocr';
 import { PowerDetailsUploadSection } from './power-details/PowerDetailsUploadSection';
@@ -16,11 +21,14 @@ export function PowerDetailsStep() {
   const { t } = useTranslation();
   const {
     draft,
+    screenshotFile,
+    groupScreenshotFile,
     setDraftField,
     applyOcrResults,
     setScreenshotFile,
     removeScreenshot,
     validateStep,
+    clearDraft,
     setNavigationNotice,
     showOcrAccuracyNotice,
   } = useApplicationDraft();
@@ -36,11 +44,13 @@ export function PowerDetailsStep() {
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
   const [dragging, setDragging] = useState(false);
   const [scoreErrorToast, setScoreErrorToast] = useState('');
+  const [clearConfirmationOpen, setClearConfirmationOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const { thresholds } = useLiveTierThresholds();
+  const hasDraftData = hasApplicationDraftData(draft, Boolean(screenshotFile), Boolean(groupScreenshotFile));
 
   // A field is locked only when:
   //   1. A screenshot was successfully processed (screenshotPresent), AND
@@ -180,6 +190,22 @@ export function PowerDetailsStep() {
     }
   };
 
+  const handleClearDraft = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setProcessing(false);
+    setOcrProgress(null);
+    setOcrError('');
+    setOcrSuccess(false);
+    setOcrUncertain(false);
+    setOcrDiagnostics(null);
+    setStepErrors({});
+    setScoreErrorToast('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    clearDraft();
+    setClearConfirmationOpen(false);
+  };
+
   return (
     <>
       <DismissibleToast message={scoreErrorToast} onDismiss={() => setScoreErrorToast('')} />
@@ -187,6 +213,8 @@ export function PowerDetailsStep() {
         navigationProps={{
           onContinue: handleContinue,
           continueLabel: t('wizard.power.continue'),
+          onClear: hasDraftData ? () => setClearConfirmationOpen(true) : undefined,
+          clearLabel: t('wizard.power.clearForm'),
           disabled: processing,
         }}
       >
@@ -243,6 +271,33 @@ export function PowerDetailsStep() {
         clearError={(field) => setStepErrors((old) => ({ ...old, [field]: '' }))}
       />
       </StepLayout>
+      {clearConfirmationOpen && (
+        <Modal
+          title={t('wizard.power.clearFormTitle')}
+          onClose={() => setClearConfirmationOpen(false)}
+          actions={
+            <>
+              <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => setClearConfirmationOpen(false)}
+              >
+                {t('common.actions.cancel')}
+              </button>
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={handleClearDraft}
+              >
+                {t('wizard.power.clearForm')}
+              </button>
+            </>
+          }
+          showCloseButton
+        >
+          <p>{t('wizard.power.clearFormConfirmation')}</p>
+        </Modal>
+      )}
     </>
   );
 }

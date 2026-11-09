@@ -4,11 +4,9 @@ import { useCachedActiveAlliances } from '../../lib/activeAlliancesCache';
 import { Field, FormSection } from '../../components/Field';
 import { AllianceMultiSelect } from '../../components/AllianceMultiSelect';
 import { StepLayout } from '../../components/form/StepLayout';
-import type { MigrationTier, MigrationType } from '../../types/application';
+import type { MigrationType } from '../../types/application';
 import { useApplicationDraft, type StepErrors } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
-
-const tierOptions: MigrationTier[] = ['Regular', 'Medium', 'Advanced', 'Elite'];
 
 export function MigrationPreferencesStep() {
   const { t } = useTranslation();
@@ -108,26 +106,6 @@ export function MigrationPreferencesStep() {
           />
         </Field>
 
-        <Field id="tier-regular" label={t('wizard.preferences.tier')} required error={stepErrors.tier}>
-          <div className="radio-grid" role="radiogroup" aria-label={t('wizard.preferences.tier')} data-testid="tier-options">
-            {tierOptions.map((tier) => (
-              <label className="radio-card" key={tier}>
-                <input
-                  type="radio"
-                  name="tier"
-                  value={tier}
-                  checked={draft.tier === tier}
-                  onChange={() => {
-                    setDraftField('tier', tier, true);
-                    setStepErrors((old) => ({ ...old, tier: '' }));
-                  }}
-                  data-testid={`tier-${tier.toLowerCase()}`}
-                />
-                {t(`wizard.preferences.tiers.${tier.toLowerCase()}`)}
-              </label>
-            ))}
-          </div>
-        </Field>
       </FormSection>
     </StepLayout>
   );

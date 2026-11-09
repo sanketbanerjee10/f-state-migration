@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "快速確認 OCR 辨識結果",
+      "title": "檢查螢幕截圖",
       "message": "🤖 我們的小幫手很可靠，但有時可能會看錯名稱和擊殺數！請快速確認這兩項，其他資料應該都沒問題！",
       "dismiss": "知道了"
     },
@@ -257,7 +257,18 @@
       "formation": "F{{number}} 陣型競技場戰力",
       "f1Placeholder": "例如 180,500,000",
       "f2Placeholder": "例如 99,183,574",
-      "f3Placeholder": "例如 22,349,680"
+      "f3Placeholder": "例如 22,349,680",
+      "t10Title": "T10研究",
+      "t10Question": "您完成 T10 研究了嗎？",
+      "t10Yes": "是，已完成",
+      "t10No": "還沒有",
+      "t10Hint": "如果研究仍在進行中，請告訴我們您目前的完成百分比。",
+      "t10AutoComplete": "由於您的科技力量高於 25M，因此自動標記為完成。",
+      "t10Percent": "T10研究完成",
+      "t10PercentPlaceholder": "輸入 0–99",
+      "t10PercentMilestones": ["歡迎開始T10研究！你的勳章收藏還很樂觀。", "費用看起來還負擔得起。趁這種感覺還在，好好享受吧。", "你正在取得進展！勳章收藏都注意到了。", "你開始有進展了。實驗室還沒給你看真正的帳單呢。", "快要過半了！你的勳章即將進入生存模式。", "研究已完成一半，但勳章花費可還沒到一半。", "已完成60%。研究開始認真起來了，勳章短缺也是。", "恭喜！你已完成70%的研究，還解鎖了剩餘70%的費用！", "歡迎來到昂貴社區。現在每提升1%都得貸款。", "已完成90%！你已經投入太多，放棄不甘心，慶祝又沒錢。"],
+      "t10CompleteMessage": "哎呀，你可真不一般。",
+      "t10ProgressSummary": "進行中 ({{percent}}%)"
     },
     "statistics": {
       "continue": "繼續填寫偏好設定",
@@ -326,7 +337,7 @@
       "playerHint": "遊戲中顯示的角色名稱",
       "playerPlaceholder": "例如 GOD Sankeyyy",
       "powerRecord": "已登錄戰力",
-      "powerHint": "????",
+      "powerHint": "自動計算",
       "currentPower": "目前戰力",
       "killsOptional": "擊殺數",
       "killsHint": "參考個人資料卡上的骷髏圖示",
@@ -350,7 +361,10 @@
       "techPlaceholder": "例如 19,187,725",
       "troopPlaceholder": "例如 66,198,020",
       "heroPlaceholder": "例如 62,634,222",
-      "vehiclePlaceholder": "例如 9,436,786"
+      "vehiclePlaceholder": "例如 9,436,786",
+      "clearForm": "重新開始",
+      "clearFormTitle": "清除所有表單資料？",
+      "clearFormConfirmation": "這將刪除在每個應用程式步驟中輸入的所有值。此操作無法撤銷。"
     },
     "groupUpload": {
       "invalidType": "請選擇 PNG 或 JPG/JPEG 格式的圖片檔。",
@@ -506,7 +520,17 @@
       "destinations": "請選擇「任意聯盟」或至少一個目標聯盟。",
       "reason": "請至少用 10 個字說明你想遷州的原因。",
       "reasonMax": "遷州原因請勿超過 1,000 個字。",
-      "commentsMax": "補充說明請勿超過 1,000 個字。"
+      "commentsMax": "補充說明請勿超過 1,000 個字。",
+      "t10Research": "選擇T10研究是否完成。",
+      "t10ResearchPercent": "輸入 0 到 99 之間的整數完成百分比。"
+    },
+    "groupT10": {
+      "label": "T10研究",
+      "complete": "完成",
+      "incomplete": "進行中",
+      "percent": "研究完成度（0-99%）",
+      "autoComplete": "由於 Tech Power 大於 25M，因此自動標記為完成。",
+      "resolveMember": "在繼續之前添加 {{name}} 的 T10 研究狀態和進展。"
     }
   },
   "components": {
@@ -997,7 +1021,31 @@
       "soundEffects": "音效",
       "littleThings": "細節也重要",
       "effectsVolume": "音效音量",
-      "soundEffectFootnote": "拾取物品、受傷和戰鬥提示音。"
+      "soundEffectFootnote": "拾取物品、受傷和戰鬥提示音。",
+      "touchControlsTitle": "觸控控制",
+      "controlLayout": "控制佈局",
+      "controlLayoutHint": "選擇哪一隻手控制運動。",
+      "rightHanded": "右手",
+      "leftHanded": "左撇子",
+      "joystickAppearance": "搖桿外觀",
+      "joystickAppearanceHint": "自訂兩個浮動棒。",
+      "baseOpacity": "基礎和輝光不透明度",
+      "thumbOpacity": "大拇指不透明",
+      "joystickSize": "搖桿尺寸",
+      "small": "小號",
+      "medium": "中等",
+      "large": "大號",
+      "joystickPreview": "運動和瞄準桿的即時預覽",
+      "joystickBehaviour": "搖桿行為",
+      "joystickBehaviourHint": "選擇移動桿的顯示方式。",
+      "fixed": "固定",
+      "floating": "浮動",
+      "joystickPosition": "職位",
+      "edgePosition": "邊緣（{{side}}）",
+      "innerPosition": "內（{{side}}）",
+      "middlePositionMiddle": "中",
+      "leftSide": "左",
+      "rightSide": "對"
     },
     "hud": {
       "runStatus": "本局狀態",
@@ -1081,7 +1129,10 @@
       "resumeWhenReady": "準備好後即可繼續。",
       "resume": "繼續",
       "backToGame": "返回遊戲",
-      "guides": "指南"
+      "guides": "指南",
+      "firingRange": "射程",
+      "firingRangeDescription": "彈體的最大飛行距離。",
+      "rangeUnit": "單位"
     },
     "effects": {
       "active": "生效中的效果",
@@ -1317,7 +1368,9 @@
       "campaignProgressSaveFailed": "無法儲存戰役進度：{{error}}",
       "campaignProgressSaveFailedSimple": "無法儲存戰役進度。",
       "campaignPointsSaveFailed": "無法儲存戰役屬性點：{{error}}",
-      "campaignPointsSaveFailedSimple": "無法儲存戰役屬性點。"
+      "campaignPointsSaveFailedSimple": "無法儲存戰役屬性點。",
+      "fullscreenHoldEscape": "按住 Esc 退出全螢幕。",
+      "fullscreenPauseShortcut": "按 {{key}} 可在全螢幕模式下暫停遊戲。"
     },
     "canvas": {
       "ariaLabel": "565 殭屍生存。使用設定的移動按鍵或觸控操作來移動。用滑鼠或瞄準搖桿瞄準，武器會自動朝選定方向射擊。拾取炸彈後，按設定的炸彈鍵或觸控按鈕使用。最多拾取五座炮塔，然後在競技場空地右鍵或雙擊放置。",
@@ -1655,6 +1708,10 @@
         "name": "工業箱",
         "description": "帶有耐用金屬護板、可能掉落戰利品的加固儲物箱。"
       }
+    },
+    "fullscreenButton": {
+      "enter": "進入全螢幕",
+      "exit": "退出全螢幕"
     }
   },
   "ui": {

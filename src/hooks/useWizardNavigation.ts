@@ -14,6 +14,20 @@ export interface WizardStepDefinition {
 
 type WizardStepTemplate = Omit<WizardStepDefinition, 'title' | 'subtitle'>;
 
+export function findFirstInvalidStep(
+  steps: ReadonlyArray<Pick<WizardStepDefinition, 'key'>>,
+  targetIndex: number,
+  validateStep: (stepKey: string) => StepErrors,
+): { index: number; errors: StepErrors } | null {
+  for (let index = 0; index < targetIndex; index += 1) {
+    const errors = validateStep(steps[index].key);
+    if (Object.keys(errors).length > 0) {
+      return { index, errors };
+    }
+  }
+  return null;
+}
+
 export const BASE_STEPS: WizardStepTemplate[] = [
   {
     key: 'character',
@@ -52,7 +66,7 @@ export const REVIEW_STEP: WizardStepTemplate = {
 export function useWizardNavigation() {
   const [, setLocation] = useLocation();
   const searchString = useSearch();
-  const { draft, validateStep } = useApplicationDraft();
+  const { draft, validateStep, setNavigationNotice } = useApplicationDraft();
   const { t } = useTranslation();
 
   const isGroup = draft.migrationType === 'Group';
@@ -120,6 +134,16 @@ export function useWizardNavigation() {
     [setLocation]
   );
 
+  const ensureCurrentStepAccessible = useCallback(() => {
+    const firstInvalidStep = findFirstInvalidStep(steps, currentIndex, validateStep);
+    if (!firstInvalidStep) return true;
+
+    const firstError = Object.values(firstInvalidStep.errors)[0];
+    setNavigationNotice(firstError || 'wizard.progress.completeRequired');
+    setStepParam(steps[firstInvalidStep.index].stepParam);
+    return false;
+  }, [steps, currentIndex, validateStep, setNavigationNotice, setStepParam]);
+
   /**
    * Jump to step only if all preceding steps are valid.
    * If an earlier step is invalid, returns errors and blocks navigation.
@@ -182,6 +206,7 @@ export function useWizardNavigation() {
     isFirstStep,
     isLastStep,
     isGroup,
+    ensureCurrentStepAccessible,
     nextStep,
     prevStep,
     goToStep,

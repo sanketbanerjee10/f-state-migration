@@ -1041,6 +1041,12 @@ describe('game simulation', () => {
   it('stores bombs until requested, expires orbs, and tracks kill score', () => {
     const state = createGameState();
     suppressWaveSpawns(state);
+    state.player.fireCooldownSeconds = 1_000;
+    state.arenaObstacles = [];
+    state.militaryObjects = [];
+    state.barrels = [];
+    state.gasCylinders = [];
+    state.contaminatedObjects = [];
     const nearby = createZombie(50, 'walker', state.player.x + 90, state.player.y);
     const distant = createZombie(51, 'runner', state.player.x + 240, state.player.y);
     const nearbyHealth = nearby.health;

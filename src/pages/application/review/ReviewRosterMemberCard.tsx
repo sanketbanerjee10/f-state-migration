@@ -17,6 +17,7 @@ export function ReviewRosterMemberCard({ member, draft, index, t, thresholds }: 
   const mh = parseMagnitude(member.heroPower) || 0;
   const mv = parseMagnitude(member.modVehiclePower) || 0;
   const mScore = calculateMigrationScoreFromRaw(ms, mt, mh, mv, thresholds);
+  const t10Complete = mt >= 25_000_000 || member.t10ResearchComplete === true;
 
   return (
     <div
@@ -52,6 +53,14 @@ export function ReviewRosterMemberCard({ member, draft, index, t, thresholds }: 
       </div>
       <div style={{ color: '#64748b', fontSize: 10 }}>
         {t('common.labels.alliance')} {member.currentAlliance || draft.currentAlliance || '—'}
+      </div>
+      <div style={{ color: '#64748b', fontSize: 10 }}>
+        {t('wizard.combat.t10Title')}:{' '}
+        {t10Complete
+          ? t('wizard.combat.t10Yes')
+          : member.t10ResearchComplete === false && member.t10ResearchPercent
+            ? t('wizard.combat.t10ProgressSummary', { percent: member.t10ResearchPercent })
+            : t('wizard.review.notProvided')}
       </div>
     </div>
   );

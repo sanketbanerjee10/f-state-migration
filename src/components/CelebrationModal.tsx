@@ -5,12 +5,13 @@ import {
   CheckCircle2,
   Copy,
   ExternalLink,
+  Gamepad2,
   Info,
   PartyPopper,
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
 
 interface CelebrationModalProps {
@@ -31,15 +32,16 @@ export function CelebrationModal({
   onNewApplication,
 }: CelebrationModalProps) {
   const { t } = useTranslation();
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const [copiedId, setCopiedId] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    const audio = new Audio('/sounds/celebration.mp3');
+    const audio = new Audio('https://cdn.dbbyte.com/a21b036a/my-first-bucket/celebration.mp3');
     audio.volume = 0.5;
+    audio.loop = true;
 
     audio.play().catch((error) => {
       console.warn('Celebration audio could not be played:', error);
@@ -143,12 +145,6 @@ export function CelebrationModal({
         <div className="celebration-success__icon" aria-hidden="true">
           {isUpdate ? <Sparkles size={30} /> : <PartyPopper size={30} />}
         </div>
-        {/* <div style={{position: 'absolute', top: 10, left: 0}}>
-          <img src="/images/bully-maguire.gif" width="80px" />
-        </div>
-        <div style={{position: 'absolute', top: 10, right: 0}}>
-          <img src="/images/dance-dancing.gif" width="90px" />
-        </div> */}
         {/* <p className="celebration-success__eyebrow">
           {isUpdate ? 'Changes saved' : 'Submission complete'}
         </p> */}
@@ -321,16 +317,22 @@ export function CelebrationModal({
           <ExternalLink size={16} />
           {t('components.celebration.viewTrack')}
         </button>
-
-        {/* {onNewApplication && (
-          <button
-            type="button"
-            className="button button-secondary celebration-success__new-button"
-            onClick={handleNewApplication}
-          >
-            File Another Application
-          </button>
-        )} */}
+        <Link
+          href="/about"
+          className="button button-secondary celebration-success__track-button"
+          onClick={onClose}
+        >
+          <Info size={16} />
+          {t('common.navigation.about')}
+        </Link>
+        <Link
+          href="/game"
+          className="button button-secondary celebration-success__track-button"
+          onClick={onClose}
+        >
+          <Gamepad2 size={16} />
+          Mini game
+        </Link>
       </div>
     </section>
   );

@@ -8,11 +8,12 @@ export type PageHeaderProps = {
   showBackButton?: boolean;
   backHref?: string;
   backLabel?: ReactNode;
+  backAriaLabel?: string;
   backTestId?: string;
   actions?: ReactNode;
   className?: string;
   eyebrow?: ReactNode;
-  title: ReactNode;
+  title?: ReactNode;
   description?: ReactNode;
   descriptionClassName?: string;
 };
@@ -21,6 +22,7 @@ export function PageHeader({
   showBackButton = true,
   backHref = '/',
   backLabel,
+  backAriaLabel,
   backTestId,
   actions,
   className,
@@ -38,6 +40,9 @@ export function PageHeader({
           <Link
             href={backHref}
             className="button button-secondary"
+            aria-label={backAriaLabel ?? (typeof backLabel === 'string' && backLabel
+              ? backLabel
+              : t('common.actions.back'))}
             data-testid={backTestId}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}
           >
@@ -52,7 +57,7 @@ export function PageHeader({
       {eyebrow != null && (
         <div className="eyebrow">{eyebrow}</div>
       )}
-      <h1 className="form-title">{title}</h1>
+      {title != null && <h1 className="form-title">{title}</h1>}
       {description != null && (
         <p className={`intro${descriptionClassName ? ` ${descriptionClassName}` : ''}`}>
           {description}

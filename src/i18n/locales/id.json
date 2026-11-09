@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Periksa OCR sebentar",
+      "title": "Tinjau tangkapan layar",
       "message": "🤖 Asisten kecil kami cukup pintar, tetapi terkadang bisa keliru membaca nama dan jumlah musuh yang dikalahkan! Periksa dua hal itu sebentar. Selebihnya seharusnya sudah tepat!",
       "dismiss": "Mengerti"
     },
@@ -257,7 +257,18 @@
       "formation": "Kekuatan Arena F{{number}}",
       "f1Placeholder": "misalnya 180,500,000",
       "f2Placeholder": "misalnya 99,183,574",
-      "f3Placeholder": "misalnya 22,349,680"
+      "f3Placeholder": "misalnya 22,349,680",
+      "t10Title": "penelitian T10",
+      "t10Question": "Sudahkah Anda menyelesaikan penelitian T10?",
+      "t10Yes": "Ya, lengkap",
+      "t10No": "Belum",
+      "t10Hint": "Jika penelitian masih berlangsung, beri tahu kami persentase penyelesaian Anda saat ini.",
+      "t10AutoComplete": "Ditandai selesai secara otomatis karena Tech Power Anda di atas 25M.",
+      "t10Percent": "Penyelesaian penelitian T10",
+      "t10PercentPlaceholder": "Masukkan 0–99",
+      "t10PercentMilestones": ["Selamat datang di penelitian T10! Persediaan lencana Anda masih optimistis.", "Biayanya tampak terjangkau. Nikmati selagi masih terasa begitu.", "Anda semakin maju! Koleksi lencana Anda pun menyadarinya.", "Anda mulai berkembang. Lab belum menunjukkan tagihan sebenarnya.", "Hampir setengah jalan! Lencana Anda sebentar lagi masuk mode bertahan hidup.", "Penelitian sudah setengah jalan, tetapi pengeluaran lencana belum.", "60% selesai. Penelitiannya mulai serius. Lencana Anda juga mulai menipis.", "Selamat! Anda menyelesaikan 70% penelitian dan membuka 70% biaya sisanya!", "Selamat datang di lingkungan mahal. Kini setiap 1% perlu pinjaman.", "90% selesai! Anda sudah terlalu jauh untuk menyerah dan terlalu miskin untuk merayakan."],
+      "t10CompleteMessage": "Wah, kemampuanmu memang beda.",
+      "t10ProgressSummary": "Sedang berlangsung ({{percent}}%)"
     },
     "statistics": {
       "continue": "Lanjutkan ke Preferensi",
@@ -350,7 +361,10 @@
       "techPlaceholder": "misalnya 19,187,725",
       "troopPlaceholder": "misalnya 66,198,020",
       "heroPlaceholder": "misalnya 62,634,222",
-      "vehiclePlaceholder": "misalnya 9,436,786"
+      "vehiclePlaceholder": "misalnya 9,436,786",
+      "clearForm": "Mulai dari awal",
+      "clearFormTitle": "Hapus semua data formulir?",
+      "clearFormConfirmation": "Ini akan menghapus semua nilai yang dimasukkan di setiap langkah aplikasi. Tindakan ini tidak dapat dibatalkan."
     },
     "groupUpload": {
       "invalidType": "Harap pilih gambar PNG atau JPG/JPEG.",
@@ -506,7 +520,17 @@
       "destinations": "Pilih “Aliansi mana saja” atau setidaknya satu tujuan.",
       "reason": "Tuliskan setidaknya 10 karakter yang menjelaskan alasan Anda ingin bermigrasi.",
       "reasonMax": "Batasi alasan Anda hingga 1.000 karakter.",
-      "commentsMax": "Batasi komentar tambahan hingga 1.000 karakter."
+      "commentsMax": "Batasi komentar tambahan hingga 1.000 karakter.",
+      "t10Research": "Pilih apakah penelitian T10 sudah selesai.",
+      "t10ResearchPercent": "Masukkan persentase penyelesaian bilangan bulat dari 0 hingga 99."
+    },
+    "groupT10": {
+      "label": "penelitian T10",
+      "complete": "Lengkap",
+      "incomplete": "Sedang berlangsung",
+      "percent": "Penyelesaian penelitian (0-99%)",
+      "autoComplete": "Ditandai selesai secara otomatis karena Tech Power diatas 25M.",
+      "resolveMember": "Tambahkan status penelitian T10 dan kemajuan untuk {{name}} sebelum melanjutkan."
     }
   },
   "components": {
@@ -991,7 +1015,31 @@
       "soundEffects": "Efek suara",
       "littleThings": "Hal kecil yang berarti",
       "effectsVolume": "Volume efek",
-      "soundEffectFootnote": "Suara item, terkena serangan, dan pertempuran."
+      "soundEffectFootnote": "Suara item, terkena serangan, dan pertempuran.",
+      "touchControlsTitle": "Kontrol Sentuh",
+      "controlLayout": "Tata letak kontrol",
+      "controlLayoutHint": "Pilih tangan mana yang mengontrol gerakan.",
+      "rightHanded": "Tidak kidal",
+      "leftHanded": "kidal",
+      "joystickAppearance": "Penampilan joystick",
+      "joystickAppearanceHint": "Sesuaikan kedua tongkat apung.",
+      "baseOpacity": "Opasitas dasar dan cahaya",
+      "thumbOpacity": "Opasitas ibu jari",
+      "joystickSize": "Ukuran joystick",
+      "small": "Kecil",
+      "medium": "Sedang",
+      "large": "Besar",
+      "joystickPreview": "Pratinjau langsung gerakan dan tongkat bidik",
+      "joystickBehaviour": "Perilaku joystick",
+      "joystickBehaviourHint": "Pilih bagaimana tongkat gerakan muncul.",
+      "fixed": "Memperbaiki",
+      "floating": "Mengambang",
+      "joystickPosition": "Posisi",
+      "edgePosition": "Tepi ({{side}})",
+      "innerPosition": "Batin ({{side}})",
+      "middlePositionMiddle": "Tengah",
+      "leftSide": "kiri",
+      "rightSide": "benar"
     },
     "hud": {
       "runStatus": "Status permainan",
@@ -1075,7 +1123,10 @@
       "resumeWhenReady": "Lanjutkan saat kamu siap kembali.",
       "resume": "Lanjutkan",
       "backToGame": "Kembali ke permainan",
-      "guides": "Panduan"
+      "guides": "Panduan",
+      "firingRange": "Jarak tembak",
+      "firingRangeDescription": "Jarak maksimum yang ditempuh proyektil Anda.",
+      "rangeUnit": "unit"
     },
     "effects": {
       "active": "Efek aktif",
@@ -1311,7 +1362,9 @@
       "campaignProgressSaveFailedSimple": "Progres kampanye gagal disimpan.",
       "campaignPointsSaveFailed": "Poin Status kampanye gagal disimpan: {{error}}",
       "campaignPointsSaveFailedSimple": "Poin Status kampanye gagal disimpan.",
-      "fullscreenExitFailed": "Mode layar penuh gagal ditutup."
+      "fullscreenExitFailed": "Mode layar penuh gagal ditutup.",
+      "fullscreenHoldEscape": "Tahan Esc untuk keluar dari layar penuh.",
+      "fullscreenPauseShortcut": "Tekan {{key}} untuk menjeda permainan dalam mode layar penuh."
     },
     "canvas": {
       "ariaLabel": "565 Zombie Survival. Gunakan tombol gerak yang ditetapkan atau kontrol sentuh untuk bergerak. Bidik dengan mouse atau joystick bidik. Senjata menembak otomatis ke arah yang dipilih. Ambil bom lalu tekan tombol bom yang ditetapkan atau tombol sentuh untuk menggunakannya. Kumpulkan hingga lima turet, lalu klik kanan atau ketuk dua kali area kosong di arena untuk memasangnya.",
@@ -1649,6 +1702,10 @@
         "name": "Peti Industri",
         "description": "Wadah penyimpanan berlapis logam kuat yang dapat menjatuhkan barang."
       }
+    },
+    "fullscreenButton": {
+      "enter": "Masuk ke layar penuh",
+      "exit": "Keluar dari layar penuh"
     }
   },
   "ui": {

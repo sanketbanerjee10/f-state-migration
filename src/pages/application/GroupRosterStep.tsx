@@ -20,6 +20,11 @@ import { UploadProgressCard, type UploadProgress } from './group-roster/UploadPr
 const OCR_CONCURRENCY = 2;
 const INITIAL_SECONDS_PER_BATCH = 20;
 const MAX_GROUP_MEMBERS = 99;
+const T10_RESEARCH_AUTO_COMPLETE_TECH_POWER = 25_000_000;
+
+function isValidT10Percent(value: string) {
+  return /^\d{1,2}$/.test(value) && Number(value) <= 99;
+}
 
 export function GroupRosterStep() {
   const { t } = useTranslation();
@@ -42,6 +47,8 @@ export function GroupRosterStep() {
   const [editF3Power, setEditF3Power] = useState('');
   const [editKills, setEditKills] = useState('');
   const [editAlliance, setEditAlliance] = useState('');
+  const [editT10Complete, setEditT10Complete] = useState<boolean | null>(null);
+  const [editT10Percent, setEditT10Percent] = useState('');
   const [editError, setEditError] = useState('');
   const [editErrorScrollKey, setEditErrorScrollKey] = useState(0);
 
@@ -58,6 +65,8 @@ export function GroupRosterStep() {
   const [manualModVehiclePower, setManualModVehiclePower] = useState('');
   const [manualKills, setManualKills] = useState('');
   const [manualAlliance, setManualAlliance] = useState('');
+  const [manualT10Complete, setManualT10Complete] = useState<boolean | null>(null);
+  const [manualT10Percent, setManualT10Percent] = useState('');
   const [manualError, setManualError] = useState('');
   const [manualErrorScrollKey, setManualErrorScrollKey] = useState(0);
   const [manualEditingMember, setManualEditingMember] = useState<GroupMember | null>(null);
@@ -192,6 +201,9 @@ export function GroupRosterStep() {
             modVehiclePower,
             kills: extracted.kills || '0',
             currentAlliance: draft.currentAlliance || '',
+            t10ResearchComplete:
+              (parseMagnitude(techPower) || 0) >= T10_RESEARCH_AUTO_COMPLETE_TECH_POWER ? true : null,
+            t10ResearchPercent: '',
             screenshotFileName: file.name,
             isScreenshotVerified: true,
           };
@@ -260,6 +272,8 @@ export function GroupRosterStep() {
       setManualModVehiclePower(member.modVehiclePower);
       setManualKills(member.kills);
       setManualAlliance(member.currentAlliance);
+      setManualT10Complete(member.t10ResearchComplete);
+      setManualT10Percent(member.t10ResearchPercent);
       setManualError('');
       setManualModalOpen(true);
       return;
@@ -273,6 +287,8 @@ export function GroupRosterStep() {
     setEditF3Power(member.f3ArenaPower || '');
     setEditKills(member.kills);
     setEditAlliance(member.currentAlliance);
+    setEditT10Complete(member.t10ResearchComplete);
+    setEditT10Percent(member.t10ResearchPercent);
     setEditError('');
   };
 
@@ -305,6 +321,18 @@ export function GroupRosterStep() {
       setEditErrorScrollKey((key) => key + 1);
       return;
     }
+    const autoT10Complete =
+      (parseMagnitude(editingMember.techPower) || 0) >= T10_RESEARCH_AUTO_COMPLETE_TECH_POWER;
+    if (!autoT10Complete && editT10Complete === null) {
+      setEditError(t('wizard.validation.t10Research'));
+      setEditErrorScrollKey((key) => key + 1);
+      return;
+    }
+    if (!autoT10Complete && editT10Complete === false && !isValidT10Percent(editT10Percent)) {
+      setEditError(t('wizard.validation.t10ResearchPercent'));
+      setEditErrorScrollKey((key) => key + 1);
+      return;
+    }
 
     updateGroupMember(editingMember.id, {
       playerName: editName.trim(),
@@ -314,6 +342,9 @@ export function GroupRosterStep() {
       f3ArenaPower: editF3Power.trim(),
       kills: editKills.trim() || '0',
       currentAlliance: editAlliance.trim(),
+      t10ResearchComplete: autoT10Complete || editT10Complete === true,
+      t10ResearchPercent:
+        autoT10Complete || editT10Complete === true ? '' : editT10Percent,
     });
 
     toast.success('Updated Details', {
@@ -336,6 +367,8 @@ export function GroupRosterStep() {
     setManualModVehiclePower('');
     setManualKills('');
     setManualAlliance(draft.currentAlliance || '');
+    setManualT10Complete(null);
+    setManualT10Percent('');
     setManualError('');
     setManualModalOpen(true);
   };
@@ -397,6 +430,19 @@ export function GroupRosterStep() {
       }
     }
 
+    const autoT10Complete =
+      (parseMagnitude(manualTechPower) || 0) >= T10_RESEARCH_AUTO_COMPLETE_TECH_POWER;
+    if (!autoT10Complete && manualT10Complete === null) {
+      setManualError(t('wizard.validation.t10Research'));
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
+    if (!autoT10Complete && manualT10Complete === false && !isValidT10Percent(manualT10Percent)) {
+      setManualError(t('wizard.validation.t10ResearchPercent'));
+      setManualErrorScrollKey((key) => key + 1);
+      return;
+    }
+
     if (manualKills.trim() && parseMagnitude(manualKills, true) === null) {
       setManualError(t('wizard.roster.killsInvalid'));
       setManualErrorScrollKey((key) => key + 1);
@@ -447,6 +493,9 @@ export function GroupRosterStep() {
       modVehiclePower: manualModVehiclePower.trim(),
       kills: manualKills.trim(),
       currentAlliance: manualAlliance.trim(),
+      t10ResearchComplete: autoT10Complete || manualT10Complete === true,
+      t10ResearchPercent:
+        autoT10Complete || manualT10Complete === true ? '' : manualT10Percent,
     };
 
     if (manualEditingMember) {
@@ -467,12 +516,28 @@ export function GroupRosterStep() {
     setManualEditingMember(null);
   };
 
+  const continueFromRoster = () => {
+    const incompleteMember = draft.groupMembers.find((member) => {
+      if ((parseMagnitude(member.techPower) || 0) >= T10_RESEARCH_AUTO_COMPLETE_TECH_POWER) return false;
+      if (member.t10ResearchComplete === null) return true;
+      return member.t10ResearchComplete === false && !isValidT10Percent(member.t10ResearchPercent);
+    });
+
+    if (incompleteMember) {
+      openEditModal(incompleteMember);
+      toast.error(t('wizard.groupT10.resolveMember', { name: incompleteMember.playerName }));
+      return;
+    }
+
+    nextStep();
+  };
+
   return (
     <>
       <DismissibleToast message={scoreErrorToast} onDismiss={() => setScoreErrorToast('')} />
       <StepLayout
         navigationProps={{
-          onContinue: nextStep,
+          onContinue: continueFromRoster,
           onBack: prevStep,
           continueLabel: t('wizard.groupUpload.continue'),
           disabled: uploading,
@@ -563,6 +628,8 @@ export function GroupRosterStep() {
               f3Power: editF3Power,
               kills: editKills,
               alliance: editAlliance,
+              t10ResearchComplete: editT10Complete,
+              t10ResearchPercent: editT10Percent,
             }}
             error={editError}
             scrollKey={editErrorScrollKey}
@@ -597,6 +664,14 @@ export function GroupRosterStep() {
                 setEditAlliance(value);
                 setEditError('');
               },
+              t10ResearchComplete: (value) => {
+                setEditT10Complete(value);
+                setEditError('');
+              },
+              t10ResearchPercent: (value) => {
+                setEditT10Percent(value);
+                setEditError('');
+              },
             }}
             t={t}
           />
@@ -619,6 +694,8 @@ export function GroupRosterStep() {
               kills: manualKills,
               alliance: manualAlliance,
               highestPower: manualHighestPower,
+              t10ResearchComplete: manualT10Complete,
+              t10ResearchPercent: manualT10Percent,
             }}
             error={manualError}
             scrollKey={manualErrorScrollKey}
@@ -675,6 +752,14 @@ export function GroupRosterStep() {
               },
               alliance: (value) => {
                 setManualAlliance(value);
+                setManualError('');
+              },
+              t10ResearchComplete: (value) => {
+                setManualT10Complete(value);
+                setManualError('');
+              },
+              t10ResearchPercent: (value) => {
+                setManualT10Percent(value);
                 setManualError('');
               },
             }}

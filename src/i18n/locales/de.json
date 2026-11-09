@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Kurzer OCR-Check",
+      "title": "Screenshot überprüfen",
       "message": "🤖 Unser kleiner Helfer ist ziemlich gut, aber bei Namen und Kills kann er sich manchmal vertun! Bitte prüfe diese beiden Angaben kurz. Alles andere sollte stimmen!",
       "dismiss": "Verstanden"
     },
@@ -257,7 +257,18 @@
       "formation": "Arenaformation F{{number}}",
       "f1Placeholder": "z. B. 180,500,000",
       "f2Placeholder": "z. B. 99,183,574",
-      "f3Placeholder": "z. B. 22,349,680"
+      "f3Placeholder": "z. B. 22,349,680",
+      "t10Title": "T10-Forschung",
+      "t10Question": "Haben Sie die T10-Forschung abgeschlossen?",
+      "t10Yes": "Ja, vollständig",
+      "t10No": "Noch nicht",
+      "t10Hint": "Wenn die Forschung noch läuft, teilen Sie uns Ihren aktuellen Fertigstellungsgrad mit.",
+      "t10AutoComplete": "Wird automatisch als abgeschlossen markiert, da Ihre Tech Power über 25 Mio. liegt.",
+      "t10Percent": "Abschluss der T10-Forschung",
+      "t10PercentPlaceholder": "Geben Sie 0–99 ein",
+      "t10PercentMilestones": ["Willkommen bei der T10-Forschung! Deine Abzeichen sind noch optimistisch.", "Die Kosten wirken erschwinglich. Genieße das, solange es anhält.", "Du machst Fortschritte! Deine Abzeichensammlung hat es bemerkt.", "Es geht voran. Das Labor hat dir die echte Rechnung noch nicht gezeigt.", "Fast die Hälfte geschafft! Deine Abzeichen wechseln bald in den Überlebensmodus.", "Die Forschung ist zur Hälfte abgeschlossen, die Ausgaben für Abzeichen aber noch lange nicht.", "60 % abgeschlossen. Die Forschung wird ernst. Der Abzeichenmangel auch.", "Glückwunsch! 70 % der Forschung sind geschafft – und die übrigen 70 % der Kosten freigeschaltet!", "Willkommen im teuren Viertel. Für jedes weitere Prozent brauchst du jetzt einen Kredit.", "90 % geschafft! Zum Aufhören bist du zu weit gekommen und zum Feiern zu arm."],
+      "t10CompleteMessage": "Verdammt, du bist aus anderem Holz geschnitzt.",
+      "t10ProgressSummary": "In Bearbeitung ({{percent}}%)"
     },
     "statistics": {
       "continue": "Weiter zu den Präferenzen",
@@ -350,7 +361,10 @@
       "techPlaceholder": "z. B. 19,187,725",
       "troopPlaceholder": "z. B. 66,198,020",
       "heroPlaceholder": "z. B. 62,634,222",
-      "vehiclePlaceholder": "z. B. 9,436,786"
+      "vehiclePlaceholder": "z. B. 9,436,786",
+      "clearForm": "Fangen Sie von vorne an",
+      "clearFormTitle": "Alle Formulardaten löschen?",
+      "clearFormConfirmation": "Dadurch werden alle in jedem Anwendungsschritt eingegebenen Werte entfernt. Diese Aktion kann nicht rückgängig gemacht werden."
     },
     "groupUpload": {
       "invalidType": "Bitte wähle ein PNG- oder JPG/JPEG-Bild aus.",
@@ -506,7 +520,17 @@
       "destinations": "Wähle „Beliebige Allianz“ oder mindestens ein Ziel aus.",
       "reason": "Schreibe mindestens 10 Zeichen, um zu erklären, warum du migrieren möchtest.",
       "reasonMax": "Deine Begründung darf höchstens 1.000 Zeichen umfassen.",
-      "commentsMax": "Deine zusätzlichen Kommentare dürfen höchstens 1.000 Zeichen umfassen."
+      "commentsMax": "Deine zusätzlichen Kommentare dürfen höchstens 1.000 Zeichen umfassen.",
+      "t10Research": "Wählen Sie aus, ob die T10-Forschung abgeschlossen ist.",
+      "t10ResearchPercent": "Geben Sie einen ganzzahligen Abschlussprozentsatz von 0 bis 99 ein."
+    },
+    "groupT10": {
+      "label": "T10-Forschung",
+      "complete": "Komplett",
+      "incomplete": "In Bearbeitung",
+      "percent": "Forschungsabschluss (0-99 %)",
+      "autoComplete": "Wird automatisch als abgeschlossen markiert, da Tech Power über 25 Mio. liegt.",
+      "resolveMember": "Fügen Sie den T10-Forschungsstatus und den Fortschritt für {{name}} hinzu, bevor Sie fortfahren."
     }
   },
   "components": {
@@ -991,7 +1015,31 @@
       "soundEffects": "Soundeffekte",
       "littleThings": "Kleine Dinge, die zählen",
       "effectsVolume": "Effektlautstärke",
-      "soundEffectFootnote": "Items, Treffer und Kampfgeräusche."
+      "soundEffectFootnote": "Items, Treffer und Kampfgeräusche.",
+      "touchControlsTitle": "Touch-Steuerung",
+      "controlLayout": "Steuerungslayout",
+      "controlLayoutHint": "Wählen Sie, welche Hand die Bewegung steuert.",
+      "rightHanded": "Rechtshänder",
+      "leftHanded": "Linkshänder",
+      "joystickAppearance": "Joystick-Erscheinungsbild",
+      "joystickAppearanceHint": "Passen Sie beide Schwimmstäbe individuell an.",
+      "baseOpacity": "Grund- und Leuchtdeckkraft",
+      "thumbOpacity": "Deckkraft des Daumens",
+      "joystickSize": "Joystickgröße",
+      "small": "Klein",
+      "medium": "Mittel",
+      "large": "Groß",
+      "joystickPreview": "Live-Vorschau der Bewegung und der Zielsticks",
+      "joystickBehaviour": "Joystick-Verhalten",
+      "joystickBehaviourHint": "Wählen Sie, wie der Bewegungsstab angezeigt wird.",
+      "fixed": "Behoben",
+      "floating": "Schwebend",
+      "joystickPosition": "Anordnung",
+      "edgePosition": "Kante ({{side}})",
+      "innerPosition": "Innen ({{side}})",
+      "middlePositionMiddle": "Mitte",
+      "leftSide": "links",
+      "rightSide": "richtig"
     },
     "hud": {
       "runStatus": "Spielstatus",
@@ -1075,7 +1123,10 @@
       "resumeWhenReady": "Setze fort, sobald du zurückkehren möchtest.",
       "resume": "Fortsetzen",
       "backToGame": "Zurück zum Spiel",
-      "guides": "Anleitungen"
+      "guides": "Anleitungen",
+      "firingRange": "Schießplatz",
+      "firingRangeDescription": "Maximale Distanz, die Ihre Projektile zurücklegen.",
+      "rangeUnit": "Einheiten"
     },
     "effects": {
       "active": "Aktive Effekte",
@@ -1310,7 +1361,10 @@
       "campaignProgressSaveFailed": "Der Kampagnenfortschritt konnte nicht gespeichert werden: {{error}}",
       "campaignProgressSaveFailedSimple": "Der Kampagnenfortschritt konnte nicht gespeichert werden.",
       "campaignPointsSaveFailed": "Kampagnenstatistikpunkte konnten nicht gespeichert werden: {{error}}",
-      "campaignPointsSaveFailedSimple": "Kampagnenstatistikpunkte konnten nicht gespeichert werden."
+      "campaignPointsSaveFailedSimple": "Kampagnenstatistikpunkte konnten nicht gespeichert werden.",
+      "fullscreenExitFailed": "Der Vollbildmodus kann nicht beendet werden.",
+      "fullscreenHoldEscape": "Halten Sie Esc gedrückt, um den Vollbildmodus zu verlassen.",
+      "fullscreenPauseShortcut": "Drücken Sie {{key}}, um das Spiel im Vollbildmodus anzuhalten."
     },
     "canvas": {
     "ariaLabel": "565 Zombie-Überleben. Bewege dich mit den eingestellten Tasten oder Touch-Steuerung. Ziele mit der Maus oder dem Ziel-Joystick; die Waffe schießt automatisch. Sammle Bomben und setze sie mit der eingestellten Taste oder Touch-Schaltfläche ein. Sammle bis zu fünf Geschütze und platziere sie per Rechtsklick oder Doppeltipp auf einer freien Stelle.",
@@ -1648,6 +1702,10 @@
         "name": "Industriekiste",
         "description": "Verstärkte Lagerbehälter mit robuster Metallbeschichtung und Beuteabwürfen."
       }
+    },
+    "fullscreenButton": {
+      "enter": "Geben Sie den Vollbildmodus ein",
+      "exit": "Beenden Sie den Vollbildmodus"
     }
   },
   "ui": {

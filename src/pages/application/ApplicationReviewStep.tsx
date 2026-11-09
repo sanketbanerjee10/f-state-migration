@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle2, ExternalLink, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
+import { toast } from 'sonner';
 import { useSubmitMigrationApplication } from '@/lib/api-client';
 import { FormSection } from '../../components/Field';
 import { StepLayout } from '../../components/form/StepLayout';
-import { CelebrationModal } from '../../components/CelebrationModal';
 import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
 import { ApplicationDeletedError } from '../../lib/applicationDetailsCache';
@@ -27,12 +27,6 @@ export function ApplicationReviewStep() {
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [applicationReference, setApplicationReference] = useState('');
-  const [submittedApplicationId, setSubmittedApplicationId] = useState('');
-  const [celebrationOpen, setCelebrationOpen] = useState(false);
-  const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
 
   const idempotencyRef = useRef<string | null>(null);
   const submitMutation = useSubmitMigrationApplication();
@@ -43,6 +37,14 @@ export function ApplicationReviewStep() {
     draft.migrationType === 'Group' && draft.groupMembers.length === 0
       ? 'Individual'
       : (draft.migrationType as MigrationType);
+  const applicantTier =
+    calculateMigrationScoreFromRaw(
+      parseMagnitude(draft.structurePower) || 0,
+      parseMagnitude(draft.techPower) || 0,
+      parseMagnitude(draft.heroPower) || 0,
+      parseMagnitude(draft.modVehiclePower) || 0,
+      thresholds,
+    )?.tier || 'Regular';
 
   const handleOpenConfirm = () => {
     // Validate all preceding stages
@@ -82,7 +84,7 @@ export function ApplicationReviewStep() {
   const confirmSubmit = async () => {
     if (submitting) return;
     setSubmitting(true);
-    setSubmitError('');
+    const isEditing = Boolean(draft.editingApplicationId);
 
     try {
       if (!idempotencyRef.current) {
@@ -121,6 +123,14 @@ export function ApplicationReviewStep() {
               ...(m.f3ArenaPower && parseMagnitude(m.f3ArenaPower)
                 ? { f3ArenaPower: Math.round(parseMagnitude(m.f3ArenaPower) as number) }
                 : {}),
+              t10ResearchComplete:
+                (parseMagnitude(m.techPower) || 0) >= 25_000_000 ||
+                m.t10ResearchComplete === true,
+              t10ResearchPercent:
+                (parseMagnitude(m.techPower) || 0) >= 25_000_000 ||
+                m.t10ResearchComplete === true
+                  ? null
+                  : Number(m.t10ResearchPercent),
               isScreenshotVerified: Boolean(m.isScreenshotVerified),
             }))
           : undefined;
@@ -136,7 +146,7 @@ export function ApplicationReviewStep() {
         const h = parseMagnitude(draft.heroPower) || 0;
         const v = parseMagnitude(draft.modVehiclePower) || 0;
         const scoreRes = calculateMigrationScoreFromRaw(s, tech, h, v, thresholds);
-        return (scoreRes?.tier || draft.tier || 'Regular') as MigrationTier;
+        return (scoreRes?.tier || 'Regular') as MigrationTier;
       })();
 
       const payload = {
@@ -154,7 +164,6 @@ export function ApplicationReviewStep() {
         migrationType: effectiveMigrationType,
         groupRepresentative: effectiveMigrationType === 'Group' ? draft.representative.trim() : null,
         migrationReason: draft.reason.trim(),
-        characterReference: null,
         additionalComments: comments,
         highestPowerOnRecord: applicantHighestPower,
         structurePower: Math.max(0, Math.round(parseMagnitude(draft.structurePower) || 0)),
@@ -163,11 +172,17 @@ export function ApplicationReviewStep() {
         heroPower: Math.max(0, Math.round(parseMagnitude(draft.heroPower) || 0)),
         modVehiclePower: Math.max(0, Math.round(parseMagnitude(draft.modVehiclePower) || 0)),
         isScreenshotVerified: Boolean(draft.hasScreenshot),
+        t10ResearchComplete:
+          (parseMagnitude(draft.techPower) || 0) >= 25_000_000 ||
+          draft.t10ResearchComplete === true,
+        t10ResearchPercent:
+          (parseMagnitude(draft.techPower) || 0) >= 25_000_000 ||
+          draft.t10ResearchComplete === true
+            ? null
+            : Number(draft.t10ResearchPercent),
         groupMembers: mappedGroupMembers,
       };
-
       let resultData: { message: string; applicationReference: string; applicationId?: string };
-      const isEditing = Boolean(draft.editingApplicationId);
 
       if (isEditing && draft.editingApplicationId) {
         const res = await fetch(`/api/applications/${encodeURIComponent(draft.editingApplicationId)}`, {
@@ -177,8 +192,7 @@ export function ApplicationReviewStep() {
         });
         if (!res.ok) {
           if (res.status === 404) throw new ApplicationDeletedError();
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || 'Failed to update application');
+          throw new Error('Application update failed');
         }
         resultData = await res.json();
       } else {
@@ -187,6 +201,9 @@ export function ApplicationReviewStep() {
       }
 
       const resolvedAppId = resultData.applicationId || draft.editingApplicationId || '';
+      if (!resolvedAppId) {
+        throw new Error('The application was submitted without an application ID.');
+      }
 
       // Save to localStorage tracked applications
       saveTrackedApplication({
@@ -200,57 +217,24 @@ export function ApplicationReviewStep() {
       });
 
       setConfirmOpen(false);
-      setApplicationReference(resultData.applicationReference);
-      setSubmittedApplicationId(resolvedAppId);
-      setIsUpdateSuccess(isEditing);
       idempotencyRef.current = null;
       clearDraft(true);
-      setSuccess(true);
-      setCelebrationOpen(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setLocation(
+        `/application-submitted/${encodeURIComponent(resolvedAppId)}${isEditing ? '?updated=1' : ''}`,
+      );
     } catch (error) {
       setConfirmOpen(false);
-      setSubmitError(
+      toast.error(
         error instanceof ApplicationDeletedError
           ? t('wizard.review.deleted')
-          : t('wizard.review.submitFailed'),
+          : isEditing
+            ? t('wizard.review.updateFailed')
+            : t('wizard.review.submitFailed'),
       );
     } finally {
       setSubmitting(false);
     }
   };
-
-  const returnToStart = () => {
-    clearDraft();
-    setSuccess(false);
-    goToStep('character');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Render CelebrationModal outside the success branch so it is always mounted when
-  // celebrationOpen becomes true — even before the success page fully renders.
-  const celebrationModal = (
-    <CelebrationModal
-      isOpen={celebrationOpen}
-      onClose={() => {
-        setCelebrationOpen(false);
-        if (!success) return;
-        clearDraft();
-      }}
-      applicationId={submittedApplicationId}
-      applicationReference={applicationReference}
-      isUpdate={isUpdateSuccess}
-      onNewApplication={returnToStart}
-    />
-  );
-
-  if (success) {
-    return (
-      <main className="form-shell">
-        {celebrationModal}
-      </main>
-    );
-  }
 
   return (
     <StepLayout
@@ -261,9 +245,7 @@ export function ApplicationReviewStep() {
         submitting,
         submitMode: true,
       }}
-      formError={submitError}
     >
-      {celebrationModal}
       <FormSection number={isGroup ? '05' : '04'} title={t('wizard.review.title')}>
         <div className="review-summary-card" data-testid="review-summary-card">
           <div className="review-summary-top">
@@ -325,6 +307,19 @@ export function ApplicationReviewStep() {
               <div className="review-item"><span>{t('wizard.review.f1')}</span> <strong>{draft.f1 || '—'}</strong></div>
               <div className="review-item"><span>{t('wizard.review.f2')}</span> <strong>{draft.f2 || '—'}</strong></div>
               <div className="review-item"><span>{t('wizard.review.f3')}</span> <strong>{draft.f3 || '—'}</strong></div>
+              <div className="review-item">
+                <span>{t('wizard.combat.t10Title')}</span>
+                <strong>
+                  {(parseMagnitude(draft.techPower) || 0) >= 25_000_000 ||
+                  draft.t10ResearchComplete === true
+                    ? t('wizard.combat.t10Yes')
+                    : draft.t10ResearchComplete === false
+                      ? t('wizard.combat.t10ProgressSummary', {
+                          percent: draft.t10ResearchPercent || '—',
+                        })
+                      : '—'}
+                </strong>
+              </div>
             </ReviewSummarySection>
 
             <ReviewSummarySection
@@ -337,7 +332,7 @@ export function ApplicationReviewStep() {
               {displayMigrationType === 'Group' && (
                 <div className="review-item"><span>{t('wizard.review.representative')}</span> <strong>{draft.representative || t('wizard.review.notSpecified')}</strong></div>
               )}
-              <div className="review-item"><span>{t('wizard.review.tier')}</span> <strong>{t(`wizard.preferences.tiers.${(draft.tier || 'Regular').toLowerCase()}`)}</strong></div>
+              <div className="review-item"><span>{t('wizard.review.tier')}</span> <strong>{t(`wizard.preferences.tiers.${applicantTier.toLowerCase()}`)}</strong></div>
               <div className="review-item">
                 <span>{t('wizard.review.destinations')}</span>
                 <strong>{draft.preferredAlliances.includes('any') ? t('wizard.preferences.anyAlliance') : t('wizard.review.selected', { count: draft.preferredAlliances.length })}</strong>

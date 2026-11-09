@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Revisión rápida del OCR",
+      "title": "Revisión de captura de pantalla",
       "message": "🤖 ¡Nuestro pequeño ayudante es bastante bueno, pero a veces puede confundirse con los nombres y las bajas! Revisa esos dos datos rápidamente. ¡Todo lo demás debería estar perfecto!",
       "dismiss": "Entendido"
     },
@@ -257,7 +257,18 @@
       "formation": "Formación F{{number}} de la arena",
       "f1Placeholder": "p. ej., 180,500,000",
       "f2Placeholder": "p. ej., 99,183,574",
-      "f3Placeholder": "p. ej., 22,349,680"
+      "f3Placeholder": "p. ej., 22,349,680",
+      "t10Title": "investigación T10",
+      "t10Question": "¿Has completado la investigación T10?",
+      "t10Yes": "si, completo",
+      "t10No": "todavía no",
+      "t10Hint": "Si la investigación aún está en marcha, infórmenos su porcentaje de finalización actual.",
+      "t10AutoComplete": "Marcado como completo automáticamente porque su Tech Power está por encima de 25M.",
+      "t10Percent": "Finalización de la investigación T10",
+      "t10PercentPlaceholder": "Ingrese 0–99",
+      "t10PercentMilestones": ["¡Bienvenido a la investigación T10! Tus medallas aún son optimistas.", "Los costos parecen asequibles. Disfruta mientras dure.", "¡Estás progresando! Tu colección de medallas ya se ha dado cuenta.", "Vas avanzando. El laboratorio aún no te ha mostrado la factura real.", "¡Casi a mitad de camino! Tus medallas están a punto de entrar en modo supervivencia.", "La investigación va por la mitad, pero el gasto en medallas no.", "60 % completado. La investigación se pone seria. La escasez de medallas también.", "¡Felicidades! Has completado el 70 % de la investigación y desbloqueado el otro 70 % del costo.", "Bienvenido al barrio caro. Ahora cada 1 % requiere un préstamo.", "¡90 % completado! Has llegado demasiado lejos para abandonar y eres demasiado pobre para celebrarlo."],
+      "t10CompleteMessage": "Caramba, eres de otro nivel.",
+      "t10ProgressSummary": "En curso ({{percent}}%)"
     },
     "statistics": {
       "continue": "Continuar a las preferencias",
@@ -326,7 +337,7 @@
       "playerHint": "El nombre de tu personaje tal como aparece en el juego",
       "playerPlaceholder": "p. ej., GOD Sankeyyy",
       "powerRecord": "Poder total registrado",
-      "powerHint": "Calculado autom?ticamente",
+      "powerHint": "Calculado automáticamente",
       "currentPower": "Poder actual",
       "killsOptional": "Bajas",
       "killsHint": "En el icono de calavera de la tarjeta de perfil",
@@ -350,7 +361,10 @@
       "techPlaceholder": "p. ej., 19,187,725",
       "troopPlaceholder": "p. ej., 66,198,020",
       "heroPlaceholder": "p. ej., 62,634,222",
-      "vehiclePlaceholder": "p. ej., 9,436,786"
+      "vehiclePlaceholder": "p. ej., 9,436,786",
+      "clearForm": "Empezar de nuevo",
+      "clearFormTitle": "¿Borrar todos los datos del formulario?",
+      "clearFormConfirmation": "Esto eliminará todos los valores ingresados ​​en cada paso de la aplicación. Esta acción no se puede deshacer."
     },
     "groupUpload": {
       "invalidType": "Elige una imagen PNG o JPG/JPEG.",
@@ -506,7 +520,17 @@
       "destinations": "Elige «Cualquier alianza» o selecciona al menos un destino.",
       "reason": "Escribe al menos 10 caracteres para explicar por qué quieres migrar.",
       "reasonMax": "Limita tu motivo a 1,000 caracteres.",
-      "commentsMax": "Limita los comentarios adicionales a 1.000 caracteres como máximo."
+      "commentsMax": "Limita los comentarios adicionales a 1.000 caracteres como máximo.",
+      "t10Research": "Seleccione si la investigación T10 está completa.",
+      "t10ResearchPercent": "Ingrese un porcentaje de finalización de números enteros del 0 al 99."
+    },
+    "groupT10": {
+      "label": "investigación T10",
+      "complete": "completo",
+      "incomplete": "En progreso",
+      "percent": "Finalización de la investigación (0-99%)",
+      "autoComplete": "Marcado como completo automáticamente porque Tech Power está por encima de 25M.",
+      "resolveMember": "Agregue el estado de la investigación T10 y el progreso de {{name}} antes de continuar."
     }
   },
   "components": {
@@ -951,7 +975,31 @@
       "musicUnavailable": "Música no disponible; no hay pistas.",
       "soundEffects": "Efectos de sonido", "littleThings": "Los pequeños detalles",
       "effectsVolume": "Volumen de efectos",
-      "soundEffectFootnote": "Objetos, daño y señales de combate."
+      "soundEffectFootnote": "Objetos, daño y señales de combate.",
+      "touchControlsTitle": "Controles táctiles",
+      "controlLayout": "Diseño de controles",
+      "controlLayoutHint": "Elige qué mano controla el movimiento.",
+      "rightHanded": "diestro",
+      "leftHanded": "zurdo",
+      "joystickAppearance": "Apariencia del joystick",
+      "joystickAppearanceHint": "Personaliza ambos palos flotantes.",
+      "baseOpacity": "Opacidad base y brillo.",
+      "thumbOpacity": "Opacidad del pulgar",
+      "joystickSize": "Tamaño del joystick",
+      "small": "pequeño",
+      "medium": "Medio",
+      "large": "Grande",
+      "joystickPreview": "Vista previa en vivo del movimiento y los controles de puntería.",
+      "joystickBehaviour": "Comportamiento del joystick",
+      "joystickBehaviourHint": "Elige cómo aparece la palanca de movimiento.",
+      "fixed": "Fijo",
+      "floating": "flotante",
+      "joystickPosition": "Posición",
+      "edgePosition": "Borde ({{side}})",
+      "innerPosition": "Interior ({{side}})",
+      "middlePositionMiddle": "Medio",
+      "leftSide": "izquierda",
+      "rightSide": "correcto"
     },
     "hud": {
       "runStatus": "Estado de la partida", "wave": "OLEADA", "waveProgress": "Progreso de oleada",
@@ -1000,7 +1048,7 @@
       "refund": "Devolver punto de {{name}}", "purchase": "Mejorar {{name}}",
       "runUnavailable": "Partida no disponible", "nextChapter": "Tu próximo capítulo te espera.",
       "resumeWhenReady": "Reanuda cuando quieras volver.",
-      "resume": "Reanudar", "backToGame": "Volver a la partida", "guides": "Guías"
+      "resume": "Reanudar", "backToGame": "Volver a la partida", "guides": "Guías", "firingRange": "campo de tiro", "firingRangeDescription": "Distancia máxima que recorren tus proyectiles.", "rangeUnit": "unidades"
     },
     "effects": {
       "active": "Efectos activos", "damage": "Daño", "rapidFire": "Disparo rápido",
@@ -1176,7 +1224,10 @@
       "campaignProgressSaveFailed": "No se pudo guardar el progreso: {{error}}",
       "campaignProgressSaveFailedSimple": "No se pudo guardar el progreso.",
       "campaignPointsSaveFailed": "No se pudieron guardar los puntos de campaña: {{error}}",
-      "campaignPointsSaveFailedSimple": "No se pudieron guardar los puntos de campaña."
+      "campaignPointsSaveFailedSimple": "No se pudieron guardar los puntos de campaña.",
+      "fullscreenExitFailed": "No se puede salir del modo de pantalla completa.",
+      "fullscreenHoldEscape": "Mantenga presionada la tecla Esc para salir de la pantalla completa.",
+      "fullscreenPauseShortcut": "Presiona {{key}} para pausar el juego en modo de pantalla completa."
     },
     "canvas": {
       "ariaLabel": "565 Zombie Survival. Muévete con las teclas o controles táctiles; apunta con el ratón o joystick. El arma dispara automáticamente. Usa bombas con la tecla o botón táctil. Coloca hasta cinco torretas con clic derecho o doble toque en un espacio libre.",
@@ -1373,6 +1424,10 @@
       "moving-wall": { "name": "Muro móvil", "description": "Paneles móviles que cambian las rutas de paso." },
       "steam-pipe": { "name": "Tubería de vapor", "description": "Conductos que avisan y expulsan ráfagas de vapor." },
       "industrial-crate": { "name": "Caja industrial", "description": "Contenedores reforzados que pueden soltar botín." }
+    },
+    "fullscreenButton": {
+      "enter": "Entrar en pantalla completa",
+      "exit": "Salir de pantalla completa"
     }
   },
   "ui": {

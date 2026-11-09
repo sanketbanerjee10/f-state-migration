@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "OCRの確認",
+      "title": "スクリーンショットの確認",
       "message": "🤖 小さなアシスタントはかなり優秀ですが、名前やキル数を読み間違えることがあります！この2つだけ念のため確認してください。他の項目は問題ないはずです！",
       "dismiss": "確認しました"
     },
@@ -257,7 +257,18 @@
       "formation": "F{{number}}のアリーナ戦力",
       "f1Placeholder": "例：180,500,000",
       "f2Placeholder": "例：99,183,574",
-      "f3Placeholder": "例：22,349,680"
+      "f3Placeholder": "例：22,349,680",
+      "t10Title": "T10の研究",
+      "t10Question": "T10の研究は完了しましたか?",
+      "t10Yes": "はい、完了です",
+      "t10No": "まだ",
+      "t10Hint": "研究がまだ進行中の場合は、現在の完了率をお知らせください。",
+      "t10AutoComplete": "テックパワーが 2500 万を超えているため、自動的に完了とマークされます。",
+      "t10Percent": "T10研究完了",
+      "t10PercentPlaceholder": "0 ～ 99 を入力してください",
+      "t10PercentMilestones": ["T10研究へようこそ！バッジはまだ楽観的ですね。", "費用はまだ手が届きそうです。この気持ちが続くうちに楽しみましょう。", "順調に進んでいます！バッジコレクションも気づいています。", "少しずつ進んでいますね。本当の請求額はまだ研究所から見せられていません。", "もうすぐ半分！バッジはそろそろサバイバルモードに入りそうです。", "研究は半分まで進みました。でもバッジの出費はまだ半分ではありません。", "進捗60%。研究が本格化してきました。バッジ不足も深刻です。", "おめでとうございます！研究の70%を完了し、残りの費用の70%も解放しました！", "高額エリアへようこそ。ここからは1%進めるたびに借金が必要です。", "進捗90%！今さらやめるには進みすぎ、祝うにはお金が足りません。"],
+      "t10CompleteMessage": "くそ、君はひと味違うね。",
+      "t10ProgressSummary": "進行中 ({{percent}}%)"
     },
     "statistics": {
       "continue": "希望条件へ進む",
@@ -326,7 +337,7 @@
       "playerHint": "ゲーム内に表示されるキャラクター名",
       "playerPlaceholder": "例：GOD Sankeyyy",
       "powerRecord": "記録上の戦力",
-      "powerHint": "????",
+      "powerHint": "自動計算",
       "currentPower": "現在の戦力",
       "killsOptional": "キル数",
       "killsHint": "プロフィールカードのドクロアイコンから取得",
@@ -350,7 +361,10 @@
       "techPlaceholder": "例：19,187,725",
       "troopPlaceholder": "例：66,198,020",
       "heroPlaceholder": "例：62,634,222",
-      "vehiclePlaceholder": "例：9,436,786"
+      "vehiclePlaceholder": "例：9,436,786",
+      "clearForm": "やり直す",
+      "clearFormTitle": "フォームデータをすべてクリアしますか?",
+      "clearFormConfirmation": "これにより、アプリケーションの各ステップで入力されたすべての値が削除されます。この操作は元に戻すことができません。"
     },
     "groupUpload": {
       "invalidType": "PNGまたはJPG/JPEG形式の画像を選択してください。",
@@ -506,7 +520,17 @@
       "destinations": "「どの同盟でも」を選ぶか、移転先を1つ以上選択してください。",
       "reason": "移民を希望する理由を10文字以上で入力してください。",
       "reasonMax": "理由は1,000文字以内で入力してください。",
-      "commentsMax": "追加コメントは1,000文字以内で入力してください。"
+      "commentsMax": "追加コメントは1,000文字以内で入力してください。",
+      "t10Research": "T10 研究が完了しているかどうかを選択します。",
+      "t10ResearchPercent": "0 ～ 99 の整数完了率を入力します。"
+    },
+    "groupT10": {
+      "label": "T10の研究",
+      "complete": "完了",
+      "incomplete": "進行中",
+      "percent": "研究完了 (0-99%)",
+      "autoComplete": "Tech Power が 25M を超えているため、自動的に完了とマークされます。",
+      "resolveMember": "続行する前に、{{name}} の T10 研究ステータスと進捗状況を追加します。"
     }
   },
   "components": {
@@ -997,7 +1021,31 @@
       "soundEffects": "効果音",
       "littleThings": "細かな音も大切に",
       "effectsVolume": "効果音の音量",
-      "soundEffectFootnote": "アイテム取得、ダメージ、戦闘の効果音。"
+      "soundEffectFootnote": "アイテム取得、ダメージ、戦闘の効果音。",
+      "touchControlsTitle": "タッチコントロール",
+      "controlLayout": "コントロールのレイアウト",
+      "controlLayoutHint": "どちらの手が動きを制御するかを選択します。",
+      "rightHanded": "右利き",
+      "leftHanded": "左利き",
+      "joystickAppearance": "ジョイスティックの外観",
+      "joystickAppearanceHint": "両方のフローティングスティックをカスタマイズします。",
+      "baseOpacity": "ベースとグローの不透明度",
+      "thumbOpacity": "親指の不透明度",
+      "joystickSize": "ジョイスティックのサイズ",
+      "small": "小",
+      "medium": "中",
+      "large": "大",
+      "joystickPreview": "動きとエイムスティックのライブプレビュー",
+      "joystickBehaviour": "ジョイスティックの動作",
+      "joystickBehaviourHint": "移動スティックの表示方法を選択します。",
+      "fixed": "修正済み",
+      "floating": "フローティング",
+      "joystickPosition": "ポジション",
+      "edgePosition": "エッジ ({{side}})",
+      "innerPosition": "インナー ({{side}})",
+      "middlePositionMiddle": "ミドル",
+      "leftSide": "左",
+      "rightSide": "そうだよ"
     },
     "hud": {
       "runStatus": "プレイ状況",
@@ -1081,7 +1129,10 @@
       "resumeWhenReady": "戻る準備ができたら再開してください。",
       "resume": "再開",
       "backToGame": "ゲームに戻る",
-      "guides": "ガイド"
+      "guides": "ガイド",
+      "firingRange": "射撃場",
+      "firingRangeDescription": "発射体の最大移動距離。",
+      "rangeUnit": "単位"
     },
     "effects": {
       "active": "有効な効果",
@@ -1317,7 +1368,9 @@
       "campaignProgressSaveFailed": "キャンペーンの進行状況を保存できませんでした：{{error}}",
       "campaignProgressSaveFailedSimple": "キャンペーンの進行状況を保存できませんでした。",
       "campaignPointsSaveFailed": "キャンペーンのステータスポイントを保存できませんでした：{{error}}",
-      "campaignPointsSaveFailedSimple": "キャンペーンのステータスポイントを保存できませんでした。"
+      "campaignPointsSaveFailedSimple": "キャンペーンのステータスポイントを保存できませんでした。",
+      "fullscreenHoldEscape": "全画面表示を終了するには、Esc キーを押し続けます。",
+      "fullscreenPauseShortcut": "{{key}} を押して、全画面モードでゲームを一時停止します。"
     },
     "canvas": {
       "ariaLabel": "565 Zombie Survival。設定した移動キーまたはタッチ操作で移動します。マウスか照準ジョイスティックで狙います。武器は選択方向へ自動で発射します。爆弾を拾い、設定した爆弾キーまたは画面ボタンを押して使います。タレットは最大5基まで所持でき、アリーナの空き場所を右クリックまたはダブルタップすると設置できます。",
@@ -1655,6 +1708,10 @@
         "name": "工業用コンテナ",
         "description": "頑丈な金属板で補強された保管容器で、戦利品が入っています。"
       }
+    },
+    "fullscreenButton": {
+      "enter": "全画面表示に入る",
+      "exit": "全画面表示を終了する"
     }
   },
   "ui": {

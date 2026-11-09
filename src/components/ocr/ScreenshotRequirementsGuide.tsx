@@ -9,14 +9,6 @@ export function ScreenshotRequirementsGuide() {
 
   return (
     <div className="screenshot-guide-banner" data-testid="screenshot-requirements-guide">
-      {/* <div className="guide-thumbnail-wrap" onClick={() => setModalOpen(true)}>
-        <img
-          src="/images/power-details-example.png"
-          alt="Power details screenshot thumbnail"
-          className="guide-thumbnail"
-          loading="lazy"
-        />
-      </div> */}
       <div className="guide-content">
         <div className="guide-heading-row">
           <HelpCircle size={16} className="guide-icon" />
@@ -56,7 +48,7 @@ export function ScreenshotRequirementsGuide() {
             <div className="example-grid">
               <div className="example-image-container">
                 <img
-                  src="https://ik.imagekit.io/c1tiz3nte/power-details-example.png"
+                  src="https://ik.imagekit.io/c1tiz3nte/power-details-example.png?updatedAt=1793527173799"
                   alt={t('components.ocr.exampleAlt')}
                   className="example-full-image"
                 />

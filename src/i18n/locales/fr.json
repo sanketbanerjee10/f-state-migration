@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Vérification rapide de l’OCR",
+      "title": "Vérification de la capture d’écran",
       "message": "🤖 Notre petit assistant est plutôt doué, mais il peut parfois se tromper sur les noms et les éliminations ! Vérifiez rapidement ces deux éléments. Tout le reste devrait être correct !",
       "dismiss": "Compris"
     },
@@ -257,7 +257,18 @@
       "formation": "Formation F{{number}} de l’arène",
       "f1Placeholder": "p. ex. 180,500,000",
       "f2Placeholder": "p. ex. 99,183,574",
-      "f3Placeholder": "p. ex. 22,349,680"
+      "f3Placeholder": "p. ex. 22,349,680",
+      "t10Title": "Recherche T10",
+      "t10Question": "Avez-vous effectué une recherche T10 ?",
+      "t10Yes": "Oui, complet",
+      "t10No": "Pas encore",
+      "t10Hint": "Si la recherche est toujours en cours, indiquez-nous votre pourcentage d’achèvement actuel.",
+      "t10AutoComplete": "Marqué comme terminé automatiquement car votre Tech Power est supérieur à 25 M.",
+      "t10Percent": "Achèvement de la recherche T10",
+      "t10PercentPlaceholder": "Entrez 0 à 99",
+      "t10PercentMilestones": ["Bienvenue dans la recherche T10 ! Vos badges sont encore optimistes.", "Les coûts semblent abordables. Profitez-en tant que ça dure.", "Vous progressez ! Votre collection de badges l’a remarqué.", "Vous avancez. Le labo ne vous a pas encore montré la vraie facture.", "Presque à mi-chemin ! Vos badges vont bientôt passer en mode survie.", "La recherche est à moitié terminée, mais pas les dépenses en badges.", "60 % terminé. La recherche devient sérieuse. La pénurie de badges aussi.", "Félicitations ! Vous avez terminé 70 % de la recherche et débloqué les 70 % restants du coût !", "Bienvenue dans le quartier cher. Chaque 1 % nécessite maintenant un prêt.", "90 % terminé ! Vous êtes allé trop loin pour abandonner et trop pauvre pour fêter ça."],
+      "t10CompleteMessage": "Waouh, tu es vraiment hors du commun.",
+      "t10ProgressSummary": "En cours ({{percent}}%)"
     },
     "statistics": {
       "continue": "Continuer vers les préférences",
@@ -350,7 +361,10 @@
       "techPlaceholder": "p. ex. 19,187,725",
       "troopPlaceholder": "p. ex. 66,198,020",
       "heroPlaceholder": "p. ex. 62,634,222",
-      "vehiclePlaceholder": "p. ex. 9,436,786"
+      "vehiclePlaceholder": "p. ex. 9,436,786",
+      "clearForm": "Recommencer",
+      "clearFormTitle": "Effacer toutes les données du formulaire ?",
+      "clearFormConfirmation": "Cela supprimera toutes les valeurs saisies à chaque étape de la candidature. Cette action ne peut pas être annulée."
     },
     "groupUpload": {
       "invalidType": "Veuillez choisir une image au format PNG ou JPG/JPEG.",
@@ -506,7 +520,17 @@
       "destinations": "Choisissez « N’importe quelle alliance » ou sélectionnez au moins une destination.",
       "reason": "Veuillez expliquer en au moins 10 caractères pourquoi vous souhaitez migrer.",
       "reasonMax": "Votre motif ne doit pas dépasser 1 000 caractères.",
-      "commentsMax": "Vos commentaires supplémentaires ne doivent pas dépasser 1 000 caractères."
+      "commentsMax": "Vos commentaires supplémentaires ne doivent pas dépasser 1 000 caractères.",
+      "t10Research": "Sélectionnez si la recherche T10 est terminée.",
+      "t10ResearchPercent": "Saisissez un pourcentage d'achèvement entier compris entre 0 et 99."
+    },
+    "groupT10": {
+      "label": "Recherche T10",
+      "complete": "Terminé",
+      "incomplete": "En cours",
+      "percent": "Achèvement de la recherche (0-99 %)",
+      "autoComplete": "Marqué automatiquement car Tech Power est supérieur à 25M.",
+      "resolveMember": "Ajoutez le statut de recherche T10 et la progression pour {{name}} avant de continuer."
     }
   },
   "components": {
@@ -991,7 +1015,31 @@
       "soundEffects": "Effets sonores",
       "littleThings": "Les petites choses qui comptent",
       "effectsVolume": "Volume des effets",
-      "soundEffectFootnote": "Collecte, dégâts et sons de combat."
+      "soundEffectFootnote": "Collecte, dégâts et sons de combat.",
+      "touchControlsTitle": "Commandes tactiles",
+      "controlLayout": "Disposition des contrôles",
+      "controlLayoutHint": "Choisissez quelle main contrôle le mouvement.",
+      "rightHanded": "Droitier",
+      "leftHanded": "Gaucher",
+      "joystickAppearance": "Apparence du joystick",
+      "joystickAppearanceHint": "Personnalisez les deux bâtons flottants.",
+      "baseOpacity": "Opacité de base et d'éclat",
+      "thumbOpacity": "Opacité du pouce",
+      "joystickSize": "Taille du joystick",
+      "small": "Petit",
+      "medium": "Moyen",
+      "large": "Grand",
+      "joystickPreview": "Aperçu en direct des mouvements et des sticks de visée",
+      "joystickBehaviour": "Comportement du joystick",
+      "joystickBehaviourHint": "Choisissez comment le bâton de mouvement apparaît.",
+      "fixed": "Corrigé",
+      "floating": "Flottant",
+      "joystickPosition": "Poste",
+      "edgePosition": "Bord ({{side}})",
+      "innerPosition": "Intérieur ({{side}})",
+      "middlePositionMiddle": "Milieu",
+      "leftSide": "à gauche",
+      "rightSide": "à droite"
     },
     "hud": {
       "runStatus": "État de la partie",
@@ -1075,7 +1123,10 @@
       "resumeWhenReady": "Reprenez lorsque vous êtes prêt à revenir.",
       "resume": "Reprendre",
       "backToGame": "Retour au jeu",
-      "guides": "Guides"
+      "guides": "Guides",
+      "firingRange": "Champ de tir",
+      "firingRangeDescription": "Distance maximale parcourue par vos projectiles.",
+      "rangeUnit": "unités"
     },
     "effects": {
       "active": "Effets actifs",
@@ -1310,7 +1361,10 @@
       "campaignProgressSaveFailed": "La progression de la campagne n'a pas pu être enregistrée : {{error}}",
       "campaignProgressSaveFailedSimple": "La progression de la campagne n'a pas pu être enregistrée.",
       "campaignPointsSaveFailed": "Les points de statistiques de campagne n'ont pas pu être enregistrés : {{error}}",
-      "campaignPointsSaveFailedSimple": "Les points de statistiques de campagne n'ont pas pu être enregistrés."
+      "campaignPointsSaveFailedSimple": "Les points de statistiques de campagne n'ont pas pu être enregistrés.",
+      "fullscreenExitFailed": "Impossible de quitter le mode plein écran.",
+      "fullscreenHoldEscape": "Maintenez la touche Échap pour quitter le plein écran.",
+      "fullscreenPauseShortcut": "Appuyez sur {{key}} pour mettre le jeu en pause en mode plein écran."
     },
     "canvas": {
       "ariaLabel": "565 Survie des zombies. Utilisez vos touches de mouvement configurées ou vos commandes tactiles pour vous déplacer. Visez avec la souris ou le joystick. L'arme tire automatiquement dans la direction sélectionnée. Collectez des bombes et appuyez sur la touche de bombe configurée ou sur le bouton de bombe tactile pour en utiliser une. Récupérez jusqu'à cinq tourelles, puis cliquez avec le bouton droit ou appuyez deux fois sur un endroit ouvert de l'arène pour en placer une.",
@@ -1648,6 +1702,10 @@
         "name": "Caisse industrielle",
         "description": "Conteneurs de stockage renforcés avec placage métallique durable et butin."
       }
+    },
+    "fullscreenButton": {
+      "enter": "Entrez en plein écran",
+      "exit": "Quitter le plein écran"
     }
   },
   "ui": {

@@ -14,7 +14,6 @@ import {
 import {
   TIER_COLORS,
   rowsToTierThresholds,
-  tierFromScore,
 } from '../../lib/migrationScore';
 import {
   MigrationScoreBadge,
@@ -85,18 +84,13 @@ export function ApplicationDetailDrawer({
     const counts = { Elite: 0, Advanced: 0, Medium: 0, Regular: 0 };
     if (selected?.players && selected.players.length > 0) {
       for (const p of selected.players) {
-        if (p.migrationScore != null) {
-          const tier = tierFromScore(Number(p.migrationScore), liveThresholds);
-          counts[tier]++;
-        } else {
-          counts[selected.migrationTier || 'Regular']++;
-        }
+        counts[p.migrationTier]++;
       }
     } else if (selected) {
       counts[selected.migrationTier || 'Regular'] = 1;
     }
     return counts;
-  }, [selected, liveThresholds]);
+  }, [selected]);
 
   const activeTiers = (['Elite', 'Advanced', 'Medium', 'Regular'] as const).filter(
     (t) => playerTierCounts[t] > 0,
@@ -408,12 +402,18 @@ export function ApplicationDetailDrawer({
                     onOpenModal={(title, text) => setModalContent({ title, text })}
                   />
 
-                  {selected.characterReference ? (
-                    <DetailItem
-                      label={t('components.dashboard.reference')}
-                      value={selected.characterReference}
-                    />
-                  ) : null}
+                  <DetailItem
+                    label={t('wizard.combat.t10Title')}
+                    value={
+                      selected.t10ResearchComplete
+                        ? t('wizard.combat.t10Yes')
+                        : selected.t10ResearchPercent == null
+                          ? t('common.status.notProvided')
+                          : t('wizard.combat.t10ProgressSummary', {
+                              percent: selected.t10ResearchPercent,
+                            })
+                    }
+                  />
 
                   {/* ── Truncated Additional Comments with Modal View ── */}
                   <ExpandableTextItem
@@ -502,10 +502,7 @@ export function ApplicationDetailDrawer({
                                 {p.migrationScore != null &&
                                   (() => {
                                     const scoreVal = Number(p.migrationScore);
-                                    const calculatedTier = tierFromScore(
-                                      scoreVal,
-                                      liveThresholds,
-                                    );
+                                    const calculatedTier = p.migrationTier;
                                     const calculatedPasses =
                                       calculatedTier === 'Elite'
                                         ? liveThresholds.elitePasses
@@ -595,6 +592,20 @@ export function ApplicationDetailDrawer({
                                 </strong>
                               </div>
                             </div>
+                            {!p.isApplicant && (
+                              <DetailItem
+                                label={t('wizard.combat.t10Title')}
+                                value={
+                                  p.techPower >= 25_000_000 || p.t10ResearchComplete
+                                    ? t('wizard.combat.t10Yes')
+                                    : p.t10ResearchPercent == null
+                                      ? t('common.status.notProvided')
+                                      : t('wizard.combat.t10ProgressSummary', {
+                                          percent: p.t10ResearchPercent,
+                                        })
+                                }
+                              />
+                            )}
                             {(p.structurePower > 0 ||
                               p.techPower > 0 ||
                               p.troopPower > 0 ||

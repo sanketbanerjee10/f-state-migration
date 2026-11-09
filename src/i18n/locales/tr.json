@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "OCR'ı hızlıca kontrol edin",
+      "title": "Ekran görüntüsü incelemesi",
       "message": "🤖 Küçük yardımcımız oldukça iyi, ancak isimleri ve öldürme sayılarını bazen yanlış okuyabiliyor! Bu iki bilgiyi hızlıca kontrol edin. Diğer her şey doğru olmalı!",
       "dismiss": "Anladım"
     },
@@ -257,7 +257,18 @@
       "formation": "Arena F{{number}} gücü",
       "f1Placeholder": "ör. 180,500,000",
       "f2Placeholder": "ör. 99,183,574",
-      "f3Placeholder": "ör. 22,349,680"
+      "f3Placeholder": "ör. 22,349,680",
+      "t10Title": "T10 araştırması",
+      "t10Question": "T10 araştırmasını tamamladınız mı?",
+      "t10Yes": "Evet tamamlandı",
+      "t10No": "Henüz değil",
+      "t10Hint": "Araştırma halen devam ediyorsa mevcut tamamlanma yüzdenizi bize bildirin.",
+      "t10AutoComplete": "Teknik Gücünüz 25 milyonun üzerinde olduğu için otomatik olarak tamamlandı olarak işaretlendi.",
+      "t10Percent": "T10 araştırmasının tamamlanması",
+      "t10PercentPlaceholder": "0-99 girin",
+      "t10PercentMilestones": ["T10 araştırmasına hoş geldin! Rozetlerin hâlâ iyimser.", "Masraflar karşılanabilir görünüyor. Bu his geçmeden tadını çıkar.", "İlerleme kaydediyorsun! Rozet koleksiyonun bunu fark etti.", "Bir yere varıyorsun. Laboratuvar gerçek faturayı henüz göstermedi.", "Neredeyse yarısı bitti! Rozetlerin hayatta kalma moduna geçmek üzere.", "Araştırmanın yarısı tamamlandı ama rozet harcamalarının yarısı değil.", "%60 tamamlandı. Araştırma ciddileşiyor. Rozet kıtlığı da öyle.", "Tebrikler! Araştırmanın %70’ini tamamladın ve maliyetin diğer %70’ini açtın!", "Pahalı mahalleye hoş geldin. Artık her %1 için kredi gerekiyor.", "%90 tamamlandı! Vazgeçmek için çok ilerledin, kutlama yapmak için de çok fakirsin."],
+      "t10CompleteMessage": "Vay canına, gerçekten bambaşkasın.",
+      "t10ProgressSummary": "Devam ediyor ({{percent}}%)"
     },
     "statistics": {
       "continue": "Tercihlere devam et",
@@ -326,7 +337,7 @@
       "playerHint": "Karakterinizin oyun içinde görünen adı",
       "playerPlaceholder": "ör. GOD Sankeyyy",
       "powerRecord": "Kayıtlardaki güç",
-      "powerHint": "Otomatik hesaplan?r",
+      "powerHint": "Otomatik hesaplanır",
       "currentPower": "Mevcut Güç",
       "killsOptional": "Öldürme sayısı",
       "killsHint": "Profil kartındaki kafatası simgesinde görünen değer",
@@ -350,7 +361,10 @@
       "techPlaceholder": "ör. 19,187,725",
       "troopPlaceholder": "ör. 66,198,020",
       "heroPlaceholder": "ör. 62,634,222",
-      "vehiclePlaceholder": "ör. 9,436,786"
+      "vehiclePlaceholder": "ör. 9,436,786",
+      "clearForm": "Yeniden başla",
+      "clearFormTitle": "Tüm form verileri temizlensin mi?",
+      "clearFormConfirmation": "Bu, her uygulama adımında girilen tüm değerleri kaldıracaktır. Bu eylem geri alınamaz."
     },
     "groupUpload": {
       "invalidType": "Lütfen PNG veya JPG/JPEG biçiminde bir görsel seçin.",
@@ -506,7 +520,17 @@
       "destinations": "\"Herhangi bir ittifak\" seçeneğini veya en az bir hedef ittifakı seçin.",
       "reason": "Lütfen göç etmek isteme nedeninizi en az 10 karakterle açıklayın.",
       "reasonMax": "Nedeninizi en fazla 1.000 karakterle açıklayın.",
-      "commentsMax": "Ek yorumlarınızı en fazla 1.000 karakterle sınırlayın."
+      "commentsMax": "Ek yorumlarınızı en fazla 1.000 karakterle sınırlayın.",
+      "t10Research": "T10 araştırmasının tamamlanıp tamamlanmadığını seçin.",
+      "t10ResearchPercent": "0'dan 99'a kadar bir tam sayı tamamlanma yüzdesi girin."
+    },
+    "groupT10": {
+      "label": "T10 araştırması",
+      "complete": "Tamamlandı",
+      "incomplete": "Devam ediyor",
+      "percent": "Araştırmanın tamamlanması (%0-99)",
+      "autoComplete": "Tech Power 25M'nin üzerinde olduğundan otomatik olarak tamamlandı olarak işaretlendi.",
+      "resolveMember": "Devam etmeden önce {{name}} için T10 araştırma durumunu ve ilerlemesini ekleyin."
     }
   },
   "components": {
@@ -956,7 +980,31 @@
       "musicUnavailable": "Müzik kullanılamıyor; parça eklenmemiş.",
       "soundEffects": "Ses efektleri", "littleThings": "Küçük ama önemli ayrıntılar",
       "effectsVolume": "Efekt düzeyi",
-      "soundEffectFootnote": "Eşyalar, hasar ve çatışma sesleri."
+      "soundEffectFootnote": "Eşyalar, hasar ve çatışma sesleri.",
+      "touchControlsTitle": "Dokunmatik Kontroller",
+      "controlLayout": "Kontrol düzeni",
+      "controlLayoutHint": "Hangi elin hareketi kontrol ettiğini seçin.",
+      "rightHanded": "Sağ elini kullanan",
+      "leftHanded": "Solak",
+      "joystickAppearance": "Kumanda kolu görünümü",
+      "joystickAppearanceHint": "Her iki kayan çubuğu da özelleştirin.",
+      "baseOpacity": "Taban ve parlaklık opaklığı",
+      "thumbOpacity": "Başparmak opaklığı",
+      "joystickSize": "Kumanda kolu boyutu",
+      "small": "Küçük",
+      "medium": "Orta",
+      "large": "Büyük",
+      "joystickPreview": "Hareket ve nişan alma çubuklarının canlı önizlemesi",
+      "joystickBehaviour": "Kumanda kolu davranışı",
+      "joystickBehaviourHint": "Hareket çubuğunun nasıl görüneceğini seçin.",
+      "fixed": "Sabit",
+      "floating": "Yüzer",
+      "joystickPosition": "Pozisyon",
+      "edgePosition": "Kenar ({{side}})",
+      "innerPosition": "İç ({{side}})",
+      "middlePositionMiddle": "Orta",
+      "leftSide": "sol",
+      "rightSide": "doğru"
     },
     "hud": {
       "runStatus": "Oyun durumu", "wave": "DALGA", "waveProgress": "Dalga ilerlemesi",
@@ -1007,7 +1055,7 @@
       "runUnavailable": "Oyun kullanılamıyor",
       "nextChapter": "Sıradaki bölüm seni bekliyor.",
       "resumeWhenReady": "Hazır olduğunda devam et.",
-      "resume": "Devam et", "backToGame": "Oyuna dön", "guides": "Rehberler"
+      "resume": "Devam et", "backToGame": "Oyuna dön", "guides": "Rehberler", "firingRange": "Atış poligonu", "firingRangeDescription": "Mermilerinizin kat edeceği maksimum mesafe.", "rangeUnit": "birimler"
     },
     "effects": {
       "active": "Etkin etkiler", "damage": "Hasar",
@@ -1194,7 +1242,9 @@
       "campaignProgressSaveFailed": "Sefer ilerlemesi kaydedilemedi: {{error}}",
       "campaignProgressSaveFailedSimple": "Sefer ilerlemesi kaydedilemedi.",
       "campaignPointsSaveFailed": "Sefer özellik puanları kaydedilemedi: {{error}}",
-      "campaignPointsSaveFailedSimple": "Sefer özellik puanları kaydedilemedi."
+      "campaignPointsSaveFailedSimple": "Sefer özellik puanları kaydedilemedi.",
+      "fullscreenHoldEscape": "Tam ekrandan çıkmak için Esc tuşunu basılı tutun.",
+      "fullscreenPauseShortcut": "Oyunu tam ekran modunda duraklatmak için {{key}} tuşuna basın."
     },
     "canvas": {
       "ariaLabel": "565 Zombi Hayatta Kalma. Hareket etmek için atadığın tuşları veya dokunmatik kontrolleri kullan. Fareyle ya da nişan çubuğuyla nişan al. Silah seçilen yöne otomatik ateş eder. Bomba topla ve kullanmak için atadığın tuşa ya da dokunmatik bomba düğmesine bas. En fazla beş taret topla; arenada boş bir yere sağ tıkla veya çift dokunarak yerleştir.",
@@ -1408,6 +1458,10 @@
       "moving-wall": { "name": "Hareketli Duvar", "description": "Hareket ederek yolunu değiştirmeni gerektiren sanayi panelleri." },
       "steam-pipe": { "name": "Buhar Borusu", "description": "Uyarı verip sıcak buhar püskürten havalandırma bacaları." },
       "industrial-crate": { "name": "Sanayi Sandığı", "description": "Dayanıklı metal kaplamalı, ganimet bırakabilen güçlendirilmiş kasalar." }
+    },
+    "fullscreenButton": {
+      "enter": "Tam ekrana girin",
+      "exit": "Tam ekrandan çık"
     }
   },
   "ui": {

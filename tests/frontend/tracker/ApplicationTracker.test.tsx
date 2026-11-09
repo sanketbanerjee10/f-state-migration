@@ -68,7 +68,6 @@ function makeApplication(id: string, gameName = 'Fetched Player'): AdminApplicat
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-02T00:00:00.000Z',
     migrationReason: 'Test application',
-    characterReference: null,
     additionalComments: null,
     players: [],
   };

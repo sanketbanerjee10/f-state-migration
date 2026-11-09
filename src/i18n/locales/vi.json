@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Kiểm tra nhanh kết quả OCR",
+      "title": "Xem lại ảnh chụp màn hình",
       "message": "🤖 Trợ lý nhỏ của chúng tôi khá giỏi, nhưng đôi khi có thể nhầm tên và số mạng hạ! Hãy kiểm tra nhanh hai mục đó. Những thông tin còn lại sẽ chính xác!",
       "dismiss": "Đã hiểu"
     },
@@ -257,7 +257,18 @@
       "formation": "Sức mạnh đấu trường F{{number}}",
       "f1Placeholder": "ví dụ: 180,500,000",
       "f2Placeholder": "ví dụ: 99,183,574",
-      "f3Placeholder": "ví dụ: 22,349,680"
+      "f3Placeholder": "ví dụ: 22,349,680",
+      "t10Title": "Nghiên cứu T10",
+      "t10Question": "Bạn đã hoàn thành nghiên cứu T10 chưa?",
+      "t10Yes": "Vâng, hoàn thành",
+      "t10No": "Chưa",
+      "t10Hint": "Nếu nghiên cứu vẫn đang được tiến hành, hãy cho chúng tôi biết tỷ lệ hoàn thành hiện tại của bạn.",
+      "t10AutoComplete": "Được đánh dấu tự động là hoàn thành vì Sức mạnh công nghệ của bạn trên 25 triệu.",
+      "t10Percent": "Hoàn thành nghiên cứu T10",
+      "t10PercentPlaceholder": "Nhập 0–99",
+      "t10PercentMilestones": ["Chào mừng đến với nghiên cứu T10! Huy hiệu của bạn vẫn còn lạc quan lắm.", "Chi phí trông có vẻ vừa túi tiền. Hãy tận hưởng cảm giác này khi còn có thể.", "Bạn đang tiến bộ! Bộ sưu tập huy hiệu cũng nhận ra điều đó rồi.", "Bạn đang dần đạt mục tiêu. Phòng thí nghiệm vẫn chưa cho bạn thấy hóa đơn thật đâu.", "Sắp được nửa chặng đường! Huy hiệu của bạn sắp bước vào chế độ sinh tồn.", "Nghiên cứu đã đi được nửa chặng đường, nhưng chi tiêu huy hiệu thì chưa.", "Hoàn thành 60%. Nghiên cứu bắt đầu căng rồi. Huy hiệu cũng sắp cạn.", "Chúc mừng! Bạn đã hoàn thành 70% nghiên cứu và mở khóa 70% chi phí còn lại!", "Chào mừng đến khu phố đắt đỏ. Giờ mỗi 1% đều cần vay tiền.", "Hoàn thành 90%! Bạn đã đi quá xa để bỏ cuộc và quá nghèo để ăn mừng."],
+      "t10CompleteMessage": "Chà, bạn đúng là khác biệt thật.",
+      "t10ProgressSummary": "Đang tiến hành ({{percent}}%)"
     },
     "statistics": {
       "continue": "Tiếp tục đến phần nguyện vọng",
@@ -326,7 +337,7 @@
       "playerHint": "Tên nhân vật như hiển thị trong trò chơi",
       "playerPlaceholder": "ví dụ: GOD Sankeyyy",
       "powerRecord": "Sức mạnh được ghi nhận",
-      "powerHint": "T? ??ng t?nh to?n",
+      "powerHint": "Tự động tính toán",
       "currentPower": "Sức mạnh hiện tại",
       "killsOptional": "Số mạng hạ",
       "killsHint": "Từ biểu tượng đầu lâu trên thẻ hồ sơ",
@@ -350,7 +361,10 @@
       "techPlaceholder": "ví dụ: 19,187,725",
       "troopPlaceholder": "ví dụ: 66,198,020",
       "heroPlaceholder": "ví dụ: 62,634,222",
-      "vehiclePlaceholder": "ví dụ: 9,436,786"
+      "vehiclePlaceholder": "ví dụ: 9,436,786",
+      "clearForm": "Bắt đầu lại",
+      "clearFormTitle": "Xóa tất cả dữ liệu biểu mẫu?",
+      "clearFormConfirmation": "Thao tác này sẽ xóa tất cả giá trị được nhập trong mỗi bước ứng dụng. Không thể hoàn tác hành động này."
     },
     "groupUpload": {
       "invalidType": "Vui lòng chọn ảnh PNG hoặc JPG/JPEG.",
@@ -506,7 +520,17 @@
       "destinations": "Chọn \"Bất kỳ liên minh nào\" hoặc ít nhất một điểm đến.",
       "reason": "Vui lòng viết ít nhất 10 ký tự giải thích lý do bạn muốn di cư.",
       "reasonMax": "Lý do không được vượt quá 1.000 ký tự.",
-      "commentsMax": "Bình luận bổ sung không được vượt quá 1.000 ký tự."
+      "commentsMax": "Bình luận bổ sung không được vượt quá 1.000 ký tự.",
+      "t10Research": "Chọn xem nghiên cứu T10 đã hoàn tất hay chưa.",
+      "t10ResearchPercent": "Nhập phần trăm hoàn thành số nguyên từ 0 đến 99."
+    },
+    "groupT10": {
+      "label": "Nghiên cứu T10",
+      "complete": "Hoàn thành",
+      "incomplete": "Đang tiến hành",
+      "percent": "Hoàn thành nghiên cứu (0-99%)",
+      "autoComplete": "Được đánh dấu tự động là hoàn thành vì Tech Power trên 25 triệu.",
+      "resolveMember": "Thêm trạng thái và tiến trình nghiên cứu T10 cho {{name}} trước khi tiếp tục."
     }
   },
   "components": {
@@ -950,7 +974,7 @@
       "lofiTracks": "Các bản lo-fi phát lần lượt.",
       "musicUnavailable": "Không có nhạc — chưa cấu hình bản nhạc nào.",
       "soundEffects": "Hiệu ứng âm thanh", "littleThings": "Những chi tiết nhỏ",
-      "effectsVolume": "Âm lượng hiệu ứng", "soundEffectFootnote": "Vật phẩm, sát thương và tín hiệu chiến đấu."
+      "effectsVolume": "Âm lượng hiệu ứng", "soundEffectFootnote": "Vật phẩm, sát thương và tín hiệu chiến đấu.", "touchControlsTitle": "Điều khiển cảm ứng", "controlLayout": "Bố trí điều khiển", "controlLayoutHint": "Chọn tay nào điều khiển chuyển động.", "rightHanded": "Thuận tay phải", "leftHanded": "thuận tay trái", "joystickAppearance": "Sự xuất hiện của cần điều khiển", "joystickAppearanceHint": "Tùy chỉnh cả hai thanh nổi.", "baseOpacity": "Độ mờ cơ bản và ánh sáng", "thumbOpacity": "Độ mờ của ngón tay cái", "joystickSize": "Kích thước cần điều khiển", "small": "nhỏ", "medium": "Trung bình", "large": "lớn", "joystickPreview": "Xem trước trực tiếp chuyển động và gậy ngắm", "joystickBehaviour": "Hành vi cần điều khiển", "joystickBehaviourHint": "Chọn cách thanh chuyển động xuất hiện.", "fixed": "Đã sửa", "floating": "Nổi", "joystickPosition": "Vị trí", "edgePosition": "Cạnh ({{side}})", "innerPosition": "Bên trong ({{side}})", "middlePositionMiddle": "giữa", "leftSide": "trái", "rightSide": "đúng"
     },
     "hud": {
       "runStatus": "Trạng thái trận", "wave": "ĐỢT", "waveProgress": "Tiến độ đợt",
@@ -999,7 +1023,7 @@
       "refund": "Hoàn điểm {{name}}", "purchase": "Nâng cấp {{name}}",
       "runUnavailable": "Trận chơi không khả dụng", "nextChapter": "Chương tiếp theo đang chờ bạn.",
       "resumeWhenReady": "Tiếp tục khi bạn sẵn sàng.",
-      "resume": "Tiếp tục", "backToGame": "Quay lại trò chơi", "guides": "Cẩm nang"
+      "resume": "Tiếp tục", "backToGame": "Quay lại trò chơi", "guides": "Cẩm nang", "firingRange": "Tầm bắn", "firingRangeDescription": "Khoảng cách tối đa mà đạn của bạn di chuyển.", "rangeUnit": "đơn vị"
     },
     "effects": {
       "active": "Hiệu ứng đang có", "damage": "Sát thương", "rapidFire": "Bắn nhanh",
@@ -1177,7 +1201,9 @@
       "campaignProgressSaveFailed": "Không lưu được tiến trình chiến dịch: {{error}}",
       "campaignProgressSaveFailedSimple": "Không lưu được tiến trình chiến dịch.",
       "campaignPointsSaveFailed": "Không lưu được điểm chỉ số chiến dịch: {{error}}",
-      "campaignPointsSaveFailedSimple": "Không lưu được điểm chỉ số chiến dịch."
+      "campaignPointsSaveFailedSimple": "Không lưu được điểm chỉ số chiến dịch.",
+      "fullscreenHoldEscape": "Giữ Esc để thoát toàn màn hình.",
+      "fullscreenPauseShortcut": "Nhấn {{key}} để tạm dừng trò chơi ở chế độ toàn màn hình."
     },
     "canvas": {
       "ariaLabel": "565 Zombie Sinh tồn. Di chuyển bằng phím đã cài đặt hoặc điều khiển cảm ứng. Ngắm bằng chuột hoặc cần ngắm. Vũ khí tự bắn theo hướng đã chọn. Nhặt bom rồi nhấn phím bom hoặc nút cảm ứng để dùng. Nhặt tối đa 5 ụ súng, sau đó nhấp chuột phải hoặc chạm đúp vào chỗ trống trong đấu trường để đặt.",
@@ -1373,6 +1399,10 @@
       "moving-wall": { "name": "Tường di chuyển", "description": "Các tấm chắn công nghiệp dịch chuyển, buộc bạn đổi đường đi." },
       "steam-pipe": { "name": "Ống hơi nước", "description": "Ống thông hơi phát tín hiệu rồi phụt ra luồng hơi nóng." },
       "industrial-crate": { "name": "Thùng công nghiệp", "description": "Thùng chứa gia cố bằng kim loại bền, có thể rơi vật phẩm." }
+    },
+    "fullscreenButton": {
+      "enter": "Nhập toàn màn hình",
+      "exit": "Thoát toàn màn hình"
     }
   },
   "ui": {

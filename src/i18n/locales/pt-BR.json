@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "Confira o OCR rapidamente",
+      "title": "Revisão da captura de tela",
       "message": "🤖 Nosso pequeno ajudante é muito bom, mas às vezes pode se confundir com nomes e eliminações! Confira esses dois itens rapidinho. Todo o resto deve estar certinho!",
       "dismiss": "Entendi"
     },
@@ -257,7 +257,18 @@
       "formation": "Poder da formação F{{number}} na Arena",
       "f1Placeholder": "ex.: 180,500,000",
       "f2Placeholder": "ex.: 99,183,574",
-      "f3Placeholder": "ex.: 22,349,680"
+      "f3Placeholder": "ex.: 22,349,680",
+      "t10Title": "Pesquisa T10",
+      "t10Question": "Você concluiu a pesquisa T10?",
+      "t10Yes": "Sim, completo",
+      "t10No": "Ainda não",
+      "t10Hint": "Se a pesquisa ainda estiver em andamento, informe-nos sua porcentagem de conclusão atual.",
+      "t10AutoComplete": "Marcado como concluído automaticamente porque seu Tech Power está acima de 25M.",
+      "t10Percent": "Conclusão da pesquisa T10",
+      "t10PercentPlaceholder": "Digite 0–99",
+      "t10PercentMilestones": ["Boas-vindas à pesquisa T10! Seus emblemas ainda estão otimistas.", "Os custos parecem acessíveis. Aproveite enquanto essa sensação durar.", "Você está avançando! Sua coleção de emblemas já percebeu.", "Você está chegando lá. O laboratório ainda não mostrou a conta de verdade.", "Quase na metade! Seus emblemas estão prestes a entrar em modo de sobrevivência.", "Metade da pesquisa concluída, mas não metade dos gastos com emblemas.", "60% concluído. A pesquisa está ficando séria. A falta de emblemas também.", "Parabéns! Você concluiu 70% da pesquisa e desbloqueou os outros 70% do custo!", "Boas-vindas ao bairro caro. Agora cada 1% precisa de um empréstimo.", "90% concluído! Você chegou longe demais para desistir e está pobre demais para comemorar."],
+      "t10CompleteMessage": "Caramba, você é de outro nível.",
+      "t10ProgressSummary": "Em andamento ({{percent}}%)"
     },
     "statistics": {
       "continue": "Continuar para as preferências",
@@ -350,7 +361,10 @@
       "techPlaceholder": "ex.: 19,187,725",
       "troopPlaceholder": "ex.: 66,198,020",
       "heroPlaceholder": "ex.: 62,634,222",
-      "vehiclePlaceholder": "ex.: 9,436,786"
+      "vehiclePlaceholder": "ex.: 9,436,786",
+      "clearForm": "Recomeçar",
+      "clearFormTitle": "Limpar todos os dados do formulário?",
+      "clearFormConfirmation": "Isso removerá todos os valores inseridos em cada etapa do aplicativo. Esta ação não pode ser desfeita."
     },
     "groupUpload": {
       "invalidType": "Envie uma imagem PNG ou JPG/JPEG.",
@@ -506,7 +520,17 @@
       "destinations": "Escolha “Qualquer aliança” ou selecione pelo menos um destino.",
       "reason": "Escreva pelo menos 10 caracteres explicando por que você quer migrar.",
       "reasonMax": "Limite o motivo a 1.000 caracteres.",
-      "commentsMax": "Limite os comentários adicionais a 1.000 caracteres."
+      "commentsMax": "Limite os comentários adicionais a 1.000 caracteres.",
+      "t10Research": "Selecione se a pesquisa T10 foi concluída.",
+      "t10ResearchPercent": "Insira uma porcentagem de conclusão de número inteiro de 0 a 99."
+    },
+    "groupT10": {
+      "label": "Pesquisa T10",
+      "complete": "Completo",
+      "incomplete": "Em andamento",
+      "percent": "Conclusão da pesquisa (0-99%)",
+      "autoComplete": "Marcado como concluído automaticamente porque Tech Power está acima de 25M.",
+      "resolveMember": "Adicione o status de pesquisa T10 e o progresso para {{name}} antes de continuar."
     }
   },
   "components": {
@@ -950,7 +974,7 @@
       "lofiTracks": "As faixas lo-fi tocam em sequência.",
       "musicUnavailable": "Música indisponível — nenhuma faixa configurada.",
       "soundEffects": "Efeitos sonoros", "littleThings": "Pequenos detalhes que importam",
-      "effectsVolume": "Volume dos efeitos", "soundEffectFootnote": "Sons de itens coletados, dano e combate."
+      "effectsVolume": "Volume dos efeitos", "soundEffectFootnote": "Sons de itens coletados, dano e combate.", "touchControlsTitle": "Controles de toque", "controlLayout": "Layout de controle", "controlLayoutHint": "Escolha qual mão controla o movimento.", "rightHanded": "Destro", "leftHanded": "Canhoto", "joystickAppearance": "Aparência do joystick", "joystickAppearanceHint": "Personalize os dois bastões flutuantes.", "baseOpacity": "Opacidade de base e brilho", "thumbOpacity": "Opacidade do polegar", "joystickSize": "Tamanho do joystick", "small": "Pequeno", "medium": "Médio", "large": "Grande", "joystickPreview": "Visualização ao vivo de movimento e mira", "joystickBehaviour": "Comportamento do joystick", "joystickBehaviourHint": "Escolha como o stick de movimento aparece.", "fixed": "Corrigido", "floating": "Flutuante", "joystickPosition": "Posição", "edgePosition": "Borda ({{side}})", "innerPosition": "Interno ({{side}})", "middlePositionMiddle": "Meio", "leftSide": "esquerda", "rightSide": "certo"
     },
     "hud": {
       "runStatus": "Status da partida", "wave": "ONDA", "waveProgress": "Progresso da onda",
@@ -999,7 +1023,7 @@
       "refund": "Devolver {{name}}", "purchase": "Comprar {{name}}",
       "runUnavailable": "Partida indisponível", "nextChapter": "Seu próximo capítulo está à espera.",
       "resumeWhenReady": "Continue quando estiver pronto para voltar.",
-      "resume": "Continuar", "backToGame": "Voltar ao jogo", "guides": "Guias"
+      "resume": "Continuar", "backToGame": "Voltar ao jogo", "guides": "Guias", "firingRange": "Campo de tiro", "firingRangeDescription": "Distância máxima que seus projéteis percorrem.", "rangeUnit": "unidades"
     },
     "effects": {
       "active": "Efeitos ativos", "damage": "Dano", "rapidFire": "Tiro rápido",
@@ -1176,7 +1200,9 @@
       "campaignProgressSaveFailed": "Não foi possível salvar o progresso da campanha: {{error}}",
       "campaignProgressSaveFailedSimple": "Não foi possível salvar o progresso da campanha.",
       "campaignPointsSaveFailed": "Não foi possível salvar os pontos de atributo da campanha: {{error}}",
-      "campaignPointsSaveFailedSimple": "Não foi possível salvar os pontos de atributo da campanha."
+      "campaignPointsSaveFailedSimple": "Não foi possível salvar os pontos de atributo da campanha.",
+      "fullscreenHoldEscape": "Segure Esc para sair da tela cheia.",
+      "fullscreenPauseShortcut": "Pressione {{key}} para pausar o jogo no modo de tela cheia."
     },
     "canvas": {
       "ariaLabel": "565 Zombie Survival. Use as teclas de movimento configuradas ou os controles por toque para se mover. Mire com o mouse ou o controle analógico de mira. A arma dispara automaticamente na direção escolhida. Colete bombas e pressione a tecla configurada ou o botão de toque para usá-las. Colete até cinco torres e clique com o botão direito ou toque duas vezes em um espaço livre da arena para posicioná-las.",
@@ -1372,6 +1398,10 @@
       "moving-wall": { "name": "Parede móvel", "description": "Painéis industriais móveis que obrigam você a mudar de caminho." },
       "steam-pipe": { "name": "Tubo de vapor", "description": "Dutos que alertam antes de liberar jatos de vapor quente." },
       "industrial-crate": { "name": "Caixa industrial", "description": "Contêineres reforçados com placas metálicas resistentes que podem conter itens." }
+    },
+    "fullscreenButton": {
+      "enter": "Entrar em tela cheia",
+      "exit": "Sair da tela cheia"
     }
   },
   "ui": {

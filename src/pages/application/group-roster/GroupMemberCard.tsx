@@ -22,6 +22,7 @@ export function GroupMemberCard({ member, index, draft, thresholds, onEdit, onRe
   const mHero = parseMagnitude(member.heroPower) || 0;
   const mVeh = parseMagnitude(member.modVehiclePower) || 0;
   const mScore = calculateMigrationScoreFromRaw(mStruct, mTech, mHero, mVeh, thresholds);
+  const t10Complete = mTech >= 25_000_000 || member.t10ResearchComplete === true;
 
   return (
     <div className="group-member-card" data-testid={`group-member-item-${index}`}>
@@ -104,6 +105,14 @@ export function GroupMemberCard({ member, index, draft, thresholds, onEdit, onRe
         <span>
           {t('wizard.roster.vehicleShort')} <strong>{member.modVehiclePower}</strong>
         </span>
+      </div>
+      <div style={{ marginTop: 6, color: '#94a3b8', fontSize: 11 }}>
+        {t('wizard.combat.t10Title')}:{' '}
+        {t10Complete
+          ? t('wizard.combat.t10Yes')
+          : member.t10ResearchComplete === false && member.t10ResearchPercent
+            ? t('wizard.combat.t10ProgressSummary', { percent: member.t10ResearchPercent })
+            : t('wizard.review.notProvided')}
       </div>
     </div>
   );

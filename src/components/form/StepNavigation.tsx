@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, LoaderCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, LoaderCircle, Sparkles, Trash2 } from 'lucide-react';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +6,9 @@ export interface StepNavigationProps {
   onContinue?: () => void;
   onBack?: () => void;
   onSkip?: () => void;
+  onClear?: () => void;
   continueLabel?: string;
+  clearLabel?: string;
   backLabel?: string;
   skipLabel?: string;
   showSkip?: boolean;
@@ -21,7 +23,9 @@ export function StepNavigation({
   onContinue,
   onBack,
   onSkip,
+  onClear,
   continueLabel,
+  clearLabel,
   backLabel,
   skipLabel,
   showSkip = false,
@@ -50,7 +54,17 @@ export function StepNavigation({
       data-testid={compact ? 'wizard-navigation-top' : 'wizard-navigation'}
     >
       <div className="wizard-nav-left">
-        {!isFirstStep && (
+        {onClear ? (
+          <button
+            type="button"
+            className="button button-danger"
+            onClick={onClear}
+            disabled={submitting}
+            data-testid={compact ? 'wizard-clear-btn-top' : 'wizard-clear-btn'}
+          >
+            <Trash2 size={15} /> {clearLabel}
+          </button>
+        ) : !isFirstStep ? (
           <button
             type="button"
             className="button button-quiet"
@@ -60,7 +74,7 @@ export function StepNavigation({
           >
             <ArrowLeft size={15} /> {translatedBackLabel}
           </button>
-        )}
+        ) : null}
       </div>
 
       <div className="wizard-nav-right">

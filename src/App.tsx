@@ -4,9 +4,11 @@ import { LeadershipLogin } from './pages/LeadershipLogin';
 import { LeadershipDashboard } from './pages/LeadershipDashboard';
 import { LeadershipSettings } from './pages/LeadershipSettings';
 import { ApplicationWizard } from './pages/application/ApplicationWizard';
+import { SubmittedApplicationPage } from './pages/application/SubmittedApplicationPage';
 import { ApplicationTracker } from './pages/ApplicationTracker';
 import { About565 } from './pages/About565';
 import { GamePage } from './pages/game/GamePage';
+import { WelcomePage } from './pages/WelcomePage';
 import { NotFound } from './pages/NotFound';
 import { ReturningUserModal } from './components/ReturningUserModal';
 import { Toaster } from './components/ui/sonner';
@@ -35,6 +37,7 @@ function App() {
         <Route path="/track" component={ApplicationTracker} />
         <Route path="/status/:id" component={ApplicationTracker} />
         <Route path="/status" component={ApplicationTracker} />
+        <Route path="/application-submitted/:id" component={SubmittedApplicationPage} />
 
         {/* Leadership access routes */}
         <Route path="/leadership" component={LeadershipLogin} />
@@ -48,7 +51,8 @@ function App() {
         <Route path="/admin" component={LeadershipLogin} />
 
         {/* Multi-step Application Wizard routes */}
-        <Route path="/" component={ApplicationWizard} />
+        <Route path="/" component={WelcomePage} />
+        <Route path="/apply" component={ApplicationWizard} />
         <Route path="/apply/:step*" component={ApplicationWizard} />
 
         {/* 404 fallback */}

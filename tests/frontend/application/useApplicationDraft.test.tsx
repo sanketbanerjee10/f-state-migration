@@ -114,8 +114,9 @@ function makeApplication(players: ApplicationPlayer[] = [makePlayer()]): AdminAp
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-02T00:00:00.000Z',
     migrationReason: 'Seeking a new home',
-    characterReference: null,
     additionalComments: 'Please contact me',
+    t10ResearchComplete: false,
+    t10ResearchPercent: 60,
     players,
   };
 }
@@ -133,6 +134,8 @@ function makeGroupMember(id: string, playerName: string): GroupMember {
     modVehiclePower: '20',
     kills: '5',
     currentAlliance: 'OLD',
+    t10ResearchComplete: null,
+    t10ResearchPercent: '',
     isScreenshotVerified: false,
   };
 }
@@ -328,6 +331,8 @@ describe('ApplicationDraftProvider lifecycle', () => {
     expect(context().draft.migrationType).toBe('Group');
     expect(context().draft.editingReference).toBe('565-APP123456789');
     expect(context().draft.highestPowerOnRecord).toBe('15,000,000');
+    expect(context().draft.t10ResearchComplete).toBe(false);
+    expect(context().draft.t10ResearchPercent).toBe('60');
     expect(context().draft.groupMembers).toMatchObject([
       {
         id: 'player-group-1',
@@ -337,6 +342,47 @@ describe('ApplicationDraftProvider lifecycle', () => {
         currentAlliance: 'GROUP',
       },
     ]);
+  });
+
+  it('requires an answer and a valid progress percentage for incomplete T10 research', async () => {
+    await mountProvider();
+    await act(async () => {
+      context().setDraftField('currentState', '565');
+      context().setDraftField('currentAlliance', 'OLD');
+      context().setDraftField('f1', '1M');
+      context().setDraftField('f2', '1M');
+      context().setDraftField('f3', '1M');
+    });
+
+    expect(context().validateStep('combat').t10ResearchComplete).toBe(
+      'wizard.validation.t10Research',
+    );
+
+    await act(async () => {
+      context().setDraftField('t10ResearchComplete', false);
+      context().setDraftField('t10ResearchPercent', '100');
+    });
+    expect(context().validateStep('combat').t10ResearchPercent).toBe(
+      'wizard.validation.t10ResearchPercent',
+    );
+
+    await act(async () => context().setDraftField('t10ResearchPercent', '0'));
+    expect(context().validateStep('combat').t10ResearchPercent).toBeUndefined();
+  });
+
+  it('automatically treats T10 research as complete at 25M Tech Power', async () => {
+    await mountProvider();
+    await act(async () => {
+      context().setDraftField('techPower', '25,000,000');
+      context().setDraftField('currentState', '565');
+      context().setDraftField('currentAlliance', 'OLD');
+      context().setDraftField('f1', '1M');
+      context().setDraftField('f2', '1M');
+      context().setDraftField('f3', '1M');
+    });
+
+    expect(context().validateStep('combat').t10ResearchComplete).toBeUndefined();
+    expect(context().validateStep('combat').t10ResearchPercent).toBeUndefined();
   });
 
   it('DRAFT-10 clears edit data, selected files, and the edit query when editing is cancelled', async () => {
@@ -356,9 +402,8 @@ describe('ApplicationDraftProvider lifecycle', () => {
     expect(context().screenshotFile).toBeNull();
     expect(window.location.pathname).toBe('/apply');
     expect(window.location.search).toBe('');
-    expect(JSON.parse(sessionStorage.getItem('state565_application_draft_v4') || '{}')).toEqual(
-      initialDraft,
-    );
+    expect(localStorage.getItem('state565_application_draft_v4')).toBeNull();
+    expect(sessionStorage.getItem('state565_application_draft_v4')).toBeNull();
   });
 
   it('DRAFT-11 exposes deleted-record state when the edit lookup returns 404', async () => {
@@ -386,5 +431,51 @@ describe('ApplicationDraftProvider lifecycle', () => {
     expect(context().draft).toEqual({ ...initialDraft, migrationType: 'Group' });
     expect(context().screenshotFile).toBeNull();
     expect(context().groupScreenshotFile).toBeNull();
+    expect(localStorage.getItem('state565_application_draft_v4')).toBeNull();
+  });
+
+  it('DRAFT-13 saves the complete draft in local storage and restores it', async () => {
+    await mountProvider();
+
+    await act(async () => {
+      context().setDraftField('playerName', 'Saved Player');
+      context().setDraftField('currentState', '565');
+      context().setDraftField('preferredAlliances', ['alliance-1']);
+      context().setDraftField('t10ResearchComplete', false);
+      context().addGroupMember(makeGroupMember('member-1', 'Group Player'));
+    });
+
+    const savedDraft = JSON.parse(localStorage.getItem('state565_application_draft_v4') || '{}');
+    expect(savedDraft).toMatchObject({
+      playerName: 'Saved Player',
+      currentState: '565',
+      preferredAlliances: ['alliance-1'],
+      t10ResearchComplete: false,
+      groupMembers: [{ id: 'member-1', playerName: 'Group Player' }],
+    });
+
+    await act(async () => root?.unmount());
+    root = null;
+    await mountProvider();
+
+    expect(context().draft).toMatchObject({
+      playerName: 'Saved Player',
+      currentState: '565',
+      highestPowerOnRecord: '',
+      preferredAlliances: ['alliance-1'],
+      t10ResearchComplete: false,
+      groupMembers: [{ id: 'member-1', playerName: 'Group Player' }],
+    });
+  });
+
+  it('DRAFT-14 saves the first edit made after clearing an empty draft', async () => {
+    await mountProvider();
+
+    await act(async () => context().clearDraft());
+    await act(async () => context().setDraftField('playerName', 'New Player'));
+
+    expect(
+      JSON.parse(localStorage.getItem('state565_application_draft_v4') || '{}').playerName,
+    ).toBe('New Player');
   });
 });

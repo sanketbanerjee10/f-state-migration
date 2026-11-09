@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { BASE_STEPS, GROUP_ROSTER_STEP, REVIEW_STEP } from '@/hooks/useWizardNavigation';
-import { initialDraft } from '@/hooks/useApplicationDraft';
+import {
+  BASE_STEPS,
+  findFirstInvalidStep,
+  GROUP_ROSTER_STEP,
+  REVIEW_STEP,
+} from '@/hooks/useWizardNavigation';
+import { hasApplicationDraftData, initialDraft } from '@/hooks/useApplicationDraft';
 import { parseMagnitude, parseStateNumber } from '@/lib/parsers';
 
 describe('Wizard navigation step configuration', () => {
@@ -25,9 +30,38 @@ describe('Wizard navigation step configuration', () => {
     expect(REVIEW_STEP.key).toBe('review');
     expect(REVIEW_STEP.titleKey).toBe('wizard.navigation.review');
   });
+
+  it('finds the earliest invalid prerequisite when a later step is requested', () => {
+    const result = findFirstInvalidStep(BASE_STEPS, 2, (stepKey) =>
+      stepKey === 'combat' ? { currentState: 'wizard.validation.state' } : {},
+    );
+
+    expect(result).toEqual({
+      index: 1,
+      errors: { currentState: 'wizard.validation.state' },
+    });
+  });
+
+  it('does not validate the requested step itself', () => {
+    const validatedSteps: string[] = [];
+    const validateStep = (stepKey: string) => {
+      validatedSteps.push(stepKey);
+      return {};
+    };
+
+    expect(findFirstInvalidStep(BASE_STEPS, 1, validateStep)).toBeNull();
+    expect(validatedSteps).toEqual(['character']);
+  });
 });
 
 describe('Wizard draft validation rules', () => {
+  it('shows draft data only when there is user-entered or uploaded data to clear', () => {
+    expect(hasApplicationDraftData(initialDraft)).toBe(false);
+    expect(hasApplicationDraftData({ ...initialDraft, playerName: 'Player' })).toBe(true);
+    expect(hasApplicationDraftData(initialDraft, true)).toBe(true);
+    expect(hasApplicationDraftData({ ...initialDraft, migrationType: 'Group' })).toBe(true);
+  });
+
   it('validates state numbers between 1 and 9999', () => {
     expect(parseStateNumber('565')).toBe(565);
     expect(parseStateNumber('1')).toBe(1);

@@ -6,6 +6,7 @@ import { isApplicationDeletedError, useApplicationDetails } from '../lib/applica
 
 const DRAFT_STORAGE_KEY = 'state565_application_draft_v4';
 const OCR_ACCURACY_NOTICE_STORAGE_KEY = 'state565_ocr_accuracy_notice_shown';
+export const T10_RESEARCH_AUTO_COMPLETE_TECH_POWER = 25_000_000;
 
 function calculatePowerOnRecord(
   powers: Pick<ApplicationDraft, 'structurePower' | 'techPower' | 'troopPower' | 'heroPower' | 'modVehiclePower'>,
@@ -40,6 +41,8 @@ export interface ApplicationDraft {
   f1: string;
   f2: string;
   f3: string;
+  t10ResearchComplete: boolean | null;
+  t10ResearchPercent: string;
 
   // Step 3: Migration Details
   preferredAlliances: string[];
@@ -80,6 +83,8 @@ export const initialDraft: ApplicationDraft = {
   f1: '',
   f2: '',
   f3: '',
+  t10ResearchComplete: null,
+  t10ResearchPercent: '',
 
   preferredAlliances: [],
   tier: '',
@@ -97,6 +102,42 @@ export const initialDraft: ApplicationDraft = {
 
   dirtyFields: {},
 };
+
+export function hasApplicationDraftData(
+  draft: ApplicationDraft,
+  hasScreenshotFile = false,
+  hasGroupScreenshotFile = false,
+): boolean {
+  return Boolean(
+    draft.playerName.trim() ||
+      draft.structurePower.trim() ||
+      draft.techPower.trim() ||
+      draft.troopPower.trim() ||
+      draft.heroPower.trim() ||
+      draft.modVehiclePower.trim() ||
+      draft.kills.trim() ||
+      draft.hasScreenshot ||
+      draft.screenshotFileName ||
+      hasScreenshotFile ||
+      draft.currentState.trim() ||
+      draft.currentAlliance.trim() ||
+      draft.f1.trim() ||
+      draft.f2.trim() ||
+      draft.f3.trim() ||
+      draft.t10ResearchComplete !== null ||
+      draft.t10ResearchPercent.trim() ||
+      draft.preferredAlliances.length > 0 ||
+      draft.migrationType !== initialDraft.migrationType ||
+      draft.representative.trim() ||
+      draft.reason.trim() ||
+      draft.comments.trim() ||
+      draft.groupMembers.length > 0 ||
+      draft.hasGroupScreenshot ||
+      draft.groupScreenshotFileName ||
+      hasGroupScreenshotFile ||
+      draft.editingApplicationId
+  );
+}
 
 export type StepErrors = Record<string, string>;
 
@@ -131,18 +172,31 @@ const ApplicationDraftContext = createContext<ApplicationDraftContextValue | nul
 
 function loadStoredDraft(): ApplicationDraft {
   try {
-    const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY) || localStorage.getItem(DRAFT_STORAGE_KEY);
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY) || sessionStorage.getItem(DRAFT_STORAGE_KEY);
     if (!raw) return initialDraft;
     const parsed = JSON.parse(raw);
     const draft = {
       ...initialDraft,
       ...parsed,
-      groupMembers: parsed.groupMembers || [],
+      groupMembers: (parsed.groupMembers || []).map((member: GroupMember) => ({
+        ...member,
+        t10ResearchComplete: member.t10ResearchComplete ?? null,
+        t10ResearchPercent: member.t10ResearchPercent ?? '',
+      })),
       dirtyFields: parsed.dirtyFields || {},
     };
+    const hasPowerBreakdown = [
+      draft.structurePower,
+      draft.techPower,
+      draft.troopPower,
+      draft.heroPower,
+      draft.modVehiclePower,
+    ].some((power) => parseMagnitude(power) !== null);
     return {
       ...draft,
-      highestPowerOnRecord: calculatePowerOnRecord(draft),
+      highestPowerOnRecord: hasPowerBreakdown
+        ? calculatePowerOnRecord(draft)
+        : draft.highestPowerOnRecord,
     };
   } catch {
     return initialDraft;
@@ -152,14 +206,15 @@ function loadStoredDraft(): ApplicationDraft {
 function saveStoredDraft(draft: ApplicationDraft) {
   try {
     const serialized = JSON.stringify(draft);
-    sessionStorage.setItem(DRAFT_STORAGE_KEY, serialized);
-  } catch {
-    // Ignore storage quota errors
+    localStorage.setItem(DRAFT_STORAGE_KEY, serialized);
+  } catch (error) {
+    console.error('Unable to save the application draft in local storage.', error);
   }
 }
 
 export function ApplicationDraftProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState<ApplicationDraft>(loadStoredDraft);
+  const skipNextDraftSave = useRef(false);
   const [screenshotFile, setScreenshotFileState] = useState<File | null>(null);
   const [groupScreenshotFile, setGroupScreenshotFileState] = useState<File | null>(null);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
@@ -257,6 +312,14 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
           f1: String(data.f1ArenaPower || ''),
           f2: String(data.f2ArenaPower || ''),
           f3: String(data.f3ArenaPower || ''),
+          t10ResearchComplete:
+            data.t10ResearchComplete && data.t10ResearchPercent == null
+              ? true
+              : data.t10ResearchPercent == null
+                ? null
+                : false,
+          t10ResearchPercent:
+            data.t10ResearchPercent == null ? '' : String(data.t10ResearchPercent),
 
           preferredAlliances: data.anyAlliance
             ? ['any']
@@ -282,6 +345,20 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
             modVehiclePower: String(gp.modVehiclePower),
             kills: String(gp.kills ?? ''),
             currentAlliance: gp.currentAlliance,
+            t10ResearchComplete:
+              (parseMagnitude(String(gp.techPower ?? '')) || 0) >= 25_000_000 ||
+              gp.t10ResearchComplete === true
+                ? true
+                : gp.t10ResearchComplete === false || gp.t10ResearchPercent != null
+                  ? false
+                  : null,
+            t10ResearchPercent:
+              (parseMagnitude(String(gp.techPower ?? '')) || 0) >= 25_000_000 ||
+              gp.t10ResearchComplete === true
+                ? ''
+                : gp.t10ResearchPercent == null
+                  ? ''
+                  : String(gp.t10ResearchPercent),
             isScreenshotVerified: Boolean(gp.isScreenshotVerified),
           })),
           hasGroupScreenshot: false,
@@ -292,6 +369,10 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
 
   // Sync draft to storage on changes
   useEffect(() => {
+    if (skipNextDraftSave.current) {
+      skipNextDraftSave.current = false;
+      return;
+    }
     saveStoredDraft(draft);
   }, [draft]);
 
@@ -469,10 +550,11 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
   };
 
   const clearDraft = (preserveMigrationType = false) => {
+    skipNextDraftSave.current = true;
     setDraft(
       preserveMigrationType
         ? { ...initialDraft, migrationType: draft.migrationType }
-        : initialDraft,
+        : { ...initialDraft },
     );
     setScreenshotFileState(null);
     setGroupScreenshotFileState(null);
@@ -521,7 +603,7 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
 
       case 'combat':
       case '/apply/combat': {
-        // Step 2: Combat Power — state, alliance, arena powers
+        // Step 2: Combat Power — state, alliance, arena powers, T10 research
         if (!parseStateNumber(draft.currentState)) {
           errors.currentState = 'wizard.validation.state';
         }
@@ -536,6 +618,18 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
         }
         if (!parseMagnitude(draft.f3)) {
           errors.f3 = 'wizard.validation.f3';
+        }
+        const autoComplete =
+          (parseMagnitude(draft.techPower) || 0) >= T10_RESEARCH_AUTO_COMPLETE_TECH_POWER;
+        if (!autoComplete && draft.t10ResearchComplete === null) {
+          errors.t10ResearchComplete = 'wizard.validation.t10Research';
+        } else if (
+          !autoComplete &&
+          draft.t10ResearchComplete === false &&
+          (!/^\d{1,2}$/.test(draft.t10ResearchPercent) ||
+            Number(draft.t10ResearchPercent) > 99)
+        ) {
+          errors.t10ResearchPercent = 'wizard.validation.t10ResearchPercent';
         }
         break;
       }

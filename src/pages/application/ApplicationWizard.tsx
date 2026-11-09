@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ApplicationDraftProvider } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 import { PowerDetailsStep } from './PowerDetailsStep';
@@ -7,7 +8,11 @@ import { GroupRosterStep } from './GroupRosterStep';
 import { ApplicationReviewStep } from './ApplicationReviewStep';
 
 function WizardContent() {
-  const { currentStep } = useWizardNavigation();
+  const { currentStep, ensureCurrentStepAccessible } = useWizardNavigation();
+
+  useEffect(() => {
+    ensureCurrentStepAccessible();
+  }, [ensureCurrentStepAccessible]);
 
   switch (currentStep.key) {
     case 'character':

@@ -3,7 +3,79 @@ import { Field } from '../../../components/Field';
 import { Modal } from '../../../components/Dialogs';
 import { CommaFormattedNumberInput } from '../../../components/form/CommaFormattedNumberInput';
 import type { ApplicationDraft } from '../../../hooks/useApplicationDraft';
+import { parseMagnitude } from '../../../lib/parsers';
 import type { GroupMember } from '../../../types/application';
+
+function T10ResearchFields({
+  idPrefix,
+  techPower,
+  complete,
+  percent,
+  onCompleteChange,
+  onPercentChange,
+  t,
+}: {
+  idPrefix: string;
+  techPower: string;
+  complete: boolean | null;
+  percent: string;
+  onCompleteChange: (value: boolean) => void;
+  onPercentChange: (value: string) => void;
+  t: TFunction;
+}) {
+  const automatic = (parseMagnitude(techPower) || 0) >= 25_000_000;
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <Field id={`${idPrefix}-t10-complete`} label={t('wizard.groupT10.label')} required>
+        <div
+          className="radio-grid"
+          role="radiogroup"
+          aria-label={t('wizard.groupT10.label')}
+          style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}
+        >
+          <label className="radio-card">
+            <input
+              type="radio"
+              name={`${idPrefix}-t10-complete`}
+              checked={automatic || complete === true}
+              disabled={automatic}
+              onChange={() => onCompleteChange(true)}
+            />
+            {t('wizard.groupT10.complete')}
+          </label>
+          <label className="radio-card">
+            <input
+              type="radio"
+              name={`${idPrefix}-t10-complete`}
+              checked={!automatic && complete === false}
+              disabled={automatic}
+              onChange={() => onCompleteChange(false)}
+            />
+            {t('wizard.groupT10.incomplete')}
+          </label>
+        </div>
+        {automatic && <div className="hint">{t('wizard.groupT10.autoComplete')}</div>}
+      </Field>
+      {!automatic && complete === false && (
+        <Field id={`${idPrefix}-t10-percent`} label={t('wizard.groupT10.percent')} required>
+          <input
+            className="control"
+            id={`${idPrefix}-t10-percent`}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={2}
+            value={percent}
+            onChange={(event) => {
+              if (/^\d{0,2}$/.test(event.target.value)) onPercentChange(event.target.value);
+            }}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
 
 export type EditMemberModalProps = {
   member: GroupMember;
@@ -15,6 +87,8 @@ export type EditMemberModalProps = {
     f3Power: string;
     kills: string;
     alliance: string;
+    t10ResearchComplete: boolean | null;
+    t10ResearchPercent: string;
   };
   error: string;
   scrollKey: number;
@@ -28,6 +102,8 @@ export type EditMemberModalProps = {
     f3Power: (value: string) => void;
     kills: (value: string) => void;
     alliance: (value: string) => void;
+    t10ResearchComplete: (value: boolean) => void;
+    t10ResearchPercent: (value: string) => void;
   };
   t: TFunction;
 };
@@ -47,6 +123,8 @@ export type ManualMemberModalProps = {
     kills: string;
     alliance: string;
     highestPower: string;
+    t10ResearchComplete: boolean | null;
+    t10ResearchPercent: string;
   };
   error: string;
   scrollKey: number;
@@ -66,6 +144,8 @@ export type ManualMemberModalProps = {
     modVehiclePower: (value: string) => void;
     kills: (value: string) => void;
     alliance: (value: string) => void;
+    t10ResearchComplete: (value: boolean) => void;
+    t10ResearchPercent: (value: string) => void;
   };
   draft: ApplicationDraft;
   t: TFunction;
@@ -172,6 +252,16 @@ export function EditMemberModal({ member, values, error, scrollKey, onClose, onS
           </div>
         </div>
       </div>
+
+      <T10ResearchFields
+        idPrefix="edit-member"
+        techPower={member.techPower}
+        complete={values.t10ResearchComplete}
+        percent={values.t10ResearchPercent}
+        onCompleteChange={onFieldChange.t10ResearchComplete}
+        onPercentChange={onFieldChange.t10ResearchPercent}
+        t={t}
+      />
 
       <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
         <Field id="edit-player-f1" label={t('wizard.roster.arenaPowerOptional', { label: 'F1' })}>
@@ -300,6 +390,16 @@ export function ManualMemberModal({ draft, values, error, scrollKey, editingMemb
           />
         </Field>
       </div>
+
+      <T10ResearchFields
+        idPrefix="manual-member"
+        techPower={values.techPower}
+        complete={values.t10ResearchComplete}
+        percent={values.t10ResearchPercent}
+        onCompleteChange={onFieldChange.t10ResearchComplete}
+        onPercentChange={onFieldChange.t10ResearchPercent}
+        t={t}
+      />
 
       <div className="row-3" style={{ marginTop: 12, gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}>
         <Field id="manual-struct" label={t('wizard.roster.structureLabel')} required>

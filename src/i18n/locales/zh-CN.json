@@ -188,7 +188,7 @@
   },
   "wizard": {
     "ocrNotice": {
-      "title": "快速检查 OCR 识别结果",
+      "title": "检查截图",
       "message": "🤖 我们的小助手很能干，但有时也会把名字和击杀数弄错！请快速检查这两项，其他内容应该都准确无误！",
       "dismiss": "知道了"
     },
@@ -257,7 +257,18 @@
       "formation": "F{{number}} 阵型竞技场战力",
       "f1Placeholder": "例如 180,500,000",
       "f2Placeholder": "例如 99,183,574",
-      "f3Placeholder": "例如 22,349,680"
+      "f3Placeholder": "例如 22,349,680",
+      "t10Title": "T10研究",
+      "t10Question": "您完成 T10 研究了吗？",
+      "t10Yes": "是，已完成",
+      "t10No": "还没有",
+      "t10Hint": "如果研究仍在进行中，请告诉我们您当前的完成百分比。",
+      "t10AutoComplete": "由于您的科技力量高于 25M，因此自动标记为完成。",
+      "t10Percent": "T10研究完成",
+      "t10PercentPlaceholder": "输入 0–99",
+      "t10PercentMilestones": ["欢迎开启T10研究！你的勋章收藏还很乐观。", "费用看起来还负担得起。趁这种感觉还在，好好享受吧。", "你正在取得进展！勋章收藏都注意到了。", "你开始有进展了。实验室还没给你看真正的账单呢。", "快要过半了！你的勋章即将进入生存模式。", "研究已完成一半，但勋章花费可还没到一半。", "已完成60%。研究开始认真起来了，勋章短缺也是。", "恭喜！你已完成70%的研究，还解锁了剩余70%的费用！", "欢迎来到昂贵社区。现在每推进1%都得贷款。", "已完成90%！你已经投入太多，放弃不甘心，庆祝又没钱。"],
+      "t10CompleteMessage": "哎呀，你可真不一般。",
+      "t10ProgressSummary": "进行中 ({{percent}}%)"
     },
     "statistics": {
       "continue": "继续填写偏好",
@@ -326,7 +337,7 @@
       "playerHint": "游戏中显示的角色名称",
       "playerPlaceholder": "例如 GOD Sankeyyy",
       "powerRecord": "记录战力",
-      "powerHint": "????",
+      "powerHint": "自动计算",
       "currentPower": "当前战力",
       "killsOptional": "击杀数",
       "killsHint": "取自个人资料卡上的骷髅图标数据",
@@ -350,7 +361,10 @@
       "techPlaceholder": "例如 19,187,725",
       "troopPlaceholder": "例如 66,198,020",
       "heroPlaceholder": "例如 62,634,222",
-      "vehiclePlaceholder": "例如 9,436,786"
+      "vehiclePlaceholder": "例如 9,436,786",
+      "clearForm": "重新开始",
+      "clearFormTitle": "清除所有表单数据？",
+      "clearFormConfirmation": "这将删除在每个应用程序步骤中输入的所有值。此操作无法撤消。"
     },
     "groupUpload": {
       "invalidType": "请选择 PNG 或 JPG/JPEG 图片。",
@@ -506,7 +520,17 @@
       "destinations": "请选择“任意联盟”或至少一个目标联盟。",
       "reason": "请至少用10个字符说明你想迁州的原因。",
       "reasonMax": "迁州原因不得超过1,000个字符。",
-      "commentsMax": "补充说明不得超过1,000个字符。"
+      "commentsMax": "补充说明不得超过1,000个字符。",
+      "t10Research": "选择T10研究是否完成。",
+      "t10ResearchPercent": "输入 0 到 99 之间的整数完成百分比。"
+    },
+    "groupT10": {
+      "label": "T10研究",
+      "complete": "完成",
+      "incomplete": "进行中",
+      "percent": "研究完成度（0-99%）",
+      "autoComplete": "由于 Tech Power 大于 25M，因此自动标记为完成。",
+      "resolveMember": "在继续之前添加 {{name}} 的 T10 研究状态和进展。"
     }
   },
   "components": {
@@ -950,7 +974,7 @@
       "lofiTracks": "Lo-fi 曲目将依次播放。",
       "musicUnavailable": "音乐不可用 — 尚未配置曲目。",
       "soundEffects": "音效", "littleThings": "细节也重要",
-      "effectsVolume": "音效音量", "soundEffectFootnote": "拾取物品、受伤和战斗提示音。"
+      "effectsVolume": "音效音量", "soundEffectFootnote": "拾取物品、受伤和战斗提示音。", "touchControlsTitle": "触摸控制", "controlLayout": "控制布局", "controlLayoutHint": "选择哪只手控制运动。", "rightHanded": "右手", "leftHanded": "左撇子", "joystickAppearance": "摇杆外观", "joystickAppearanceHint": "自定义两个浮动棒。", "baseOpacity": "基础和辉光不透明度", "thumbOpacity": "拇指不透明", "joystickSize": "操纵杆尺寸", "small": "小号", "medium": "中等", "large": "大号", "joystickPreview": "运动和瞄准杆的实时预览", "joystickBehaviour": "操纵杆行为", "joystickBehaviourHint": "选择移动杆的显示方式。", "fixed": "固定", "floating": "浮动", "joystickPosition": "职位", "edgePosition": "边缘（{{side}}）", "innerPosition": "内（{{side}}）", "middlePositionMiddle": "中", "leftSide": "左", "rightSide": "对"
     },
     "hud": {
       "runStatus": "本局状态", "wave": "波次", "waveProgress": "波次进度",
@@ -999,7 +1023,7 @@
       "refund": "退还{{name}}点数", "purchase": "升级{{name}}",
       "runUnavailable": "本局不可用", "nextChapter": "下一章正等待你开启。",
       "resumeWhenReady": "准备好后即可继续。",
-      "resume": "继续", "backToGame": "返回游戏", "guides": "指南"
+      "resume": "继续", "backToGame": "返回游戏", "guides": "指南", "firingRange": "射程", "firingRangeDescription": "射弹的最大飞行距离。", "rangeUnit": "单位"
     },
     "effects": {
       "active": "生效中的效果", "damage": "伤害", "rapidFire": "快速射击",
@@ -1177,7 +1201,9 @@
       "campaignProgressSaveFailed": "无法保存战役进度：{{error}}",
       "campaignProgressSaveFailedSimple": "无法保存战役进度。",
       "campaignPointsSaveFailed": "无法保存战役属性点：{{error}}",
-      "campaignPointsSaveFailedSimple": "无法保存战役属性点。"
+      "campaignPointsSaveFailedSimple": "无法保存战役属性点。",
+      "fullscreenHoldEscape": "按住 Esc 退出全屏。",
+      "fullscreenPauseShortcut": "按 {{key}} 可在全屏模式下暂停游戏。"
     },
     "canvas": {
       "ariaLabel": "565 僵尸生存。使用设置的移动按键或触控操作来移动。用鼠标或瞄准摇杆瞄准，武器会自动朝选定方向射击。拾取炸弹后，按设置的炸弹键或触控按钮使用。最多拾取五座炮塔，然后在竞技场空地右键或双击放置。",
@@ -1373,6 +1399,10 @@
       "moving-wall": { "name": "移动墙体", "description": "会移动的工业墙板将迫使你改变路线。" },
       "steam-pipe": { "name": "蒸汽管道", "description": "通风管会发出预警，随后喷出高温蒸汽。" },
       "industrial-crate": { "name": "工业箱", "description": "带有耐用金属护板、可能掉落战利品的加固储物箱。" }
+    },
+    "fullscreenButton": {
+      "enter": "进入全屏",
+      "exit": "退出全屏"
     }
   },
   "ui": {
