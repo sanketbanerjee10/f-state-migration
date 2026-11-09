@@ -1,11 +1,23 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
+import { Spinner } from '../../components/ui/spinner';
 import { ApplicationDraftProvider } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
-import { PowerDetailsStep } from './PowerDetailsStep';
-import { CombatPowerStep } from './CombatPowerStep';
-import { MigrationDetailsStep } from './MigrationDetailsStep';
-import { GroupRosterStep } from './GroupRosterStep';
-import { ApplicationReviewStep } from './ApplicationReviewStep';
+
+const PowerDetailsStep = lazy(() =>
+  import('./PowerDetailsStep').then((module) => ({ default: module.PowerDetailsStep })),
+);
+const CombatPowerStep = lazy(() =>
+  import('./CombatPowerStep').then((module) => ({ default: module.CombatPowerStep })),
+);
+const MigrationDetailsStep = lazy(() =>
+  import('./MigrationDetailsStep').then((module) => ({ default: module.MigrationDetailsStep })),
+);
+const GroupRosterStep = lazy(() =>
+  import('./GroupRosterStep').then((module) => ({ default: module.GroupRosterStep })),
+);
+const ApplicationReviewStep = lazy(() =>
+  import('./ApplicationReviewStep').then((module) => ({ default: module.ApplicationReviewStep })),
+);
 
 function WizardContent() {
   const { currentStep, ensureCurrentStepAccessible } = useWizardNavigation();
@@ -16,18 +28,32 @@ function WizardContent() {
 
   switch (currentStep.key) {
     case 'character':
-      return <PowerDetailsStep />;
+      return <WizardStepFallback><PowerDetailsStep /></WizardStepFallback>;
     case 'combat':
-      return <CombatPowerStep />;
+      return <WizardStepFallback><CombatPowerStep /></WizardStepFallback>;
     case 'migration':
-      return <MigrationDetailsStep />;
+      return <WizardStepFallback><MigrationDetailsStep /></WizardStepFallback>;
     case 'group-roster':
-      return <GroupRosterStep />;
+      return <WizardStepFallback><GroupRosterStep /></WizardStepFallback>;
     case 'review':
-      return <ApplicationReviewStep />;
+      return <WizardStepFallback><ApplicationReviewStep /></WizardStepFallback>;
     default:
-      return <PowerDetailsStep />;
+      return <WizardStepFallback><PowerDetailsStep /></WizardStepFallback>;
   }
+}
+
+function WizardStepFallback({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] items-center justify-center">
+          <Spinner className="size-8" />
+        </div>
+      }
+    >
+      {children}
+    </Suspense>
+  );
 }
 
 export function ApplicationWizard() {

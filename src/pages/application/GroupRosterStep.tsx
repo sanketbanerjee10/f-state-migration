@@ -8,7 +8,6 @@ import { DismissibleToast } from '../../components/DismissibleToast';
 import { MigrationScoringGuide } from '../../components/MigrationScoringGuide';
 import { useApplicationDraft } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
-import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, useLiveTierThresholds } from '../../lib/migrationScore';
 import type { GroupMember } from '../../types/application';
@@ -153,6 +152,7 @@ export function GroupRosterStep() {
         updateProgress();
 
         try {
+          const { recognizeScreenshot } = await import('../../lib/ocr');
           const result = await recognizeScreenshot(file);
           const extracted = result.extracted;
           const structurePower = extracted.structurePower || '0';

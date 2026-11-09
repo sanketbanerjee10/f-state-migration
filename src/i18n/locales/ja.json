@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "新しい章がここから始まります",
+      "titleLead": "州565へ",
+      "title": "ようこそ。",
+      "intro": "コミュニティを知りたい方も、移籍を考えている方も、ちょっと楽しみたい方も、ここがぴったりの場所です。",
+      "primaryAction": "参加方法を見る",
+      "caption": "あなたの仲間と、あなたの次の章。",
+      "sectionKicker": "どうぞ自分の家のようにお過ごしください",
+      "sectionTitle": "どこから始めますか？",
+      "cards": {
+        "community": {
+          "eyebrow": "コミュニティ",
+          "title": "私たちのことを知る",
+          "description": "州565の仲間や大切にしている価値観、これまでの歩みをご紹介します。",
+          "action": "州565の紹介を見る"
+        },
+        "migration": {
+          "eyebrow": "あなたの次の章",
+          "title": "移籍を申請する",
+          "description": "アカウントについて教えてください。参加への第一歩を踏み出しましょう。",
+          "action": "申請を始める"
+        },
+        "game": {
+          "eyebrow": "ちょっとひと休み",
+          "title": "ミニゲームで遊ぶ",
+          "description": "州565のサバイバルに挑戦して、どれだけ長く生き残れるか試してみましょう。",
+          "action": "ゲームを始める"
+        }
+      },
+      "footerBrand": "州565",
+      "footerPortal": "移籍ポータル",
+      "footerTagline": "素敵な仲間。楽しい時間。帰りたくなる場所。"
+    },
     "notFound": {
       "title": "ページが見つかりません",
       "description": "このポータルページは存在しません。",

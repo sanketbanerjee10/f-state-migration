@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "UN NOUVEAU CHAPITRE COMMENCE ICI",
+      "titleLead": "Bienvenue dans l’État",
+      "title": "565.",
+      "intro": "Envie de découvrir notre communauté, prêt à nous rejoindre ou simplement là pour vous amuser ? Vous êtes au bon endroit.",
+      "primaryAction": "Trouvez votre voie",
+      "caption": "VOTRE COMMUNAUTÉ. VOTRE PROCHAIN CHAPITRE.",
+      "sectionKicker": "FAITES COMME CHEZ VOUS",
+      "sectionTitle": "Par où souhaitez-vous commencer ?",
+      "cards": {
+        "community": {
+          "eyebrow": "LA COMMUNAUTÉ",
+          "title": "Découvrez notre communauté",
+          "description": "Découvrez les membres de la communauté de l’État 565, ses valeurs et son histoire.",
+          "action": "Découvrir la communauté de l’État 565"
+        },
+        "migration": {
+          "eyebrow": "VOTRE PROCHAIN CHAPITRE",
+          "title": "Demander à rejoindre l’État 565",
+          "description": "Parlez-nous de votre compte et faites le premier pas pour rejoindre notre communauté.",
+          "action": "Commencer votre demande"
+        },
+        "game": {
+          "eyebrow": "FAITES UNE PAUSE",
+          "title": "Jouer à un mini-jeu",
+          "description": "Relevez le défi de survie de l’État 565 et découvrez combien de temps vous tiendrez.",
+          "action": "Accéder au jeu"
+        }
+      },
+      "footerBrand": "ÉTAT 565",
+      "footerPortal": "PORTAIL DE MIGRATION",
+      "footerTagline": "DES GENS BIEN. DE BONS MOMENTS. UN LIEU OÙ SE SENTIR CHEZ SOI."
+    },
     "notFound": {
       "title": "Page introuvable",
       "description": "Cette page du portail n’existe pas.",

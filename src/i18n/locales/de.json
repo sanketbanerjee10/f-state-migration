@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "HIER BEGINNT EIN NEUES KAPITEL",
+      "titleLead": "Willkommen bei",
+      "title": "Staat 565.",
+      "intro": "Möchtest du unsere Gemeinschaft kennenlernen, in unseren Staat wechseln oder einfach ein wenig Spaß haben? Dann bist du hier genau richtig.",
+      "primaryAction": "Finde deinen Weg",
+      "caption": "DEINE GEMEINSCHAFT. DEIN NÄCHSTES KAPITEL.",
+      "sectionKicker": "MACH ES DIR GEMÜTLICH",
+      "sectionTitle": "Womit möchtest du anfangen?",
+      "cards": {
+        "community": {
+          "eyebrow": "DIE GEMEINSCHAFT",
+          "title": "Lerne uns kennen",
+          "description": "Lerne die Menschen, Werte und Geschichte der Gemeinschaft von Staat 565 kennen.",
+          "action": "Die Gemeinschaft von Staat 565 entdecken"
+        },
+        "migration": {
+          "eyebrow": "DEIN NÄCHSTES KAPITEL",
+          "title": "Wechsel in den Staat 565 beantragen",
+          "description": "Erzähl uns von deinem Spielkonto und mach den ersten Schritt zu uns.",
+          "action": "Antrag starten"
+        },
+        "game": {
+          "eyebrow": "GÖNN DIR EINE PAUSE",
+          "title": "Ein Minispiel spielen",
+          "description": "Stell dich der Überlebensherausforderung von Staat 565 und finde heraus, wie lange du durchhältst.",
+          "action": "Zum Spiel"
+        }
+      },
+      "footerBrand": "STAAT 565",
+      "footerPortal": "PORTAL FÜR DEN STAATENWECHSEL",
+      "footerTagline": "TOLLE MENSCHEN. GUTE ZEITEN. EIN ORT, AN DEM MAN SICH ZU HAUSE FÜHLT."
+    },
     "notFound": {
       "title": "Seite nicht gefunden",
       "description": "Diese Portalseite existiert nicht.",

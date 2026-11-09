@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "YENİ BİR BÖLÜM BURADA BAŞLIYOR",
+      "titleLead": "565. Eyalet'e",
+      "title": "hoş geldiniz.",
+      "intro": "Topluluğumuzu merak mı ediyorsunuz, eyaletimize taşınmayı mı düşünüyorsunuz, yoksa sadece biraz eğlenmek mi istiyorsunuz? Doğru yerdesiniz.",
+      "primaryAction": "Katılma yolunu keşfet",
+      "caption": "TOPLULUĞUNUZ. YENİ BÖLÜMÜNÜZ.",
+      "sectionKicker": "KENDİNİZİ EVİNİZDE HİSSEDİN",
+      "sectionTitle": "Nereden başlamak istersiniz?",
+      "cards": {
+        "community": {
+          "eyebrow": "TOPLULUK",
+          "title": "Bizi tanıyın",
+          "description": "565. Eyalet topluluğunun üyelerini, değerlerini ve hikâyesini tanıyın.",
+          "action": "565. Eyalet topluluğunu keşfet"
+        },
+        "migration": {
+          "eyebrow": "YENİ BÖLÜMÜNÜZ",
+          "title": "Eyaletimize geçiş başvurusu yapın",
+          "description": "Oyun hesabınız hakkında bilgi verin ve bize katılmak için ilk adımı atın.",
+          "action": "Başvuruyu başlat"
+        },
+        "game": {
+          "eyebrow": "BİRAZ MOLA VERİN",
+          "title": "Mini oyun oynayın",
+          "description": "565. Eyalet'te hayatta kalma mücadelesine katılın ve ne kadar dayanabileceğinizi görün.",
+          "action": "Oynamaya başla"
+        }
+      },
+      "footerBrand": "565. EYALET",
+      "footerPortal": "GÖÇ PORTALI",
+      "footerTagline": "İYİ İNSANLAR. GÜZEL ANLAR. EVİNİZ DİYECEĞİNİZ BİR YER."
+    },
     "notFound": {
       "title": "Sayfa bulunamadı",
       "description": "Bu sayfa mevcut değil.",

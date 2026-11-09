@@ -1,29 +1,55 @@
 import i18next from 'i18next';
+import type { BackendModule } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-import en from './locales/en.json';
-import ja from './locales/ja.json';
-import ko from './locales/ko.json';
-import vi from './locales/vi.json';
-import zhCN from './locales/zh-CN.json';
-import es from './locales/es.json';
-import fr from './locales/fr.json';
-import de from './locales/de.json';
-import zhTW from './locales/zh-TW.json';
-import ru from './locales/ru.json';
-import id from './locales/id.json';
-import ptBR from './locales/pt-BR.json';
-import th from './locales/th.json';
-import tr from './locales/tr.json';
-import ar from './locales/ar.json';
 import {
   DEFAULT_LANGUAGE,
   SUPPORTED_LANGUAGES,
+  isSupportedLanguage,
   type SupportedLanguage,
 } from './languages';
 
 export const LANGUAGE_STORAGE_KEY = 'i18nextLng';
+
+const localeLoaders = {
+  en: () => import('./locales/en.json'),
+  ko: () => import('./locales/ko.json'),
+  ja: () => import('./locales/ja.json'),
+  vi: () => import('./locales/vi.json'),
+  'zh-CN': () => import('./locales/zh-CN.json'),
+  es: () => import('./locales/es.json'),
+  fr: () => import('./locales/fr.json'),
+  de: () => import('./locales/de.json'),
+  'zh-TW': () => import('./locales/zh-TW.json'),
+  ru: () => import('./locales/ru.json'),
+  id: () => import('./locales/id.json'),
+  'pt-BR': () => import('./locales/pt-BR.json'),
+  th: () => import('./locales/th.json'),
+  tr: () => import('./locales/tr.json'),
+  ar: () => import('./locales/ar.json'),
+} satisfies Record<SupportedLanguage, () => Promise<{ default: Record<string, unknown> }>>;
+
+const localeBackend: BackendModule = {
+  type: 'backend',
+  init() {},
+  read(language, namespace, callback) {
+    if (namespace !== 'translation') {
+      callback(new Error(`Unsupported translation namespace: ${namespace}`), false);
+      return;
+    }
+    if (!isSupportedLanguage(language)) {
+      callback(new Error(`Unsupported translation language: ${language}`), false);
+      return;
+    }
+
+    void localeLoaders[language]()
+      .then(({ default: translations }) => callback(null, translations))
+      .catch((error: unknown) => {
+        callback(error instanceof Error ? error : new Error(String(error)), false);
+      });
+  },
+};
 
 export function resolveSupportedLanguage(language: string | undefined): SupportedLanguage {
   if (!language) return DEFAULT_LANGUAGE;
@@ -59,7 +85,8 @@ export function resolveSupportedLanguage(language: string | undefined): Supporte
   return exactMatches[normalized] ?? primaryLanguage[baseLanguage] ?? DEFAULT_LANGUAGE;
 }
 
-void i18next
+export const i18nReady = i18next
+  .use(localeBackend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .on('languageChanged', (language) => {
@@ -69,30 +96,14 @@ void i18next
     }
   })
   .init({
-    resources: {
-      en: { translation: en },
-      ko: { translation: ko },
-      ja: { translation: ja },
-      vi: { translation: vi },
-      'zh-CN': { translation: zhCN },
-      es: { translation: es },
-      fr: { translation: fr },
-      de: { translation: de },
-      'zh-TW': { translation: zhTW },
-      ru: { translation: ru },
-      id: { translation: id },
-      'pt-BR': { translation: ptBR },
-      th: { translation: th },
-      tr: { translation: tr },
-      ar: { translation: ar },
-    },
+    ns: ['translation'],
     supportedLngs: [...SUPPORTED_LANGUAGES],
     fallbackLng: DEFAULT_LANGUAGE,
     load: 'currentOnly',
     nonExplicitSupportedLngs: false,
     detection: {
       order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
+      caches: [],
       lookupLocalStorage: LANGUAGE_STORAGE_KEY,
       convertDetectedLanguage: resolveSupportedLanguage,
     },

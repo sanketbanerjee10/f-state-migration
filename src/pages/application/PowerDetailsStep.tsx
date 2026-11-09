@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '../../components/Dialogs';
 import { StepLayout } from '../../components/form/StepLayout';
 import { DismissibleToast } from '../../components/DismissibleToast';
-import { recognizeScreenshot } from '../../lib/ocr';
 import { parseMagnitude } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, useLiveTierThresholds } from '../../lib/migrationScore';
 import {
@@ -107,7 +106,10 @@ export function PowerDetailsStep() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    recognizeScreenshot(file, setOcrProgress, controller.signal)
+    import('../../lib/ocr')
+      .then(({ recognizeScreenshot }) =>
+        recognizeScreenshot(file, setOcrProgress, controller.signal),
+      )
       .then((result) => {
         setOcrDiagnostics(result.diagnostics);
         const requiredFields = [

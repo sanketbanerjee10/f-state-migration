@@ -2491,12 +2491,11 @@ textarea.control { min-height:100px; resize:vertical; line-height:1.5; }
 }
 
 .welcome-page {
+  --welcome-background-rgb: 11, 18, 29;
   min-height: 100vh;
   overflow: hidden;
   color: #e8eef6;
-  background:
-    radial-gradient(ellipse at 82% 0%, rgba(52, 94, 153, 0.16), transparent 34rem),
-    #0b121d;
+  background: rgb(var(--welcome-background-rgb));
 }
 
 .welcome-card:focus-visible {
@@ -2793,20 +2792,47 @@ textarea.control { min-height:100px; resize:vertical; line-height:1.5; }
 
 .welcome-footer {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   width: min(1160px, calc(100% - 64px));
   margin: 0 auto;
-  padding: 19px 0 24px;
-  border-top: 1px solid rgba(184, 207, 234, 0.11);
-  color: #738196;
-  font: 8px var(--app-font-mono);
-  letter-spacing: 0.12em;
 }
 
-.welcome-footer-divider {
-  padding: 0 5px;
-  color: #9dcaff;
+.welcome-footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  text-align: center;
+}
+
+.welcome-footer a {
+  color: #94c4f2;
+  text-decoration: none;
+}
+
+.welcome-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+  .welcome-hero {
+    overflow: visible;
+  }
+
+  .welcome-hero::after {
+    position: absolute;
+    z-index: -1;
+    right: 0;
+    bottom: -90px;
+    left: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, transparent 0%, rgb(var(--welcome-background-rgb)) 50%);
+    content: '';
+    pointer-events: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -2820,8 +2846,8 @@ textarea.control { min-height:100px; resize:vertical; line-height:1.5; }
 
   .welcome-hero-shade {
     background:
-      linear-gradient(90deg, rgba(11, 18, 29, 0.96), rgba(11, 18, 29, 0.66)),
-      linear-gradient(0deg, #0b121d 0%, transparent 58%);
+      linear-gradient(90deg, rgba(var(--welcome-background-rgb), 0.96), rgba(var(--welcome-background-rgb), 0.66)),
+      linear-gradient(0deg, rgb(var(--welcome-background-rgb)) 0%, transparent 58%);
   }
 
   .welcome-hero-content,
@@ -2874,9 +2900,6 @@ textarea.control { min-height:100px; resize:vertical; line-height:1.5; }
     display: none;
   }
 
-  .welcome-footer {
-    flex-direction: column;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

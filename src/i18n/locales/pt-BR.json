@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "UM NOVO CAPÍTULO COMEÇA AQUI",
+      "titleLead": "Boas-vindas ao",
+      "title": "Estado 565.",
+      "intro": "Quer conhecer nossa comunidade, está pronto para se juntar a nós ou só veio se divertir? Você está no lugar certo.",
+      "primaryAction": "Descubra como participar",
+      "caption": "SUA COMUNIDADE. SEU PRÓXIMO CAPÍTULO.",
+      "sectionKicker": "SINTA-SE EM CASA",
+      "sectionTitle": "Por onde você gostaria de começar?",
+      "cards": {
+        "community": {
+          "eyebrow": "A COMUNIDADE",
+          "title": "Conheça a gente",
+          "description": "Conheça as pessoas, os valores e a história da comunidade do Estado 565.",
+          "action": "Conheça a comunidade do Estado 565"
+        },
+        "migration": {
+          "eyebrow": "SEU PRÓXIMO CAPÍTULO",
+          "title": "Solicite sua transferência",
+          "description": "Conte-nos sobre sua conta no jogo e dê o primeiro passo para se juntar a nós.",
+          "action": "Começar inscrição"
+        },
+        "game": {
+          "eyebrow": "FAÇA UMA PAUSA",
+          "title": "Jogue um minijogo",
+          "description": "Encare o desafio de sobrevivência do Estado 565 e descubra por quanto tempo consegue resistir.",
+          "action": "Entrar no jogo"
+        }
+      },
+      "footerBrand": "ESTADO 565",
+      "footerPortal": "PORTAL DE MIGRAÇÃO",
+      "footerTagline": "GENTE BOA. BONS MOMENTOS. UM LUGAR PARA CHAMAR DE LAR."
+    },
     "notFound": {
       "title": "Página não encontrada",
       "description": "Esta página do portal não existe.",

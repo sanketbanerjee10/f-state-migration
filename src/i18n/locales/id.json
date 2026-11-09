@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "BABAK BARU DIMULAI DI SINI",
+      "titleLead": "Selamat datang di",
+      "title": "Negara Bagian 565.",
+      "intro": "Ingin mengenal komunitas kami, siap bergabung, atau hanya mampir untuk bersenang-senang? Anda berada di tempat yang tepat.",
+      "primaryAction": "Cari tahu cara bergabung",
+      "caption": "KOMUNITAS ANDA. BABAK BERIKUTNYA.",
+      "sectionKicker": "MERASA NYAMANLAH SEPERTI DI RUMAH",
+      "sectionTitle": "Anda ingin mulai dari mana?",
+      "cards": {
+        "community": {
+          "eyebrow": "KOMUNITAS",
+          "title": "Kenali kami",
+          "description": "Kenali para anggota, nilai-nilai, dan kisah komunitas Negara Bagian 565.",
+          "action": "Jelajahi komunitas Negara Bagian 565"
+        },
+        "migration": {
+          "eyebrow": "BABAK BERIKUTNYA",
+          "title": "Ajukan perpindahan ke negara bagian kami",
+          "description": "Ceritakan tentang akun permainan Anda dan ambil langkah pertama untuk bergabung.",
+          "action": "Mulai pengajuan"
+        },
+        "game": {
+          "eyebrow": "BERISTIRAHAT SEJENAK",
+          "title": "Mainkan permainan singkat",
+          "description": "Ikuti tantangan bertahan hidup di Negara Bagian 565 dan lihat berapa lama Anda bisa bertahan.",
+          "action": "Mulai bermain"
+        }
+      },
+      "footerBrand": "NEGARA BAGIAN 565",
+      "footerPortal": "PORTAL MIGRASI",
+      "footerTagline": "ORANG-ORANG BAIK. SAAT YANG MENYENANGKAN. TEMPAT UNTUK MERASA DI RUMAH."
+    },
     "notFound": {
       "title": "Halaman tidak ditemukan",
       "description": "Halaman portal ini tidak tersedia.",

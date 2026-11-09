@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "全新篇章，從這裡開始",
+      "titleLead": "歡迎來到",
+      "title": "565州。",
+      "intro": "想認識我們的社群、準備好加入我們，還是只想來放鬆一下？你來對地方了。",
+      "primaryAction": "了解如何加入",
+      "caption": "你的夥伴，你的下一篇章。",
+      "sectionKicker": "請把這裡當作自己的家",
+      "sectionTitle": "你想從哪裡開始？",
+      "cards": {
+        "community": {
+          "eyebrow": "社群",
+          "title": "認識我們",
+          "description": "認識565州的成員，了解這個社群的價值觀與故事。",
+          "action": "了解565州社群"
+        },
+        "migration": {
+          "eyebrow": "你的下一篇章",
+          "title": "申請遷入",
+          "description": "告訴我們你的遊戲帳號狀況，踏出加入我們的第一步。",
+          "action": "開始申請"
+        },
+        "game": {
+          "eyebrow": "稍作休息",
+          "title": "玩個小遊戲",
+          "description": "參加565州的生存挑戰，看看你能撐多久。",
+          "action": "進入遊戲"
+        }
+      },
+      "footerBrand": "565州",
+      "footerPortal": "移民入口",
+      "footerTagline": "友善的夥伴，愉快的時光，一個溫暖的家。"
+    },
     "notFound": {
       "title": "找不到頁面",
       "description": "此入口網站頁面不存在。",

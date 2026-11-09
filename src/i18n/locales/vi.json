@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "CHƯƠNG MỚI BẮT ĐẦU TỪ ĐÂY",
+      "titleLead": "Chào mừng đến với",
+      "title": "Bang 565.",
+      "intro": "Bạn muốn tìm hiểu cộng đồng, sẵn sàng chuyển bang hay chỉ ghé chơi một chút? Bạn đã đến đúng nơi.",
+      "primaryAction": "Tìm hiểu cách tham gia",
+      "caption": "CỘNG ĐỒNG CỦA BẠN. CHƯƠNG TIẾP THEO.",
+      "sectionKicker": "HÃY CỨ TỰ NHIÊN NHƯ Ở NHÀ",
+      "sectionTitle": "Bạn muốn bắt đầu từ đâu?",
+      "cards": {
+        "community": {
+          "eyebrow": "CỘNG ĐỒNG",
+          "title": "Tìm hiểu về chúng tôi",
+          "description": "Gặp gỡ các thành viên, tìm hiểu những giá trị và câu chuyện của cộng đồng Bang 565.",
+          "action": "Khám phá cộng đồng Bang 565"
+        },
+        "migration": {
+          "eyebrow": "CHƯƠNG TIẾP THEO CỦA BẠN",
+          "title": "Đăng ký chuyển đến bang của chúng tôi",
+          "description": "Cho chúng tôi biết về tài khoản trò chơi của bạn và thực hiện bước đầu tiên để tham gia.",
+          "action": "Bắt đầu đăng ký"
+        },
+        "game": {
+          "eyebrow": "GIẢI LAO MỘT CHÚT",
+          "title": "Chơi trò chơi nhỏ",
+          "description": "Hãy tham gia thử thách sinh tồn tại Bang 565 và xem bạn có thể trụ được bao lâu.",
+          "action": "Vào trò chơi"
+        }
+      },
+      "footerBrand": "BANG 565",
+      "footerPortal": "CỔNG CHUYỂN BANG",
+      "footerTagline": "BẠN TỐT. NIỀM VUI. NƠI ĐỂ GỌI LÀ NHÀ."
+    },
     "notFound": {
       "title": "Không tìm thấy trang",
       "description": "Trang này không tồn tại trong cổng thông tin.",

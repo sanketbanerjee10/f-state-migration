@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "새로운 시작이 여기서 펼쳐집니다",
+      "titleLead": "주 565에",
+      "title": "오신 것을 환영합니다.",
+      "intro": "우리 커뮤니티가 궁금하신가요? 함께할 준비가 되셨나요? 아니면 잠시 즐기러 오셨나요? 모두 환영합니다.",
+      "primaryAction": "참여 방법 알아보기",
+      "caption": "함께할 사람들. 당신의 다음 이야기.",
+      "sectionKicker": "편안히 둘러보세요",
+      "sectionTitle": "어디서 시작하고 싶으신가요?",
+      "cards": {
+        "community": {
+          "eyebrow": "커뮤니티",
+          "title": "우리를 알아보세요",
+          "description": "주 565의 사람들과 가치관, 그곳에 담긴 이야기를 만나보세요.",
+          "action": "주 565 소개 보기"
+        },
+        "migration": {
+          "eyebrow": "당신의 다음 여정",
+          "title": "주 이전 신청하기",
+          "description": "게임 계정 정보를 알려주시고 우리와 함께할 첫걸음을 내디뎌 보세요.",
+          "action": "신청 시작하기"
+        },
+        "game": {
+          "eyebrow": "잠시 쉬어 가기",
+          "title": "간단한 게임 즐기기",
+          "description": "주 565 생존 도전에 참여해 얼마나 오래 버틸 수 있는지 확인해 보세요.",
+          "action": "게임 시작하기"
+        }
+      },
+      "footerBrand": "주 565",
+      "footerPortal": "이주 포털",
+      "footerTagline": "좋은 사람들. 즐거운 시간. 마음 편히 머물 곳."
+    },
     "notFound": {
       "title": "페이지를 찾을 수 없음",
       "description": "이 포털 페이지는 존재하지 않습니다.",

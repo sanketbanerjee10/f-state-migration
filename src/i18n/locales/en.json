@@ -8,6 +8,39 @@
     "navigation": { "about": "About 565", "applications": "Applications", "applicationsDashboard": "Applications Dashboard", "backToApplication": "Back to Application", "stateMigration": "STATE 565 MIGRATION" }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "A NEW CHAPTER STARTS HERE",
+      "titleLead": "Welcome to",
+      "title": "State 565.",
+      "intro": "Curious about our community, ready to make your move, or just here for a little fun? You're in the right place.",
+      "primaryAction": "Find your way in",
+      "caption": "YOUR PEOPLE. YOUR NEXT CHAPTER.",
+      "sectionKicker": "MAKE YOURSELF AT HOME",
+      "sectionTitle": "Where would you like to start?",
+      "cards": {
+        "community": {
+          "eyebrow": "THE COMMUNITY",
+          "title": "Get to know us",
+          "description": "Meet the people, values, and story behind State 565.",
+          "action": "Explore State 565"
+        },
+        "migration": {
+          "eyebrow": "YOUR NEXT CHAPTER",
+          "title": "Apply for migration",
+          "description": "Tell us about your account and take the first step toward joining us.",
+          "action": "Start your application"
+        },
+        "game": {
+          "eyebrow": "TAKE A BREATHER",
+          "title": "Play a mini game",
+          "description": "Take on the 565 survival challenge and see how long you can last.",
+          "action": "Enter the game"
+        }
+      },
+      "footerBrand": "STATE 565",
+      "footerPortal": "MIGRATION PORTAL",
+      "footerTagline": "GOOD PEOPLE. GOOD TIMES. A PLACE TO CALL HOME."
+    },
     "confirmation": {
       "breadcrumb": "Confirmation",
       "title": "Application confirmation",

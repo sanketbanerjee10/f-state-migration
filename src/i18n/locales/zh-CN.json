@@ -76,6 +76,39 @@
     }
   },
   "pages": {
+    "welcome": {
+      "heroEyebrow": "全新篇章，由此开启",
+      "titleLead": "欢迎来到",
+      "title": "565州。",
+      "intro": "想了解我们的社区、准备好加入我们，还是只想来放松一下？你来对地方了。",
+      "primaryAction": "了解如何加入",
+      "caption": "你的伙伴，你的下一篇章。",
+      "sectionKicker": "请把这里当作自己的家",
+      "sectionTitle": "你想从哪里开始？",
+      "cards": {
+        "community": {
+          "eyebrow": "社区",
+          "title": "认识我们",
+          "description": "认识565州的成员，了解这个社区的价值观与故事。",
+          "action": "了解565州社区"
+        },
+        "migration": {
+          "eyebrow": "你的下一篇章",
+          "title": "申请迁服",
+          "description": "告诉我们你的游戏账号情况，迈出加入我们的第一步。",
+          "action": "开始申请"
+        },
+        "game": {
+          "eyebrow": "稍作休息",
+          "title": "玩个小游戏",
+          "description": "参加565州的生存挑战，看看你能坚持多久。",
+          "action": "进入游戏"
+        }
+      },
+      "footerBrand": "565州",
+      "footerPortal": "迁服门户",
+      "footerTagline": "友善的伙伴，愉快的时光，一个温暖的家。"
+    },
     "notFound": {
       "title": "找不到页面",
       "description": "此门户页面不存在。",
