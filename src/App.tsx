@@ -1,6 +1,6 @@
 import { lazy, Suspense, useLayoutEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
-import { Spinner } from './components/ui/spinner';
+import { PageLoader } from './components/PageLoader';
 import { ReturningUserModal } from './components/ReturningUserModal';
 import { Toaster } from './components/ui/sonner';
 
@@ -47,11 +47,7 @@ function App() {
       {(location === '/apply' || location.startsWith('/apply/')) && <ReturningUserModal />}
       <Toaster position="top-right" />
       <Suspense
-        fallback={
-          <div className="flex min-h-screen items-center justify-center">
-            <Spinner className="size-8" />
-          </div>
-        }
+        fallback={<PageLoader />}
       >
         <Switch>
           {/* About 565 public route */}

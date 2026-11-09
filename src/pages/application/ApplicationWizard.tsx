@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Spinner } from '../../components/ui/spinner';
+import { PageLoader } from '../../components/PageLoader';
 import { ApplicationDraftProvider } from '../../hooks/useApplicationDraft';
 import { useWizardNavigation } from '../../hooks/useWizardNavigation';
 
@@ -44,15 +44,7 @@ function WizardContent() {
 
 function WizardStepFallback({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner className="size-8" />
-        </div>
-      }
-    >
-      {children}
-    </Suspense>
+    <Suspense fallback={<PageLoader />}>{children}</Suspense>
   );
 }
 
