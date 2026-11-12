@@ -305,13 +305,8 @@ export interface AdminApplicationSummary {
   gameName: string;
   currentState: number;
   currentAlliance: string;
-  f1ArenaPower: number;
-  f2ArenaPower: number;
-  f3ArenaPower: number;
-  kills: number;
   preferredAlliances: Alliance[];
   anyAlliance: boolean;
-  migrationTier: MigrationTier;
   migrationType: MigrationType;
   /** @nullable */
   groupRepresentative: string | null;
@@ -359,14 +354,7 @@ export type AdminApplication = AdminApplicationSummary & ({
   migrationReason: string;
   /** @nullable */
   additionalComments: string | null;
-  t10ResearchComplete: boolean;
-  /**
-     * @minimum 0
-     * @maximum 99
-     * @nullable
-     */
-  t10ResearchPercent: number | null;
-  players?: ApplicationPlayer[];
+  players: ApplicationPlayer[];
 });
 
 export interface AdminApplicationPage {
@@ -462,32 +450,26 @@ export type RateLimitedResponse = ErrorResponse;
 export type ServiceUnavailableResponse = ErrorResponse;
 
 export type ListAdminApplicationsParams = {
-/**
- * @maxLength 40
- */
-q?: string;
-/**
- * @minimum 1
- * @maximum 32767
- */
-currentState?: number;
-/**
- * @minimum 1
- */
-allianceId?: number;
-migrationTier?: MigrationTier;
-status?: ApplicationStatus;
-sort?: ListAdminApplicationsSort;
-order?: ListAdminApplicationsOrder;
-/**
- * @minimum 1
- */
-page?: number;
-/**
- * @minimum 1
- * @maximum 100
- */
-pageSize?: number;
+  /** @maxLength 40 */
+  q?: string;
+  /**
+   * @minimum 1
+   * @maximum 32767
+   */
+  currentState?: number;
+  /** @minimum 1 */
+  allianceId?: number;
+  migrationTier?: MigrationTier;
+  status?: ApplicationStatus;
+  sort?: ListAdminApplicationsSort;
+  order?: ListAdminApplicationsOrder;
+  /** @minimum 1 */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  pageSize?: number;
 };
 
 export type ListAdminApplicationsSort = typeof ListAdminApplicationsSort[keyof typeof ListAdminApplicationsSort];
@@ -508,23 +490,19 @@ export const ListAdminApplicationsOrder = {
 } as const;
 
 export type ExportAdminApplicationsParams = {
-/**
- * @maxLength 40
- */
-q?: string;
-/**
- * @minimum 1
- * @maximum 32767
- */
-currentState?: number;
-/**
- * @minimum 1
- */
-allianceId?: number;
-migrationTier?: MigrationTier;
-status?: ApplicationStatus;
-sort?: ExportAdminApplicationsSort;
-order?: ExportAdminApplicationsOrder;
+  /** @maxLength 40 */
+  q?: string;
+  /**
+   * @minimum 1
+   * @maximum 32767
+   */
+  currentState?: number;
+  /** @minimum 1 */
+  allianceId?: number;
+  migrationTier?: MigrationTier;
+  status?: ApplicationStatus;
+  sort?: ExportAdminApplicationsSort;
+  order?: ExportAdminApplicationsOrder;
 };
 
 export type ExportAdminApplicationsSort = typeof ExportAdminApplicationsSort[keyof typeof ExportAdminApplicationsSort];

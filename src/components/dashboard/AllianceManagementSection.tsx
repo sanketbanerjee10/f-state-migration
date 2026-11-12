@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import {
+  getGetActiveAlliancesQueryKey,
   getListAdminAlliancesQueryKey,
   useCreateAdminAlliance,
-  useListAdminAlliances,
   useUpdateAdminAlliance,
   type AdminAlliance,
 } from '@/lib/api-client';
+import { clearCachedActiveAlliances } from '../../lib/activeAlliancesCache';
+import { clearCachedAdminAlliances, useCachedAdminAlliances } from '../../lib/adminAlliancesCache';
 
 const emptyAlliance = { tag: '', name: '', displayOrder: 0 };
 
@@ -29,12 +31,7 @@ export function AllianceManagementSection({
   const [allianceForm, setAllianceForm] = useState(emptyAlliance);
   const [formError, setFormError] = useState('');
 
-  const alliances = useListAdminAlliances({
-    query: {
-      queryKey: getListAdminAlliancesQueryKey(),
-      enabled,
-    },
-  });
+  const alliances = useCachedAdminAlliances(enabled);
 
   const createAlliance = useCreateAdminAlliance();
   const updateAlliance = useUpdateAdminAlliance();
@@ -67,7 +64,10 @@ export function AllianceManagementSection({
       }
       setAllianceEdit(null);
       onNotice?.(t(allianceEdit === 'new' ? 'components.dashboard.allianceAdded' : 'components.dashboard.allianceUpdated'));
+      clearCachedAdminAlliances();
+      clearCachedActiveAlliances();
       void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
+      void client.invalidateQueries({ queryKey: getGetActiveAlliancesQueryKey() });
     } catch (error) {
       onError?.(error);
       setFormError(
@@ -88,7 +88,10 @@ export function AllianceManagementSection({
           action: t(alliance.isActive ? 'components.dashboard.deactivated' : 'components.dashboard.activated'),
         }),
       );
+      clearCachedAdminAlliances();
+      clearCachedActiveAlliances();
       void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
+      void client.invalidateQueries({ queryKey: getGetActiveAlliancesQueryKey() });
     } catch (error) {
       onError?.(error);
       onNotice?.(

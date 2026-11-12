@@ -1,25 +1,27 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { ExternalLink, Maximize2, Sofa, Users, X } from 'lucide-react';
+import { ExternalLink, Maximize2, Sofa, Swords, Users, X } from 'lucide-react';
 import {
   getGetAdminApplicationQueryKey,
   getListAdminApplicationsQueryKey,
   getGetAdminOverviewQueryKey,
   useGetAdminApplication,
-  useGetAdminTierThresholds,
   useUpdateAdminApplicationStatus,
   type ApplicationStatus,
 } from '@/lib/api-client';
 import {
   TIER_COLORS,
   rowsToTierThresholds,
+  useCachedTierThresholdRows,
 } from '../../lib/migrationScore';
 import {
   MigrationScoreBadge,
   VerifiedBadge,
 } from '../MigrationScoringGuide';
 import { Modal } from '../Dialogs';
+import { PageLoader } from '../PageLoader';
+import { useFieldTranslation } from '../FieldTranslation';
 
 interface ApplicationDetailDrawerProps {
   applicationId: string;
@@ -44,8 +46,10 @@ export function ApplicationDetailDrawer({
       enabled: !!applicationId,
     },
   });
+  const reasonTranslation = useFieldTranslation(detail.data?.migrationReason ?? '');
+  const commentsTranslation = useFieldTranslation(detail.data?.additionalComments ?? '');
 
-  const tierThresholds = useGetAdminTierThresholds();
+  const tierThresholds = useCachedTierThresholdRows();
   const liveThresholds = useMemo(
     () => rowsToTierThresholds(tierThresholds.data),
     [tierThresholds.data],
@@ -78,6 +82,7 @@ export function ApplicationDetailDrawer({
   };
 
   const selected = detail.data;
+  const applicantPlayer = selected?.players?.find((player) => player.isApplicant);
 
   // Compute aggregate tier counts for players in this application
   const playerTierCounts = useMemo(() => {
@@ -86,11 +91,11 @@ export function ApplicationDetailDrawer({
       for (const p of selected.players) {
         counts[p.migrationTier]++;
       }
-    } else if (selected) {
-      counts[selected.migrationTier || 'Regular'] = 1;
+    } else if (applicantPlayer) {
+      counts[applicantPlayer.migrationTier] = 1;
     }
     return counts;
-  }, [selected]);
+  }, [selected, applicantPlayer]);
 
   const activeTiers = (['Elite', 'Advanced', 'Medium', 'Regular'] as const).filter(
     (t) => playerTierCounts[t] > 0,
@@ -116,7 +121,7 @@ export function ApplicationDetailDrawer({
               <span className="panel-kicker">{t('components.dashboard.reviewKicker')}</span>
               <h2>
                 {selected?.gameName ||
-                  (detail.isLoading ? t('components.dashboard.loadingDetails') : t('components.dashboard.application'))}
+                  t('components.dashboard.application')}
               </h2>
             </div>
             <button
@@ -130,7 +135,7 @@ export function ApplicationDetailDrawer({
           </div>
 
           {detail.isLoading ? (
-            <div className="skeleton detail-skeleton" />
+            <PageLoader className="page-loading--detail" />
           ) : detail.isError ? (
             <div className="admin-error" role="alert">
               <span>
@@ -309,10 +314,12 @@ export function ApplicationDetailDrawer({
                     label={t('components.dashboard.currentAlliance')}
                     value={selected.currentAlliance || t('components.dashboard.noneListed')}
                   />
-                  <DetailItem
-                    label={t('common.labels.tier')}
-                    value={t(`wizard.preferences.tiers.${selected.migrationTier.toLowerCase()}`)}
-                  />
+                  {applicantPlayer && (
+                    <DetailItem
+                      label={t('common.labels.tier')}
+                      value={t(`wizard.preferences.tiers.${applicantPlayer.migrationTier.toLowerCase()}`)}
+                    />
+                  )}
                   <DetailItem
                     label={t('components.dashboard.preferenceListed')}
                     value={
@@ -399,26 +406,23 @@ export function ApplicationDetailDrawer({
                   <ExpandableTextItem
                     label={t('components.dashboard.reason')}
                     text={selected.migrationReason}
+                    translationAction={reasonTranslation.action}
+                    copyAction={reasonTranslation.copyAction}
+                    translationPanel={reasonTranslation.panel}
+                    translationFailed={reasonTranslation.hasError}
+                    translationErrorRevision={reasonTranslation.errorRevision}
                     onOpenModal={(title, text) => setModalContent({ title, text })}
-                  />
-
-                  <DetailItem
-                    label={t('wizard.combat.t10Title')}
-                    value={
-                      selected.t10ResearchComplete
-                        ? t('wizard.combat.t10Yes')
-                        : selected.t10ResearchPercent == null
-                          ? t('common.status.notProvided')
-                          : t('wizard.combat.t10ProgressSummary', {
-                              percent: selected.t10ResearchPercent,
-                            })
-                    }
                   />
 
                   {/* ── Truncated Additional Comments with Modal View ── */}
                   <ExpandableTextItem
                     label={t('components.dashboard.comments')}
                     text={selected.additionalComments || t('common.status.notProvided')}
+                    translationAction={commentsTranslation.action}
+                    copyAction={commentsTranslation.copyAction}
+                    translationPanel={commentsTranslation.panel}
+                    translationFailed={commentsTranslation.hasError}
+                    translationErrorRevision={commentsTranslation.errorRevision}
                     onOpenModal={(title, text) => setModalContent({ title, text })}
                   />
 
@@ -465,7 +469,6 @@ export function ApplicationDetailDrawer({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                width: '83%',
                                 marginBottom: 6,
                               }}
                             >
@@ -546,6 +549,32 @@ export function ApplicationDetailDrawer({
                                     {t('components.dashboard.manual')}
                                   </span>
                                 )}
+                                <span
+                                  title={`T10: ${p.t10ResearchComplete ? 100 : p.t10ResearchPercent ?? '—'}%`}
+                                  aria-label={`T10: ${p.t10ResearchComplete ? 100 : p.t10ResearchPercent ?? '—'}%`}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    color: p.t10ResearchComplete ? '#4ade80' : '#f87171',
+                                    background: p.t10ResearchComplete
+                                      ? 'rgba(74,222,128,0.12)'
+                                      : 'rgba(248,113,113,0.12)',
+                                    border: `1px solid ${
+                                      p.t10ResearchComplete
+                                        ? 'rgba(74,222,128,0.35)'
+                                        : 'rgba(248,113,113,0.35)'
+                                    }`,
+                                    padding: '2px 6px',
+                                    borderRadius: 4,
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  <Swords size={12} />
+                                  T10: {p.t10ResearchComplete ? 100 : p.t10ResearchPercent ?? '—'}%
+                                </span>
                               </div>
                             </div>
                             <div
@@ -592,20 +621,6 @@ export function ApplicationDetailDrawer({
                                 </strong>
                               </div>
                             </div>
-                            {!p.isApplicant && (
-                              <DetailItem
-                                label={t('wizard.combat.t10Title')}
-                                value={
-                                  p.techPower >= 25_000_000 || p.t10ResearchComplete
-                                    ? t('wizard.combat.t10Yes')
-                                    : p.t10ResearchPercent == null
-                                      ? t('common.status.notProvided')
-                                      : t('wizard.combat.t10ProgressSummary', {
-                                          percent: p.t10ResearchPercent,
-                                        })
-                                }
-                              />
-                            )}
                             {(p.structurePower > 0 ||
                               p.techPower > 0 ||
                               p.troopPower > 0 ||
@@ -718,11 +733,21 @@ function DetailItem({ label, value }: { label: string; value: string }) {
 function ExpandableTextItem({
   label,
   text,
+  translationAction,
+  copyAction,
+  translationPanel,
+  translationFailed,
+  translationErrorRevision,
   onOpenModal,
   maxPreviewChars = 90,
 }: {
   label: string;
   text: string;
+  translationAction: React.ReactNode;
+  copyAction: React.ReactNode;
+  translationPanel: React.ReactNode;
+  translationFailed: boolean;
+  translationErrorRevision: number;
   onOpenModal: (title: string, text: string) => void;
   maxPreviewChars?: number;
 }) {
@@ -751,32 +776,42 @@ function ExpandableTextItem({
         }}
       >
         <span>{label}</span>
-        {isLong && (
-          <button
-            type="button"
-            className="link-button"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              fontSize: 10,
-              color: '#60a5fa',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '1px 4px',
-              borderRadius: 3,
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenModal(label, text);
-            }}
-          >
-            <Maximize2 size={11} /> {t('components.dashboard.expand')}
-          </button>
-        )}
+        <div className="field-review-actions">
+          {(translationAction || copyAction) && (
+            <span onClick={(event) => event.stopPropagation()}>
+              {translationAction}
+              {copyAction}
+            </span>
+          )}
+          {isLong && (
+            <button
+              type="button"
+              className="link-button"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                fontSize: 10,
+                color: '#60a5fa',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '1px 4px',
+                borderRadius: 3,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenModal(label, text);
+              }}
+            >
+              <Maximize2 size={11} /> {t('components.dashboard.expand')}
+            </button>
+          )}
+        </div>
       </div>
       <strong
+        key={translationErrorRevision}
+        className={translationFailed ? 'field-translation-shake' : undefined}
         style={{
           display: 'block',
           whiteSpace: 'pre-wrap',
@@ -786,6 +821,7 @@ function ExpandableTextItem({
       >
         {preview}
       </strong>
+      {translationPanel}
     </div>
   );
 }

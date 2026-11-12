@@ -90,6 +90,9 @@ function makePlayer(overrides: Partial<ApplicationPlayer> = {}): ApplicationPlay
     kills: 42,
     currentAlliance: 'OLD',
     isScreenshotVerified: true,
+    t10ResearchComplete: false,
+    t10ResearchPercent: 60,
+    migrationTier: 'Advanced',
     createdAt: '2025-01-01T00:00:00.000Z',
     ...overrides,
   };
@@ -101,13 +104,8 @@ function makeApplication(players: ApplicationPlayer[] = [makePlayer()]): AdminAp
     gameName: 'Player One',
     currentState: 565,
     currentAlliance: 'OLD',
-    f1ArenaPower: 11_000_000,
-    f2ArenaPower: 12_000_000,
-    f3ArenaPower: 13_000_000,
-    kills: 42,
     preferredAlliances: [{ id: 7, tag: 'NEW', name: 'New Alliance' }],
     anyAlliance: false,
-    migrationTier: 'Advanced',
     migrationType: 'Group',
     groupRepresentative: 'Player One',
     status: 'Pending',
@@ -115,8 +113,6 @@ function makeApplication(players: ApplicationPlayer[] = [makePlayer()]): AdminAp
     updatedAt: '2025-01-02T00:00:00.000Z',
     migrationReason: 'Seeking a new home',
     additionalComments: 'Please contact me',
-    t10ResearchComplete: false,
-    t10ResearchPercent: 60,
     players,
   };
 }
@@ -317,6 +313,8 @@ describe('ApplicationDraftProvider lifecycle', () => {
         kills: 8,
         currentAlliance: 'GROUP',
         isScreenshotVerified: false,
+        t10ResearchComplete: false,
+        t10ResearchPercent: 40,
       }),
     ]);
     vi.mocked(fetch).mockResolvedValue(jsonResponse(app));
@@ -340,6 +338,8 @@ describe('ApplicationDraftProvider lifecycle', () => {
         currentState: '566',
         highestPowerOnRecord: '25000000',
         currentAlliance: 'GROUP',
+        t10ResearchComplete: false,
+        t10ResearchPercent: '40',
       },
     ]);
   });

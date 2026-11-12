@@ -1,6 +1,6 @@
 import { Link } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import { LogOut, RefreshCw, Settings, X } from 'lucide-react';
+import { LogOut, Settings, X } from 'lucide-react';
 import { PageHeader } from '../PageHeader';
 
 interface DashboardHeaderProps {
@@ -8,7 +8,6 @@ interface DashboardHeaderProps {
   sessionError?: boolean;
   notice?: string;
   onLogout: () => void;
-  onRefresh: () => void;
   onDismissNotice: () => void;
   onLoginRedirect: () => void;
   activePage?: 'dashboard' | 'settings';
@@ -19,7 +18,6 @@ export function DashboardHeader({
   sessionError,
   notice,
   onLogout,
-  onRefresh,
   onDismissNotice,
   onLoginRedirect,
   activePage = 'dashboard',
@@ -32,9 +30,8 @@ export function DashboardHeader({
         eyebrow={t('components.dashboard.workspace')}
         title={t('components.dashboard.title')}
         description={t('components.dashboard.subtitle')}
-        actions={
-          <>
-            {activePage === 'settings' ? (
+        leadingActions={
+          activePage === 'settings' ? (
             <Link
               href="/leadership/dashboard"
               className="button button-quiet"
@@ -44,34 +41,27 @@ export function DashboardHeader({
             >
               <span>{t('common.navigation.applications')}</span>
             </Link>
-            ) : (
-              <Link
-                href="/leadership/settings"
-                className="button button-quiet"
-                data-testid="nav-settings"
-                title={t('components.dashboard.settingsTitle')}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                <Settings size={15} />
-              </Link>
-            )}
-            <button
+          ) : (
+            <Link
+              href="/leadership/settings"
               className="button button-quiet"
-              type="button"
-              onClick={onRefresh}
-              data-testid="refresh-dashboard"
+              data-testid="nav-settings"
+              title={t('components.dashboard.settingsTitle')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              <RefreshCw size={14} /> {t('components.dashboard.refresh')}
-            </button>
-            <button
-              className="button button-quiet"
-              type="button"
-              onClick={onLogout}
-              data-testid="logout"
-            >
-              <LogOut size={15} /> {t('pages.leadership.signOut')}
-            </button>
-          </>
+              <Settings size={15} />
+            </Link>
+          )
+        }
+        actions={
+          <button
+            className="button button-quiet"
+            type="button"
+            onClick={onLogout}
+            data-testid="logout"
+          >
+            <LogOut size={15} /> {t('pages.leadership.signOut')}
+          </button>
         }
       />
 

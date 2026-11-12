@@ -353,13 +353,7 @@ export function ApplicationsSection({
                           (counts.Regular ?? 0) > 0);
                       const effectiveCounts = hasCounts
                         ? counts
-                        : {
-                            Regular: 0,
-                            Medium: 0,
-                            Advanced: 0,
-                            Elite: 0,
-                            [app.migrationTier || 'Regular']: 1,
-                          };
+                        : { Regular: 0, Medium: 0, Advanced: 0, Elite: 0 };
 
                       const tierKeys: ('Elite' | 'Advanced' | 'Medium' | 'Regular')[] = [
                         'Elite',

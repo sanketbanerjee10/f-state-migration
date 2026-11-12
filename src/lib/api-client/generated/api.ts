@@ -54,6 +54,8 @@ type AwaitedInput<T> = PromiseLike<T> | T;
       type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
@@ -82,7 +84,7 @@ export const getHealthCheckUrl = () => {
 /**
  * @summary Health check
  */
-export const healthCheck = async ( options?: RequestInit): Promise<HealthStatus> => {
+export const healthCheck = async ( options?: Parameters<typeof customFetch>[1]): Promise<HealthStatus> => {
 
   return customFetch<HealthStatus>(getHealthCheckUrl(),
   {
@@ -104,16 +106,16 @@ export const getHealthCheckQueryKey = () => {
     }
 
 
-export const getHealthCheckQueryOptions = <TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, }
+export const getHealthCheckQueryOptions = <TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHealthCheckQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheck>>> = ({ signal }) => healthCheck({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheck>>> = ({ signal }) => healthCheck({ signal, ...requestOptions });
 
 
 
@@ -126,12 +128,9 @@ export type HealthCheckQueryResult = NonNullable<Awaited<ReturnType<typeof healt
 export type HealthCheckQueryError = ErrorType<unknown>
 
 
-/**
- * @summary Health check
- */
-
+/** @summary Health check */
 export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -159,7 +158,7 @@ export const getGetActiveAlliancesUrl = () => {
 /**
  * @summary List active migration destination alliances
  */
-export const getActiveAlliances = async ( options?: RequestInit): Promise<Alliance[]> => {
+export const getActiveAlliances = async ( options?: Parameters<typeof customFetch>[1]): Promise<Alliance[]> => {
 
   return customFetch<Alliance[]>(getGetActiveAlliancesUrl(),
   {
@@ -181,16 +180,16 @@ export const getGetActiveAlliancesQueryKey = () => {
     }
 
 
-export const getGetActiveAlliancesQueryOptions = <TData = Awaited<ReturnType<typeof getActiveAlliances>>, TError = ErrorType<ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAlliances>>, TError, TData>, }
+export const getGetActiveAlliancesQueryOptions = <TData = Awaited<ReturnType<typeof getActiveAlliances>>, TError = ErrorType<ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAlliances>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetActiveAlliancesQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActiveAlliances>>> = ({ signal }) => getActiveAlliances({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActiveAlliances>>> = ({ signal }) => getActiveAlliances({ signal, ...requestOptions });
 
 
 
@@ -203,12 +202,9 @@ export type GetActiveAlliancesQueryResult = NonNullable<Awaited<ReturnType<typeo
 export type GetActiveAlliancesQueryError = ErrorType<ServiceUnavailableResponse>
 
 
-/**
- * @summary List active migration destination alliances
- */
-
+/** @summary List active migration destination alliances */
 export function useGetActiveAlliances<TData = Awaited<ReturnType<typeof getActiveAlliances>>, TError = ErrorType<ServiceUnavailableResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAlliances>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActiveAlliances>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -236,7 +232,7 @@ export const getGetTierThresholdsUrl = () => {
 /**
  * @summary Get migration tier thresholds from database
  */
-export const getTierThresholds = async ( options?: RequestInit): Promise<TierThreshold[]> => {
+export const getTierThresholds = async ( options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold[]> => {
 
   return customFetch<TierThreshold[]>(getGetTierThresholdsUrl(),
   {
@@ -258,16 +254,16 @@ export const getGetTierThresholdsQueryKey = () => {
     }
 
 
-export const getGetTierThresholdsQueryOptions = <TData = Awaited<ReturnType<typeof getTierThresholds>>, TError = ErrorType<ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTierThresholds>>, TError, TData>, }
+export const getGetTierThresholdsQueryOptions = <TData = Awaited<ReturnType<typeof getTierThresholds>>, TError = ErrorType<ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTierThresholds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTierThresholdsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTierThresholds>>> = ({ signal }) => getTierThresholds({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTierThresholds>>> = ({ signal }) => getTierThresholds({ signal, ...requestOptions });
 
 
 
@@ -280,12 +276,9 @@ export type GetTierThresholdsQueryResult = NonNullable<Awaited<ReturnType<typeof
 export type GetTierThresholdsQueryError = ErrorType<ServiceUnavailableResponse>
 
 
-/**
- * @summary Get migration tier thresholds from database
- */
-
+/** @summary Get migration tier thresholds from database */
 export function useGetTierThresholds<TData = Awaited<ReturnType<typeof getTierThresholds>>, TError = ErrorType<ServiceUnavailableResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTierThresholds>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTierThresholds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -314,7 +307,7 @@ export const getSubmitMigrationApplicationUrl = () => {
  * Accepts confirmed application fields only. Screenshot bytes and OCR text are never accepted.
  * @summary Submit a migration application
  */
-export const submitMigrationApplication = async (migrationApplicationInput: MigrationApplicationInput, options?: RequestInit): Promise<ApplicationSubmissionResult> => {
+export const submitMigrationApplication = async (migrationApplicationInput: MigrationApplicationInput, options?: Parameters<typeof customFetch>[1]): Promise<ApplicationSubmissionResult> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -346,15 +339,15 @@ return customFetch<ApplicationSubmissionResult>(getSubmitMigrationApplicationUrl
 export const getSubmitMigrationApplicationMutationKey = () => ['submitMigrationApplication'] as const;
 
 export const getSubmitMigrationApplicationMutationOptions = <TError = ErrorType<BadRequestResponse | ConflictResponse | PayloadTooLargeResponse | RateLimitedResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitMigrationApplication>>, TError,SubmitMigrationApplicationMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitMigrationApplication>>, TError,SubmitMigrationApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof submitMigrationApplication>>, TError,SubmitMigrationApplicationMutationVariables, TContext> => {
 
 const mutationKey = getSubmitMigrationApplicationMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -362,7 +355,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitMigrationApplication>>, SubmitMigrationApplicationMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  submitMigrationApplication(data,)
+          return  submitMigrationApplication(data,requestOptions)
         }
 
 
@@ -378,10 +371,11 @@ const {mutation: mutationOptions} = options ?
     export type SubmitMigrationApplicationMutationVariables = {data: BodyType<MigrationApplicationInput>}
 
     /**
+ * Accepts confirmed application fields only. Screenshot bytes and OCR text are never accepted.
  * @summary Submit a migration application
  */
 export const useSubmitMigrationApplication = <TError = ErrorType<BadRequestResponse | ConflictResponse | PayloadTooLargeResponse | RateLimitedResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitMigrationApplication>>, TError,SubmitMigrationApplicationMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitMigrationApplication>>, TError,SubmitMigrationApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof submitMigrationApplication>>,
         TError,
@@ -402,7 +396,7 @@ export const getGetApplicationByIdUrl = (id: string,) => {
 /**
  * @summary Get migration application by ID or reference for tracking
  */
-export const getApplicationById = async (id: string, options?: RequestInit): Promise<AdminApplication> => {
+export const getApplicationById = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<AdminApplication> => {
 
   return customFetch<AdminApplication>(getGetApplicationByIdUrl(id),
   {
@@ -424,16 +418,16 @@ export const getGetApplicationByIdQueryKey = (id: string,) => {
     }
 
 
-export const getGetApplicationByIdQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationById>>, TError = ErrorType<NotFoundResponse | ServiceUnavailableResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getApplicationById>>, TError, TData>, }
+export const getGetApplicationByIdQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationById>>, TError = ErrorType<NotFoundResponse | ServiceUnavailableResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getApplicationById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetApplicationByIdQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationById>>> = ({ signal }) => getApplicationById(id, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationById>>> = ({ signal }) => getApplicationById(id, { signal, ...requestOptions });
 
 
 
@@ -446,12 +440,9 @@ export type GetApplicationByIdQueryResult = NonNullable<Awaited<ReturnType<typeo
 export type GetApplicationByIdQueryError = ErrorType<NotFoundResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary Get migration application by ID or reference for tracking
- */
-
+/** @summary Get migration application by ID or reference for tracking */
 export function useGetApplicationById<TData = Awaited<ReturnType<typeof getApplicationById>>, TError = ErrorType<NotFoundResponse | ServiceUnavailableResponse>>(
- id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getApplicationById>>, TError, TData>, }
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getApplicationById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -480,7 +471,7 @@ export const getUpdateMigrationApplicationUrl = (id: string,) => {
  * @summary Update and resubmit an existing migration application
  */
 export const updateMigrationApplication = async (id: string,
-    migrationApplicationInput: MigrationApplicationInput, options?: RequestInit): Promise<ApplicationSubmissionResult> => {
+    migrationApplicationInput: MigrationApplicationInput, options?: Parameters<typeof customFetch>[1]): Promise<ApplicationSubmissionResult> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -512,15 +503,15 @@ return customFetch<ApplicationSubmissionResult>(getUpdateMigrationApplicationUrl
 export const getUpdateMigrationApplicationMutationKey = () => ['updateMigrationApplication'] as const;
 
 export const getUpdateMigrationApplicationMutationOptions = <TError = ErrorType<BadRequestResponse | NotFoundResponse | RateLimitedResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMigrationApplication>>, TError,UpdateMigrationApplicationMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMigrationApplication>>, TError,UpdateMigrationApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateMigrationApplication>>, TError,UpdateMigrationApplicationMutationVariables, TContext> => {
 
 const mutationKey = getUpdateMigrationApplicationMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -528,7 +519,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMigrationApplication>>, UpdateMigrationApplicationMutationVariables> = (props) => {
           const {id,data} = props ?? {};
 
-          return  updateMigrationApplication(id,data,)
+          return  updateMigrationApplication(id,data,requestOptions)
         }
 
 
@@ -543,11 +534,9 @@ const {mutation: mutationOptions} = options ?
     export type UpdateMigrationApplicationMutationError = ErrorType<BadRequestResponse | NotFoundResponse | RateLimitedResponse | ServiceUnavailableResponse>
     export type UpdateMigrationApplicationMutationVariables = {id: string;data: BodyType<MigrationApplicationInput>}
 
-    /**
- * @summary Update and resubmit an existing migration application
- */
+    /** @summary Update and resubmit an existing migration application */
 export const useUpdateMigrationApplication = <TError = ErrorType<BadRequestResponse | NotFoundResponse | RateLimitedResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMigrationApplication>>, TError,UpdateMigrationApplicationMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMigrationApplication>>, TError,UpdateMigrationApplicationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateMigrationApplication>>,
         TError,
@@ -568,7 +557,7 @@ export const getGetAdminOverviewUrl = () => {
 /**
  * @summary Get application status totals
  */
-export const getAdminOverview = async ( options?: RequestInit): Promise<AdminOverview> => {
+export const getAdminOverview = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminOverview> => {
 
   return customFetch<AdminOverview>(getGetAdminOverviewUrl(),
   {
@@ -590,16 +579,16 @@ export const getGetAdminOverviewQueryKey = () => {
     }
 
 
-export const getGetAdminOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getAdminOverview>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminOverview>>, TError, TData>, }
+export const getGetAdminOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getAdminOverview>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminOverviewQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminOverview>>> = ({ signal }) => getAdminOverview({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminOverview>>> = ({ signal }) => getAdminOverview({ signal, ...requestOptions });
 
 
 
@@ -612,12 +601,9 @@ export type GetAdminOverviewQueryResult = NonNullable<Awaited<ReturnType<typeof 
 export type GetAdminOverviewQueryError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary Get application status totals
- */
-
+/** @summary Get application status totals */
 export function useGetAdminOverview<TData = Awaited<ReturnType<typeof getAdminOverview>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminOverview>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -652,7 +638,7 @@ export const getListAdminApplicationsUrl = (params?: ListAdminApplicationsParams
 /**
  * @summary Search and page through applications
  */
-export const listAdminApplications = async (params?: ListAdminApplicationsParams, options?: RequestInit): Promise<AdminApplicationPage> => {
+export const listAdminApplications = async (params?: ListAdminApplicationsParams, options?: Parameters<typeof customFetch>[1]): Promise<AdminApplicationPage> => {
 
   return customFetch<AdminApplicationPage>(getListAdminApplicationsUrl(params),
   {
@@ -674,16 +660,16 @@ export const getListAdminApplicationsQueryKey = (params?: ListAdminApplicationsP
     }
 
 
-export const getListAdminApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(params?: ListAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminApplications>>, TError, TData>, }
+export const getListAdminApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(params?: ListAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListAdminApplicationsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminApplications>>> = ({ signal }) => listAdminApplications(params, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminApplications>>> = ({ signal }) => listAdminApplications(params, { signal, ...requestOptions });
 
 
 
@@ -696,12 +682,9 @@ export type ListAdminApplicationsQueryResult = NonNullable<Awaited<ReturnType<ty
 export type ListAdminApplicationsQueryError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary Search and page through applications
- */
-
+/** @summary Search and page through applications */
 export function useListAdminApplications<TData = Awaited<ReturnType<typeof listAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(
- params?: ListAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminApplications>>, TError, TData>, }
+ params?: ListAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -736,7 +719,7 @@ export const getExportAdminApplicationsUrl = (params?: ExportAdminApplicationsPa
 /**
  * @summary Export currently filtered applications as CSV
  */
-export const exportAdminApplications = async (params?: ExportAdminApplicationsParams, options?: RequestInit): Promise<string> => {
+export const exportAdminApplications = async (params?: ExportAdminApplicationsParams, options?: Parameters<typeof customFetch>[1]): Promise<string> => {
 
   return customFetch<string>(getExportAdminApplicationsUrl(params),
   {
@@ -758,16 +741,16 @@ export const getExportAdminApplicationsQueryKey = (params?: ExportAdminApplicati
     }
 
 
-export const getExportAdminApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof exportAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(params?: ExportAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminApplications>>, TError, TData>, }
+export const getExportAdminApplicationsQueryOptions = <TData = Awaited<ReturnType<typeof exportAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(params?: ExportAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getExportAdminApplicationsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdminApplications>>> = ({ signal }) => exportAdminApplications(params, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdminApplications>>> = ({ signal }) => exportAdminApplications(params, { signal, ...requestOptions });
 
 
 
@@ -780,12 +763,9 @@ export type ExportAdminApplicationsQueryResult = NonNullable<Awaited<ReturnType<
 export type ExportAdminApplicationsQueryError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary Export currently filtered applications as CSV
- */
-
+/** @summary Export currently filtered applications as CSV */
 export function useExportAdminApplications<TData = Awaited<ReturnType<typeof exportAdminApplications>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(
- params?: ExportAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminApplications>>, TError, TData>, }
+ params?: ExportAdminApplicationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportAdminApplications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -813,7 +793,7 @@ export const getGetAdminApplicationUrl = (id: string,) => {
 /**
  * @summary Read an application for leadership review
  */
-export const getAdminApplication = async (id: string, options?: RequestInit): Promise<AdminApplication> => {
+export const getAdminApplication = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<AdminApplication> => {
 
   return customFetch<AdminApplication>(getGetAdminApplicationUrl(id),
   {
@@ -835,16 +815,16 @@ export const getGetAdminApplicationQueryKey = (id: string,) => {
     }
 
 
-export const getGetAdminApplicationQueryOptions = <TData = Awaited<ReturnType<typeof getAdminApplication>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminApplication>>, TError, TData>, }
+export const getGetAdminApplicationQueryOptions = <TData = Awaited<ReturnType<typeof getAdminApplication>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminApplication>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminApplicationQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminApplication>>> = ({ signal }) => getAdminApplication(id, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminApplication>>> = ({ signal }) => getAdminApplication(id, { signal, ...requestOptions });
 
 
 
@@ -857,12 +837,9 @@ export type GetAdminApplicationQueryResult = NonNullable<Awaited<ReturnType<type
 export type GetAdminApplicationQueryError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary Read an application for leadership review
- */
-
+/** @summary Read an application for leadership review */
 export function useGetAdminApplication<TData = Awaited<ReturnType<typeof getAdminApplication>>, TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>>(
- id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminApplication>>, TError, TData>, }
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminApplication>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -891,7 +868,7 @@ export const getUpdateAdminApplicationStatusUrl = (id: string,) => {
  * @summary Change an application review status
  */
 export const updateAdminApplicationStatus = async (id: string,
-    applicationStatusUpdate: ApplicationStatusUpdate, options?: RequestInit): Promise<AdminApplication> => {
+    applicationStatusUpdate: ApplicationStatusUpdate, options?: Parameters<typeof customFetch>[1]): Promise<AdminApplication> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -923,15 +900,15 @@ return customFetch<AdminApplication>(getUpdateAdminApplicationStatusUrl(id),
 export const getUpdateAdminApplicationStatusMutationKey = () => ['updateAdminApplicationStatus'] as const;
 
 export const getUpdateAdminApplicationStatusMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, TError,UpdateAdminApplicationStatusMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, TError,UpdateAdminApplicationStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, TError,UpdateAdminApplicationStatusMutationVariables, TContext> => {
 
 const mutationKey = getUpdateAdminApplicationStatusMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -939,7 +916,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, UpdateAdminApplicationStatusMutationVariables> = (props) => {
           const {id,data} = props ?? {};
 
-          return  updateAdminApplicationStatus(id,data,)
+          return  updateAdminApplicationStatus(id,data,requestOptions)
         }
 
 
@@ -954,11 +931,9 @@ const {mutation: mutationOptions} = options ?
     export type UpdateAdminApplicationStatusMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>
     export type UpdateAdminApplicationStatusMutationVariables = {id: string;data: BodyType<ApplicationStatusUpdate>}
 
-    /**
- * @summary Change an application review status
- */
+    /** @summary Change an application review status */
 export const useUpdateAdminApplicationStatus = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, TError,UpdateAdminApplicationStatusMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminApplicationStatus>>, TError,UpdateAdminApplicationStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateAdminApplicationStatus>>,
         TError,
@@ -979,7 +954,7 @@ export const getListAdminAlliancesUrl = () => {
 /**
  * @summary List active and inactive alliance settings
  */
-export const listAdminAlliances = async ( options?: RequestInit): Promise<AdminAlliance[]> => {
+export const listAdminAlliances = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminAlliance[]> => {
 
   return customFetch<AdminAlliance[]>(getListAdminAlliancesUrl(),
   {
@@ -1001,16 +976,16 @@ export const getListAdminAlliancesQueryKey = () => {
     }
 
 
-export const getListAdminAlliancesQueryOptions = <TData = Awaited<ReturnType<typeof listAdminAlliances>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminAlliances>>, TError, TData>, }
+export const getListAdminAlliancesQueryOptions = <TData = Awaited<ReturnType<typeof listAdminAlliances>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminAlliances>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getListAdminAlliancesQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminAlliances>>> = ({ signal }) => listAdminAlliances({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminAlliances>>> = ({ signal }) => listAdminAlliances({ signal, ...requestOptions });
 
 
 
@@ -1023,12 +998,9 @@ export type ListAdminAlliancesQueryResult = NonNullable<Awaited<ReturnType<typeo
 export type ListAdminAlliancesQueryError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary List active and inactive alliance settings
- */
-
+/** @summary List active and inactive alliance settings */
 export function useListAdminAlliances<TData = Awaited<ReturnType<typeof listAdminAlliances>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminAlliances>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminAlliances>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -1056,7 +1028,7 @@ export const getCreateAdminAllianceUrl = () => {
 /**
  * @summary Add a destination alliance
  */
-export const createAdminAlliance = async (allianceInput: AllianceInput, options?: RequestInit): Promise<AdminAlliance> => {
+export const createAdminAlliance = async (allianceInput: AllianceInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAlliance> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1088,15 +1060,15 @@ return customFetch<AdminAlliance>(getCreateAdminAllianceUrl(),
 export const getCreateAdminAllianceMutationKey = () => ['createAdminAlliance'] as const;
 
 export const getCreateAdminAllianceMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAlliance>>, TError,CreateAdminAllianceMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAlliance>>, TError,CreateAdminAllianceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createAdminAlliance>>, TError,CreateAdminAllianceMutationVariables, TContext> => {
 
 const mutationKey = getCreateAdminAllianceMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -1104,7 +1076,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminAlliance>>, CreateAdminAllianceMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  createAdminAlliance(data,)
+          return  createAdminAlliance(data,requestOptions)
         }
 
 
@@ -1119,11 +1091,9 @@ const {mutation: mutationOptions} = options ?
     export type CreateAdminAllianceMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>
     export type CreateAdminAllianceMutationVariables = {data: BodyType<AllianceInput>}
 
-    /**
- * @summary Add a destination alliance
- */
+    /** @summary Add a destination alliance */
 export const useCreateAdminAlliance = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAlliance>>, TError,CreateAdminAllianceMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminAlliance>>, TError,CreateAdminAllianceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createAdminAlliance>>,
         TError,
@@ -1144,7 +1114,7 @@ export const getGetAdminTierThresholdsUrl = () => {
 /**
  * @summary List migration tier thresholds
  */
-export const getAdminTierThresholds = async ( options?: RequestInit): Promise<TierThreshold[]> => {
+export const getAdminTierThresholds = async ( options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold[]> => {
 
   return customFetch<TierThreshold[]>(getGetAdminTierThresholdsUrl(),
   {
@@ -1166,16 +1136,16 @@ export const getGetAdminTierThresholdsQueryKey = () => {
     }
 
 
-export const getGetAdminTierThresholdsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminTierThresholds>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTierThresholds>>, TError, TData>, }
+export const getGetAdminTierThresholdsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminTierThresholds>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTierThresholds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminTierThresholdsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminTierThresholds>>> = ({ signal }) => getAdminTierThresholds({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminTierThresholds>>> = ({ signal }) => getAdminTierThresholds({ signal, ...requestOptions });
 
 
 
@@ -1188,12 +1158,9 @@ export type GetAdminTierThresholdsQueryResult = NonNullable<Awaited<ReturnType<t
 export type GetAdminTierThresholdsQueryError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>
 
 
-/**
- * @summary List migration tier thresholds
- */
-
+/** @summary List migration tier thresholds */
 export function useGetAdminTierThresholds<TData = Awaited<ReturnType<typeof getAdminTierThresholds>>, TError = ErrorType<UnauthorizedResponse | ForbiddenResponse | ServiceUnavailableResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTierThresholds>>, TError, TData>, }
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminTierThresholds>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -1221,7 +1188,7 @@ export const getCreateAdminTierThresholdUrl = () => {
 /**
  * @summary Add a migration tier threshold
  */
-export const createAdminTierThreshold = async (tierThresholdCreate: TierThresholdCreate, options?: RequestInit): Promise<TierThreshold> => {
+export const createAdminTierThreshold = async (tierThresholdCreate: TierThresholdCreate, options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1253,15 +1220,15 @@ return customFetch<TierThreshold>(getCreateAdminTierThresholdUrl(),
 export const getCreateAdminTierThresholdMutationKey = () => ['createAdminTierThreshold'] as const;
 
 export const getCreateAdminTierThresholdMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext> => {
 
 const mutationKey = getCreateAdminTierThresholdMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -1269,7 +1236,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminTierThreshold>>, CreateAdminTierThresholdMutationVariables> = (props) => {
           const {data} = props ?? {};
 
-          return  createAdminTierThreshold(data,)
+          return  createAdminTierThreshold(data,requestOptions)
         }
 
 
@@ -1284,11 +1251,9 @@ const {mutation: mutationOptions} = options ?
     export type CreateAdminTierThresholdMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>
     export type CreateAdminTierThresholdMutationVariables = {data: BodyType<TierThresholdCreate>}
 
-    /**
- * @summary Add a migration tier threshold
- */
+    /** @summary Add a migration tier threshold */
 export const useCreateAdminTierThreshold = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminTierThreshold>>, TError,CreateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createAdminTierThreshold>>,
         TError,
@@ -1310,7 +1275,7 @@ export const getUpdateAdminTierThresholdUrl = (name: string,) => {
  * @summary Update a migration tier threshold
  */
 export const updateAdminTierThreshold = async (name: string,
-    tierThresholdUpdate: TierThresholdUpdate, options?: RequestInit): Promise<TierThreshold> => {
+    tierThresholdUpdate: TierThresholdUpdate, options?: Parameters<typeof customFetch>[1]): Promise<TierThreshold> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1342,15 +1307,15 @@ return customFetch<TierThreshold>(getUpdateAdminTierThresholdUrl(name),
 export const getUpdateAdminTierThresholdMutationKey = () => ['updateAdminTierThreshold'] as const;
 
 export const getUpdateAdminTierThresholdMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTierThreshold>>, TError,UpdateAdminTierThresholdMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTierThreshold>>, TError,UpdateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateAdminTierThreshold>>, TError,UpdateAdminTierThresholdMutationVariables, TContext> => {
 
 const mutationKey = getUpdateAdminTierThresholdMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -1358,7 +1323,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminTierThreshold>>, UpdateAdminTierThresholdMutationVariables> = (props) => {
           const {name,data} = props ?? {};
 
-          return  updateAdminTierThreshold(name,data,)
+          return  updateAdminTierThreshold(name,data,requestOptions)
         }
 
 
@@ -1373,11 +1338,9 @@ const {mutation: mutationOptions} = options ?
     export type UpdateAdminTierThresholdMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>
     export type UpdateAdminTierThresholdMutationVariables = {name: string;data: BodyType<TierThresholdUpdate>}
 
-    /**
- * @summary Update a migration tier threshold
- */
+    /** @summary Update a migration tier threshold */
 export const useUpdateAdminTierThreshold = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTierThreshold>>, TError,UpdateAdminTierThresholdMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminTierThreshold>>, TError,UpdateAdminTierThresholdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateAdminTierThreshold>>,
         TError,
@@ -1399,7 +1362,7 @@ export const getUpdateAdminAllianceUrl = (id: number,) => {
  * @summary Update an alliance or deactivate it
  */
 export const updateAdminAlliance = async (id: number,
-    allianceUpdate: AllianceUpdate, options?: RequestInit): Promise<AdminAlliance> => {
+    allianceUpdate: AllianceUpdate, options?: Parameters<typeof customFetch>[1]): Promise<AdminAlliance> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1431,15 +1394,15 @@ return customFetch<AdminAlliance>(getUpdateAdminAllianceUrl(id),
 export const getUpdateAdminAllianceMutationKey = () => ['updateAdminAlliance'] as const;
 
 export const getUpdateAdminAllianceMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAlliance>>, TError,UpdateAdminAllianceMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAlliance>>, TError,UpdateAdminAllianceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateAdminAlliance>>, TError,UpdateAdminAllianceMutationVariables, TContext> => {
 
 const mutationKey = getUpdateAdminAllianceMutationKey();
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
@@ -1447,7 +1410,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminAlliance>>, UpdateAdminAllianceMutationVariables> = (props) => {
           const {id,data} = props ?? {};
 
-          return  updateAdminAlliance(id,data,)
+          return  updateAdminAlliance(id,data,requestOptions)
         }
 
 
@@ -1462,11 +1425,9 @@ const {mutation: mutationOptions} = options ?
     export type UpdateAdminAllianceMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ConflictResponse | ServiceUnavailableResponse>
     export type UpdateAdminAllianceMutationVariables = {id: number;data: BodyType<AllianceUpdate>}
 
-    /**
- * @summary Update an alliance or deactivate it
- */
+    /** @summary Update an alliance or deactivate it */
 export const useUpdateAdminAlliance = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | ForbiddenResponse | NotFoundResponse | ConflictResponse | ServiceUnavailableResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAlliance>>, TError,UpdateAdminAllianceMutationVariables, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminAlliance>>, TError,UpdateAdminAllianceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateAdminAlliance>>,
         TError,

@@ -5,6 +5,7 @@ import { useLocation } from 'wouter';
 import { toast } from 'sonner';
 import { useSubmitMigrationApplication } from '@/lib/api-client';
 import { FormSection } from '../../components/Field';
+import { PageLoader } from '../../components/PageLoader';
 import { StepLayout } from '../../components/form/StepLayout';
 import { parseMagnitude, parseStateNumber } from '../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, useLiveTierThresholds } from '../../lib/migrationScore';
@@ -97,10 +98,6 @@ export function ApplicationReviewStep() {
         draft.migrationType === 'Group' && draft.groupMembers.length === 0
           ? 'Individual'
           : (draft.migrationType as MigrationType);
-      const verifiedTag = draft.hasScreenshot ? '[Screenshot Verified]' : null;
-      const groupNote = draft.groupMembers.length > 0 ? `[Group Members: ${draft.groupMembers.length}]` : null;
-      const comments = [draft.comments.trim(), verifiedTag, groupNote].filter(Boolean).join(' ') || null;
-
       const mappedGroupMembers =
         draft.migrationType === 'Group' && draft.groupMembers.length > 0
           ? draft.groupMembers.map((m) => ({
@@ -164,7 +161,7 @@ export function ApplicationReviewStep() {
         migrationType: effectiveMigrationType,
         groupRepresentative: effectiveMigrationType === 'Group' ? draft.representative.trim() : null,
         migrationReason: draft.reason.trim(),
-        additionalComments: comments,
+        additionalComments: draft.comments.trim() || null,
         highestPowerOnRecord: applicantHighestPower,
         structurePower: Math.max(0, Math.round(parseMagnitude(draft.structurePower) || 0)),
         techPower: Math.max(0, Math.round(parseMagnitude(draft.techPower) || 0)),
@@ -235,6 +232,8 @@ export function ApplicationReviewStep() {
       setSubmitting(false);
     }
   };
+
+  if (submitting) return <PageLoader />;
 
   return (
     <StepLayout
@@ -379,12 +378,11 @@ export function ApplicationReviewStep() {
       {confirmOpen && (
         <ReviewConfirmModal
           isOpen={confirmOpen}
-          submitting={submitting}
           t={t}
           hasScreenshot={draft.hasScreenshot}
           isGroup={isGroup}
           memberCount={draft.groupMembers.length}
-          onClose={() => !submitting && setConfirmOpen(false)}
+          onClose={() => setConfirmOpen(false)}
           onConfirm={confirmSubmit}
         />
       )}

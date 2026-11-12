@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
 import { KeyRound, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { useLeadershipSession } from '../lib/auth';
+import { PageLoader } from '../components/PageLoader';
 import { PageHeader } from '../components/PageHeader';
 
 export function LeadershipLogin() {
@@ -18,13 +19,7 @@ export function LeadershipLogin() {
     if (session) setLocation('/leadership/dashboard');
   }, [session, setLocation]);
 
-  if (loading) {
-    return (
-      <main className="auth-shell">
-        <div className="skeleton auth-skeleton" aria-label={t('pages.leadership.checkingSession')} />
-      </main>
-    );
-  }
+  if (loading) return <PageLoader />;
 
   if (session) return null;
 

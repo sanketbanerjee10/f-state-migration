@@ -5,13 +5,6 @@ import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  getGetAdminApplicationQueryKey,
-  getGetAdminOverviewQueryKey,
-  getGetAdminTierThresholdsQueryKey,
-  getListAdminAlliancesQueryKey,
-  getListAdminApplicationsQueryKey,
-} from '@/lib/api-client';
 import { LeadershipDashboard } from '@/pages/LeadershipDashboard';
 import { useLeadershipSession } from '@/lib/auth';
 
@@ -171,13 +164,13 @@ afterEach(async () => {
 });
 
 describe('Leadership dashboard and session flows', () => {
-  it('LEAD-01 shows a session-checking placeholder while session status is loading', async () => {
+  it('LEAD-01 shows the universal page loader while session status is loading', async () => {
     const pending = deferred<Response>();
     vi.mocked(fetch).mockReturnValue(pending.promise);
 
     await mount(createElement(LeadershipDashboard));
 
-    expect(container?.querySelector('[aria-label="pages.leadership.checkingSession"]')).not.toBeNull();
+    expect(container?.querySelector('.page-loading[role="status"]')).not.toBeNull();
     expect(container?.querySelector('[data-testid="leadership-dashboard"]')).toBeNull();
 
     pending.resolve(response({ authenticated: false }));
@@ -207,25 +200,19 @@ describe('Leadership dashboard and session flows', () => {
     expect(container?.querySelector('[data-testid="applications-section"]')?.getAttribute('data-enabled')).toBe('true');
   });
 
-  it('LEAD-04 invalidates dashboard queries and the selected application on refresh', async () => {
+  it('LEAD-04 orders leadership header actions and does not render refresh', async () => {
     vi.mocked(fetch).mockResolvedValue(response({ authenticated: true }));
     await mount(createElement(LeadershipDashboard));
     await settle();
 
-    const invalidate = vi.spyOn(queryClient!, 'invalidateQueries');
-    await click('select-application');
-    await click('refresh-dashboard');
+    const header = container?.querySelector('header.page-header');
+    const settings = header?.querySelector('[data-testid="nav-settings"]');
+    const language = header?.querySelector('.language-selector-trigger');
+    const logout = header?.querySelector('[data-testid="logout"]');
 
-    const invalidatedKeys = invalidate.mock.calls.map(([filters]) => filters.queryKey);
-    expect(invalidatedKeys).toEqual(
-      expect.arrayContaining([
-        getGetAdminOverviewQueryKey(),
-        getListAdminApplicationsQueryKey(),
-        getListAdminAlliancesQueryKey(),
-        getGetAdminTierThresholdsQueryKey(),
-        getGetAdminApplicationQueryKey('app-42'),
-      ]),
-    );
+    expect(container?.querySelector('[data-testid^="refresh-"]')).toBeNull();
+    expect(settings?.compareDocumentPosition(language!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(language?.compareDocumentPosition(logout!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it('LEAD-05 opens the selected application drawer and closes it on request', async () => {
@@ -235,9 +222,22 @@ describe('Leadership dashboard and session flows', () => {
 
     await click('select-application');
     expect(container?.querySelector('[data-testid="application-drawer"]')?.getAttribute('data-application-id')).toBe('app-42');
+    expect(mockRouter.navigations).toContain('/leadership/dashboard?applicationId=app-42');
 
     await click('close-drawer');
     expect(container?.querySelector('[data-testid="application-drawer"]')).toBeNull();
+    expect(mockRouter.navigations).toContain('/leadership/dashboard');
+  });
+
+  it('LEAD-05a automatically opens the application drawer from the applicationId URL parameter', async () => {
+    mockRouter.location = '/leadership/dashboard';
+    window.history.replaceState({}, '', '/leadership/dashboard?applicationId=app-42');
+    vi.mocked(fetch).mockResolvedValue(response({ authenticated: true }));
+
+    await mount(createElement(LeadershipDashboard));
+    await settle();
+
+    expect(container?.querySelector('[data-testid="application-drawer"]')?.getAttribute('data-application-id')).toBe('app-42');
   });
 
   it('LEAD-06 logs out and navigates to the expired-session login route on a session error', async () => {

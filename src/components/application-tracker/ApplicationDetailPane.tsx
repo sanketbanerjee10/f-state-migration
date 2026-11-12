@@ -258,13 +258,13 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
         <div style={s.statStrip}>
           <StatCell label={t('components.tracker.currentState')} value={t('components.tracker.stateNumber', { state: application.currentState })} />
           <StatCell label={t('components.tracker.alliance')} value={application.currentAlliance || t('components.tracker.none')} />
-          <StatCell label={t('common.labels.kills')} value={formatNumber(application.kills)} />
+          <StatCell label={t('common.labels.kills')} value={formatNumber(applicantPlayer?.kills ?? 0)} />
           <StatCell
             label={t('components.tracker.highestPower')}
             value={
               applicantPlayer
                 ? formatPowerInM(applicantPlayer.highestPowerOnRecord)
-                : formatPowerInM(application.f1ArenaPower)
+                : '—'
             }
           />
         </div>
@@ -278,7 +278,7 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
               <PowerStatCard label={t('components.tracker.troop')} value={formatPowerInM(applicantPlayer.troopPower)} />
               <PowerStatCard label={t('components.tracker.hero')} value={formatPowerInM(applicantPlayer.heroPower)} />
               <PowerStatCard label={t('components.tracker.vehicle')} value={formatPowerInM(applicantPlayer.modVehiclePower)} />
-              <PowerStatCard label={t('components.tracker.f1')} value={formatPowerInM(application.f1ArenaPower)} />
+              <PowerStatCard label={t('components.tracker.f1')} value={formatPowerInM(applicantPlayer?.f1ArenaPower ?? 0)} />
             </div>
           </div>
         )}
@@ -356,7 +356,7 @@ export function ApplicationDetailPane({ application, onRemove }: ApplicationDeta
               </span>
             )}
           </Field>
-          <Field label={t('components.tracker.tier')}>{application.migrationTier}</Field>
+          <Field label={t('components.tracker.tier')}>{applicantPlayer?.migrationTier ?? t('components.tracker.none')}</Field>
           <Field label={t('components.tracker.preferredAlliances')}>
             {application.anyAlliance
               ? t('components.tracker.anyAlliance')

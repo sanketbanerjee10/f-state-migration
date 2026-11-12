@@ -277,8 +277,8 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
     const data = editApplication.data;
     if (!data) return;
 
-        const applicantPlayer = data.players?.find((p: any) => p.isApplicant);
-        const groupPlayers = data.players?.filter((p: any) => !p.isApplicant) || [];
+        const applicantPlayer = data.players?.find((player) => player.isApplicant);
+        const groupPlayers = data.players?.filter((player) => !player.isApplicant) || [];
         const ref = `565-${data.id.replaceAll('-', '').slice(0, 12).toUpperCase()}`;
         const structurePower = applicantPlayer?.structurePower ? String(applicantPlayer.structurePower) : '';
         const techPower = applicantPlayer?.techPower ? String(applicantPlayer.techPower) : '';
@@ -303,34 +303,36 @@ export function ApplicationDraftProvider({ children }: { children: ReactNode }) 
           troopPower,
           heroPower,
           modVehiclePower,
-          kills: String(applicantPlayer?.kills ?? data.kills ?? ''),
+          kills: String(applicantPlayer?.kills ?? ''),
           hasScreenshot: Boolean(applicantPlayer?.isScreenshotVerified),
           screenshotFileName: applicantPlayer?.isScreenshotVerified ? 'Verified Screenshot Record' : '',
 
           currentState: String(data.currentState || ''),
           currentAlliance: data.currentAlliance || '',
-          f1: String(data.f1ArenaPower || ''),
-          f2: String(data.f2ArenaPower || ''),
-          f3: String(data.f3ArenaPower || ''),
+          f1: String(applicantPlayer?.f1ArenaPower ?? ''),
+          f2: String(applicantPlayer?.f2ArenaPower ?? ''),
+          f3: String(applicantPlayer?.f3ArenaPower ?? ''),
           t10ResearchComplete:
-            data.t10ResearchComplete && data.t10ResearchPercent == null
+            applicantPlayer?.t10ResearchComplete && applicantPlayer.t10ResearchPercent == null
               ? true
-              : data.t10ResearchPercent == null
+              : applicantPlayer?.t10ResearchPercent == null
                 ? null
                 : false,
           t10ResearchPercent:
-            data.t10ResearchPercent == null ? '' : String(data.t10ResearchPercent),
+            applicantPlayer?.t10ResearchPercent == null
+              ? ''
+              : String(applicantPlayer.t10ResearchPercent),
 
           preferredAlliances: data.anyAlliance
             ? ['any']
-            : (data.preferredAlliances?.map((a: any) => String(a.id)) || []),
-          tier: data.migrationTier || '',
+            : (data.preferredAlliances?.map((alliance) => String(alliance.id)) || []),
+          tier: applicantPlayer?.migrationTier || '',
           migrationType: data.migrationType || 'Individual',
           representative: data.groupRepresentative || '',
           reason: data.migrationReason || '',
           comments: data.additionalComments || '',
 
-          groupMembers: groupPlayers.map((gp: any) => ({
+          groupMembers: groupPlayers.map((gp) => ({
             id: gp.id || crypto.randomUUID(),
             playerName: gp.playerName,
             currentState: String(gp.currentState ?? data.currentState ?? ''),

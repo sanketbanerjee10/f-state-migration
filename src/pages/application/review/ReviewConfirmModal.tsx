@@ -1,9 +1,8 @@
-import { CheckCircle2, LoaderCircle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { Modal } from '../../../components/Dialogs';
 
 export type ReviewConfirmModalProps = {
   isOpen: boolean;
-  submitting: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
   hasScreenshot: boolean;
   isGroup: boolean;
@@ -14,7 +13,6 @@ export type ReviewConfirmModalProps = {
 
 export function ReviewConfirmModal({
   isOpen,
-  submitting,
   t,
   hasScreenshot,
   isGroup,
@@ -34,7 +32,6 @@ export function ReviewConfirmModal({
             type="button"
             className="button button-quiet"
             onClick={onClose}
-            disabled={submitting}
             data-testid="cancel-submit"
           >
             {t('common.actions.cancel')}
@@ -43,18 +40,9 @@ export function ReviewConfirmModal({
             type="button"
             className="button button-primary"
             onClick={onConfirm}
-            disabled={submitting}
             data-testid="confirm-submit"
           >
-            {submitting ? (
-              <>
-                <LoaderCircle size={14} className="spin" /> {t('common.status.sending')}
-              </>
-            ) : (
-              <>
-                <CheckCircle2 size={15} /> {t('wizard.review.submit')}
-              </>
-            )}
+            <CheckCircle2 size={15} /> {t('wizard.review.submit')}
           </button>
         </>
       }

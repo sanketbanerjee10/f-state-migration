@@ -3,14 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Edit3, Plus, Sofa } from 'lucide-react';
 import {
-  getGetAdminTierThresholdsQueryKey,
   getGetTierThresholdsQueryKey,
   useCreateAdminTierThreshold,
-  useGetAdminTierThresholds,
   useUpdateAdminTierThreshold,
   type TierThreshold,
 } from '@/lib/api-client';
-import { TIER_COLORS } from '../../lib/migrationScore';
+import {
+  clearCachedTierThresholds,
+  useCachedTierThresholdRows,
+  TIER_COLORS,
+} from '../../lib/migrationScore';
 
 interface TierThresholdsSectionProps {
   enabled?: boolean;
@@ -31,12 +33,7 @@ export function TierThresholdsSection({
   const [thresholdPasses, setThresholdPasses] = useState('');
   const [thresholdError, setThresholdError] = useState('');
 
-  const tierThresholds = useGetAdminTierThresholds({
-    query: {
-      queryKey: getGetAdminTierThresholdsQueryKey(),
-      enabled,
-    },
-  });
+  const tierThresholds = useCachedTierThresholdRows(enabled);
 
   const createThresholdMutation = useCreateAdminTierThreshold();
   const updateThresholdMutation = useUpdateAdminTierThreshold();
@@ -90,9 +87,7 @@ export function TierThresholdsSection({
           data: { scoreMin: scoreVal, passesRequired: passVal },
         });
       }
-      void client.invalidateQueries({
-        queryKey: getGetAdminTierThresholdsQueryKey(),
-      });
+      clearCachedTierThresholds();
       void client.invalidateQueries({
         queryKey: getGetTierThresholdsQueryKey(),
       });

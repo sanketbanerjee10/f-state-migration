@@ -1,29 +1,38 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation } from 'wouter';
-import { useQueryClient } from '@tanstack/react-query';
-import {
-  getGetAdminOverviewQueryKey,
-  getListAdminApplicationsQueryKey,
-  getListAdminAlliancesQueryKey,
-  getGetAdminTierThresholdsQueryKey,
-  getGetAdminApplicationQueryKey,
-} from '@/lib/api-client';
 import { useLeadershipSession } from '../lib/auth';
+import { PageLoader } from '../components/PageLoader';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { DashboardOverview } from '../components/dashboard/DashboardOverview';
 import { ApplicationsSection } from '../components/dashboard/ApplicationsSection';
 import { ApplicationDetailDrawer } from '../components/dashboard/ApplicationDetailDrawer';
 
-export function LeadershipDashboard() {
-  const { t } = useTranslation();
-  const { session, loading, logout: authLogout } = useLeadershipSession();
-  const [, setLocation] = useLocation();
-  const client = useQueryClient();
+function getApplicationId(location: string) {
+  const routeUrl = new URL(location, window.location.origin);
+  const routeApplicationId = routeUrl.searchParams.get('applicationId');
+  if (routeApplicationId) return routeApplicationId;
 
-  const [selectedId, setSelectedId] = useState('');
+  if (routeUrl.pathname === window.location.pathname) {
+    return new URLSearchParams(window.location.search).get('applicationId') ?? '';
+  }
+
+  return '';
+}
+
+export function LeadershipDashboard() {
+  const { session, loading, logout: authLogout } = useLeadershipSession();
+  const [location, setLocation] = useLocation();
+
+  const [selectedId, setSelectedId] = useState(() => getApplicationId(location));
   const [notice, setNotice] = useState('');
   const [sessionError, setSessionError] = useState(false);
+
+  useEffect(() => {
+    const syncApplicationId = () => setSelectedId(getApplicationId(location));
+    syncApplicationId();
+    window.addEventListener('popstate', syncApplicationId);
+    return () => window.removeEventListener('popstate', syncApplicationId);
+  }, [location]);
 
   useEffect(() => {
     if (!loading && !session) {
@@ -31,16 +40,7 @@ export function LeadershipDashboard() {
     }
   }, [loading, session, setLocation]);
 
-  if (loading) {
-    return (
-      <main className="admin-shell">
-        <div
-          className="skeleton dashboard-skeleton"
-          aria-label={t('pages.leadership.checkingSession')}
-        />
-      </main>
-    );
-  }
+  if (loading) return <PageLoader />;
 
   if (!session) return null;
 
@@ -55,16 +55,18 @@ export function LeadershipDashboard() {
     setLocation('/leadership');
   };
 
-  const handleRefresh = () => {
-    void client.invalidateQueries({ queryKey: getGetAdminOverviewQueryKey() });
-    void client.invalidateQueries({ queryKey: getListAdminApplicationsQueryKey() });
-    void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
-    void client.invalidateQueries({ queryKey: getGetAdminTierThresholdsQueryKey() });
-    if (selectedId) {
-      void client.invalidateQueries({
-        queryKey: getGetAdminApplicationQueryKey(selectedId),
-      });
+  const updateApplicationId = (applicationId: string) => {
+    const url = new URL(location, window.location.origin);
+    if (url.pathname === window.location.pathname && !url.search) {
+      url.search = window.location.search;
     }
+    if (applicationId) {
+      url.searchParams.set('applicationId', applicationId);
+    } else {
+      url.searchParams.delete('applicationId');
+    }
+    setLocation(`${url.pathname}${url.search}${url.hash}`);
+    setSelectedId(applicationId);
   };
 
   return (
@@ -74,7 +76,6 @@ export function LeadershipDashboard() {
         sessionError={sessionError}
         notice={notice}
         onLogout={handleLogout}
-        onRefresh={handleRefresh}
         onDismissNotice={() => setNotice('')}
         onLoginRedirect={() => setLocation('/leadership')}
       />
@@ -84,14 +85,14 @@ export function LeadershipDashboard() {
       <ApplicationsSection
         enabled={!!session}
         selectedId={selectedId}
-        onSelectApplication={(id) => setSelectedId(id)}
+        onSelectApplication={(id) => updateApplicationId(id)}
         onError={handleSessionError}
       />
 
       {selectedId && (
         <ApplicationDetailDrawer
           applicationId={selectedId}
-          onClose={() => setSelectedId('')}
+          onClose={() => updateApplicationId('')}
           onNotice={(msg) => setNotice(msg)}
           onSessionError={handleSessionError}
         />

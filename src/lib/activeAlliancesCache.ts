@@ -1,7 +1,7 @@
 import { getActiveAlliances, getGetActiveAlliancesQueryKey, useGetActiveAlliances, type Alliance } from '@/lib/api-client';
 
 const ACTIVE_ALLIANCES_CACHE_KEY = 'state565_active_alliances';
-const ACTIVE_ALLIANCES_CACHE_TTL = 24 * 60 * 60 * 1000;
+export const ACTIVE_ALLIANCES_CACHE_TTL = 24 * 60 * 60 * 1000;
 
 interface CachedActiveAlliances {
   cachedAt: number;
@@ -42,6 +42,14 @@ function readCachedActiveAlliances(): Alliance[] | null {
     return entry.alliances;
   } catch {
     return null;
+  }
+}
+
+export function clearCachedActiveAlliances(): void {
+  try {
+    localStorage.removeItem(ACTIVE_ALLIANCES_CACHE_KEY);
+  } catch {
+    // The query cache will still be invalidated when browser storage is unavailable.
   }
 }
 

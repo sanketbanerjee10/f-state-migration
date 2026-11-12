@@ -10,6 +10,7 @@ export type PageHeaderProps = {
   backLabel?: ReactNode;
   backAriaLabel?: string;
   backTestId?: string;
+  leadingActions?: ReactNode;
   actions?: ReactNode;
   className?: string;
   eyebrow?: ReactNode;
@@ -24,6 +25,7 @@ export function PageHeader({
   backLabel,
   backAriaLabel,
   backTestId,
+  leadingActions,
   actions,
   className,
   eyebrow,
@@ -50,6 +52,7 @@ export function PageHeader({
           </Link>
         )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          {leadingActions}
           <LanguageSelector />
           {actions}
         </div>

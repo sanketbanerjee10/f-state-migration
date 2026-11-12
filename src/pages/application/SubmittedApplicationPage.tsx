@@ -1,7 +1,8 @@
-import { Search, Sparkles } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Link, useParams, useSearch } from 'wouter';
 import { useTranslation } from 'react-i18next';
 import { CelebrationModal } from '../../components/CelebrationModal';
+import { PageLoader } from '../../components/PageLoader';
 import { PageHeader } from '../../components/PageHeader';
 import { useApplicationDetails } from '../../lib/applicationDetailsCache';
 import { getReferenceCode } from '../../components/application-tracker/trackerUtils';
@@ -53,25 +54,7 @@ export function SubmittedApplicationPage() {
   const { t } = useTranslation();
   const applicationQuery = useApplicationDetails(id);
 
-  if (applicationQuery.isLoading) {
-    return (
-      <SubmittedApplicationLayout>
-        <div className="confirmation-loading" role="status" aria-live="polite">
-          <div className="confirmation-loading__art" aria-hidden="true">
-            <span className="confirmation-loading__orbit confirmation-loading__orbit--outer" />
-            <span className="confirmation-loading__orbit confirmation-loading__orbit--inner" />
-            <span className="confirmation-loading__satellite confirmation-loading__satellite--one" />
-            <span className="confirmation-loading__satellite confirmation-loading__satellite--two" />
-            <span className="confirmation-loading__core">
-              <Sparkles size={25} />
-            </span>
-          </div>
-          <h2>{t('pages.confirmation.loadingTitle')}</h2>
-          <p>{t('pages.confirmation.loadingDescription')}</p>
-        </div>
-      </SubmittedApplicationLayout>
-    );
-  }
+  if (applicationQuery.isLoading) return <PageLoader />;
 
   const application = applicationQuery.data;
   if (

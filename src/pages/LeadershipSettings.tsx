@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
-import { RefreshCw, Sliders, Users, Sofa, LogOut, X } from 'lucide-react';
-import {
-  getListAdminAlliancesQueryKey,
-  getGetAdminTierThresholdsQueryKey,
-  getGetTierThresholdsQueryKey,
-} from '@/lib/api-client';
+import { Sliders, Users, Sofa, LogOut, X } from 'lucide-react';
 import { useLeadershipSession } from '../lib/auth';
+import { PageLoader } from '../components/PageLoader';
 import { AllianceManagementSection } from '../components/dashboard/AllianceManagementSection';
 import { TierThresholdsSection } from '../components/dashboard/TierThresholdsSection';
 import { PageHeader } from '../components/PageHeader';
@@ -17,7 +12,6 @@ export function LeadershipSettings() {
   const { t } = useTranslation();
   const { session, loading, logout: authLogout } = useLeadershipSession();
   const [, setLocation] = useLocation();
-  const client = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<'all' | 'alliances' | 'thresholds'>('all');
   const [notice, setNotice] = useState('');
@@ -29,16 +23,7 @@ export function LeadershipSettings() {
     }
   }, [loading, session, setLocation]);
 
-  if (loading) {
-    return (
-      <main className="admin-shell">
-        <div
-          className="skeleton dashboard-skeleton"
-          aria-label={t('pages.leadership.checkingSession')}
-        />
-      </main>
-    );
-  }
+  if (loading) return <PageLoader />;
 
   if (!session) return null;
 
@@ -61,12 +46,6 @@ export function LeadershipSettings() {
     setLocation('/leadership');
   };
 
-  const handleRefresh = () => {
-    void client.invalidateQueries({ queryKey: getListAdminAlliancesQueryKey() });
-    void client.invalidateQueries({ queryKey: getGetAdminTierThresholdsQueryKey() });
-    void client.invalidateQueries({ queryKey: getGetTierThresholdsQueryKey() });
-  };
-
   return (
     <main className="admin-shell" data-testid="leadership-settings">
       <PageHeader
@@ -77,24 +56,14 @@ export function LeadershipSettings() {
         title={t('pages.leadership.settingsAndConfig')}
         description={t('pages.leadership.settingsDescription')}
         actions={
-          <>
-            <button
-              className="button button-quiet"
-              type="button"
-              onClick={handleRefresh}
-              data-testid="refresh-settings"
-            >
-              <RefreshCw size={14} /> {t('components.dashboard.refresh')}
-            </button>
-            <button
+          <button
               className="button button-quiet"
               type="button"
               onClick={handleLogout}
               data-testid="logout"
             >
               <LogOut size={15} /> {t('pages.leadership.signOut')}
-            </button>
-          </>
+          </button>
         }
       />
 

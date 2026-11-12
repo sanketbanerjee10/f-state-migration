@@ -1,3 +1,5 @@
+import { Swords } from 'lucide-react';
+import { VerifiedBadge } from '../../../components/MigrationScoringGuide';
 import { parseMagnitude } from '../../../lib/parsers';
 import { calculateMigrationScoreFromRaw, TIER_COLORS, type TierThresholds } from '../../../lib/migrationScore';
 import type { ApplicationDraft } from '../../../hooks/useApplicationDraft';
@@ -17,7 +19,8 @@ export function ReviewRosterMemberCard({ member, draft, index, t, thresholds }: 
   const mh = parseMagnitude(member.heroPower) || 0;
   const mv = parseMagnitude(member.modVehiclePower) || 0;
   const mScore = calculateMigrationScoreFromRaw(ms, mt, mh, mv, thresholds);
-  const t10Complete = mt >= 25_000_000 || member.t10ResearchComplete === true;
+  const t10Complete = member.t10ResearchComplete === true;
+  const t10Percent = t10Complete ? '100' : member.t10ResearchPercent.trim() || '—';
 
   return (
     <div
@@ -30,8 +33,46 @@ export function ReviewRosterMemberCard({ member, draft, index, t, thresholds }: 
       }}
       data-testid={`review-group-member-${index}`}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontWeight: 600, color: '#93c5fd' }}>{member.playerName}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 600, color: '#93c5fd' }}>{member.playerName}</span>
+          {member.isScreenshotVerified ? (
+            <VerifiedBadge />
+          ) : (
+            <span
+              style={{
+                fontSize: 9,
+                color: '#94a3b8',
+                background: 'rgba(255,255,255,0.06)',
+                padding: '2px 5px',
+                borderRadius: 4,
+              }}
+            >
+              {t('wizard.roster.manual')}
+            </span>
+          )}
+          <span
+            data-testid={`review-group-member-t10-${index}`}
+            aria-label={`T10: ${t10Percent}%`}
+            title={`T10: ${t10Percent}%`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              color: t10Complete ? '#4ade80' : '#f87171',
+              background: t10Complete ? 'rgba(74,222,128,0.12)' : 'rgba(248,113,113,0.12)',
+              border: `1px solid ${t10Complete ? 'rgba(74,222,128,0.35)' : 'rgba(248,113,113,0.35)'}`,
+              padding: '2px 6px',
+              borderRadius: 4,
+              fontSize: 10,
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Swords size={12} />
+            T10: {t10Percent}%
+          </span>
+        </div>
         {mScore && (
           <span
             style={{
@@ -53,14 +94,6 @@ export function ReviewRosterMemberCard({ member, draft, index, t, thresholds }: 
       </div>
       <div style={{ color: '#64748b', fontSize: 10 }}>
         {t('common.labels.alliance')} {member.currentAlliance || draft.currentAlliance || '—'}
-      </div>
-      <div style={{ color: '#64748b', fontSize: 10 }}>
-        {t('wizard.combat.t10Title')}:{' '}
-        {t10Complete
-          ? t('wizard.combat.t10Yes')
-          : member.t10ResearchComplete === false && member.t10ResearchPercent
-            ? t('wizard.combat.t10ProgressSummary', { percent: member.t10ResearchPercent })
-            : t('wizard.review.notProvided')}
       </div>
     </div>
   );

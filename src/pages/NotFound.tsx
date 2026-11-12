@@ -60,7 +60,7 @@ export default function NotFound() {
         </section>
 
         <nav className="not-found-destinations" aria-label="Helpful destinations">
-          <Link href="/" className="not-found-destination">
+          <Link href="/apply" className="not-found-destination">
             <span className="not-found-destination-icon"><MapPin size={18} /></span>
             <span className="not-found-destination-copy">
               <strong>Migration</strong>

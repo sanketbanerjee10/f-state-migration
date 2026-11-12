@@ -38,7 +38,7 @@ export const DEFAULT_THRESHOLDS: TierThresholds = {
 };
 
 const TIER_THRESHOLDS_CACHE_KEY = 'state565_tier_thresholds';
-const TIER_THRESHOLDS_CACHE_TTL = 3 * 24 * 60 * 60 * 1000;
+export const TIER_THRESHOLDS_CACHE_TTL = 3 * 24 * 60 * 60 * 1000;
 
 interface CachedTierThresholds {
   cachedAt: number;
@@ -85,7 +85,7 @@ function readCachedTierThresholds(): TierThreshold[] | null {
   }
 }
 
-async function getCachedTierThresholds(signal?: AbortSignal): Promise<TierThreshold[]> {
+export async function getCachedTierThresholds(signal?: AbortSignal): Promise<TierThreshold[]> {
   const cachedRows = readCachedTierThresholds();
   if (cachedRows) return cachedRows;
 
@@ -97,6 +97,26 @@ async function getCachedTierThresholds(signal?: AbortSignal): Promise<TierThresh
     // Keep the fetched result available even when browser storage is unavailable.
   }
   return rows;
+}
+
+export function clearCachedTierThresholds(): void {
+  try {
+    localStorage.removeItem(TIER_THRESHOLDS_CACHE_KEY);
+  } catch {
+    // The query cache will still be invalidated when browser storage is unavailable.
+  }
+}
+
+export function useCachedTierThresholdRows(enabled = true) {
+  return useGetTierThresholds({
+    query: {
+      queryKey: getGetTierThresholdsQueryKey(),
+      queryFn: ({ signal }) => getCachedTierThresholds(signal),
+      enabled,
+      staleTime: TIER_THRESHOLDS_CACHE_TTL,
+      refetchOnWindowFocus: false,
+    },
+  });
 }
 
 export function rowsToTierThresholds(
@@ -127,14 +147,7 @@ export function useLiveTierThresholds(): {
   thresholds: TierThresholds;
   isLoading: boolean;
 } {
-  const { data: rows, isLoading } = useGetTierThresholds({
-    query: {
-      queryKey: getGetTierThresholdsQueryKey(),
-      queryFn: ({ signal }) => getCachedTierThresholds(signal),
-      staleTime: TIER_THRESHOLDS_CACHE_TTL,
-      refetchOnWindowFocus: false,
-    },
-  });
+  const { data: rows, isLoading } = useCachedTierThresholdRows();
 
   const thresholds = useMemo(() => rowsToTierThresholds(rows), [rows]);
   return { thresholds, isLoading };
