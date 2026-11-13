@@ -344,6 +344,7 @@ async function mountGame() {
 }
 
 beforeEach(() => {
+  window.history.replaceState(null, '', '/game');
   (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   mocks.engines.length = 0;
   mocks.audios.length = 0;
@@ -431,9 +432,45 @@ afterEach(async () => {
   fullscreenPropertyDescriptors = [];
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  window.history.replaceState(null, '', '/');
 });
 
 describe('game UI scenarios', () => {
+  it('does not serialize the pause-menu click event into the URL when returning to the main menu', async () => {
+    await mountGame();
+    await clickButton('Start survival');
+    await clickButton('Pause run');
+    await clickButton('Return to main menu');
+
+    expect(new URLSearchParams(window.location.search).get('gameMenu')).toBe('home');
+    expect(window.location.href).not.toContain('[object Object]');
+    expect(container?.querySelector('[data-testid="game-menu-main"]')).not.toBeNull();
+  });
+
+  it('uses browser history to pause and resume an active run', async () => {
+    await mountGame();
+    await clickButton('Start survival');
+    expect(new URLSearchParams(window.location.search).get('gameMenu')).toBe('playing');
+
+    await clickButton('Pause run');
+    expect(new URLSearchParams(window.location.search).get('gameMenu')).toBe('home');
+    expect(container?.querySelector('[data-testid="game-menu-pause"]')).not.toBeNull();
+
+    await act(async () => {
+      window.history.back();
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+    expect(new URLSearchParams(window.location.search).get('gameMenu')).toBe('playing');
+    expect(container?.querySelector('[data-testid="game-menu-pause"]')).toBeNull();
+
+    await act(async () => {
+      window.history.forward();
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+    expect(new URLSearchParams(window.location.search).get('gameMenu')).toBe('home');
+    expect(container?.querySelector('[data-testid="game-menu-pause"]')).not.toBeNull();
+  });
+
   it('only enters fullscreen after the user activates the fullscreen button', async () => {
     await act(async () => mediaQuery.setMatches(true));
     await mountGame();

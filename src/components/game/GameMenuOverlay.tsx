@@ -14,6 +14,10 @@ import { GameMusicPlayer } from './GameMusicPlayer';
 import { GamePauseMenu } from './GamePauseMenu';
 import { GameSettingsPanel } from './GameSettingsPanel';
 import type { GameMenuMode, GameMenuView } from './GameMenuTypes';
+import {
+  getGameMenuView,
+  pushGameMenuNavigationState,
+} from './GameMenuNavigation';
 
 export type { GameMenuMode } from './GameMenuTypes';
 
@@ -69,9 +73,26 @@ export function GameMenuOverlay({
   tutorialMode = false,
 }: GameMenuOverlayProps) {
   const { t } = useTranslation();
-  const [view, setView] = useState<GameMenuView>(initialView);
+  const [view, setView] = useState<GameMenuView>(() =>
+    getGameMenuView(window.location.search, initialView),
+  );
   const overlayRef = useRef<HTMLElement>(null);
   const isMainMenu = mode === 'main';
+
+  const navigateToView = (nextView: GameMenuView) => {
+    if (nextView === view) return;
+    pushGameMenuNavigationState(nextView);
+    setView(nextView);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setView(getGameMenuView(window.location.search, initialView));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [initialView]);
 
   useLayoutEffect(() => {
     if (overlayRef.current) overlayRef.current.scrollTop = 0;
@@ -83,7 +104,7 @@ export function GameMenuOverlay({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
-      setView('home');
+      navigateToView('home');
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -137,7 +158,7 @@ export function GameMenuOverlay({
             view === 'leaderboard') && (
             <GameMainMenu
               view="home"
-              onViewChange={setView}
+              onViewChange={navigateToView}
               onStart={onStart}
               onStartTutorial={onStartTutorial}
             />
@@ -146,7 +167,7 @@ export function GameMenuOverlay({
           <GamePauseMenu
             active={view === 'home' || view === 'settings'}
             gameState={gameState}
-            onViewChange={setView}
+            onViewChange={navigateToView}
             onResume={onResume}
             onAdjustStat={onAdjustStat}
             onAdjustRareUpgrade={onAdjustRareUpgrade}
@@ -157,18 +178,18 @@ export function GameMenuOverlay({
         )}
         {view === 'leaderboard' && !isMainMenu ? (
           <GameLeaderboardPanel
-            onBack={() => setView('home')}
+            onBack={() => navigateToView('home')}
             backLabel={backLabel}
           />
         ) : view === 'enemy-guide' && !isMainMenu ? (
           <GameEnemyGuide
-            onBack={() => setView('home')}
+            onBack={() => navigateToView('home')}
             backLabel={backLabel}
           />
         ) : view === 'level-select' && !isMainMenu ? (
           <GameMainMenu
             view="level-select"
-            onViewChange={setView}
+            onViewChange={navigateToView}
             onStart={onStart}
             onStartTutorial={onStartTutorial}
           />
@@ -179,7 +200,7 @@ export function GameMenuOverlay({
               className="game-level-select-backdrop"
               type="button"
               aria-label={t('game.menu.closeCampaign')}
-              onClick={() => setView('home')}
+              onClick={() => navigateToView('home')}
             />
             <section
               className="game-level-select-overlay"
@@ -189,7 +210,7 @@ export function GameMenuOverlay({
             >
               <GameMainMenu
                 view="level-select"
-                onViewChange={setView}
+                onViewChange={navigateToView}
                 onStart={onStart}
                 onStartTutorial={onStartTutorial}
               />
@@ -203,7 +224,7 @@ export function GameMenuOverlay({
             className="game-leaderboard-backdrop"
             type="button"
             aria-label={t('game.menu.closeLeaderboard')}
-            onClick={() => setView('home')}
+            onClick={() => navigateToView('home')}
           />
           <section
             className="game-leaderboard-dialog"
@@ -212,7 +233,7 @@ export function GameMenuOverlay({
             aria-labelledby="game-leaderboard-title"
           >
             <GameLeaderboardPanel
-              onBack={() => setView('home')}
+              onBack={() => navigateToView('home')}
               backLabel={backLabel}
             />
           </section>
@@ -224,7 +245,7 @@ export function GameMenuOverlay({
             className="game-guide-backdrop"
             type="button"
             aria-label={t('game.menu.closeGuides')}
-            onClick={() => setView('home')}
+            onClick={() => navigateToView('home')}
           />
           <section
             className="game-guide-dialog"
@@ -232,11 +253,11 @@ export function GameMenuOverlay({
             aria-modal="true"
             aria-labelledby="game-enemy-guide-title"
             onKeyDown={(event) => {
-              if (event.key === 'Escape') setView('home');
+              if (event.key === 'Escape') navigateToView('home');
             }}
           >
             <GameEnemyGuide
-              onBack={() => setView('home')}
+              onBack={() => navigateToView('home')}
               backLabel={backLabel}
             />
           </section>
@@ -248,7 +269,7 @@ export function GameMenuOverlay({
             className="game-settings-backdrop"
             type="button"
             aria-label={t('game.menu.closeSettings')}
-            onClick={() => setView('home')}
+            onClick={() => navigateToView('home')}
           />
           <section
             className="game-settings-dialog"
@@ -256,7 +277,7 @@ export function GameMenuOverlay({
             aria-modal="true"
             aria-labelledby="game-settings-title"
             onKeyDown={(event) => {
-              if (event.key === 'Escape') setView('home');
+              if (event.key === 'Escape') navigateToView('home');
             }}
           >
             <GameSettingsPanel
@@ -264,7 +285,7 @@ export function GameMenuOverlay({
               error={settingsError}
               audioError={audioError}
               onChange={onSettingsChange}
-              onBack={() => setView('home')}
+              onBack={() => navigateToView('home')}
               backLabel={backLabel}
             />
           </section>

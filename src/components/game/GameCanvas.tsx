@@ -30,6 +30,10 @@ import {
 import { formatGameKeyCode } from '@/game/core/GameSettings';
 import type { RareUpgradeId } from '@/game/upgrades';
 import type { GameMenuMode } from './GameMenuTypes';
+import {
+  getGameMenuNavigationState,
+  pushGameMenuNavigationState,
+} from './GameMenuNavigation';
 import { GameMusicPlayer } from './GameMusicPlayer';
 import { GameHud } from './GameHud';
 import { GameMenuOverlay } from './GameMenuOverlay';
@@ -512,6 +516,7 @@ export function GameCanvas() {
     engineRef.current?.resume();
     setHasStarted(true);
     setIsPaused(false);
+    pushGameMenuNavigationState('playing');
     canvasRef.current?.focus();
   };
 
@@ -558,6 +563,7 @@ export function GameCanvas() {
     audioRef.current?.startGameplay();
     setHasStarted(true);
     setIsPaused(false);
+    pushGameMenuNavigationState('playing');
     enterTutorialStep(0);
   };
 
@@ -585,6 +591,7 @@ export function GameCanvas() {
   };
 
   const pauseRun = () => {
+    pushGameMenuNavigationState('home');
     isActivelyPlayingRef.current = false;
     engineRef.current?.pause();
     audioRef.current?.pauseGameplay();
@@ -593,6 +600,7 @@ export function GameCanvas() {
   };
 
   const resumeRun = () => {
+    pushGameMenuNavigationState('playing');
     audioRef.current?.resumeGameplay();
     engineRef.current?.resume();
     setIsPaused(false);
@@ -626,9 +634,10 @@ export function GameCanvas() {
     resumeRun();
   };
 
-  const returnToMenu = () => {
+  const resetRunToMenu = (initialView: 'home' | 'level-select') => {
     const engine = engineRef.current;
     if (!engine) return;
+    pushGameMenuNavigationState(initialView);
     currentRunGameModeRef.current = 'survival';
     currentCampaignLevelIdRef.current = null;
     currentCampaignStartingRarePointsRef.current = 0;
@@ -650,6 +659,8 @@ export function GameCanvas() {
     setHasStarted(false);
     setIsPaused(false);
   };
+
+  const returnToMenu = () => resetRunToMenu('home');
 
   useEffect(() => {
     if (
@@ -696,7 +707,7 @@ export function GameCanvas() {
 
   const openCampaignLevelSelection = () => {
     setOpenLevelSelectionOnMenu(true);
-    returnToMenu();
+    resetRunToMenu('level-select');
   };
 
   const startNextCampaignLevel = () => {
@@ -799,6 +810,33 @@ export function GameCanvas() {
   const isTerminalPhase =
     gameState?.wave.phase === 'gameOver' ||
     gameState?.wave.phase === 'levelComplete';
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    const handlePopState = () => {
+      if (isTerminalPhase) return;
+      const shouldBePlaying =
+        getGameMenuNavigationState(window.location.search) === 'playing';
+      if (shouldBePlaying === !isPaused) return;
+
+      if (shouldBePlaying) {
+        audioRef.current?.resumeGameplay();
+        engineRef.current?.resume();
+        setIsPaused(false);
+        canvasRef.current?.focus();
+      } else {
+        isActivelyPlayingRef.current = false;
+        engineRef.current?.pause();
+        audioRef.current?.pauseGameplay();
+        syncGameState();
+        setIsPaused(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [hasStarted, isPaused, isTerminalPhase]);
 
   isActivelyPlayingRef.current =
     hasStarted &&
