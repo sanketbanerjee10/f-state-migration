@@ -3,14 +3,15 @@
 import * as React from 'react';
 import { act, createElement, createRef, Profiler } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GameSettingsPanel } from '@/components/game/GameSettingsPanel';
 import { GameTouchControls } from '@/components/game/GameTouchControls';
 import { DualJoystickInput } from '@/game/core/DualJoystickInput';
 import { DEFAULT_GAME_SETTINGS, type GameSettings } from '@/game/core/GameSettings';
-import type { GameStateSnapshot } from '@/game/core/GameState';
-import { GameScoreSubmission } from '@/components/game/GameScoreSubmission';
+import { GamePlayerAuthProvider } from '@/components/game/GamePlayerAuthProvider';
+import { GamePlayerAccountPanel } from '@/components/game/GamePlayerAccountPanel';
+import { GamePlayerProfileWidget } from '@/components/game/GamePlayerProfileWidget';
+import { renderGamePlayerAvatar } from '@/lib/gamePlayerAvatar';
 import { GamePage } from '@/pages/game/GamePage';
 import { toast } from 'sonner';
 
@@ -21,6 +22,7 @@ vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
     info: vi.fn(),
+    success: vi.fn(),
   },
 }));
 
@@ -87,17 +89,45 @@ const mocks = vi.hoisted(() => ({
     'game.tutorial.steps.intro.title': 'Welcome to the arena',
     'game.tutorial.steps.player.title': 'Your survivor',
     'game.tutorial.steps.movement.title': 'Move around',
-    'game.submission.title': 'Submit your run',
-    'game.submission.name': 'Leaderboard name',
-    'game.submission.enterName': 'Enter a name to submit your score.',
-    'game.submission.submitting': 'Submitting…',
-    'game.submission.retry': 'Retry submission',
-    'game.submission.submitted': 'Score submitted',
-    'game.submission.submit': 'Submit score',
-    'game.submission.success': 'Score submitted successfully.',
-    'game.submission.failed': 'Score submission failed. Check your connection and retry.',
+    'game.account.checking': 'Checking player account…',
+    'game.account.title': 'Player Account',
+    'game.account.requestFailed': 'The account request could not be completed.',
+    'game.account.invalidCredentials': 'The username or password is incorrect.',
+    'game.account.usernameConflict': 'That username is already taken. Try another one.',
+    'game.account.invalidInput': 'Check your username and password and try again.',
+    'game.account.tooManyRequests': 'Too many attempts. Please wait a moment and try again.',
+    'game.account.serviceUnavailable': 'The account service is temporarily unavailable. Please try again later.',
+    'game.account.statusCheckFailed': "We couldn't check your account status. Please refresh and try again.",
+    'game.account.usernameChecking': 'Checking username availability',
+    'game.account.usernameAvailable': 'Username is available',
+    'game.account.usernameUnavailable': 'Username is unavailable',
+    'game.account.usernameError': "Couldn't check username availability",
+    'game.account.usernameTakenHint': 'Username is taken. Try another.',
+    'game.account.eyebrow': 'PLAYER ACCOUNT',
+    'game.account.signIn': 'Sign in',
+    'game.account.signOut': 'Sign out',
+    'game.account.signedInAs': 'Signed in as {{username}}.',
+    'game.account.signedInDescription': 'Survival scores use this username.',
+    'game.account.createAccount': 'Create account',
+    'game.account.username': 'Username',
+    'game.account.password': 'Password',
+    'game.account.showPassword': 'Show password',
+    'game.account.hidePassword': 'Hide password',
+    'game.account.randomizeAvatar': 'Randomise avatar',
+    'game.account.avatarSaved': 'Avatar saved.',
+    'game.account.working': 'Please wait…',
+    'game.account.signingOut': 'Signing out…',
   },
 }));
+
+const testAvatar = {
+  style: 'avataaars' as const,
+  seed: 'test-player',
+  appearance: 'shortRound',
+  color: '428bca',
+  accessory: false,
+  backgroundColor: '18243b',
+};
 
 vi.mock('@/game/core/GameEngine', () => {
   function makeSnapshot(gameMode = 'survival') {
@@ -171,9 +201,12 @@ vi.mock('@/game/audio/GameAudioController', () => ({
 vi.mock('react-i18next', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-i18next')>(),
   useTranslation: (() => {
-    const t = (key: string, options?: { key?: string }) => {
-      const value = mocks.translations[key as keyof typeof mocks.translations] ?? key;
-      return options?.key ? value.replace('{{key}}', options.key) : value;
+    const t = (key: string, options?: Record<string, unknown>) => {
+      let value = mocks.translations[key as keyof typeof mocks.translations] ?? key;
+      for (const [name, replacement] of Object.entries(options ?? {})) {
+        value = value.replaceAll(`{{${name}}}`, String(replacement));
+      }
+      return value;
     };
     return () => ({ i18n: mocks.i18n, t });
   })(),
@@ -224,7 +257,6 @@ vi.mock('@/components/game/GamePauseButton', () => ({
 
 let root: Root | null = null;
 let container: HTMLDivElement | null = null;
-let queryClient: QueryClient | null = null;
 let resizeObserverInstances: Array<{ observe: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
 let mediaQuery: MediaQueryList & { setMatches: (matches: boolean) => void };
 let mediaChangeListeners: Array<(event: MediaQueryListEvent) => void>;
@@ -237,17 +269,6 @@ let fullscreenPropertyDescriptors: Array<{
   property: string;
   descriptor: PropertyDescriptor | undefined;
 }> = [];
-
-const stateForScore = (gameMode: GameStateSnapshot['gameMode'] = 'standard') => ({
-  gameMode,
-  score: 1234,
-  statistics: {
-    highestWaveCleared: 5,
-    highestWaveReached: 6,
-    zombiesKilled: 42,
-    survivalSeconds: 90.9,
-  },
-}) as GameStateSnapshot;
 
 async function render(element: React.ReactNode) {
   container = document.createElement('div');
@@ -302,6 +323,12 @@ async function flush() {
   });
 }
 
+async function waitForUsernameAvailability() {
+  await act(async () => {
+    await new Promise((resolve) => window.setTimeout(resolve, 400));
+  });
+}
+
 async function waitFor(predicate: () => boolean) {
   for (let attempt = 0; attempt < 30; attempt += 1) {
     if (predicate()) return;
@@ -325,17 +352,6 @@ function renderSettings(onBack = vi.fn(), onChange = vi.fn()) {
       backLabel="Back to menu"
     />,
   ).then(() => ({ onBack, onChange }));
-}
-
-function renderScore(gameState: GameStateSnapshot) {
-  queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <GameScoreSubmission gameState={gameState} />
-    </QueryClientProvider>,
-  );
 }
 
 async function mountGame() {
@@ -382,6 +398,10 @@ beforeEach(() => {
       resizeObserverInstances.push(this);
     }
   });
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(
+    JSON.stringify({ authenticated: false }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } },
+  )));
   fullscreenPropertyDescriptors = [
     { target: document, property: 'fullscreenEnabled', descriptor: Object.getOwnPropertyDescriptor(document, 'fullscreenEnabled') },
     { target: document, property: 'fullscreenElement', descriptor: Object.getOwnPropertyDescriptor(document, 'fullscreenElement') },
@@ -413,6 +433,7 @@ beforeEach(() => {
   vi.spyOn(window, 'clearInterval').mockImplementation(() => undefined);
   vi.mocked(toast.info).mockClear();
   vi.mocked(toast.error).mockClear();
+  vi.mocked(toast.success).mockClear();
   window.localStorage.clear();
 });
 
@@ -423,8 +444,6 @@ afterEach(async () => {
   root = null;
   container?.remove();
   container = null;
-  queryClient?.clear();
-  queryClient = null;
   for (const { target, property, descriptor } of fullscreenPropertyDescriptors) {
     if (descriptor) Object.defineProperty(target, property, descriptor);
     else Reflect.deleteProperty(target, property);
@@ -436,6 +455,249 @@ afterEach(async () => {
 });
 
 describe('game UI scenarios', () => {
+  it('shows only the sign-in action for a guest player', async () => {
+    const onSignIn = vi.fn();
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerProfileWidget
+          onSignIn={onSignIn}
+          onOpenProfile={vi.fn()}
+        />
+      </GamePlayerAuthProvider>,
+    );
+
+    await waitFor(() => container?.querySelector('.game-player-profile-widget-guest') !== null);
+    expect(container?.textContent).not.toContain('PLAYER ACCOUNT');
+    expect(container?.textContent).not.toContain('Create account');
+    expect(container?.querySelectorAll('.game-player-profile-widget-actions button')).toHaveLength(1);
+    expect(container?.querySelector('.game-player-profile-widget-actions button')?.classList)
+      .toContain('is-primary');
+    await clickButton('Sign in', container!);
+    expect(onSignIn).toHaveBeenCalledOnce();
+  });
+
+  it('shows the signed-in username and avatar in the profile widget', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(
+      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    )));
+    const onOpenProfile = vi.fn();
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerProfileWidget
+          onSignIn={vi.fn()}
+          onOpenProfile={onOpenProfile}
+        />
+      </GamePlayerAuthProvider>,
+    );
+
+    await waitFor(() => container?.querySelector('.game-player-profile-widget-authenticated') !== null);
+    expect(container?.textContent).toContain('Aster');
+    expect(container?.textContent).not.toContain('PLAYER ACCOUNT');
+    expect((container?.querySelector('.game-player-profile-widget-avatar') as HTMLImageElement).src)
+      .toContain('data:image/svg+xml');
+    await clickButton('Signed in as Aster.', container!);
+    expect(onOpenProfile).toHaveBeenCalledOnce();
+  });
+
+  it('initializes the account panel on the requested sign-up tab', async () => {
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel
+          onBack={vi.fn()}
+          backLabel="Back to menu"
+          initialTab="sign-up"
+        />
+      </GamePlayerAuthProvider>,
+    );
+
+    await waitFor(() => container?.querySelector('#game-player-account-title') !== null);
+    expect(container?.querySelector('[aria-pressed="true"]')?.textContent)
+      .toContain('Create account');
+  });
+
+  it('creates a player account from the account panel and updates the signed-in state', async () => {
+    const fetchMock = vi.fn((url: string, _options?: RequestInit) => Promise.resolve(new Response(
+      JSON.stringify(url === '/api/game/account/session'
+        ? { authenticated: false }
+        : url === '/api/game/account/availability?username=Aster'
+          ? { available: true }
+          : { authenticated: true, username: 'Aster', avatar: testAvatar }),
+      {
+        status: url === '/api/game/account/register' ? 201 : 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )));
+    vi.stubGlobal('fetch', fetchMock);
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel onBack={vi.fn()} backLabel="Back to menu" />
+      </GamePlayerAuthProvider>,
+    );
+    await waitFor(() => container?.querySelector('#game-player-account-title') !== null);
+    expect(container?.querySelector('#game-player-account-title')?.textContent).toBe('Player Account');
+    expect(container?.querySelector('.game-dialog-wordmark')?.textContent).toContain('LAST');
+    expect(container?.querySelector('.game-dialog-wordmark')?.textContent).toContain('AFTERHOURS');
+    expect(container?.querySelector('.game-level-back-button svg')).not.toBeNull();
+    expect(container?.textContent).not.toContain('Create an account or sign in to submit');
+    const passwordInput = container!.querySelector('#game-account-password') as HTMLInputElement;
+    expect(passwordInput.required).toBe(true);
+    expect(passwordInput.minLength).toBe(-1);
+    expect(passwordInput.maxLength).toBe(-1);
+    await setInputValue(passwordInput, 'anything');
+    await clickButton('Show password', container!);
+    expect(passwordInput.type).toBe('text');
+    expect(passwordInput.value).toBe('anything');
+    await clickButton('Hide password', container!);
+    expect(passwordInput.type).toBe('password');
+    expect(passwordInput.value).toBe('anything');
+    await clickButton('Create account', container!);
+    const defaultAvatar = container!.querySelector('.game-player-avatar-image') as HTMLImageElement;
+    expect(defaultAvatar).not.toBeNull();
+    expect(container?.querySelector('.game-player-avatar-picker')).not.toBeNull();
+    expect(container?.querySelector('button[aria-label="Randomise avatar"]')).not.toBeNull();
+    expect(container?.textContent).not.toContain('Player avatar');
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(container?.querySelector('#game-player-account-title')?.textContent).toBe('Player Account');
+    expect((container!.querySelector('[aria-pressed="true"]') as HTMLButtonElement).textContent).toContain('Create account');
+    await setInputValue(container!.querySelector('#game-account-username')!, 'Aster');
+    await waitForUsernameAvailability();
+    await waitFor(() => container?.querySelector('[data-username-availability="available"]') !== null);
+    expect(container?.textContent).not.toContain('Username is available');
+    await submitForm(container!.querySelector('form')!);
+
+    await waitFor(() => container?.querySelector('form') === null);
+    expect(container?.textContent).toContain('Signed in as Aster.');
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      '/api/game/account/session',
+      '/api/game/account/availability?username=Aster',
+      '/api/game/account/register',
+    ]);
+    expect(JSON.parse(String(fetchMock.mock.calls[2]?.[1]?.body))).toMatchObject({
+      username: 'Aster',
+      password: 'anything',
+      avatar: expect.objectContaining({ style: expect.any(String), seed: expect.any(String) }),
+    });
+  });
+
+  it('marks a taken username unavailable and disables account creation', async () => {
+    const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(
+      JSON.stringify(url === '/api/game/account/session'
+        ? { authenticated: false }
+        : { available: false }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )));
+    vi.stubGlobal('fetch', fetchMock);
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel onBack={vi.fn()} backLabel="Back to menu" />
+      </GamePlayerAuthProvider>,
+    );
+    await waitFor(() => container?.querySelector('#game-player-account-title') !== null);
+    await clickButton('Create account', container!);
+    await setInputValue(container!.querySelector('#game-account-username')!, 'Aster');
+
+    await waitForUsernameAvailability();
+    await waitFor(() => container?.querySelector('[data-username-availability="unavailable"]') !== null);
+    expect(container?.textContent).toContain('Username is taken. Try another.');
+    expect(container?.textContent).not.toContain('Username is unavailable');
+    expect((container!.querySelector('form button[type="submit"]') as HTMLButtonElement).disabled).toBe(true);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toContain(
+      '/api/game/account/availability?username=Aster',
+    );
+  });
+
+  it('shows the saved avatar without a randomizer for signed-in players', async () => {
+    const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(
+      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    )));
+    vi.stubGlobal('fetch', fetchMock);
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel onBack={vi.fn()} backLabel="Back to menu" />
+      </GamePlayerAuthProvider>,
+    );
+    await waitFor(() => container?.querySelector('.game-player-avatar-image') !== null);
+    const avatarImage = container!.querySelector('.game-player-avatar-image') as HTMLImageElement;
+    const picker = container!.querySelector('.game-player-avatar-picker') as HTMLDivElement;
+    expect(avatarImage.src).toBe(renderGamePlayerAvatar(testAvatar));
+    expect(picker.querySelector('.game-player-avatar-randomize-button')).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a friendly toast instead of technical account service errors', async () => {
+    const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(
+      JSON.stringify(url === '/api/game/account/session'
+        ? { authenticated: false }
+        : { message: 'The game score service is temporarily unavailable.' }),
+      {
+        status: url === '/api/game/account/session' ? 200 : 503,
+        statusText: url === '/api/game/account/session' ? 'OK' : 'Service Unavailable',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )));
+    vi.stubGlobal('fetch', fetchMock);
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel onBack={vi.fn()} backLabel="Back to menu" />
+      </GamePlayerAuthProvider>,
+    );
+    await waitFor(() => container?.querySelector('#game-player-account-title') !== null);
+    await setInputValue(container!.querySelector('#game-account-username')!, 'Aster');
+    await setInputValue(container!.querySelector('#game-account-password')!, 'a secure passphrase');
+    await submitForm(container!.querySelector('form')!);
+
+    await waitFor(() => vi.mocked(toast.error).mock.calls.length > 0);
+    expect(toast.error).toHaveBeenCalledWith(
+      'The account service is temporarily unavailable. Please try again later.',
+    );
+    expect(container?.textContent).not.toContain('HTTP 503');
+    expect(container?.textContent).not.toContain('The game score service is temporarily unavailable.');
+  });
+
+  it('shows sign-in failures as friendly toast messages', async () => {
+    const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(
+      JSON.stringify(url === '/api/game/account/session'
+        ? { authenticated: false }
+        : { message: 'Internal authentication details' }),
+      {
+        status: url === '/api/game/account/session' ? 200 : 401,
+        statusText: url === '/api/game/account/session' ? 'OK' : 'Unauthorized',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )));
+    vi.stubGlobal('fetch', fetchMock);
+    await render(
+      <GamePlayerAuthProvider>
+        <GamePlayerAccountPanel onBack={vi.fn()} backLabel="Back to menu" />
+      </GamePlayerAuthProvider>,
+    );
+    await waitFor(() => container?.querySelector('#game-player-account-title') !== null);
+    await setInputValue(container!.querySelector('#game-account-username')!, 'Aster');
+    await setInputValue(container!.querySelector('#game-account-password')!, 'a secure passphrase');
+    await submitForm(container!.querySelector('form')!);
+
+    await waitFor(() => vi.mocked(toast.error).mock.calls.length > 0);
+    expect(toast.error).toHaveBeenCalledWith('The username or password is incorrect.');
+    expect(container?.textContent).not.toContain('Internal authentication details');
+    expect(container?.textContent).not.toContain('HTTP 401');
+  });
+
+  it('checks player session once and does not poll during a Survival run', async () => {
+    const fetchMock = vi.mocked(fetch);
+    await mountGame();
+    await waitFor(() => fetchMock.mock.calls.length === 1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/game/account/session');
+
+    await clickButton('Start survival');
+    await clickButton('Pause run');
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
   it('does not serialize the pause-menu click event into the URL when returning to the main menu', async () => {
     await mountGame();
     await clickButton('Start survival');
@@ -1185,84 +1447,4 @@ describe('game UI scenarios', () => {
     input.detach();
   });
 
-  it('GAME-UI-14 rejects blank and whitespace-only leaderboard names accessibly', async () => {
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-    await renderScore(stateForScore());
-    const form = container?.querySelector('form') as HTMLFormElement;
-
-    await submitForm(form);
-    expect(container?.querySelector('[role="alert"]')?.textContent).toContain('Enter a name');
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    await setInputValue(container!.querySelector('input')!, '   ');
-    await submitForm(form);
-    expect(container?.querySelector('[role="alert"]')?.textContent).toContain('Enter a name');
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('GAME-UI-15 submits a trimmed eligible score once and disables duplicate submission', async () => {
-    let resolveResponse!: (response: Response) => void;
-    const fetchMock = vi.fn(() => new Promise<Response>((resolve) => {
-      resolveResponse = resolve;
-    }));
-    vi.stubGlobal('fetch', fetchMock);
-    await renderScore(stateForScore());
-    const input = container!.querySelector('input')!;
-    const form = container!.querySelector('form')!;
-    await setInputValue(input, '  Alex Player  ');
-    await submitForm(form);
-
-    await waitFor(() => fetchMock.mock.calls.length === 1);
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).toEqual({
-      playerName: 'Alex Player',
-      score: 1234,
-      waveCleared: 5,
-      waveReached: 6,
-      zombiesKilled: 42,
-      survivalTime: 90,
-    });
-    expect(input.disabled).toBe(true);
-    expect(findButton('Submitting…').disabled).toBe(true);
-
-    await act(async () => resolveResponse(new Response(
-      JSON.stringify({ message: 'ok', scoreReference: 'score-1' }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } },
-    )));
-    await waitFor(() => container?.querySelector('[role="status"]') !== null);
-    expect(fetchMock).toHaveBeenCalledOnce();
-    expect(findButton('Score submitted').disabled).toBe(true);
-  });
-
-  it('GAME-UI-16 does not render score submission for an ineligible level run', async () => {
-    await renderScore(stateForScore('level'));
-    expect(container?.querySelector('form')).toBeNull();
-    expect(container?.textContent).not.toContain('Submit your run');
-  });
-
-  it('GAME-UI-17 shows submission failure, allows retry, and confirms the retry success', async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ message: 'Leaderboard is unavailable' }),
-        { status: 503, headers: { 'Content-Type': 'application/json' } },
-      ))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ message: 'ok', scoreReference: 'score-2' }),
-        { status: 201, headers: { 'Content-Type': 'application/json' } },
-      ));
-    vi.stubGlobal('fetch', fetchMock);
-    await renderScore(stateForScore());
-    await setInputValue(container!.querySelector('input')!, 'Alex');
-    const form = container!.querySelector('form')!;
-
-    await submitForm(form);
-    await waitFor(() => container?.querySelector('[role="alert"]') !== null);
-    expect(container?.querySelector('[role="alert"]')?.textContent).toContain('Leaderboard is unavailable');
-    expect(findButton('Retry submission').disabled).toBe(false);
-
-    await submitForm(form);
-    await waitFor(() => container?.querySelector('[role="status"]') !== null);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(findButton('Score submitted').disabled).toBe(true);
-  });
 });

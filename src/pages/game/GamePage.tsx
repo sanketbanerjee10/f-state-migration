@@ -1,9 +1,12 @@
 import { GameCanvas } from '@/components/game/GameCanvas';
+import { GamePlayerAuthProvider } from '@/components/game/GamePlayerAuthProvider';
 
 export function GamePage() {
   return (
     <main className="game-screen" data-testid="game-page">
-      <GameCanvas />
+      <GamePlayerAuthProvider>
+        <GameCanvas />
+      </GamePlayerAuthProvider>
     </main>
   );
 }

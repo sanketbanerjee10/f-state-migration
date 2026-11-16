@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { useGameLeaderboard } from '@/lib/gameApi';
+import {
+  createDefaultGamePlayerAvatar,
+  getGamePlayerAvatarBackground,
+  renderGamePlayerAvatar,
+} from '@/lib/gamePlayerAvatar';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
 
 const PAGE_SIZE = 10;
@@ -57,9 +62,7 @@ export function GameLeaderboardPanel({
       ) : leaderboard.isError ? (
         <div className="game-leaderboard-message" role="alert">
           <p>
-            {leaderboard.error instanceof Error
-              ? leaderboard.error.message
-              : t('game.leaderboard.loadFailed')}
+            {t('game.leaderboard.loadFailed')}
           </p>
           <button
             className="game-menu-secondary"
@@ -91,6 +94,7 @@ export function GameLeaderboardPanel({
               <tbody>
                 {page.items.map((entry, index) => {
                   const rank = offset + index + 1;
+                  const avatar = entry.avatar ?? createDefaultGamePlayerAvatar(entry.playerName);
 
                   return (
                     <tr
@@ -103,10 +107,17 @@ export function GameLeaderboardPanel({
                         </span>
                       </td>
                       <td>
-                        <strong>{entry.playerName}</strong>
-                        <span className="game-leaderboard-reached">
-                          {t('game.leaderboard.reached', { wave: entry.waveReached })}
-                        </span>
+                        <div className="game-leaderboard-player">
+                          <img
+                            src={renderGamePlayerAvatar(avatar)}
+                            alt=""
+                            aria-hidden="true"
+                            style={{ backgroundColor: getGamePlayerAvatarBackground(avatar) }}
+                          />
+                          <div>
+                            <strong>{entry.playerName}</strong>
+                          </div>
+                        </div>
                       </td>
                       <td>{entry.waveCleared}</td>
                       <td>{entry.score.toLocaleString()}</td>

@@ -1,6 +1,6 @@
 # Proposed Frontend Test Scenarios
 
-These expected scenarios were identified by comparing the existing frontend tests with implemented user-facing flows. DRAFT-01 through DRAFT-12, GAME-UI-01 through GAME-UI-17, TRACK-01 through TRACK-08, and LEAD-01 through LEAD-08 now have executable tests under `tests/frontend/`. The cases remain documented here as a scenario index.
+These expected scenarios were identified by comparing the existing frontend tests with implemented user-facing flows. DRAFT-01 through DRAFT-12, GAME-UI-01 through GAME-UI-13, TRACK-01 through TRACK-08, and LEAD-01 through LEAD-08 now have executable tests under `tests/frontend/`. The cases remain documented here as a scenario index.
 
 ## 1. Application draft lifecycle
 
@@ -23,7 +23,7 @@ Relevant implementation: `src/hooks/useApplicationDraft.tsx`
 
 ## 2. Game UI flows
 
-Relevant implementation: `src/components/game/` (especially `GameCanvas.tsx`, `GameMenuOverlay.tsx`, `GamePauseMenu.tsx`, `GameSettingsPanel.tsx`, `GameTouchControls.tsx`, and `GameScoreSubmission.tsx`)
+Relevant implementation: `src/components/game/` (especially `GameCanvas.tsx`, `GameMenuOverlay.tsx`, `GamePauseMenu.tsx`, `GameSettingsPanel.tsx`, and `GameTouchControls.tsx`)
 
 | ID | Scenario | Expected result |
 |---|---|---|
@@ -40,10 +40,6 @@ Relevant implementation: `src/components/game/` (especially `GameCanvas.tsx`, `G
 | GAME-UI-11 | Reject an unsupported key or cancel capture with Escape | Unsupported keys show an inline alert without changing the binding; Escape cancels capture without changing it. |
 | GAME-UI-12 | Change touch-control visibility | `always` mounts controls, `never` hides them, and `auto` follows the responsive-device media query, including changes to that query. |
 | GAME-UI-13 | Use the touch bomb control | Clicking with bombs available calls the bomb action; with zero bombs the control is disabled. |
-| GAME-UI-14 | Submit a score with a blank or whitespace-only name | Submission is not sent and an accessible name-validation alert is shown. |
-| GAME-UI-15 | Submit a valid eligible run | The trimmed player name and run statistics are sent once; pending and success states disable duplicate submission. |
-| GAME-UI-16 | Submit a score for an ineligible game mode | The score-submission form is not rendered. |
-| GAME-UI-17 | Handle a failed score submission | The failure is visible and the user can retry; a subsequent success displays confirmation and disables resubmission. |
 
 ## 3. Application tracking and leadership dashboard
 
@@ -74,4 +70,4 @@ Relevant implementation: `src/pages/ApplicationTracker.tsx`, `src/components/app
 2. Main game start/pause/resume/restart and tutorial exit flows (GAME-UI-02 through GAME-UI-08).
 3. Tracker lookup and stored-entry lifecycle (TRACK-03 through TRACK-08).
 4. Leadership authentication/session-expiry and refresh flows (LEAD-02 through LEAD-08).
-5. Remaining settings, touch-control, and score-submission UI states.
+5. Remaining settings and touch-control UI states.

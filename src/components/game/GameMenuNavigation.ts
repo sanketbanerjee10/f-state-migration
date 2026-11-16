@@ -8,6 +8,7 @@ const GAME_MENU_VIEWS: ReadonlySet<string> = new Set([
   'leaderboard',
   'enemy-guide',
   'level-select',
+  'account',
 ]);
 
 function isGameMenuNavigationState(

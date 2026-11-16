@@ -4,4 +4,5 @@ export type GameMenuView =
   | 'settings'
   | 'leaderboard'
   | 'enemy-guide'
-  | 'level-select';
+  | 'level-select'
+  | 'account';

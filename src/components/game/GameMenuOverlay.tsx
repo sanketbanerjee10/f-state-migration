@@ -11,6 +11,8 @@ import { GameEnemyGuide } from './GameEnemyGuide';
 import { GameLeaderboardPanel } from './GameLeaderboardPanel';
 import { GameMainMenu } from './GameMainMenu';
 import { GameMusicPlayer } from './GameMusicPlayer';
+import { GamePlayerAccountPanel } from './GamePlayerAccountPanel';
+import { GamePlayerProfileWidget } from './GamePlayerProfileWidget';
 import { GamePauseMenu } from './GamePauseMenu';
 import { GameSettingsPanel } from './GameSettingsPanel';
 import type { GameMenuMode, GameMenuView } from './GameMenuTypes';
@@ -99,7 +101,7 @@ export function GameMenuOverlay({
   }, [view]);
 
   useEffect(() => {
-    if (view !== 'leaderboard') return;
+    if (view !== 'leaderboard' && view !== 'account') return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -117,11 +119,13 @@ export function GameMenuOverlay({
       ? 'game-paused-title'
       : view === 'leaderboard'
         ? 'game-leaderboard-title'
-        : view === 'enemy-guide'
-          ? 'game-enemy-guide-title'
-          : view === 'level-select' || isMainMenu
-            ? 'game-menu-title'
-            : 'game-paused-title';
+        : view === 'account'
+          ? 'game-player-account-title'
+          : view === 'enemy-guide'
+            ? 'game-enemy-guide-title'
+            : view === 'level-select'
+              ? 'game-menu-title'
+              : 'game-paused-title';
   const backLabel = t(isMainMenu ? 'game.menu.backToMenu' : 'game.menu.backToPauseMenu');
 
   return (
@@ -136,6 +140,27 @@ export function GameMenuOverlay({
           onClick={onResume}
         />
       )}
+      {isMainMenu && view === 'account' && (
+        <>
+          <button
+            className="game-leaderboard-backdrop"
+            type="button"
+            aria-label={t('game.menu.closeAccount')}
+            onClick={() => navigateToView('home')}
+          />
+          <section
+            className="game-leaderboard-dialog game-account-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-player-account-title"
+          >
+            <GamePlayerAccountPanel
+              onBack={() => navigateToView('home')}
+              backLabel={backLabel}
+            />
+          </section>
+        </>
+      )}
       <section
         ref={overlayRef}
         className={[
@@ -146,8 +171,8 @@ export function GameMenuOverlay({
           highlightPauseMenu ? 'game-pause-overlay-highlighted' : '',
         ].filter(Boolean).join(' ')}
         role="dialog"
-        aria-modal={view !== 'settings' && !(isMainMenu && view === 'leaderboard')}
-        aria-hidden={isMainMenu && (view === 'enemy-guide' || view === 'leaderboard')}
+        aria-modal={view !== 'settings' && !(isMainMenu && (view === 'leaderboard' || view === 'account'))}
+        aria-hidden={isMainMenu && (view === 'enemy-guide' || view === 'leaderboard' || view === 'account')}
         aria-labelledby={titleId}
       >
         {isMainMenu &&
@@ -155,7 +180,8 @@ export function GameMenuOverlay({
             view === 'level-select' ||
             view === 'settings' ||
             view === 'enemy-guide' ||
-            view === 'leaderboard') && (
+            view === 'leaderboard' ||
+            view === 'account') && (
             <GameMainMenu
               view="home"
               onViewChange={navigateToView}
@@ -192,6 +218,11 @@ export function GameMenuOverlay({
             onViewChange={navigateToView}
             onStart={onStart}
             onStartTutorial={onStartTutorial}
+          />
+        ) : view === 'account' && !isMainMenu ? (
+          <GamePlayerAccountPanel
+            onBack={() => navigateToView('home')}
+            backLabel={backLabel}
           />
         ) : null}
         {isMainMenu && view === 'level-select' && (
@@ -238,6 +269,12 @@ export function GameMenuOverlay({
             />
           </section>
         </>
+      )}
+      {isMainMenu && view === 'home' && (
+        <GamePlayerProfileWidget
+          onSignIn={() => navigateToView('account')}
+          onOpenProfile={() => navigateToView('account')}
+        />
       )}
       {isMainMenu && view === 'enemy-guide' && (
         <>

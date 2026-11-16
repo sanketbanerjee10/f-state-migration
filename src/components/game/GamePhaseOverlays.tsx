@@ -1,11 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 import type { GameStateSnapshot } from '@/game/core/GameState';
 import { isLeaderboardEligibleGameMode } from '@/game/core/GameState';
+import { isGameScoreBetter } from '@/lib/gameScoreTracker';
 import { getBossForWave } from '@/game/bosses/BossSystem';
 import { getLevelDefinition } from '@/game/core/LevelCampaign';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
+import { useGamePlayerAuth } from './GamePlayerAuthProvider';
 
 interface GamePhaseOverlaysProps {
   readonly gameState: GameStateSnapshot | null;
@@ -21,6 +24,28 @@ function formatSeconds(seconds: number): string {
   return `${Math.floor(wholeSeconds / 60)}:${String(wholeSeconds % 60).padStart(2, '0')}`;
 }
 
+function fireHighScoreConfetti(): void {
+  const colors = ['#ffc987', '#f18bc9', '#d8c6ff', '#fff0d0'];
+  confetti({
+    particleCount: 70,
+    angle: 60,
+    spread: 58,
+    startVelocity: 55,
+    origin: { x: 0, y: 0.72 },
+    colors,
+    disableForReducedMotion: true,
+  });
+  confetti({
+    particleCount: 70,
+    angle: 120,
+    spread: 58,
+    startVelocity: 55,
+    origin: { x: 1, y: 0.72 },
+    colors,
+    disableForReducedMotion: true,
+  });
+}
+
 export function GamePhaseOverlays({
   gameState,
   onPlayAgain,
@@ -30,6 +55,7 @@ export function GamePhaseOverlays({
   tutorialMode = false,
 }: GamePhaseOverlaysProps) {
   const { t } = useTranslation();
+  const { account, bestScore, recordScoreIfBest } = useGamePlayerAuth();
   const isBossClear =
     !tutorialMode &&
     gameState?.gameMode === 'level' &&
@@ -37,6 +63,67 @@ export function GamePhaseOverlays({
     gameState.campaignLevelId !== null &&
     gameState.campaignLevelId % 10 === 0;
   const confettiFiredForBossClearRef = useRef(false);
+  const scoreSubmissionStartedRef = useRef(false);
+  const [scoreSubmissionStatus, setScoreSubmissionStatus] = useState<
+    'idle' | 'optimistic' | 'recorded' | 'not-recorded' | 'failed'
+  >('idle');
+  const isSurvivalGameOver = Boolean(
+    gameState &&
+    !tutorialMode &&
+    gameState.wave.phase === 'gameOver' &&
+    isLeaderboardEligibleGameMode(gameState.gameMode),
+  );
+  const scoreToRecord = isSurvivalGameOver && gameState
+    ? {
+        gameMode: gameState.gameMode,
+        score: gameState.score,
+        waveCleared: gameState.statistics.highestWaveCleared,
+        waveReached: gameState.statistics.highestWaveReached,
+        zombiesKilled: gameState.statistics.zombiesKilled,
+        survivalTime: gameState.statistics.survivalSeconds,
+      }
+    : null;
+
+  useEffect(() => {
+    if (!scoreToRecord) {
+      scoreSubmissionStartedRef.current = false;
+      setScoreSubmissionStatus('idle');
+      return;
+    }
+
+    if (account.status !== 'authenticated' || scoreSubmissionStartedRef.current) return;
+    scoreSubmissionStartedRef.current = true;
+    const locallyImprovesBest = bestScore.status === 'ready' &&
+      isGameScoreBetter(scoreToRecord, bestScore.score);
+    if (locallyImprovesBest) {
+      setScoreSubmissionStatus('optimistic');
+      fireHighScoreConfetti();
+    }
+
+    void recordScoreIfBest(scoreToRecord).then((result) => {
+      if (result.isPersonalBest) {
+        setScoreSubmissionStatus('recorded');
+        if (!locallyImprovesBest) fireHighScoreConfetti();
+      } else {
+        setScoreSubmissionStatus('not-recorded');
+      }
+    }).catch((error: unknown) => {
+      console.error('Unable to record the Survival leaderboard score.', error);
+      toast.error(t('game.notifications.scoreSubmissionFailed'));
+      if (!locallyImprovesBest) setScoreSubmissionStatus('failed');
+    });
+  }, [
+    account.status,
+    bestScore,
+    scoreToRecord?.gameMode,
+    scoreToRecord?.score,
+    scoreToRecord?.waveCleared,
+    scoreToRecord?.waveReached,
+    scoreToRecord?.zombiesKilled,
+    scoreToRecord?.survivalTime,
+    recordScoreIfBest,
+    t,
+  ]);
 
   useEffect(() => {
     if (!isBossClear) {
@@ -47,25 +134,7 @@ export function GamePhaseOverlays({
     if (confettiFiredForBossClearRef.current) return;
     confettiFiredForBossClearRef.current = true;
 
-    const colors = ['#ffc987', '#f18bc9', '#d8c6ff', '#fff0d0'];
-    confetti({
-      particleCount: 70,
-      angle: 60,
-      spread: 58,
-      startVelocity: 55,
-      origin: { x: 0, y: 0.72 },
-      colors,
-      disableForReducedMotion: true,
-    });
-    confetti({
-      particleCount: 70,
-      angle: 120,
-      spread: 58,
-      startVelocity: 55,
-      origin: { x: 1, y: 0.72 },
-      colors,
-      disableForReducedMotion: true,
-    });
+    fireHighScoreConfetti();
   }, [isBossClear]);
 
   if (!gameState) return null;
@@ -334,6 +403,20 @@ export function GamePhaseOverlays({
                     <span className="afterhours-run-summary__score-icon" aria-hidden="true">✦</span>
                   </div>
                   <strong>{gameState.score.toLocaleString()}</strong>
+                  {isSurvivalGameOver &&
+                  (scoreSubmissionStatus === 'optimistic' || scoreSubmissionStatus === 'recorded') ? (
+                    <p className="afterhours-run-summary__new-record" role="status">
+                      {t(scoreSubmissionStatus === 'recorded'
+                        ? 'game.results.newHighScoreRecorded'
+                        : 'game.results.newHighScore')}
+                    </p>
+                  ) : isSurvivalGameOver &&
+                    bestScore.status === 'ready' &&
+                    bestScore.score ? (
+                    <p className="afterhours-run-summary__personal-best">
+                      {t('game.results.personalBest')}: {bestScore.score.score.toLocaleString()}
+                    </p>
+                  ) : null}
                 </section>
 
                 {!isLeaderboardEligibleGameMode(gameState.gameMode) && (

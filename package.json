@@ -79,6 +79,8 @@
     "zod": "^3.25.76"
   },
   "dependencies": {
+    "@dicebear/core": "^10.7.0",
+    "@dicebear/styles": "^10.6.0",
     "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
     "i18next": "^26.5.11",
