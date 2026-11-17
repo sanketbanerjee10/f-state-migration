@@ -13,6 +13,8 @@ import {
   RARE_UPGRADE_ORDER,
   type RareUpgradeId,
 } from '@/game/upgrades';
+import { GamePauseMoon } from './GamePauseMoon';
+import { GamePauseQuickAccess } from './GamePauseQuickAccess';
 import type { GameMenuView } from './GameMenuTypes';
 
 interface GamePauseMenuProps {
@@ -83,73 +85,20 @@ export function GamePauseMenu({
         <div className="game-pause-heading-copy">
           <h1 id="game-paused-title">{t('game.pause.title')}<span>.</span></h1>
         </div>
-        <div className="game-pause-moon" aria-hidden="true">
-          <span className="game-pause-moon-halo" />
-          <span className="game-pause-moon-core">☾</span>
-          <span className="game-pause-moon-star game-pause-moon-star-one">✦</span>
-          <span className="game-pause-moon-star game-pause-moon-star-two">·</span>
-        </div>
+        <GamePauseMoon />
       </header>
 
       {gameState && (
         <div className="game-pause-layout">
           <aside className="game-pause-sidebar">
-            <section className="game-pause-quick-actions" aria-label={t('game.pause.actions')}>
-              <div className="game-pause-section-kicker">
-                <span className="game-pause-kicker-mark" />
-                {t('game.pause.quickAccess')}
-              </div>
-              <button
-                className="game-pause-resume"
-                type="button"
-                onClick={onResume}
-                autoFocus
-              >
-                <span className="game-pause-resume-symbol" aria-hidden="true">▶</span>
-                <span className="game-pause-resume-copy">
-                  <strong>{t('game.pause.resumeRun')}</strong>
-                  <small>{t('game.pause.jumpBack')}</small>
-                </span>
-                <span className="game-pause-resume-key" aria-hidden="true">↵</span>
-              </button>
-
-              <div className="game-pause-action-grid">
-                <button
-                  className="game-pause-action"
-                  type="button"
-                  onClick={() => onViewChange('settings')}
-                >
-                  <span className="game-pause-action-icon" aria-hidden="true">⚙</span>
-                  <span>{t('game.pause.settings')}</span>
-                </button>
-                <button
-                  className="game-pause-action"
-                  type="button"
-                  onClick={() => onViewChange('enemy-guide')}
-                >
-                  <span className="game-pause-action-icon" aria-hidden="true">▤</span>
-                  <span>{t('game.pause.fieldGuide')}</span>
-                </button>
-                {!tutorialMode && (
-                  <button
-                    className="game-pause-action game-pause-action-muted"
-                    type="button"
-                    onClick={onRestart}
-                  >
-                    <span className="game-pause-action-icon" aria-hidden="true">↻</span>
-                    <span>{t('game.pause.restartRun')}</span>
-                  </button>
-                )}
-                <button
-                  className="game-pause-action game-pause-action-muted"
-                  type="button"
-                  onClick={onReturnToMenu}
-                >
-                  <span className="game-pause-action-icon" aria-hidden="true">⌂</span>
-                  <span>{t(tutorialMode ? 'game.pause.exitTutorial' : 'game.pause.mainMenu')}</span>
-                </button>
-              </div>
-            </section>
+            <GamePauseQuickAccess
+              onResume={onResume}
+              onOpenSettings={() => onViewChange('settings')}
+              onOpenFieldGuide={() => onViewChange('enemy-guide')}
+              onRestart={onRestart}
+              onReturnToMenu={onReturnToMenu}
+              tutorialMode={tutorialMode}
+            />
 
             <section
               className="game-pause-run"

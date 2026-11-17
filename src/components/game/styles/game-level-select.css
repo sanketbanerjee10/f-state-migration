@@ -141,7 +141,6 @@
 .game-level-brand h1 {
   margin: 0;
   color: var(--ah-cream);
-  font-size: clamp(20px, 2.6vw, 29px);
   font-weight: 850;
   letter-spacing: -.045em;
   line-height: 1;
@@ -184,6 +183,30 @@
   flex-direction: column;
   justify-content: space-between;
   padding: clamp(14px, 2.6vw, 30px);
+}
+
+.game-campaign-carousel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.game-campaign-carousel > .overflow-hidden {
+  height: 100%;
+}
+
+.game-campaign-carousel-content {
+  height: 100%;
+  margin-left: 0;
+}
+
+.game-campaign-carousel-slide {
+  display: flex;
+  height: 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 0;
 }
 
 .game-campaign-location {
@@ -265,6 +288,15 @@
 .game-campaign-arrow:disabled { opacity: .25; cursor: default; }
 .game-campaign-arrow-prev { left: 10px; }
 .game-campaign-arrow-next { right: 10px; }
+
+.game-campaign-carousel .game-campaign-arrow {
+  top: 27%;
+  translate: none;
+  transform: none;
+}
+
+.game-campaign-carousel .game-campaign-arrow-prev { left: 10px; }
+.game-campaign-carousel .game-campaign-arrow-next { right: 10px; }
 
 .game-mission-panel {
   position: relative;
@@ -460,9 +492,9 @@
   .game-campaign-scene { padding: 11px 9px; }
   .game-campaign-location { max-width: 85%; padding: 7px 9px; }
   .game-campaign-location h2 { font-size: clamp(23px, 6vw, 34px); }
-  .game-campaign-arrow { top: 21%; width: 34px; height: 34px; font-size: 23px; }
-  .game-campaign-arrow-prev { left: 4px; }
-  .game-campaign-arrow-next { right: 4px; }
+  .game-campaign-carousel .game-campaign-arrow { top: 21%; width: 34px; height: 34px; font-size: 23px; }
+  .game-campaign-carousel .game-campaign-arrow-prev { left: 4px; }
+  .game-campaign-carousel .game-campaign-arrow-next { right: 4px; }
   .game-level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
   .game-level-card { min-height: clamp(48px, 7.5vh, 64px); gap: 3px; padding: 5px 6px; border-radius: 7px; }
   .game-level-number { font-size: 12px; }

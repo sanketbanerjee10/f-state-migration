@@ -25,6 +25,7 @@ import {
 import { GAME_MUSIC_TRACKS } from '@/game/audio/GameAudioController';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
 import { GameJoystickVisual } from './GameJoystickVisual';
+import { GamePauseMoon } from './GamePauseMoon';
 
 interface GameSettingsPanelProps {
   readonly settings: GameSettings;
@@ -209,16 +210,19 @@ export function GameSettingsPanel({
             <p className="game-dialog-wordmark">
               <GameFranchiseWordmark />
             </p>
-            <h1 id="game-settings-title">{t('game.settings.title')}</h1>
+            <h1 id="game-settings-title" className="game-menu-panel-title">
+              {t('game.settings.title')}
+            </h1>
           </div>
         </div>
 
-        <div className="settings-header-actions">
+        <div className="settings-header-actions game-settings-header-actions">
           {(error || audioError) && (
             <p className="settings-inline-error settings-header-error" role="alert">
               {error || t('game.settings.audioUnavailable', { error: audioError })}
             </p>
           )}
+          <GamePauseMoon />
         </div>
       </header>
 

@@ -83,6 +83,7 @@
     "@dicebear/styles": "^10.6.0",
     "@supabase/supabase-js": "^2.118.0",
     "canvas-confetti": "^1.9.4",
+    "embla-carousel-fade": "^8.6.0",
     "i18next": "^26.5.11",
     "i18next-browser-languagedetector": "^8.2.3",
     "onnxruntime-web": "1.30.0",

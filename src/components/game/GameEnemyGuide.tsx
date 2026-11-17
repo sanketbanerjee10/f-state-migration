@@ -424,7 +424,9 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
                 <p className="game-dialog-wordmark">
                   <GameFranchiseWordmark />
                 </p>
-                <h1 id="game-enemy-guide-title">{t('game.menu.fieldGuides')}<span>.</span></h1>
+                <h1 id="game-enemy-guide-title" className="game-menu-panel-title">
+                  {t('game.menu.fieldGuides')}<span>.</span>
+                </h1>
               </div>
             </div>
             <p className="game-guide-hero-description">

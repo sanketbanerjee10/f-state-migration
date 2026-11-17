@@ -36,6 +36,7 @@ interface GameMenuOverlayProps {
   readonly onSettingsChange: (settings: GameSettings) => void;
   readonly onStart: (gameMode: GameMode, levelId?: number) => void;
   readonly onStartTutorial: () => void;
+  readonly onOpenSiege?: () => void;
   readonly onResume: () => void;
   readonly onAdjustStat: (
     attribute: RunStatAttribute,
@@ -65,6 +66,7 @@ export function GameMenuOverlay({
   onSettingsChange,
   onStart,
   onStartTutorial,
+  onOpenSiege,
   onResume,
   onAdjustStat,
   onAdjustRareUpgrade,
@@ -187,6 +189,7 @@ export function GameMenuOverlay({
               onViewChange={navigateToView}
               onStart={onStart}
               onStartTutorial={onStartTutorial}
+              onOpenSiege={onOpenSiege}
             />
           )}
         {!isMainMenu && (
@@ -218,6 +221,7 @@ export function GameMenuOverlay({
             onViewChange={navigateToView}
             onStart={onStart}
             onStartTutorial={onStartTutorial}
+            onOpenSiege={onOpenSiege}
           />
         ) : view === 'account' && !isMainMenu ? (
           <GamePlayerAccountPanel
@@ -244,6 +248,7 @@ export function GameMenuOverlay({
                 onViewChange={navigateToView}
                 onStart={onStart}
                 onStartTutorial={onStartTutorial}
+                onOpenSiege={onOpenSiege}
               />
             </section>
           </>

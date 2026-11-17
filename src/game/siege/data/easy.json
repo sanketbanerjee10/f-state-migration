@@ -1,0 +1,672 @@
+{
+  "schemaVersion": 1,
+  "difficulty": "easy",
+  "rules": {
+    "startTroops": 20,
+    "laneShiftLimit": 2,
+    "wallRatio": {
+      "min": 0.55,
+      "max": 0.7
+    },
+    "allowedOps": [
+      "add",
+      "sub",
+      "mul"
+    ],
+    "maxDivisor": 0,
+    "gateSpawnIntervalSeconds": 2.5,
+    "gateScrollSpeedPerViewport": 0.32
+  },
+  "levels": [
+    {
+      "id": "easy-01",
+      "name": "First Contact",
+      "theme": "military_outpost",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 5
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 7
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 9
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-02",
+      "name": "Open Route",
+      "theme": "military_outpost",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 6
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 4
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 10
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-03",
+      "name": "Double Down",
+      "theme": "military_outpost",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 7
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 5
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 11
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-04",
+      "name": "Northern Passage",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 10
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 12
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-05",
+      "name": "Safe Numbers",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 4
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 11
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 13
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-06",
+      "name": "Factory Line",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 10
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 5
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 12
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 14
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-07",
+      "name": "Clear Skies",
+      "theme": "contaminated_zone",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 11
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 13
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 15
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-08",
+      "name": "Open Ground",
+      "theme": "contaminated_zone",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 12
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 4
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 14
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 16
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-09",
+      "name": "Steady Advance",
+      "theme": "contaminated_zone",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 13
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 5
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 15
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 17
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "easy-10",
+      "name": "First Stronghold",
+      "theme": "contaminated_zone",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 16,
+        "three": 32
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 14
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 16
+                },
+                {
+                  "lane": 2,
+                  "op": "add",
+                  "value": 18
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 48
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

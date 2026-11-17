@@ -1,0 +1,499 @@
+.game-screen.game-siege-screen {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: block;
+  background: transparent;
+}
+
+.game-siege-screen .game-canvas-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+}
+
+.game-siege-screen:not([data-screen='playing']) .game-canvas-frame {
+  background: transparent;
+}
+
+.game-siege-screen .game-siege-backdrop {
+  background: rgb(var(--ah-shadow-rgb) / 48%);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+.game-screen .game-siege-menu {
+  z-index: 7;
+  display: flex;
+  width: min(940px, calc(100% - 28px));
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: auto;
+  border-color: rgb(var(--ah-lavender-rgb) / 32%);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% -12%, rgb(var(--ah-purple-rgb) / 24%), transparent 48%),
+    radial-gradient(ellipse at 100% 55%, rgb(var(--ah-pink-rgb) / 7%), transparent 42%),
+    linear-gradient(145deg, rgb(var(--ah-purple-rgb) / 20%), rgb(var(--ah-midnight-rgb) / 92%) 54%, rgb(var(--ah-midnight-rgb) / 92%));
+  box-shadow:
+    0 30px 100px rgb(var(--ah-shadow-rgb) / 72%),
+    0 0 0 1px rgb(var(--ah-white-rgb) / 3%) inset,
+    0 0 55px rgb(var(--ah-purple-rgb) / 12%);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  isolation: isolate;
+}
+
+.game-siege-screen[data-screen='difficulty'] .game-siege-menu {
+  width: min(680px, calc(100% - 28px));
+}
+
+.game-screen .game-siege-menu.game-siege-modal-compact {
+  width: min(620px, calc(100% - 28px));
+}
+
+.game-screen .game-siege-menu::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background-image: radial-gradient(rgb(var(--ah-cream-rgb) / 55%) 0.65px, transparent 0.65px);
+  background-size: 19px 19px;
+  content: "";
+  opacity: 0.18;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black, transparent 76%);
+}
+
+.game-siege-modal-header,
+.game-siege-modal-content {
+  position: relative;
+  z-index: 1;
+}
+
+.game-siege-modal-header {
+  width: 100%;
+  text-align: left;
+}
+
+.game-siege-modal-header .settings-title {
+  text-align: left;
+}
+
+.game-siege-modal-content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: clamp(18px, 3vw, 26px);
+  text-align: center;
+}
+
+.game-siege-menu > .game-siege-modal-content > p:not(.game-panel-eyebrow) {
+  max-width: 640px;
+  margin: 0;
+}
+
+.game-siege-menu .game-siege-difficulty-list {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.game-siege-difficulty-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 158px !important;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px !important;
+  overflow: hidden;
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.game-siege-screen[data-screen='difficulty'] .game-siege-difficulty-card {
+  min-height: 138px !important;
+}
+
+.game-siege-difficulty-card:not(:disabled):hover {
+  transform: translateY(-4px);
+  border-color: var(--siege-tier-color);
+  box-shadow: 0 10px 24px rgb(var(--ah-shadow-rgb) / 42%);
+}
+
+.game-siege-difficulty-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--siege-tier-color);
+  content: '';
+}
+
+.game-siege-difficulty-easy { --siege-tier-color: #69d7ba; }
+.game-siege-difficulty-medium { --siege-tier-color: #83b9ff; }
+.game-siege-difficulty-difficult { --siege-tier-color: #ffad68; }
+.game-siege-difficulty-impossible { --siege-tier-color: #f579a7; }
+
+.game-siege-difficulty-number {
+  color: var(--siege-tier-color);
+  font: 800 24px/1 var(--app-font-mono, monospace);
+}
+
+.game-siege-difficulty-card strong {
+  color: var(--ah-cream);
+  font-size: clamp(13px, 1.8vw, 18px);
+  text-transform: uppercase;
+}
+
+.game-siege-difficulty-card small,
+.game-siege-difficulty-status {
+  color: var(--ah-muted);
+  font-size: 11px;
+}
+
+.game-siege-difficulty-status {
+  color: var(--siege-tier-color);
+  font: 700 9px var(--app-font-mono, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.game-siege-difficulty-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.game-siege-level-selection {
+  width: 100%;
+}
+
+.game-siege-difficulty-name {
+  margin: 0 0 16px;
+  color: var(--ah-muted);
+  font: 700 11px var(--app-font-mono, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.game-siege-carousel {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-siege-carousel > div {
+  min-width: 0;
+}
+
+.game-siege-carousel-content {
+  align-items: stretch;
+}
+
+.game-siege-carousel-slide {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+  padding: 6px 8px 10px 0;
+}
+
+.game-siege-carousel-card {
+  display: flex;
+  width: 100%;
+  min-height: 190px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px !important;
+  text-align: left;
+  transition: transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease;
+}
+
+.game-siege-carousel-card:not(.is-centered) {
+  transform: scale(0.92);
+  opacity: 0.7;
+}
+
+.game-siege-carousel-card.is-centered {
+  border-color: rgb(var(--ah-pink-rgb) / 72%);
+  box-shadow: 0 8px 24px rgb(var(--ah-shadow-rgb) / 42%);
+}
+
+.game-siege-carousel-card.is-locked {
+  opacity: 0.46;
+}
+
+.game-siege-carousel-card .game-level-card-name {
+  display: -webkit-box;
+  font-size: clamp(12px, 1.6vw, 17px);
+  overflow: hidden;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.game-siege-carousel-card .game-level-number {
+  font-size: 21px;
+}
+
+.game-siege-carousel-card .game-level-state {
+  font-size: 9px;
+}
+
+.game-siege-carousel-card-bottom {
+  width: 100%;
+  color: var(--ah-muted);
+  font-size: 10px;
+}
+
+.game-siege-carousel-stars {
+  color: var(--ah-peach);
+  letter-spacing: 0.08em;
+}
+
+.game-siege-carousel .game-siege-carousel-arrow {
+  position: static;
+  width: 38px;
+  height: 38px;
+  justify-self: center;
+  transform: none;
+}
+
+.game-siege-carousel .game-siege-carousel-arrow:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.game-siege-carousel .game-siege-carousel-arrow:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.game-siege-carousel .game-siege-carousel-arrow:focus-visible,
+.game-siege-difficulty-card:focus-visible,
+.game-siege-modal-header .game-level-back-button:focus-visible {
+  outline: 2px solid var(--ah-pink);
+  outline-offset: 3px;
+}
+
+.game-siege-save-error {
+  color: var(--ah-peach) !important;
+  font-size: 12px;
+}
+
+.game-hud-siege {
+  --hud-max-width: 420px;
+  width: min(420px, calc(100% - 78px));
+  padding: 9px 12px;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 30%);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgb(var(--ah-purple-rgb) / 16%), transparent 75%),
+    rgb(var(--ah-midnight-rgb) / 82%);
+  box-shadow: 0 4px 16px rgb(var(--ah-shadow-rgb) / 52%);
+  backdrop-filter: blur(4px);
+}
+
+.game-siege-result-stars {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 0;
+  color: var(--ah-peach) !important;
+  font-size: clamp(40px, 8vw, 58px);
+  line-height: 1;
+  letter-spacing: 0.15em;
+}
+
+.game-siege-result-stars-count {
+  color: var(--ah-muted);
+  font: 700 10px var(--app-font-mono, monospace);
+  letter-spacing: 0.1em;
+}
+
+.game-menu-actions.game-siege-result-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.game-siege-result-actions-lost {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+}
+
+.game-siege-result-actions-won {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.game-siege-result-actions-won .game-siege-result-next {
+  min-height: 60px;
+  grid-column: 1 / -1;
+  font-size: 15px;
+}
+
+.game-siege-result-action {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.game-siege-result-actions-lost .game-siege-result-action {
+  min-height: 76px;
+}
+
+.game-siege-result-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 18%);
+  border-radius: 10px;
+  background: rgb(var(--ah-lavender-rgb) / 8%);
+  color: var(--ah-pink);
+  font-size: 18px;
+}
+
+.game-menu-primary.game-siege-result-action .game-siege-result-icon {
+  border-color: rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 13%);
+  color: var(--ah-white);
+}
+
+.game-siege-touch-controls {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.game-siege-touch-controls .siege-joystick-proxy {
+  display: none;
+}
+
+@media (max-width: 440px) {
+  .game-siege-menu {
+    gap: 0;
+    padding: 0;
+  }
+
+  .game-siege-modal-header {
+    min-height: 68px;
+    padding: 12px 14px;
+  }
+
+  .game-siege-modal-content {
+    gap: 8px;
+    padding: 16px 12px;
+  }
+
+  .game-siege-menu .game-siege-difficulty-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .game-siege-difficulty-card {
+    min-height: 118px !important;
+    gap: 5px;
+    padding: 10px !important;
+  }
+
+  .game-siege-screen[data-screen='difficulty'] .game-siege-difficulty-card {
+    min-height: 118px !important;
+  }
+
+  .game-siege-difficulty-number {
+    font-size: 18px;
+  }
+
+  .game-siege-difficulty-card small,
+  .game-siege-difficulty-status {
+    font-size: 9px;
+  }
+
+  .game-siege-carousel {
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    gap: 0;
+  }
+
+  .game-siege-carousel-slide {
+    padding: 4px 5px 8px 0;
+  }
+
+  .game-siege-carousel-card {
+    min-height: 150px;
+  }
+
+  .game-siege-carousel-card {
+    gap: 6px;
+    padding: 8px !important;
+  }
+
+  .game-siege-carousel-card .game-level-state {
+    font-size: 7px;
+  }
+
+  .game-siege-carousel-card .game-level-number {
+    font-size: 16px;
+  }
+
+  .game-siege-carousel-card .game-level-card-name {
+    font-size: 10px;
+  }
+
+  .game-siege-carousel .game-siege-carousel-arrow {
+    width: 28px;
+    height: 34px;
+    font-size: 22px;
+  }
+
+  .game-siege-result-actions-lost {
+    gap: 8px;
+  }
+
+  .game-siege-result-actions-lost .game-siege-result-action {
+    min-height: 62px;
+  }
+
+  .game-siege-result-action {
+    gap: 7px;
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .game-siege-result-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .game-siege-touch-controls {
+    display: block !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-siege-carousel-card,
+  .game-siege-difficulty-card {
+    transition: none;
+  }
+}

@@ -66,7 +66,11 @@ function getAngleDifference(left: number, right: number): number {
   return Math.atan2(Math.sin(left - right), Math.cos(left - right));
 }
 
-export function GameCanvas() {
+export function GameCanvas({
+  onOpenSiege,
+}: {
+  readonly onOpenSiege?: () => void;
+} = {}) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1159,6 +1163,7 @@ export function GameCanvas() {
           onSettingsChange={updateSettings}
           onStart={startRun}
           onStartTutorial={startTutorial}
+          onOpenSiege={onOpenSiege}
           onResume={resumeRun}
           onAdjustStat={adjustStat}
           onAdjustRareUpgrade={adjustRareUpgrade}

@@ -1,0 +1,673 @@
+{
+  "schemaVersion": 1,
+  "difficulty": "medium",
+  "rules": {
+    "startTroops": 15,
+    "laneShiftLimit": 2,
+    "wallRatio": {
+      "min": 0.7,
+      "max": 0.85
+    },
+    "allowedOps": [
+      "add",
+      "sub",
+      "mul",
+      "div"
+    ],
+    "maxDivisor": 2,
+    "gateSpawnIntervalSeconds": 2,
+    "gateScrollSpeedPerViewport": 0.32
+  },
+  "levels": [
+    {
+      "id": "medium-01",
+      "name": "Boiler Room",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 4
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-02",
+      "name": "Foundry Run",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 5
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-03",
+      "name": "Crucible",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 10
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 6
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-04",
+      "name": "Refinery",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 11
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 7
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-05",
+      "name": "Conveyor",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-06",
+      "name": "Furnace Hall",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-07",
+      "name": "Smelter",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 10
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 10
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-08",
+      "name": "Generator Wing",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 11
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 11
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-09",
+      "name": "Assembly Line",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 8
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 12
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "medium-10",
+      "name": "The Forge",
+      "theme": "industrial_complex",
+      "laneCount": 3,
+      "startLane": 1,
+      "stars": {
+        "two": 11,
+        "three": 22
+      },
+      "sections": [
+        {
+          "elements": [
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "mul",
+                  "value": 2
+                },
+                {
+                  "lane": 1,
+                  "op": "add",
+                  "value": 9
+                },
+                {
+                  "lane": 2,
+                  "op": "sub",
+                  "value": 5
+                }
+              ]
+            },
+            {
+              "type": "gateRow",
+              "gates": [
+                {
+                  "lane": 0,
+                  "op": "add",
+                  "value": 13
+                },
+                {
+                  "lane": 1,
+                  "op": "mul",
+                  "value": 3
+                },
+                {
+                  "lane": 2,
+                  "op": "mul",
+                  "value": 2
+                }
+              ]
+            }
+          ],
+          "wall": {
+            "zombies": [
+              {
+                "kind": "walker",
+                "count": 68
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import {
   renderGamePlayerAvatar,
 } from '@/lib/gamePlayerAvatar';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
+import { GamePauseMoon } from './GamePauseMoon';
 
 const PAGE_SIZE = 10;
 const MAX_LEADERBOARD_OFFSET = 10_000;
@@ -50,9 +51,12 @@ export function GameLeaderboardPanel({
             <p className="game-dialog-wordmark">
               <GameFranchiseWordmark />
             </p>
-            <h1 id="game-leaderboard-title">{t('game.leaderboard.title')}</h1>
+            <h1 id="game-leaderboard-title" className="game-menu-panel-title">
+              {t('game.leaderboard.title')}
+            </h1>
           </div>
         </div>
+        <GamePauseMoon />
       </header>
       <p className="game-leaderboard-ranking">{t('game.leaderboard.ranking')}</p>
       {leaderboard.isPending ? (

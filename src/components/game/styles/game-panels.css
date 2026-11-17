@@ -49,6 +49,10 @@
   color: var(--ah-cream);
 }
 
+.game-screen .game-menu-panel-title {
+  font-size: 28px;
+}
+
 .game-menu-overlay h1 {
   font-size: clamp(23px, 5vw, 34px);
   line-height: 1.08;
@@ -3126,6 +3130,10 @@
   justify-content: flex-end;
 }
 
+.game-settings-header-actions {
+  gap: 12px;
+}
+
 .settings-brand {
   min-width: 0;
   display: flex;
@@ -3137,7 +3145,6 @@
   margin: 0;
   color: var(--ah-cream);
   font-family: var(--app-font-sans);
-  font-size: clamp(23px, 3vw, 30px);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -4079,10 +4086,6 @@ button.settings-key-row:hover {
     gap: 10px;
   }
 
-  .settings-header h1 {
-    font-size: 22px;
-  }
-
   .settings-nav {
     padding: 7px 8px;
     gap: 5px;
@@ -4964,7 +4967,6 @@ button.settings-key-row:hover {
 .game-leaderboard-heading h1 {
   margin: 0;
   color: var(--ah-cream);
-  font-size: clamp(24px, 4vw, 34px);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -5248,7 +5250,6 @@ button.settings-key-row:hover {
 .game-guide-hero h1 {
   margin: 0;
   color: var(--ah-cream);
-  font-size: clamp(32px, 5vw, 54px);
   font-weight: 850;
   letter-spacing: -0.055em;
   line-height: 0.98;
