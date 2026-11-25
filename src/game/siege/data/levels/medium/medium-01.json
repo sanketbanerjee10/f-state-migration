@@ -2,6 +2,12 @@
   "id": "medium-01",
   "name": "Flooded Foundry",
   "theme": "industrial_complex",
+  "gateColors": {
+    "add": "#22C55E",
+    "sub": "#FDA4AF",
+    "mul": "#FACC15",
+    "div": "#FF1744"
+  },
   "laneCount": 3,
   "stars": {
     "two": 13212,
@@ -15,51 +21,8 @@
           "gates": [
             {
               "lane": 0,
-              "span": 2,
-              "op": "mul",
-              "value": 2
-            },
-            {
-              "lane": 2,
               "op": "sub",
-              "value": 3
-            }
-          ]
-        },
-        {
-          "type": "hazard",
-          "kind": "toxic_puddle",
-          "lane": 1,
-          "value": 1,
-          "duration": 2
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "div",
-              "value": 2
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 3
-            },
-            {
-              "lane": 2,
-              "op": "add",
-              "value": 9
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "add",
-              "value": 9
+              "value": 8
             },
             {
               "lane": 1,
@@ -78,14 +41,58 @@
           "gates": [
             {
               "lane": 0,
-              "span": 2,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 1,
+              "op": "sub",
+              "value": 8
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 8
+            },
+            {
+              "lane": 1,
+              "op": "div",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 8
+            },
+            {
+              "lane": 1,
               "op": "mul",
               "value": 2
             },
             {
               "lane": 2,
-              "op": "sub",
-              "value": 3
+              "op": "div",
+              "value": 2
             }
           ]
         }
@@ -115,13 +122,13 @@
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 3
+              "op": "sub",
+              "value": 12
             },
             {
               "lane": 2,
               "op": "add",
-              "value": 9
+              "value": 16
             }
           ]
         },
@@ -130,18 +137,44 @@
           "gates": [
             {
               "lane": 0,
-              "op": "add",
-              "value": 8
+              "op": "div",
+              "value": 2
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 2
+              "op": "add",
+              "value": 16
             },
             {
               "lane": 2,
+              "op": "sub",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "type": "hazard",
+          "kind": "razor_wire",
+          "lane": 1,
+          "value": 2
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 16
+            },
+            {
+              "lane": 1,
               "op": "div",
               "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 12
             }
           ]
         },
@@ -150,30 +183,18 @@
           "gates": [
             {
               "lane": 0,
-              "span": 2,
-              "op": "mul",
+              "op": "add",
+              "value": 16
+            },
+            {
+              "lane": 1,
+              "op": "div",
               "value": 2
             },
             {
               "lane": 2,
               "op": "sub",
-              "value": 3
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "span": 2,
-              "op": "mul",
-              "value": 2
-            },
-            {
-              "lane": 2,
-              "op": "sub",
-              "value": 3
+              "value": 12
             }
           ]
         }
@@ -182,11 +203,11 @@
         "zombies": [
           {
             "kind": "runner",
-            "count": 507
+            "count": 558
           },
           {
             "kind": "walker",
-            "count": 338
+            "count": 372
           }
         ]
       }
@@ -199,17 +220,17 @@
             {
               "lane": 0,
               "op": "mul",
-              "value": 1.15
+              "value": 3
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 16
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 3
             }
           ]
         },
@@ -218,18 +239,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 16
             },
             {
               "lane": 1,
               "op": "mul",
-              "value": 1.15
+              "value": 3
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 3
             }
           ]
         },
@@ -238,18 +259,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 16
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 3
             },
             {
               "lane": 2,
               "op": "mul",
-              "value": 1.15
+              "value": 3
             }
           ]
         },
@@ -258,18 +279,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 16
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 3
             },
             {
               "lane": 2,
               "op": "mul",
-              "value": 1.15
+              "value": 3
             }
           ]
         }
@@ -278,11 +299,11 @@
         "zombies": [
           {
             "kind": "armoured",
-            "count": 30
+            "count": 36
           },
           {
             "kind": "spitter",
-            "count": 21
+            "count": 26
           }
         ]
       }
@@ -294,18 +315,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 24
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "add",
+              "value": 24
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 4
             }
           ]
         },
@@ -314,18 +335,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 24
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 4
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "add",
+              "value": 24
             }
           ]
         },
@@ -334,18 +355,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 24
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "add",
+              "value": 24
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 4
             }
           ]
         },
@@ -354,18 +375,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 1.15
+              "op": "add",
+              "value": 24
             },
             {
               "lane": 1,
-              "op": "mul",
-              "value": 1.15
+              "op": "sub",
+              "value": 24
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 1.15
+              "op": "div",
+              "value": 4
             }
           ]
         }
@@ -374,11 +395,11 @@
         "zombies": [
           {
             "kind": "runner",
-            "count": 381
+            "count": 515
           },
           {
             "kind": "walker",
-            "count": 254
+            "count": 343
           }
         ]
       }

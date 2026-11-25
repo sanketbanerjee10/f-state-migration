@@ -33,6 +33,7 @@ vi.mock('../../../../src/game/siege/SiegeEngine', () => ({
 
     moveLane() {}
     setMovementInput() {}
+    movePlayerByTouch() {}
     setKeyboardMovementEnabled(enabled: boolean) {
       engineHarness.keyboardMovementEnabled = enabled;
     }
@@ -136,6 +137,41 @@ describe('Siege UI', () => {
     expect(container?.querySelector('.game-hud-siege')).not.toBeNull();
     expect(container?.querySelector('.game-pause-button')).not.toBeNull();
     expect(engineHarness.keyboardMovementEnabled).toBe(true);
+  });
+
+  it('formats player and enemy troop counts consistently in the HUD', async () => {
+    await act(async () => {
+      root?.render(createElement(SiegeGame, { onExit: vi.fn() }));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+    await act(async () => {
+      (container?.querySelector(
+        '.game-siege-difficulty-card[data-difficulty="easy"]',
+      ) as HTMLButtonElement).click();
+    });
+    await act(async () => {
+      (container?.querySelector(
+        '.game-siege-carousel-card[data-level-id="easy-01"]',
+      ) as HTMLButtonElement).click();
+    });
+    await act(async () => {
+      engineHarness.onState?.({
+        phase: 'wall',
+        troops: 1234567,
+        playerX: 0,
+        playerY: 0,
+        sectionIndex: 0,
+        rowIndex: 1,
+        rowCount: 1,
+        zombiesRemaining: 2345678,
+        elapsedSeconds: 30,
+      });
+    });
+
+    expect(container?.querySelector('.game-hud-score strong')?.textContent)
+      .toBe('1,234,567');
+    expect(container?.querySelector('.game-hud-bombs strong')?.textContent)
+      .toBe('2,345,678');
   });
 
   it('returns to level selection for old URLs that requested an active level', async () => {

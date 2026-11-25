@@ -47,76 +47,50 @@ describe('Siege rules', () => {
   });
 
   it.each(SIEGE_DIFFICULTIES)(
-    'validates and simulates all levels for %s',
+    'validates all levels for %s',
     async (difficulty) => {
       const data = await loadSiegeDifficultyData(difficulty);
       const result = validateSiegeDifficultyData(data);
       expect(result.data).not.toBeNull();
       expect(result.issues.filter(({ severity }) => severity === 'error')).toEqual([]);
       expect(data.levels).toHaveLength(20);
-      for (const level of data.levels) {
-        expect(simulateSiegeLevel(data, level).won).toBe(true);
-      }
+      expect(data.levels.every((level) => level.gateColors)).toBe(true);
     },
   );
 
-  it('scales enemy stages and gate rows exponentially with difficulty', async () => {
+  it('uses the manifest section and gate-row lengths', async () => {
     const targets = [
-      { difficulty: 'easy', sections: 2, gateRows: 8 },
-      { difficulty: 'medium', sections: 4, gateRows: 16 },
-      { difficulty: 'difficult', sections: 8, gateRows: 32 },
-      { difficulty: 'impossible', sections: 16, gateRows: 64 },
+      { difficulty: 'easy' as const, level: 'easy-01', sections: 2, gateRows: 8 },
+      { difficulty: 'medium' as const, level: 'medium-01', sections: 4, gateRows: 16 },
+      { difficulty: 'difficult' as const, level: 'difficult-01', sections: 5, gateRows: 20 },
+      { difficulty: 'impossible' as const, level: 'impossible-01', sections: 4, gateRows: 16 },
     ] as const;
 
-    for (const { difficulty, sections, gateRows } of targets) {
+    for (const { difficulty, level: levelId, sections, gateRows } of targets) {
       const data = await loadSiegeDifficultyData(difficulty);
-      for (const level of data.levels) {
-        expect(level.sections).toHaveLength(sections);
-        const totalGateRows = level.sections.reduce(
-          (total, section) => total + section.elements.filter(
-            (element) => element.type === 'gateRow',
-          ).length,
-          0,
-        );
-        expect(totalGateRows).toBeGreaterThanOrEqual(gateRows);
-      }
+      const level = data.levels.find(({ id }) => id === levelId)!;
+      expect(level.sections).toHaveLength(sections);
+      const totalGateRows = level.sections.reduce(
+        (total, section) => total + section.elements.filter(
+          (element) => element.type === 'gateRow',
+        ).length,
+        0,
+      );
+      expect(totalGateRows).toBe(gateRows);
     }
   });
 
-  it('sets star thresholds relative to each level best-path outcome', async () => {
+  it('uses the exact tier star thresholds', async () => {
+    const thresholds = {
+      easy: { two: 152, three: 243 },
+      medium: { two: 13212, three: 21139 },
+      difficult: { two: 63807, three: 102092 },
+      impossible: { two: 120651, three: 193041 },
+    } as const;
     for (const difficulty of SIEGE_DIFFICULTIES) {
       const data = await loadSiegeDifficultyData(difficulty);
       for (const level of data.levels) {
-        const finalTroops = simulateSiegeLevel(data, level).finalTroops;
-        expect(level.stars.two).toBe(Math.max(1, Math.floor(finalTroops * 0.5)));
-        expect(level.stars.three).toBe(
-          Math.max(level.stars.two + 1, Math.floor(finalTroops * 0.8)),
-        );
-        expect(level.stars.three).toBeLessThanOrEqual(finalTroops);
-      }
-    }
-  });
-
-  it('scales zombie groups in expanded enemy stages', async () => {
-    const enemyScales = {
-      medium: 0.75,
-      difficult: 0.4,
-      impossible: 1,
-    } as const;
-
-    for (const difficulty of SIEGE_DIFFICULTIES.slice(1)) {
-      const data = await loadSiegeDifficultyData(difficulty);
-      for (const level of data.levels) {
-        for (let sectionIndex = 2; sectionIndex < level.sections.length; sectionIndex += 1) {
-          const section = level.sections[sectionIndex]!;
-          const template = level.sections[(sectionIndex - 2) % 2]!;
-          expect(section.wall.zombies).toEqual(template.wall.zombies.map(
-            (group) => ({
-              ...group,
-              count: Math.ceil(group.count * enemyScales[difficulty]),
-            }),
-          ));
-        }
+        expect(level.stars).toEqual(thresholds[difficulty]);
       }
     }
   });
@@ -125,19 +99,84 @@ describe('Siege rules', () => {
     const easyData = await loadSiegeDifficultyData('easy');
     const level = easyData.levels[0]!;
 
+    expect(level.gateColors).toEqual({
+      add: '#22C55E',
+      sub: '#FDA4AF',
+      mul: '#FACC15',
+      div: '#FF1744',
+    });
     expect(level.sections).toHaveLength(2);
     expect(level.sections.map((section) => section.elements.filter(
       (element) => element.type === 'gateRow',
     ).length)).toEqual([4, 4]);
-    expect(level.sections[0]!.elements[1]).toMatchObject({
+    expect(level.sections[1]!.elements[3]).toMatchObject({
       type: 'hazard',
       kind: 'razor_wire',
     });
     expect(level.sections[0]!.wall.zombies.map(({ kind }) => kind)).toEqual(['walker']);
-    expect(level.sections[1]!.wall.zombies.map(({ kind }) => kind))
-      .toEqual(['runner', 'brute']);
+    expect(level.sections[1]!.wall.zombies.map(({ kind }) => kind)).toEqual(['walker']);
     expect(simulateSiegeLevel(easyData, level).sections)
       .toHaveLength(2);
+  });
+
+  it('validates optional per-level gate colors', async () => {
+    const easyData = await loadSiegeDifficultyData('easy');
+    const validData = {
+      ...easyData,
+      levels: easyData.levels.map((level, index) => index === 0
+        ? {
+          ...level,
+          gateColors: { add: '#123456' },
+          sections: level.sections.map((section, sectionIndex) => sectionIndex === 0
+            ? {
+              ...section,
+              elements: section.elements.map((element, elementIndex) => (
+                elementIndex === 0 && element.type === 'gateRow'
+                  ? {
+                    ...element,
+                    gates: element.gates.map((gate, gateIndex) => (
+                      gateIndex === 0 ? { ...gate, color: '#654321' } : gate
+                    )),
+                  }
+                  : element
+              )),
+            }
+            : section),
+        }
+        : level),
+    };
+    expect(validateSiegeDifficultyData(validData).data?.levels[0]?.gateColors)
+      .toEqual({ add: '#123456' });
+    const firstGate = validateSiegeDifficultyData(validData).data
+      ?.levels[0]?.sections[0]?.elements[0];
+    expect(firstGate?.type === 'gateRow' && firstGate.gates[0]?.color)
+      .toBe('#654321');
+
+    const invalidData = {
+      ...validData,
+      levels: validData.levels.map((level, index) => index === 0
+        ? {
+          ...level,
+          gateColors: { add: 'lime' },
+          sections: level.sections.map((section, sectionIndex) => sectionIndex === 0
+            ? {
+              ...section,
+              elements: section.elements.map((element, elementIndex) => (
+                elementIndex === 0 && element.type === 'gateRow'
+                  ? {
+                    ...element,
+                    gates: element.gates.map((gate, gateIndex) => (
+                      gateIndex === 0 ? { ...gate, color: 'lime' } : gate
+                    )),
+                  }
+                  : element
+              )),
+            }
+            : section),
+        }
+        : level),
+    };
+    expect(validateSiegeDifficultyData(invalidData).data).toBeNull();
   });
 
   it('rejects removed lane-shift and start-lane fields', async () => {

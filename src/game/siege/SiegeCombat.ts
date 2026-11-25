@@ -7,7 +7,7 @@ import type { SiegeDifficulty, SiegeZombieGroup } from './SiegeRules';
 export const MAX_PLAYER_VISUALS = 30;
 
 const PLAYER_RADIUS = 18;
-const PLAYER_SPEED = 400;
+const PLAYER_SPEED = 800;
 const PLAYER_FORMATION_COLUMNS = 5;
 const PLAYER_FORMATION_HORIZONTAL_SPACING = 36;
 const PLAYER_FORMATION_VERTICAL_SPACING = 28;

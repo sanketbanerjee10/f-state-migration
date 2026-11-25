@@ -382,6 +382,10 @@
   display: none;
 }
 
+.game-siege-touch-controls .game-joystick-movement {
+  display: none;
+}
+
 @media (max-width: 440px) {
   .game-siege-menu {
     gap: 0;

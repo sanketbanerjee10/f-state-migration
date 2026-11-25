@@ -7,9 +7,9 @@
         "min": 0.55,
         "max": 0.7
       },
-      "allowedOps": ["add", "sub", "mul"],
-      "hazards": ["razor_wire"],
-      "maxDivisor": 0,
+      "allowedOps": ["add", "sub", "mul", "div"],
+      "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
+      "maxDivisor": 4,
       "gateSpawnIntervalSeconds": 2.5,
       "gateScrollSpeedPerViewport": 0.32
     },
@@ -21,7 +21,7 @@
       },
       "allowedOps": ["add", "sub", "mul", "div"],
       "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
-      "maxDivisor": 2,
+      "maxDivisor": 4,
       "gateSpawnIntervalSeconds": 2,
       "gateScrollSpeedPerViewport": 0.32
     },
@@ -33,7 +33,7 @@
       },
       "allowedOps": ["add", "sub", "mul", "div"],
       "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
-      "maxDivisor": 3,
+      "maxDivisor": 4,
       "gateSpawnIntervalSeconds": 1.5,
       "gateScrollSpeedPerViewport": 0.32
     },

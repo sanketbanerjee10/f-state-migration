@@ -13,6 +13,8 @@ import {
   getMusicTrackName,
 } from '@/game/audio/GameAudioController';
 import {
+  readDiscoveredBosses,
+  readDiscoveredEnemies,
   notifyNewBossDiscoveries,
   notifyNewEnemyDiscoveries,
 } from '@/game/discovery/EnemyDiscovery';
@@ -46,6 +48,7 @@ import {
   GameTutorialOverlay,
 } from './GameTutorialOverlay';
 import { useGameSettings } from './useGameSettings';
+import { useGamePlayerAuth } from './GamePlayerAuthProvider';
 import './game-canvas.css';
 
 interface TutorialBaseline {
@@ -72,6 +75,10 @@ export function GameCanvas({
   readonly onOpenSiege?: () => void;
 } = {}) {
   const { t } = useTranslation();
+  const {
+    saveCampaignProgress: syncCampaignProgress,
+    saveDiscoveries: syncDiscoveries,
+  } = useGamePlayerAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fullscreenRequestPendingRef = useRef(false);
@@ -385,7 +392,7 @@ export function GameCanvas({
             audioRef.current?.playCue('enemyDeath');
           }
 
-          notifyNewBossDiscoveries(
+          const newlyDiscoveredBossTypes = notifyNewBossDiscoveries(
             globalThis.localStorage,
             nextState.zombies.flatMap((zombie) =>
               zombie.isBoss && zombie.bossType ? [zombie.bossType] : [],
@@ -400,6 +407,14 @@ export function GameCanvas({
               });
             },
           );
+          if (newlyDiscoveredEnemyTypes.length > 0 || newlyDiscoveredBossTypes.length > 0) {
+            void syncDiscoveries({
+              enemies: [...readDiscoveredEnemies(globalThis.localStorage)],
+              bosses: [...readDiscoveredBosses(globalThis.localStorage)],
+            }).catch((error: unknown) => {
+              console.error('Unable to sync player guide discoveries.', error);
+            });
+          }
 
           previousAudioEventsRef.current = {
             impacts: new Set(nextState.impacts.map((impact) => impact.id)),
@@ -697,7 +712,13 @@ export function GameCanvas({
         gameState.progression.standardAttributeLevels,
         gameState.statistics.rareCurrency?.available ?? 0,
       );
-      saveLevelCampaignProgress(progress);
+      void syncCampaignProgress(progress).catch((error: unknown) => {
+        toast.error(
+          error instanceof Error
+            ? t('game.notifications.campaignProgressSaveFailed', { error: error.message })
+            : t('game.notifications.campaignProgressSaveFailedSimple'),
+        );
+      });
       savedCampaignLevelIdRef.current = gameState.campaignLevelId;
       currentCampaignRewardEligibleRef.current = false;
     } catch (error) {
@@ -707,7 +728,7 @@ export function GameCanvas({
           : t('game.notifications.campaignProgressSaveFailedSimple'),
       );
     }
-  }, [gameState]);
+  }, [gameState, syncCampaignProgress, t]);
 
   const openCampaignLevelSelection = () => {
     setOpenLevelSelectionOnMenu(true);
@@ -729,12 +750,18 @@ export function GameCanvas({
       const availablePoints =
         engineRef.current?.getGameState()?.upgradePoints;
       if (availablePoints !== undefined) {
-        saveLevelCampaignProgress({
+        void syncCampaignProgress({
           ...progress,
           statPoints: availablePoints,
           standardAttributeLevels:
             engineRef.current?.getGameState()?.progression
               .standardAttributeLevels ?? progress.standardAttributeLevels,
+        }).catch((error: unknown) => {
+          toast.error(
+            error instanceof Error
+              ? t('game.notifications.campaignPointsSaveFailed', { error: error.message })
+              : t('game.notifications.campaignPointsSaveFailedSimple'),
+          );
         });
       }
     } catch (error) {

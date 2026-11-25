@@ -17,10 +17,10 @@ import {
   getSiegeStars,
   readSiegeProgress,
   recordSiegeLevelClear,
-  saveSiegeProgress,
   type SiegeProgress,
 } from '@/game/siege/SiegeProgress';
 import type { SiegeRunResult } from '@/game/siege/SiegeEngine';
+import { useGamePlayerAuth } from './GamePlayerAuthProvider';
 import { SiegePlaySession } from './SiegePlaySession';
 import { SiegeSelectionModal } from './SiegeSelectionModal';
 import {
@@ -44,6 +44,10 @@ function getInitialDifficulty(): SiegeDifficulty {
 
 export function SiegeGame({ onExit }: SiegeGameProps) {
   const { t } = useTranslation();
+  const {
+    playerProgress,
+    saveSiegeProgress: syncSiegeProgress,
+  } = useGamePlayerAuth();
   const [difficultyData, setDifficultyData] = useState<
     Partial<Record<SiegeDifficulty, SiegeDifficultyData>> | null
   >(null);
@@ -89,6 +93,12 @@ export function SiegeGame({ onExit }: SiegeGameProps) {
   useEffect(() => {
     void loadContent();
   }, [loadContent]);
+
+  useEffect(() => {
+    if (!playerProgress) return;
+    setProgress(playerProgress.siege);
+    progressRef.current = playerProgress.siege;
+  }, [playerProgress]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -150,15 +160,14 @@ export function SiegeGame({ onExit }: SiegeGameProps) {
     );
     setProgress(nextProgress);
     progressRef.current = nextProgress;
-    try {
-      saveSiegeProgress(nextProgress);
+    void syncSiegeProgress(nextProgress).then(() => {
       setSaveError(null);
-    } catch (error) {
+    }).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
       setSaveError(message);
       console.error('Unable to save Siege campaign progress.', error);
-    }
-  }, []);
+    });
+  }, [syncSiegeProgress]);
 
   const handleRunComplete = useCallback((run: ActiveSiegeRun, result: SiegeRunResult) => {
     recordRun(run, result);

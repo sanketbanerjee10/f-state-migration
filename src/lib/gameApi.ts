@@ -1,5 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { isLeaderboardEligibleGameMode, type GameMode } from '@/game/core/GameState';
+import type { LevelCampaignProgress } from '@/game/core/LevelCampaign';
+import type { BossType } from '@/game/bosses/BossSystem';
+import type { ZombieType } from '@/game/core/GameState';
+import type { SiegeProgress } from '@/game/siege/SiegeProgress';
 import { customFetch, type CustomFetchOptions } from './api-client/custom-fetch';
 import type { GamePlayerAvatar } from './gamePlayerAvatar';
 
@@ -32,6 +36,16 @@ export interface GamePlayerSession {
   authenticated: true;
   username: string;
   avatar: GamePlayerAvatar;
+  progress: GamePlayerProgress;
+}
+
+export interface GamePlayerProgress {
+  campaign: LevelCampaignProgress;
+  siege: SiegeProgress;
+  discoveries: {
+    enemies: ZombieType[];
+    bosses: BossType[];
+  };
 }
 
 export interface GamePlayerCredentials {
@@ -167,6 +181,36 @@ export async function saveGamePlayerAvatar(
     method: 'PATCH',
     skipAuthToken: true,
     body: JSON.stringify(avatar),
+  });
+}
+
+export async function saveGamePlayerCampaignProgress(
+  progress: LevelCampaignProgress,
+): Promise<void> {
+  await customFetch('/api/game/account/progress/campaign', {
+    method: 'PUT',
+    skipAuthToken: true,
+    body: JSON.stringify(progress),
+  });
+}
+
+export async function saveGamePlayerSiegeProgress(
+  progress: SiegeProgress,
+): Promise<void> {
+  await customFetch('/api/game/account/progress/siege', {
+    method: 'PUT',
+    skipAuthToken: true,
+    body: JSON.stringify(progress),
+  });
+}
+
+export async function saveGamePlayerDiscoveries(
+  discoveries: GamePlayerProgress['discoveries'],
+): Promise<void> {
+  await customFetch('/api/game/account/progress/discoveries', {
+    method: 'PUT',
+    skipAuthToken: true,
+    body: JSON.stringify(discoveries),
   });
 }
 

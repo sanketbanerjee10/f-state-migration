@@ -2,10 +2,16 @@
   "id": "difficult-13",
   "name": "Flooded Underpass",
   "theme": "urban_ruins",
+  "gateColors": {
+    "add": "#22C55E",
+    "sub": "#FDA4AF",
+    "mul": "#FACC15",
+    "div": "#FF1744"
+  },
   "laneCount": 3,
   "stars": {
-    "two": 5284788,
-    "three": 8455661
+    "two": 63807,
+    "three": 102092
   },
   "sections": [
     {
@@ -15,18 +21,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "sub",
-              "value": 11
+              "op": "div",
+              "value": 2
             },
             {
               "lane": 1,
               "op": "add",
-              "value": 36
+              "value": 16
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 2
+              "op": "sub",
+              "value": 12
             }
           ]
         },
@@ -35,8 +41,8 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 3
+              "op": "add",
+              "value": 16
             },
             {
               "lane": 1,
@@ -45,8 +51,8 @@
             },
             {
               "lane": 2,
-              "op": "add",
-              "value": 30
+              "op": "sub",
+              "value": 12
             }
           ]
         },
@@ -56,37 +62,17 @@
             {
               "lane": 0,
               "op": "div",
-              "value": 3
-            },
-            {
-              "lane": 1,
-              "op": "mul",
               "value": 2
             },
             {
-              "lane": 2,
-              "op": "add",
-              "value": 35
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "add",
-              "value": 32
-            },
-            {
               "lane": 1,
-              "op": "mul",
-              "value": 3
-            },
-            {
-              "lane": 2,
               "op": "sub",
-              "value": 11
+              "value": 12
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 16
             }
           ]
         },
@@ -95,38 +81,18 @@
           "gates": [
             {
               "lane": 0,
-              "op": "mul",
-              "value": 2
-            },
-            {
-              "lane": 1,
               "op": "div",
-              "value": 3
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 3
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "sub",
-              "value": 13
+              "value": 2
             },
             {
               "lane": 1,
-              "op": "add",
-              "value": 38
+              "op": "sub",
+              "value": 12
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 2
+              "op": "add",
+              "value": 16
             }
           ]
         }
@@ -134,12 +100,12 @@
       "wall": {
         "zombies": [
           {
-            "kind": "splitter",
-            "count": 1348
+            "kind": "screamer",
+            "count": 110
           },
           {
-            "kind": "armoured",
-            "count": 900
+            "kind": "bloater",
+            "count": 74
           }
         ]
       }
@@ -152,87 +118,7 @@
             {
               "lane": 0,
               "op": "sub",
-              "value": 11
-            },
-            {
-              "lane": 1,
-              "op": "add",
-              "value": 36
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 2
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 3
-            },
-            {
-              "lane": 1,
-              "op": "div",
-              "value": 2
-            },
-            {
-              "lane": 2,
-              "op": "add",
-              "value": 30
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "div",
-              "value": 3
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 2
-            },
-            {
-              "lane": 2,
-              "op": "add",
-              "value": 35
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "add",
-              "value": 32
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 3
-            },
-            {
-              "lane": 2,
-              "op": "sub",
-              "value": 11
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 2
+              "value": 16
             },
             {
               "lane": 1,
@@ -251,18 +137,154 @@
           "gates": [
             {
               "lane": 0,
+              "op": "mul",
+              "value": 3
+            },
+            {
+              "lane": 1,
               "op": "sub",
-              "value": 13
+              "value": 16
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 16
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 3
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 3
+            },
+            {
+              "lane": 1,
+              "op": "sub",
+              "value": 16
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 3
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "runner",
+            "count": 3049
+          },
+          {
+            "kind": "walker",
+            "count": 2034
+          }
+        ]
+      }
+    },
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 24
+            },
+            {
+              "lane": 1,
+              "op": "sub",
+              "value": 24
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 24
             },
             {
               "lane": 1,
               "op": "add",
-              "value": 38
+              "value": 24
             },
             {
               "lane": 2,
-              "op": "mul",
-              "value": 2
+              "op": "div",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 24
+            },
+            {
+              "lane": 1,
+              "op": "div",
+              "value": 4
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 24
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 24
+            },
+            {
+              "lane": 2,
+              "op": "div",
+              "value": 4
             }
           ]
         }
@@ -270,588 +292,12 @@
       "wall": {
         "zombies": [
           {
-            "kind": "splitter",
-            "count": 1348
+            "kind": "screamer",
+            "count": 57
           },
           {
-            "kind": "armoured",
-            "count": 900
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
-          }
-        ]
-      }
-    },
-    {
-      "elements": [
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        },
-        {
-          "type": "gateRow",
-          "gates": [
-            {
-              "lane": 0,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 1,
-              "op": "mul",
-              "value": 1.1
-            },
-            {
-              "lane": 2,
-              "op": "mul",
-              "value": 1.1
-            }
-          ]
-        }
-      ],
-      "wall": {
-        "zombies": [
-          {
-            "kind": "splitter",
-            "count": 540
-          },
-          {
-            "kind": "armoured",
-            "count": 360
+            "kind": "bloater",
+            "count": 39
           }
         ]
       }

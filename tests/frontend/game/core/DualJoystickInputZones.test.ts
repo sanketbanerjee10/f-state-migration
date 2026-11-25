@@ -47,6 +47,7 @@ function createHarness(
   options: {
     readonly pointerType?: 'touch' | 'any';
     readonly movementAxis?: 'both' | 'horizontal';
+    readonly movementMode?: 'joystick' | 'swipe';
   } = {},
 ) {
   const surface = document.createElement('div');
@@ -65,6 +66,7 @@ function createHarness(
 
   const input = new DualJoystickInput();
   const onMovement = vi.fn();
+  const onMovementDelta = vi.fn();
   const onAim = vi.fn();
   const positionStick = vi.fn();
   input.attachToZones(movement, aim, onMovement, onAim, {
@@ -73,6 +75,7 @@ function createHarness(
     getZones: () => zones,
     settings,
     ...options,
+    onMovementDelta,
     positionStick,
   });
   input.setEnabled(true);
@@ -85,6 +88,7 @@ function createHarness(
     hud,
     zones,
     onMovement,
+    onMovementDelta,
     onAim,
     positionStick,
     captures,
@@ -144,6 +148,37 @@ describe('DualJoystickInput zone ownership', () => {
       expect.any(Object),
       fullSurfaceZones,
     );
+    harness.input.detach();
+  });
+
+  it('moves only by each horizontal swipe delta and stops when the finger stops', () => {
+    const harness = createHarness(DEFAULT_CONTROL_SETTINGS, {
+      pointerType: 'any',
+      movementAxis: 'horizontal',
+      movementMode: 'swipe',
+    });
+
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointerdown', 5, 5, 300),
+    );
+    expect(harness.onMovementDelta).not.toHaveBeenCalled();
+
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointermove', 5, 35, 500),
+    );
+    expect(harness.onMovementDelta).toHaveBeenLastCalledWith(30);
+
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointermove', 5, 35, 500),
+    );
+    expect(harness.onMovementDelta).toHaveBeenLastCalledWith(0);
+    expect(harness.onMovementDelta).toHaveBeenCalledTimes(2);
+
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointerup', 5, 25, 500),
+    );
+    expect(harness.onMovementDelta).toHaveBeenLastCalledWith(-10);
+    expect(harness.onMovementDelta).toHaveBeenCalledTimes(3);
     harness.input.detach();
   });
 

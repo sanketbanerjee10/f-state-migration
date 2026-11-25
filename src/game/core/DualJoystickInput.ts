@@ -39,6 +39,8 @@ export interface ZoneInputOptions {
   readonly settings: ControlSettings;
   readonly pointerType?: 'touch' | 'any';
   readonly movementAxis?: 'both' | 'horizontal';
+  readonly movementMode?: 'joystick' | 'swipe';
+  readonly onMovementDelta?: (deltaX: number) => void;
   readonly positionStick: (
     stick: JoystickName,
     point: ControlPoint | null,
@@ -105,6 +107,9 @@ export class DualJoystickInput {
     documentTarget: Document = document,
   ): void {
     if (this.movement.element || this.aim.element) return;
+    if (options.movementMode === 'swipe' && !options.onMovementDelta) {
+      throw new Error('Swipe movement requires an onMovementDelta handler.');
+    }
 
     this.movement.element = movementElement;
     this.movement.onChange = onMovement;
@@ -356,8 +361,12 @@ export class DualJoystickInput {
       name === 'movement' ? zones.movement : zones.aim,
       zones.joystickDiameter,
     );
-    state.centerX = base.x;
-    state.centerY = base.y;
+    const swipeOrigin =
+      name === 'movement' && options.movementMode === 'swipe'
+        ? { x: event.clientX, y: event.clientY }
+        : base;
+    state.centerX = swipeOrigin.x;
+    state.centerY = swipeOrigin.y;
     options.positionStick(
       name,
       base,
@@ -378,7 +387,11 @@ export class DualJoystickInput {
     if (!state) return;
     event.preventDefault();
     event.stopPropagation();
-    this.updateJoystick(state === this.movement ? 'movement' : 'aim', event);
+    if (state === this.movement && this.zoneOptions?.movementMode === 'swipe') {
+      this.updateMovementDrag(event);
+    } else {
+      this.updateJoystick(state === this.movement ? 'movement' : 'aim', event);
+    }
   }
 
   private handleSurfacePointerEnd(event: PointerEvent): void {
@@ -391,7 +404,22 @@ export class DualJoystickInput {
     if (!state) return;
     event.preventDefault();
     event.stopPropagation();
+    if (
+      event.type === 'pointerup' &&
+      state === this.movement &&
+      this.zoneOptions?.movementMode === 'swipe'
+    ) {
+      this.updateMovementDrag(event);
+    }
     this.resetJoystick(state, true);
+  }
+
+  private updateMovementDrag(event: PointerEvent): void {
+    const state = this.movement;
+    const deltaX = event.clientX - state.pointerX;
+    state.pointerX = event.clientX;
+    state.pointerY = event.clientY;
+    this.zoneOptions?.onMovementDelta?.(deltaX);
   }
 
   private updateJoystick(name: JoystickName, event: PointerEvent): void {
@@ -451,6 +479,10 @@ export class DualJoystickInput {
     const state = this.getState(name);
     if (state.pointerId === null || !this.zoneOptions) return;
     state.radius = zones.joystickDiameter / 2;
+    if (name === 'movement' && this.zoneOptions.movementMode === 'swipe') {
+      this.updateVector(name);
+      return;
+    }
     const base = clampFloatingBase(
       { x: state.centerX, y: state.centerY },
       name === 'movement' ? zones.movement : zones.aim,

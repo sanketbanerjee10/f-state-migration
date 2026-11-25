@@ -4,9 +4,9 @@ import { DualJoystickInput } from '@/game/core/DualJoystickInput';
 import { resolveTouchControlsInputMode } from '@/game/core/GameSettings';
 import { computeZones, type ControlZones } from '@/game/core/TouchControlGeometry';
 import { getSiegeStars } from '@/game/siege/SiegeProgress';
+import { formatSiegeCount } from '@/game/siege/SiegeFormatting';
 import { SiegeEngine, type SiegeRunResult, type SiegeRuntimeState } from '@/game/siege/SiegeEngine';
 import { GamePauseButton } from './GamePauseButton';
-import { GameJoystickVisual } from './GameJoystickVisual';
 import { positionFloatingStick } from './GameTouchControls';
 import type { SiegePauseView } from './SiegeRunOverlays';
 import { useGameSettings } from './useGameSettings';
@@ -178,7 +178,7 @@ export function SiegePlaySession({
     joystick.attachToZones(
       movement,
       aim,
-      (vector) => engine.setMovementInput(vector),
+      () => undefined,
       () => undefined,
       {
         surface,
@@ -187,6 +187,8 @@ export function SiegePlaySession({
         settings: settings.touchControlSettings,
         pointerType: 'any',
         movementAxis: 'horizontal',
+        movementMode: 'swipe',
+        onMovementDelta: (deltaX) => engine.movePlayerByTouch(deltaX),
         positionStick: (stick, point, currentZones) => {
           positionFloatingStick(
             root,
@@ -269,14 +271,14 @@ export function SiegePlaySession({
             </div>
             <div className="game-hud-stat game-hud-score">
               <span className="game-hud-label">{t('game.siege.troops')}</span>
-              <strong>{runtime.troops}</strong>
+              <strong>{formatSiegeCount(runtime.troops)}</strong>
             </div>
           </div>
           <div className="game-hud-stats">
             {runtime.phase === 'wall' && (
               <div className="game-hud-stat game-hud-bombs">
                 <span className="game-hud-label">{t('game.siege.horde')}</span>
-                <strong>{runtime.zombiesRemaining}</strong>
+                <strong>{formatSiegeCount(runtime.zombiesRemaining)}</strong>
               </div>
             )}
           </div>
@@ -304,12 +306,7 @@ export function SiegePlaySession({
             className="game-joystick game-joystick-movement"
             type="button"
             aria-label={t('game.touch.movement')}
-          >
-            <GameJoystickVisual
-              baseOpacity={settings.touchControlSettings.baseOpacity}
-              thumbOpacity={settings.touchControlSettings.thumbOpacity}
-            />
-          </button>
+          />
           <button
             ref={aimJoystickRef}
             className="game-joystick game-joystick-aim siege-joystick-proxy"

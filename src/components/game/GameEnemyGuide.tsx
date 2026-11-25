@@ -28,6 +28,7 @@ import { drawZombie } from '@/game/rendering/ZombieRenderer';
 import { GameOrbGuideSection } from './GameOrbGuide';
 import { GameGuideDetailDialog } from './GameGuideDetailDialog';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
+import { useGamePlayerAuth } from './GamePlayerAuthProvider';
 
 interface GameEnemyGuideProps {
   readonly onBack: () => void;
@@ -336,15 +337,22 @@ function GuideSectionHeading({
 
 export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
   const { t } = useTranslation();
+  const { playerProgress } = useGamePlayerAuth();
   const backButtonRef = useRef<HTMLButtonElement>(null);
-  const [discoveredEnemies] = useState<Set<ZombieType>>(
+  const [discoveredEnemies, setDiscoveredEnemies] = useState<Set<ZombieType>>(
     () => readDiscoveredEnemies(getEnemyDiscoveryStorage()),
   );
-  const [discoveredBosses] = useState<Set<BossType>>(
+  const [discoveredBosses, setDiscoveredBosses] = useState<Set<BossType>>(
     () => readDiscoveredBosses(getEnemyDiscoveryStorage()),
   );
   const [selectedGuideEntry, setSelectedGuideEntry] =
     useState<SelectedGuideEntry | null>(null);
+
+  useEffect(() => {
+    if (!playerProgress) return;
+    setDiscoveredEnemies(new Set(playerProgress.discoveries.enemies));
+    setDiscoveredBosses(new Set(playerProgress.discoveries.bosses));
+  }, [playerProgress]);
 
   const discoveredCount = ENEMY_DISCOVERY_TYPES.filter((type) =>
     discoveredEnemies.has(type),

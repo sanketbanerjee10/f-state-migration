@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getSiegeGateColor,
+  getSiegeGateSymbol,
   getSiegeDisplayedUnitCount,
   getSiegeBulletDamage,
   getSiegeCombatHordeCount,
@@ -17,9 +19,26 @@ import {
   getSiegeShotInterval,
   getSiegeTankFormation,
   moveSiegePlayer,
+  moveSiegePlayerByTouch,
 } from '../../../../src/game/siege/SiegeEngine';
+import { formatSiegeCount } from '../../../../src/game/siege/SiegeFormatting';
 
 describe('Siege engine controls', () => {
+  it('formats siege counts with international thousands separators', () => {
+    expect(formatSiegeCount(1234567)).toBe('1,234,567');
+    expect(formatSiegeCount(0)).toBe('0');
+  });
+
+  it('uses level gate colors with operation-specific defaults and slash division', () => {
+    expect(getSiegeGateColor('add')).toBe('#22C55E');
+    expect(getSiegeGateColor('mul')).toBe('#FACC15');
+    expect(getSiegeGateColor('sub')).toBe('#FDA4AF');
+    expect(getSiegeGateColor('div')).toBe('#FF1744');
+    expect(getSiegeGateColor('add', { add: '#123456' })).toBe('#123456');
+    expect(getSiegeGateColor('add', { add: '#123456' }, '#654321')).toBe('#654321');
+    expect(getSiegeGateSymbol('div')).toBe('/');
+  });
+
   it('only reads keyboard movement when keyboard input is selected', () => {
     const leftKeys = new Set(['arrowleft', 'a', 'arrowup', 'w']);
     const rightKeys = new Set(['arrowright', 'd', 'arrowdown', 's']);
@@ -91,7 +110,7 @@ describe('Siege engine controls', () => {
 
     expect(gateTravel).toBe(192);
     expect(fasterConfiguredGateTravel).toBe(300);
-    expect(playerTravel.x - 100).toBe(600);
+    expect(playerTravel.x - 100).toBe(800);
     expect(gateTravel).toBeLessThan(playerTravel.x - 100);
   });
 
@@ -100,9 +119,9 @@ describe('Siege engine controls', () => {
     const reference = moveSiegePlayer(100, 100, 1, 1, 1280, 600);
     const wide = moveSiegePlayer(100, 100, 1, 1, 1920, 600);
 
-    expect(compact.x - 100).toBe(600);
-    expect(reference.x - 100).toBe(600);
-    expect(wide.x - 100).toBe(900);
+    expect(compact.x - 100).toBe(682);
+    expect(reference.x - 100).toBe(800);
+    expect(wide.x - 100).toBe(1200);
   });
 
   it('scrolls the background with the gates at a slower parallax rate', () => {
@@ -120,9 +139,19 @@ describe('Siege engine controls', () => {
     const right = moveSiegePlayer(100, 100, 1, 1, 1000, 1000);
     const left = moveSiegePlayer(100, 100, -1, 1, 1000, 1000);
     const overdriven = moveSiegePlayer(100, 100, 2, 1, 1000, 1000);
-    expect(right).toEqual({ x: 700, y: 100 });
+    expect(right).toEqual({ x: 900, y: 100 });
     expect(left).toEqual({ x: 18, y: 100 });
-    expect(overdriven).toEqual({ x: 700, y: 100 });
+    expect(overdriven).toEqual({ x: 900, y: 100 });
+  });
+
+  it('moves the player by the exact touch delta and stops between drag events', () => {
+    const afterDrag = moveSiegePlayerByTouch(100, 30, 1000);
+    const afterFingerStops = moveSiegePlayerByTouch(afterDrag, 0, 1000);
+
+    expect(afterDrag).toBe(130);
+    expect(afterFingerStops).toBe(130);
+    expect(moveSiegePlayerByTouch(100, -30, 1000)).toBe(70);
+    expect(moveSiegePlayerByTouch(25, -30, 1000)).toBe(18);
   });
 
   it('caps the rendered player crowd while retaining the exact army count', () => {

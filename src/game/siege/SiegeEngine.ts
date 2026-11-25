@@ -27,10 +27,12 @@ import {
   type SiegeDifficulty,
   type SiegeDifficultyData,
   type SiegeGateRow,
+  type SiegeOperation,
   type SiegeHazard,
   type SiegeLevel,
   type SiegeSection,
 } from './SiegeRules';
+import { formatSiegeCount } from './SiegeFormatting';
 import {
   MAX_PLAYER_VISUALS,
   getSiegeBulletDamage,
@@ -64,6 +66,13 @@ interface ActiveToxicPuddle {
   readonly duration: number;
   elapsedSeconds: number;
   damageApplied: number;
+}
+
+interface ActiveSiegeGateEffect {
+  readonly x: number;
+  readonly y: number;
+  readonly troopChange: number;
+  elapsedSeconds: number;
 }
 
 export interface SiegeRuntimeState {
@@ -103,13 +112,14 @@ interface SiegeBullet {
 
 const PLAYER_RADIUS = 18;
 const PLAYER_SPEED = 400;
-const PLAYER_SPEED_INCREASE = 1.5;
+const PLAYER_SPEED_INCREASE = 2;
 const PLAYER_SPEED_REFERENCE_WIDTH = 1280;
 const PLAYER_FORMATION_TRAIL_OFFSET = 28;
 const PLAYER_FORMATION_TANK_SCALE = 0.55;
 const PLAYER_START_Y_FRACTION = 0.72;
 const GATE_HEIGHT = 56;
 const HAZARD_HEIGHT = 56;
+const GATE_EFFECT_DURATION_SECONDS = 0.85;
 const DEFAULT_GATE_SCROLL_SPEED_PER_VIEWPORT = 0.32;
 const BACKGROUND_SCROLL_SPEED_RATIO = 0.4;
 const DIFFICULTY_SPACING_FRACTIONS: Readonly<Record<SiegeDifficulty, number>> = {
@@ -293,20 +303,49 @@ export function moveSiegePlayer(
   };
 }
 
+export function moveSiegePlayerByTouch(
+  x: number,
+  deltaX: number,
+  width: number,
+): number {
+  if (
+    ![x, deltaX, width].every(Number.isFinite) ||
+    width <= PLAYER_RADIUS * 2
+  ) {
+    throw new RangeError('Siege touch movement requires finite values and a positive viewport.');
+  }
+  return Math.max(PLAYER_RADIUS, Math.min(width - PLAYER_RADIUS, x + deltaX));
+}
+
 function getTheme(theme: string): ArenaThemeId {
   return ARENA_THEMES[theme] ?? 'military';
 }
 
-function getOperationColor(op: SiegeGateRow['gates'][number]['op']): string {
+const DEFAULT_GATE_COLORS: Readonly<Record<SiegeOperation, string>> = {
+  add: '#22C55E',
+  sub: '#FDA4AF',
+  mul: '#FACC15',
+  div: '#FF1744',
+};
+
+export function getSiegeGateColor(
+  op: SiegeOperation,
+  gateColors?: Partial<Record<SiegeOperation, string>>,
+  gateColor?: string,
+): string {
+  return gateColor ?? gateColors?.[op] ?? DEFAULT_GATE_COLORS[op];
+}
+
+export function getSiegeGateSymbol(op: SiegeOperation): string {
   switch (op) {
     case 'add':
-      return GAME_PALETTE.player.fill;
+      return '+';
     case 'sub':
-      return GAME_PALETTE.combat.damage;
+      return '−';
     case 'mul':
-      return GAME_PALETTE.orbs.rapidFire;
+      return '×';
     case 'div':
-      return GAME_PALETTE.combat.turretProjectile;
+      return '/';
   }
 }
 
@@ -317,7 +356,7 @@ function drawCountBadge(
   count: number,
   color: string,
 ): void {
-  const label = String(count);
+  const label = formatSiegeCount(count);
   context.save();
   context.font = '800 15px sans-serif';
   const width = Math.max(42, context.measureText(label).width + 20);
@@ -347,20 +386,15 @@ function drawGate(
   y: number,
   row: SiegeGateRow,
   elapsedSeconds: number,
+  gateColors?: Partial<Record<SiegeOperation, string>>,
 ): void {
   for (const gate of row.gates) {
     const bounds = getSiegeGateBounds(width, laneCount, gate);
     const { left, width: gateWidth, center: x } = bounds;
-    const color = getOperationColor(gate.op);
+    const color = getSiegeGateColor(gate.op, gateColors, gate.color);
     const top = y - GATE_HEIGHT / 2;
     const pulse = 0.5 + Math.sin(elapsedSeconds * 4 + gate.lane) * 0.5;
-    const symbol = gate.op === 'add'
-      ? '+'
-      : gate.op === 'sub'
-        ? '−'
-        : gate.op === 'mul'
-          ? '×'
-          : '÷';
+    const symbol = getSiegeGateSymbol(gate.op);
 
     context.save();
     context.shadowColor = color;
@@ -517,6 +551,52 @@ function drawHazard(
   context.restore();
 }
 
+function drawSiegeGateEffect(
+  context: CanvasRenderingContext2D,
+  effect: ActiveSiegeGateEffect,
+): void {
+  const progress = Math.min(1, effect.elapsedSeconds / GATE_EFFECT_DURATION_SECONDS);
+  const color = effect.troopChange > 0
+    ? '#22C55E'
+    : effect.troopChange < 0
+      ? '#FF1744'
+      : '#FACC15';
+  const fade = 1 - progress;
+  const label = effect.troopChange > 0
+    ? `+${effect.troopChange} TROOPS`
+    : effect.troopChange < 0
+      ? `-${Math.abs(effect.troopChange)} TROOPS`
+      : 'NO CHANGE';
+  const labelY = effect.y - 78 - progress * 28;
+  const pop = 1 + Math.sin(Math.min(1, progress / 0.22) * Math.PI) * 0.12;
+
+  drawImpactEffect(context, {
+    x: effect.x,
+    y: effect.y,
+    progress,
+    color,
+    radius: 68,
+  });
+
+  context.save();
+  context.globalAlpha = fade;
+  context.translate(effect.x, labelY);
+  context.scale(pop, pop);
+  drawRoundedRectangle(context, -82, -15, 164, 30, 12, {
+    fill: 'rgba(8, 15, 20, 0.92)',
+    stroke: color,
+    lineWidth: 1.5,
+  });
+  context.fillStyle = color;
+  context.shadowColor = color;
+  context.shadowBlur = 12;
+  context.font = '900 16px sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(label, 0, 0, 150);
+  context.restore();
+}
+
 export class SiegeEngine {
   private readonly context: CanvasRenderingContext2D;
   private readonly canvas: HTMLCanvasElement;
@@ -532,6 +612,7 @@ export class SiegeEngine {
   private readonly zombies: SiegeHordeVisual[] = [];
   private readonly bullets: SiegeBullet[] = [];
   private readonly toxicPuddles: ActiveToxicPuddle[] = [];
+  private readonly gateEffects: ActiveSiegeGateEffect[] = [];
   private spawnGroups: Array<SiegeZombieSpawnGroup & { remaining: number }> = [];
   private phase: SiegeRunPhase = 'running';
   private phaseBeforePause: 'running' | 'wall' = 'running';
@@ -620,6 +701,14 @@ export class SiegeEngine {
     };
   }
 
+  movePlayerByTouch(deltaX: number): void {
+    this.playerX = moveSiegePlayerByTouch(
+      this.playerX,
+      deltaX,
+      this.viewportWidth,
+    );
+  }
+
   setKeyboardMovementEnabled(enabled: boolean): void {
     this.keyboardMovementEnabled = enabled;
     if (!enabled) this.pressedKeys.clear();
@@ -672,6 +761,7 @@ export class SiegeEngine {
   private update(deltaSeconds: number): void {
     if (deltaSeconds === 0 || this.viewportHeight <= 0) return;
     this.elapsedSeconds += deltaSeconds;
+    this.updateGateEffects(deltaSeconds);
     this.backgroundScrollDistance += deltaSeconds * getSiegeBackgroundScrollSpeed(
       this.viewportHeight,
       this.data.rules.gateScrollSpeedPerViewport,
@@ -726,7 +816,16 @@ export class SiegeEngine {
           return this.playerX >= bounds.left - PLAYER_RADIUS &&
             this.playerX <= bounds.left + bounds.width + PLAYER_RADIUS;
         });
-        if (gate) this.troops = applySiegeGate(this.troops, gate);
+        if (gate) {
+          const previousTroops = this.troops;
+          this.troops = applySiegeGate(this.troops, gate);
+          this.gateEffects.push({
+            x: this.playerX,
+            y: this.playerY,
+            troopChange: this.troops - previousTroops,
+            elapsedSeconds: 0,
+          });
+        }
       } else {
         const bounds = getSiegeGateBounds(this.viewportWidth, this.laneCount, element);
         const intersectsHazard = this.playerX >= bounds.left - PLAYER_RADIUS &&
@@ -753,6 +852,16 @@ export class SiegeEngine {
       this.startWall(section);
     }
     this.publishState(true);
+  }
+
+  private updateGateEffects(deltaSeconds: number): void {
+    for (let index = this.gateEffects.length - 1; index >= 0; index -= 1) {
+      const effect = this.gateEffects[index]!;
+      effect.elapsedSeconds += deltaSeconds;
+      if (effect.elapsedSeconds >= GATE_EFFECT_DURATION_SECONDS) {
+        this.gateEffects.splice(index, 1);
+      }
+    }
   }
 
   private updateToxicPuddles(deltaSeconds: number): void {
@@ -1013,9 +1122,9 @@ export class SiegeEngine {
               this.viewportHeight,
               this.backgroundScrollDistance,
             );
-            if (this.phase !== 'running' || !section) return;
+            if (!section) return;
             const initialY = -GATE_HEIGHT;
-            for (let index = this.rowIndex; index < section.elements.length; index += 1) {
+            for (let index = 0; index < section.elements.length; index += 1) {
               const y = getSiegeTimedGateY(
                 initialY,
                 this.elapsedSeconds - this.sectionStartElapsedSeconds,
@@ -1030,6 +1139,7 @@ export class SiegeEngine {
               if (y < -GATE_HEIGHT || y > this.viewportHeight + GATE_HEIGHT) continue;
               const element = section.elements[index];
               if (!element) continue;
+              if (index < this.rowIndex && element.type !== 'gateRow') continue;
               if (element.type === 'gateRow') {
                 drawGate(
                   context,
@@ -1038,6 +1148,7 @@ export class SiegeEngine {
                   y,
                   element,
                   this.elapsedSeconds,
+                  this.level.gateColors,
                 );
               } else {
                 drawHazard(
@@ -1111,7 +1222,9 @@ export class SiegeEngine {
         }),
         ...this.getPlayerMovementActors(this.elapsedSeconds),
       ],
-      foregroundEffects: [],
+      foregroundEffects: this.gateEffects.map((effect) => ({
+        draw: (context) => drawSiegeGateEffect(context, effect),
+      })),
       feedback: [
         {
           draw: (context) => {
