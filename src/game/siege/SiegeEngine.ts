@@ -3,7 +3,7 @@ import { drawImpactEffect } from '../rendering/EffectsRenderer';
 import { GAME_PALETTE } from '../rendering/GamePalette';
 import { drawPlayer } from '../rendering/PlayerRenderer';
 import { drawProjectile } from '../rendering/ProjectileRenderer';
-import { drawCircle, drawLine, drawRoundedRectangle } from '../rendering/ShapeLibrary';
+import { drawRoundedRectangle } from '../rendering/ShapeLibrary';
 import { renderGameScene } from '../rendering/Renderer';
 import type { RenderActor, RenderCommand, RenderLayers } from '../rendering/RenderScene';
 import { drawZombie } from '../rendering/ZombieRenderer';
@@ -21,18 +21,49 @@ import {
   SIEGE_DIFFICULTIES,
   ZOMBIE_BASE_STRENGTH,
   applySiegeGate,
+  applySiegeHazard,
+  getSiegeCombatHordeCount,
+  type SiegeGate,
   type SiegeDifficulty,
   type SiegeDifficultyData,
   type SiegeGateRow,
+  type SiegeHazard,
   type SiegeLevel,
   type SiegeSection,
 } from './SiegeRules';
+import {
+  MAX_PLAYER_VISUALS,
+  getSiegeBulletDamage,
+  getSiegeCombatSpawnGroups,
+  getSiegeDisplayedUnitCount,
+  getSiegeShotInterval,
+  getSiegeTankFormation,
+} from './SiegeCombat';
+import { drawSiegeBattlefield } from './SiegeMapRenderer';
+
+export {
+  MAX_PLAYER_VISUALS,
+  getSiegeBulletDamage,
+  getSiegeCombatSpawnGroups,
+  getSiegeDisplayedUnitCount,
+  getSiegeShotInterval,
+  getSiegeTankFormation,
+  getSiegeVolleyDamage,
+  type SiegeTankOffset,
+} from './SiegeCombat';
+export { getSiegeCombatHordeCount } from './SiegeRules';
 
 export type SiegeRunPhase = 'running' | 'wall' | 'paused' | 'won' | 'lost';
 
 export interface SiegeMovementVector {
   readonly x: number;
-  readonly y: number;
+}
+
+interface ActiveToxicPuddle {
+  readonly value: number;
+  readonly duration: number;
+  elapsedSeconds: number;
+  damageApplied: number;
 }
 
 export interface SiegeRuntimeState {
@@ -70,19 +101,17 @@ interface SiegeBullet {
   readonly damage: number;
 }
 
-const MAX_PLAYER_VISUALS = 30;
 const PLAYER_RADIUS = 18;
 const PLAYER_SPEED = 400;
-const PLAYER_FORMATION_COLUMNS = 5;
-const PLAYER_FORMATION_HORIZONTAL_SPACING = 36;
-const PLAYER_FORMATION_VERTICAL_SPACING = 28;
+const PLAYER_SPEED_INCREASE = 1.5;
+const PLAYER_SPEED_REFERENCE_WIDTH = 1280;
 const PLAYER_FORMATION_TRAIL_OFFSET = 28;
 const PLAYER_FORMATION_TANK_SCALE = 0.55;
-const MIN_SIEGE_SHOT_INTERVAL_SECONDS = 0.25;
 const PLAYER_START_Y_FRACTION = 0.72;
 const GATE_HEIGHT = 56;
+const HAZARD_HEIGHT = 56;
 const DEFAULT_GATE_SCROLL_SPEED_PER_VIEWPORT = 0.32;
-const BACKGROUND_TILE_SIZE = 264;
+const BACKGROUND_SCROLL_SPEED_RATIO = 0.4;
 const DIFFICULTY_SPACING_FRACTIONS: Readonly<Record<SiegeDifficulty, number>> = {
   easy: 0.8,
   medium: 0.64,
@@ -119,6 +148,33 @@ export function getSiegeGateWidth(width: number, laneCount: number): number {
   return width / laneCount;
 }
 
+export interface SiegeGateBounds {
+  readonly left: number;
+  readonly width: number;
+  readonly center: number;
+}
+
+export function getSiegeGateBounds(
+  width: number,
+  laneCount: number,
+  gate: Pick<SiegeGate, 'lane' | 'span'>,
+): SiegeGateBounds {
+  const laneWidth = getSiegeGateWidth(width, laneCount);
+  const span = gate.span ?? 1;
+  if (
+    !Number.isSafeInteger(gate.lane) ||
+    gate.lane < 0 ||
+    !Number.isSafeInteger(span) ||
+    span < 1 ||
+    gate.lane + span > laneCount
+  ) {
+    throw new RangeError('Siege gate bounds require a valid lane and span.');
+  }
+  const gateWidth = laneWidth * span;
+  const left = laneWidth * gate.lane;
+  return { left, width: gateWidth, center: left + gateWidth / 2 };
+}
+
 export function getSiegeGateScrollSpeed(
   height: number,
   speedPerViewport = DEFAULT_GATE_SCROLL_SPEED_PER_VIEWPORT,
@@ -132,6 +188,23 @@ export function getSiegeGateScrollSpeed(
     throw new RangeError('Siege gate speed requires a positive viewport and speed.');
   }
   return height * speedPerViewport;
+}
+
+export function getSiegeBackgroundScrollSpeed(
+  height: number,
+  gateSpeedPerViewport = DEFAULT_GATE_SCROLL_SPEED_PER_VIEWPORT,
+): number {
+  return getSiegeGateScrollSpeed(height, gateSpeedPerViewport) *
+    BACKGROUND_SCROLL_SPEED_RATIO;
+}
+
+export function getSiegeKeyboardMovementX(
+  pressedKeys: ReadonlySet<string>,
+  enabled: boolean,
+): number {
+  if (!enabled) return 0;
+  return Number(pressedKeys.has('arrowright') || pressedKeys.has('d')) -
+    Number(pressedKeys.has('arrowleft') || pressedKeys.has('a'));
 }
 
 export function getSiegeGateY(
@@ -168,37 +241,6 @@ export function getSiegeTimedGateY(
   return initialY + (elapsedSeconds - spawnTime) * scrollSpeed;
 }
 
-export function getSiegeDisplayedUnitCount(troops: number): number {
-  if (!Number.isSafeInteger(troops) || troops < 0) {
-    throw new RangeError('Siege troop count must be a non-negative safe integer.');
-  }
-  return Math.min(troops, MAX_PLAYER_VISUALS);
-}
-
-export interface SiegeTankOffset {
-  readonly x: number;
-  readonly y: number;
-}
-
-export function getSiegeTankFormation(count: number): readonly SiegeTankOffset[] {
-  if (!Number.isSafeInteger(count) || count < 1 || count > MAX_PLAYER_VISUALS) {
-    throw new RangeError(`Siege tank count must be between 1 and ${MAX_PLAYER_VISUALS}.`);
-  }
-
-  return Array.from({ length: count }, (_, index) => {
-    if (index === 0) return { x: 0, y: 0 };
-    const formationIndex = index - 1;
-    const row = Math.floor(formationIndex / PLAYER_FORMATION_COLUMNS);
-    const rowStart = row * PLAYER_FORMATION_COLUMNS;
-    const rowLength = Math.min(PLAYER_FORMATION_COLUMNS, count - 1 - rowStart);
-    const column = formationIndex - rowStart;
-    return {
-      x: (column - (rowLength - 1) / 2) * PLAYER_FORMATION_HORIZONTAL_SPACING,
-      y: PLAYER_FORMATION_TRAIL_OFFSET + row * PLAYER_FORMATION_VERTICAL_SPACING,
-    };
-  });
-}
-
 export function getSiegeHordeWins(troops: number, zombies: number): boolean {
   if (
     !Number.isSafeInteger(troops) ||
@@ -223,74 +265,17 @@ export function getSiegeRemainingTroops(troops: number, zombies: number): number
   return Math.max(0, troops - zombies);
 }
 
-export function getSiegeVolleyDamage(troops: number): number {
-  if (!Number.isSafeInteger(troops) || troops < 1) {
-    throw new RangeError('Siege troops must be a positive safe integer.');
-  }
-  const bulletCount = getSiegeDisplayedUnitCount(troops);
-  if (troops <= MAX_PLAYER_VISUALS) return troops;
-  return Math.round(
-    bulletCount * Math.pow(troops / bulletCount, 0.6),
-  );
-}
-
-export function getSiegeBulletDamage(troops: number, bulletIndex: number): number {
-  const bulletCount = getSiegeDisplayedUnitCount(troops);
-  if (
-    bulletCount < 1 ||
-    !Number.isSafeInteger(bulletIndex) ||
-    bulletIndex < 0 ||
-    bulletIndex >= bulletCount
-  ) {
-    throw new RangeError('Siege bullet index must identify a visible tank.');
-  }
-  const baseDamage = Math.floor(getSiegeVolleyDamage(troops) / bulletCount);
-  const extraDamageBullets = getSiegeVolleyDamage(troops) % bulletCount;
-  return baseDamage + Number(bulletIndex < extraDamageBullets);
-}
-
-export function getSiegeCombatHordeCount(
-  baseZombieCount: number,
-  troops: number,
-  difficulty: SiegeDifficulty,
-  levelIndex: number,
-  levelCount: number,
-): number {
-  const difficultyIndex = SIEGE_DIFFICULTIES.indexOf(difficulty);
-  if (
-    !Number.isSafeInteger(baseZombieCount) ||
-    baseZombieCount < 1 ||
-    !Number.isSafeInteger(troops) ||
-    troops < 1 ||
-    difficultyIndex < 0 ||
-    !Number.isSafeInteger(levelIndex) ||
-    !Number.isSafeInteger(levelCount) ||
-    levelCount < 1 ||
-    levelIndex < 0 ||
-    levelIndex >= levelCount
-  ) {
-    throw new RangeError('Siege combat horde inputs are invalid.');
-  }
-  const levelProgress = levelCount === 1 ? 0 : levelIndex / (levelCount - 1);
-  const targetVolleys = 3 + levelProgress * 1.5 + difficultyIndex * 0.25;
-  return Math.max(
-    baseZombieCount,
-    Math.ceil(getSiegeVolleyDamage(troops) * targetVolleys),
-  );
-}
-
 export function moveSiegePlayer(
   x: number,
   y: number,
   movementX: number,
-  movementY: number,
   deltaSeconds: number,
   width: number,
   height: number,
   speed = PLAYER_SPEED,
 ): { readonly x: number; readonly y: number } {
   if (
-    ![x, y, movementX, movementY, deltaSeconds, width, height, speed]
+    ![x, y, movementX, deltaSeconds, width, height, speed]
       .every(Number.isFinite) ||
     deltaSeconds < 0 ||
     width <= PLAYER_RADIUS * 2 ||
@@ -299,33 +284,13 @@ export function moveSiegePlayer(
   ) {
     throw new RangeError('Siege player movement requires finite values and a positive viewport.');
   }
-  let dx = movementX;
-  let dy = movementY;
-  const magnitude = Math.hypot(dx, dy);
-  if (magnitude > 1) {
-    dx /= magnitude;
-    dy /= magnitude;
-  }
+  const dx = Math.max(-1, Math.min(1, movementX));
+  const scaledSpeed = speed * PLAYER_SPEED_INCREASE *
+    Math.max(1, width / PLAYER_SPEED_REFERENCE_WIDTH);
   return {
-    x: Math.max(PLAYER_RADIUS, Math.min(width - PLAYER_RADIUS, x + dx * speed * deltaSeconds)),
-    y: Math.max(PLAYER_RADIUS, Math.min(height - PLAYER_RADIUS, y + dy * speed * deltaSeconds)),
+    x: Math.max(PLAYER_RADIUS, Math.min(width - PLAYER_RADIUS, x + dx * scaledSpeed * deltaSeconds)),
+    y: Math.max(PLAYER_RADIUS, Math.min(height - PLAYER_RADIUS, y)),
   };
-}
-
-export function getSiegeShotInterval(
-  troops: number,
-  difficulty: SiegeDifficulty,
-): number {
-  if (!Number.isSafeInteger(troops) || troops < 1) {
-    throw new RangeError('Siege troops must be a positive safe integer.');
-  }
-  const difficultyIndex = SIEGE_DIFFICULTIES.indexOf(difficulty);
-  return Math.max(
-    MIN_SIEGE_SHOT_INTERVAL_SECONDS,
-    0.42 -
-      Math.log2(getSiegeDisplayedUnitCount(troops) + 1) * 0.025 -
-      difficultyIndex * 0.015,
-  );
 }
 
 function getTheme(theme: string): ArenaThemeId {
@@ -381,26 +346,14 @@ function drawGate(
   laneCount: number,
   y: number,
   row: SiegeGateRow,
+  elapsedSeconds: number,
 ): void {
-  const gateWidth = getSiegeGateWidth(width, laneCount);
-  const itemWidth = gateWidth;
   for (const gate of row.gates) {
-    const x = itemWidth * (gate.lane + 0.5);
+    const bounds = getSiegeGateBounds(width, laneCount, gate);
+    const { left, width: gateWidth, center: x } = bounds;
     const color = getOperationColor(gate.op);
-    drawRoundedRectangle(
-      context,
-      x - gateWidth / 2,
-      y - GATE_HEIGHT / 2,
-      gateWidth,
-      GATE_HEIGHT,
-      8,
-      { fill: 'rgba(20, 30, 27, 0.92)', stroke: color, lineWidth: 3 },
-    );
-    context.save();
-    context.fillStyle = color;
-    context.font = '700 20px sans-serif';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
+    const top = y - GATE_HEIGHT / 2;
+    const pulse = 0.5 + Math.sin(elapsedSeconds * 4 + gate.lane) * 0.5;
     const symbol = gate.op === 'add'
       ? '+'
       : gate.op === 'sub'
@@ -408,49 +361,159 @@ function drawGate(
         : gate.op === 'mul'
           ? '×'
           : '÷';
-    context.fillText(`${symbol} ${gate.value}`, x, y);
+
+    context.save();
+    context.shadowColor = color;
+    context.shadowBlur = 8 + pulse * 8;
+    drawRoundedRectangle(
+      context,
+      left + 3,
+      top + 2,
+      gateWidth - 6,
+      GATE_HEIGHT - 4,
+      10,
+      { fill: 'rgba(255, 255, 255, 0.06)', stroke: color, lineWidth: 2 },
+    );
+    context.restore();
+
+    const panelGradient = context.createLinearGradient(
+      left + 6,
+      0,
+      left + gateWidth - 6,
+      0,
+    );
+    panelGradient.addColorStop(0, 'transparent');
+    panelGradient.addColorStop(0.28, color);
+    panelGradient.addColorStop(0.72, color);
+    panelGradient.addColorStop(1, 'transparent');
+    context.save();
+    context.globalAlpha = 0.34;
+    drawRoundedRectangle(
+      context,
+      left + 6,
+      top + 5,
+      gateWidth - 12,
+      GATE_HEIGHT - 10,
+      7,
+      { fill: panelGradient, stroke: 'rgba(255, 255, 255, 0.14)', lineWidth: 1 },
+    );
+    context.restore();
+
+    context.save();
+    context.globalAlpha = 0.35 + pulse * 0.4;
+    context.fillStyle = color;
+    context.fillRect(left + 8, top + 5, gateWidth - 16, 2);
+    context.fillRect(left + 8, top + GATE_HEIGHT - 7, gateWidth - 16, 2);
+    context.restore();
+
+    context.save();
+    context.fillStyle = color;
+    context.shadowColor = color;
+    context.shadowBlur = 7;
+    for (let particle = 0; particle < 8; particle += 1) {
+      const edge = particle % 4;
+      const progress = (
+        elapsedSeconds * (0.3 + (particle % 3) * 0.08) +
+        particle * 0.19 +
+        gate.lane * 0.11
+      ) % 1;
+      const horizontalTravel = Math.max(1, gateWidth - 28);
+      const verticalTravel = GATE_HEIGHT - 24;
+      const particleX = edge < 2
+        ? left + 14 + progress * horizontalTravel
+        : edge === 2
+          ? left + 8
+          : left + gateWidth - 8;
+      const particleY = edge < 2
+        ? top + (edge === 0 ? 8 : GATE_HEIGHT - 8)
+        : top + 12 + progress * verticalTravel;
+      const radius = 1.2 + (particle % 3) * 0.45;
+      context.globalAlpha = 0.45 + (1 - progress) * 0.45;
+      context.beginPath();
+      context.arc(particleX, particleY, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.restore();
+
+    context.save();
+    context.fillStyle = color;
+    context.globalAlpha = 0.18;
+    context.strokeStyle = color;
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(x - 20, y, 15, 0, Math.PI * 2);
+    context.fill();
+    context.globalAlpha = 1;
+    context.globalAlpha = 0.7 + pulse * 0.3;
+    context.stroke();
+    context.fillStyle = color;
+    context.font = '900 22px sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(symbol, x - 20, y + 1);
+    context.restore();
+
+    context.save();
+    context.fillStyle = '#F0F3DB';
+    context.shadowColor = color;
+    context.shadowBlur = 6;
+    context.font = `900 ${Math.min(26, Math.max(18, gateWidth * 0.22))}px sans-serif`;
+    context.textAlign = 'left';
+    context.textBaseline = 'middle';
+    context.fillText(String(gate.value), x + 3, y + 1, Math.max(20, gateWidth / 2 - 20));
+    context.restore();
+
+    context.save();
+    context.fillStyle = color;
+    context.globalAlpha = 0.9;
+    for (const side of [-1, 1]) {
+      const markerX = x + side * (gateWidth / 2 - 11);
+      context.beginPath();
+      context.moveTo(markerX - side * 3, y - 5);
+      context.lineTo(markerX + side * 2, y);
+      context.lineTo(markerX - side * 3, y + 5);
+      context.strokeStyle = color;
+      context.lineWidth = 2;
+      context.stroke();
+    }
     context.restore();
   }
 }
 
-function drawScrollingGround(
+function drawHazard(
   context: CanvasRenderingContext2D,
   width: number,
-  height: number,
-  scrollDistance: number,
+  laneCount: number,
+  y: number,
+  hazard: SiegeHazard,
 ): void {
-  const offset = scrollDistance % BACKGROUND_TILE_SIZE;
+  const bounds = getSiegeGateBounds(width, laneCount, hazard);
+  const color = hazard.kind === 'fuel_drum'
+    ? '#F59E0B'
+    : hazard.kind === 'toxic_puddle'
+      ? '#84CC16'
+      : '#EF4444';
+  const label = hazard.kind === 'fuel_drum'
+    ? `FUEL -${hazard.value}%`
+    : hazard.kind === 'toxic_puddle'
+      ? `TOXIC -${hazard.value}/s`
+      : `WIRE -${hazard.value}`;
+
   context.save();
-  context.beginPath();
-  context.rect(0, 0, width, height);
-  context.clip();
-  for (
-    let tile = -1;
-    tile <= Math.ceil(height / BACKGROUND_TILE_SIZE);
-    tile += 1
-  ) {
-    const tileTop = tile * BACKGROUND_TILE_SIZE + offset;
-    for (let mark = 0; mark < 14; mark += 1) {
-      const x = (mark * 137 + tile * 67 + width) % width;
-      const y = tileTop + ((mark * 47 + 23) % BACKGROUND_TILE_SIZE);
-      const radius = 1 + (mark % 3) * 0.7;
-      drawCircle(context, x, y, radius, {
-        fill: mark % 2 === 0
-          ? 'rgba(214, 205, 166, 0.18)'
-          : 'rgba(5, 12, 10, 0.22)',
-      });
-      if (mark % 4 === 0) {
-        const length = 5 + mark % 5;
-        drawLine(
-          context,
-          { x: x + 7, y: y + 5 },
-          { x: x + 7 + length, y: y + 4 },
-          GAME_PALETTE.arena.marking,
-          1,
-        );
-      }
-    }
-  }
+  drawRoundedRectangle(
+    context,
+    bounds.left + 3,
+    y - HAZARD_HEIGHT / 2 + 3,
+    bounds.width - 6,
+    HAZARD_HEIGHT - 6,
+    8,
+    { fill: `${color}33`, stroke: color, lineWidth: 3 },
+  );
+  context.fillStyle = color;
+  context.font = '800 14px sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(label, bounds.center, y, Math.max(24, bounds.width - 20));
   context.restore();
 }
 
@@ -468,6 +531,7 @@ export class SiegeEngine {
   private readonly pressedKeys = new Set<string>();
   private readonly zombies: SiegeHordeVisual[] = [];
   private readonly bullets: SiegeBullet[] = [];
+  private readonly toxicPuddles: ActiveToxicPuddle[] = [];
   private spawnGroups: Array<SiegeZombieSpawnGroup & { remaining: number }> = [];
   private phase: SiegeRunPhase = 'running';
   private phaseBeforePause: 'running' | 'wall' = 'running';
@@ -476,7 +540,7 @@ export class SiegeEngine {
   private troops: number;
   private playerX = 0;
   private playerY = 0;
-  private movementInput: SiegeMovementVector = { x: 0, y: 0 };
+  private movementInput: SiegeMovementVector = { x: 0 };
   private hordeX = 0;
   private hordeY = -80;
   private hordeCount = 0;
@@ -492,6 +556,7 @@ export class SiegeEngine {
   private viewportHeight = 0;
   private pixelRatio = 1;
   private completed = false;
+  private keyboardMovementEnabled = false;
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     const key = event.key.toLowerCase();
     if (event.key === 'Escape' || key === 'p') {
@@ -503,14 +568,14 @@ export class SiegeEngine {
       return;
     }
     event.preventDefault();
-    this.pressedKeys.add(key);
+    if (this.keyboardMovementEnabled) this.pressedKeys.add(key);
   };
   private readonly handleKeyUp = (event: KeyboardEvent): void => {
     this.pressedKeys.delete(event.key.toLowerCase());
   };
   private readonly handleWindowBlur = (): void => {
     this.pressedKeys.clear();
-    this.setMovementInput({ x: 0, y: 0 });
+    this.setMovementInput({ x: 0 });
   };
   private readonly tick = (timestamp: number): void => {
     if (this.phase !== 'won' && this.phase !== 'lost') {
@@ -552,8 +617,12 @@ export class SiegeEngine {
   setMovementInput(vector: SiegeMovementVector): void {
     this.movementInput = {
       x: Number.isFinite(vector.x) ? vector.x : 0,
-      y: Number.isFinite(vector.y) ? vector.y : 0,
     };
+  }
+
+  setKeyboardMovementEnabled(enabled: boolean): void {
+    this.keyboardMovementEnabled = enabled;
+    if (!enabled) this.pressedKeys.clear();
   }
 
   pause(): void {
@@ -603,36 +672,36 @@ export class SiegeEngine {
   private update(deltaSeconds: number): void {
     if (deltaSeconds === 0 || this.viewportHeight <= 0) return;
     this.elapsedSeconds += deltaSeconds;
-    this.backgroundScrollDistance += deltaSeconds * 94;
-    const keyboardX =
-      Number(this.pressedKeys.has('arrowright') || this.pressedKeys.has('d')) -
-      Number(this.pressedKeys.has('arrowleft') || this.pressedKeys.has('a'));
-    const keyboardY =
-      Number(this.pressedKeys.has('arrowdown') || this.pressedKeys.has('s')) -
-      Number(this.pressedKeys.has('arrowup') || this.pressedKeys.has('w'));
-    const movement = {
-      x: keyboardX + this.movementInput.x,
-      y: keyboardY + this.movementInput.y,
-    };
+    this.backgroundScrollDistance += deltaSeconds * getSiegeBackgroundScrollSpeed(
+      this.viewportHeight,
+      this.data.rules.gateScrollSpeedPerViewport,
+    );
+    const keyboardX = getSiegeKeyboardMovementX(
+      this.pressedKeys,
+      this.keyboardMovementEnabled,
+    );
+    const movementX = keyboardX + this.movementInput.x;
     const moved = moveSiegePlayer(
       this.playerX,
       this.playerY,
-      movement.x,
-      movement.y,
+      movementX,
       deltaSeconds,
       this.viewportWidth,
       this.viewportHeight,
     );
     this.playerX = moved.x;
     this.playerY = moved.y;
+    if (this.phase === 'wall') this.updateWall(deltaSeconds);
+    if (this.phase === 'running' || this.phase === 'wall') {
+      this.updateToxicPuddles(deltaSeconds);
+    }
     if (this.phase === 'running') this.updateGates(deltaSeconds);
-    else if (this.phase === 'wall') this.updateWall(deltaSeconds);
     this.publishState();
   }
 
   private updateGates(deltaSeconds: number): void {
     const section = this.getSection();
-    const gateY = getSiegeTimedGateY(
+    const elementY = getSiegeTimedGateY(
       -GATE_HEIGHT,
       this.elapsedSeconds - this.sectionStartElapsedSeconds,
       this.rowIndex,
@@ -642,19 +711,41 @@ export class SiegeEngine {
         this.data.rules.gateScrollSpeedPerViewport,
       ),
     );
-    if (gateY === null) return;
-    if (gateY < this.playerY - GATE_HEIGHT / 2) return;
-    const row = section.elements[this.rowIndex];
-    if (!row) throw new RangeError('Siege gate row is out of range.');
-    const gateWidth = getSiegeGateWidth(this.viewportWidth, this.laneCount);
-    const itemWidth = gateWidth;
-    const gate = row.gates.find((candidate) => {
-      const gateX = itemWidth * (candidate.lane + 0.5);
-      return Math.abs(gateX - this.playerX) <= gateWidth / 2 + PLAYER_RADIUS;
-    });
-    if (gate && Math.abs(gateY - this.playerY) <= GATE_HEIGHT / 2 + PLAYER_RADIUS) {
-      this.troops = applySiegeGate(this.troops, gate);
+    if (elementY === null) return;
+    const element = section.elements[this.rowIndex];
+    if (!element) throw new RangeError('Siege element index is out of range.');
+    const elementHeight = element.type === 'hazard' ? HAZARD_HEIGHT : GATE_HEIGHT;
+    if (elementY < this.playerY - elementHeight / 2) return;
+
+    if (
+      Math.abs(elementY - this.playerY) <= elementHeight / 2 + PLAYER_RADIUS
+    ) {
+      if (element.type === 'gateRow') {
+        const gate = element.gates.find((candidate) => {
+          const bounds = getSiegeGateBounds(this.viewportWidth, this.laneCount, candidate);
+          return this.playerX >= bounds.left - PLAYER_RADIUS &&
+            this.playerX <= bounds.left + bounds.width + PLAYER_RADIUS;
+        });
+        if (gate) this.troops = applySiegeGate(this.troops, gate);
+      } else {
+        const bounds = getSiegeGateBounds(this.viewportWidth, this.laneCount, element);
+        const intersectsHazard = this.playerX >= bounds.left - PLAYER_RADIUS &&
+          this.playerX <= bounds.left + bounds.width + PLAYER_RADIUS;
+        if (intersectsHazard) {
+          if (element.kind === 'toxic_puddle') {
+            this.toxicPuddles.push({
+              value: element.value,
+              duration: element.duration ?? 2,
+              elapsedSeconds: 0,
+              damageApplied: 0,
+            });
+          } else {
+            this.troops = applySiegeHazard(this.troops, element);
+          }
+        }
+      }
     }
+
     this.rowIndex += 1;
     if (this.troops < 1) {
       this.finish(false);
@@ -662,6 +753,30 @@ export class SiegeEngine {
       this.startWall(section);
     }
     this.publishState(true);
+  }
+
+  private updateToxicPuddles(deltaSeconds: number): void {
+    for (let index = this.toxicPuddles.length - 1; index >= 0; index -= 1) {
+      const puddle = this.toxicPuddles[index]!;
+      const elapsed = Math.min(
+        deltaSeconds,
+        puddle.duration - puddle.elapsedSeconds,
+      );
+      puddle.elapsedSeconds += elapsed;
+      const totalDamage = Math.floor(puddle.value * puddle.elapsedSeconds + 1e-9);
+      const damage = totalDamage - puddle.damageApplied;
+      if (damage > 0) {
+        this.troops = Math.max(0, this.troops - damage);
+        puddle.damageApplied = totalDamage;
+      }
+      if (this.troops < 1) {
+        this.finish(false);
+        return;
+      }
+      if (puddle.elapsedSeconds >= puddle.duration) {
+        this.toxicPuddles.splice(index, 1);
+      }
+    }
   }
 
   private startWall(section: SiegeSection): void {
@@ -683,16 +798,14 @@ export class SiegeEngine {
       levelIndex,
       this.data.levels.length,
     );
-    let remainingZombieCount = targetZombieCount;
-    this.spawnGroups = section.wall.zombies.map((group, index) => {
-      const count = index === section.wall.zombies.length - 1
-        ? remainingZombieCount
-        : Math.floor(group.count * targetZombieCount / baseZombieCount);
-      remainingZombieCount -= count;
+    this.spawnGroups = getSiegeCombatSpawnGroups(
+      section.wall.zombies,
+      targetZombieCount,
+    ).map((group) => {
       return {
         kind: group.kind,
-        count,
-        remaining: count,
+        count: group.count,
+        remaining: group.count,
       };
     });
     this.hordeCount = targetZombieCount;
@@ -894,7 +1007,7 @@ export class SiegeEngine {
       groundShadows: [
         {
           draw: (context) => {
-            drawScrollingGround(
+            drawSiegeBattlefield(
               context,
               this.viewportWidth,
               this.viewportHeight,
@@ -915,8 +1028,26 @@ export class SiegeEngine {
               );
               if (y === null) continue;
               if (y < -GATE_HEIGHT || y > this.viewportHeight + GATE_HEIGHT) continue;
-              const row = section.elements[index];
-              if (row) drawGate(context, this.viewportWidth, this.laneCount, y, row);
+              const element = section.elements[index];
+              if (!element) continue;
+              if (element.type === 'gateRow') {
+                drawGate(
+                  context,
+                  this.viewportWidth,
+                  this.laneCount,
+                  y,
+                  element,
+                  this.elapsedSeconds,
+                );
+              } else {
+                drawHazard(
+                  context,
+                  this.viewportWidth,
+                  this.laneCount,
+                  y,
+                  element,
+                );
+              }
             }
           },
         },

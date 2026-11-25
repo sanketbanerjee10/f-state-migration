@@ -1,0 +1,396 @@
+{
+  "id": "medium-17",
+  "name": "Cooling Tower",
+  "theme": "industrial_complex",
+  "laneCount": 3,
+  "stars": {
+    "two": 18926,
+    "three": 30281
+  },
+  "sections": [
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 28
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 3
+            },
+            {
+              "lane": 1,
+              "op": "div",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 12
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 33
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 28
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 12
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "armoured",
+            "count": 60
+          },
+          {
+            "kind": "spitter",
+            "count": 40
+          }
+        ]
+      }
+    },
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 28
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 3
+            },
+            {
+              "lane": 1,
+              "op": "div",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 12
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 33
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 28
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 12
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "armoured",
+            "count": 60
+          },
+          {
+            "kind": "spitter",
+            "count": 40
+          }
+        ]
+      }
+    },
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "armoured",
+            "count": 45
+          },
+          {
+            "kind": "spitter",
+            "count": 30
+          }
+        ]
+      }
+    },
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.15
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.15
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "armoured",
+            "count": 45
+          },
+          {
+            "kind": "spitter",
+            "count": 30
+          }
+        ]
+      }
+    }
+  ]
+}

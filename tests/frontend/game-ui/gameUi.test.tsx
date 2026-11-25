@@ -44,6 +44,7 @@ const mocks = vi.hoisted(() => ({
     'game.settings.controls': 'Controls',
     'game.settings.audio': 'Audio',
     'game.settings.touchControlsTitle': 'Touch Controls',
+    'game.settings.auto': 'Auto',
     'game.settings.controlLayout': 'Control layout',
     'game.settings.controlLayoutHint': 'Choose which hand controls movement.',
     'game.settings.rightHanded': 'Right-handed',

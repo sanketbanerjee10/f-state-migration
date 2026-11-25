@@ -14,6 +14,7 @@ import type {
 const engineHarness = vi.hoisted(() => ({
   created: false,
   createdCount: 0,
+  keyboardMovementEnabled: false,
   onState: null as ((state: SiegeRuntimeState) => void) | null,
   onComplete: null as ((result: SiegeRunResult) => void) | null,
 }));
@@ -31,6 +32,10 @@ vi.mock('../../../../src/game/siege/SiegeEngine', () => ({
     }
 
     moveLane() {}
+    setMovementInput() {}
+    setKeyboardMovementEnabled(enabled: boolean) {
+      engineHarness.keyboardMovementEnabled = enabled;
+    }
     pause() {}
     resume() {}
     resize() {}
@@ -54,6 +59,7 @@ let container: HTMLDivElement | null = null;
 beforeEach(() => {
   engineHarness.created = false;
   engineHarness.createdCount = 0;
+  engineHarness.keyboardMovementEnabled = false;
   engineHarness.onState = null;
   engineHarness.onComplete = null;
   vi.stubGlobal('matchMedia', (media: string) => ({
@@ -77,6 +83,7 @@ beforeEach(() => {
     unobserve() {}
     disconnect() {}
   });
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1024 });
   window.history.replaceState({}, '', '/game');
   container = document.createElement('div');
   document.body.appendChild(container);
@@ -111,7 +118,8 @@ describe('Siege UI', () => {
     expect(new URLSearchParams(window.location.search).get('siege')).toBe('levels');
     expect(new URLSearchParams(window.location.search).get('siegeDifficulty')).toBe('easy');
     expect(container?.querySelectorAll('.game-siege-carousel-slide[data-level-index]'))
-      .toHaveLength(10);
+      .toHaveLength(20);
+    expect(container?.querySelector('.game-siege-difficulty-name')).toBeNull();
     expect(container?.querySelector('.game-siege-level-actions')).toBeNull();
     expect(container?.querySelector('.game-siege-carousel-card[data-level-id="easy-02"]'))
       .toHaveProperty('disabled', true);
@@ -120,12 +128,53 @@ describe('Siege UI', () => {
     ) as HTMLButtonElement;
     await act(async () => firstLevel.click());
 
-    expect(new URLSearchParams(window.location.search).get('siege')).toBe('playing');
-    expect(new URLSearchParams(window.location.search).get('siegeLevel')).toBe('easy-01');
+    expect(new URLSearchParams(window.location.search).get('siege')).toBe('levels');
+    expect(new URLSearchParams(window.location.search).has('siegeLevel')).toBe(false);
     expect(container?.querySelector('.game-canvas')).not.toBeNull();
+    expect(container?.querySelector('.game-siege-touch-controls')).toBeNull();
     expect(engineHarness.created).toBe(true);
     expect(container?.querySelector('.game-hud-siege')).not.toBeNull();
     expect(container?.querySelector('.game-pause-button')).not.toBeNull();
+    expect(engineHarness.keyboardMovementEnabled).toBe(true);
+  });
+
+  it('returns to level selection for old URLs that requested an active level', async () => {
+    window.history.replaceState(
+      {},
+      '',
+      '/game?siege=playing&siegeDifficulty=easy&siegeLevel=easy-01',
+    );
+    await act(async () => {
+      root?.render(createElement(SiegeGame, { onExit: vi.fn() }));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+
+    expect(container?.querySelector('.game-siege-screen')?.getAttribute('data-screen'))
+      .toBe('levels');
+    expect(container?.querySelector('.game-canvas')).toBeNull();
+    expect(new URLSearchParams(window.location.search).get('siege')).toBe('levels');
+    expect(new URLSearchParams(window.location.search).has('siegeLevel')).toBe(false);
+  });
+
+  it('auto-selects touch and disables keyboard movement on narrow screens', async () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 640 });
+    await act(async () => {
+      root?.render(createElement(SiegeGame, { onExit: vi.fn() }));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+    await act(async () => {
+      (container?.querySelector(
+        '.game-siege-difficulty-card[data-difficulty="easy"]',
+      ) as HTMLButtonElement).click();
+    });
+    await act(async () => {
+      (container?.querySelector(
+        '.game-siege-carousel-card[data-level-id="easy-01"]',
+      ) as HTMLButtonElement).click();
+    });
+
+    expect(container?.querySelector('.game-siege-touch-controls')).not.toBeNull();
+    expect(engineHarness.keyboardMovementEnabled).toBe(false);
   });
 
   it('returns from a difficulty carousel to difficulty selection and updates the URL', async () => {
@@ -227,8 +276,8 @@ describe('Siege UI', () => {
     expect(nextLevelButton).toBeDefined();
     await act(async () => nextLevelButton?.click());
 
-    expect(new URLSearchParams(window.location.search).get('siege')).toBe('playing');
-    expect(new URLSearchParams(window.location.search).get('siegeLevel')).toBe('easy-02');
+    expect(new URLSearchParams(window.location.search).get('siege')).toBe('levels');
+    expect(new URLSearchParams(window.location.search).has('siegeLevel')).toBe(false);
   });
 
   it('shows zero stars and the Main Menu and Play again actions after a loss', async () => {
@@ -376,7 +425,7 @@ describe('Siege UI', () => {
     });
 
     expect(container?.querySelectorAll('.game-siege-carousel-slide[data-level-index]'))
-      .toHaveLength(10);
+      .toHaveLength(20);
     const previousLevel = container?.querySelector(
       '.game-siege-carousel-card[data-level-id="easy-01"]',
     );
@@ -398,8 +447,8 @@ describe('Siege UI', () => {
     await act(async () => {
       (currentLevel as HTMLButtonElement).click();
     });
-    expect(new URLSearchParams(window.location.search).get('siege')).toBe('playing');
-    expect(new URLSearchParams(window.location.search).get('siegeLevel')).toBe('easy-02');
+    expect(new URLSearchParams(window.location.search).get('siege')).toBe('levels');
+    expect(new URLSearchParams(window.location.search).has('siegeLevel')).toBe(false);
   });
 
   it('exposes Siege as a main-menu destination', () => {

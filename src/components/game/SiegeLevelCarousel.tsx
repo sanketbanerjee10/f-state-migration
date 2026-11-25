@@ -8,10 +8,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import {
-  countSiegeClears,
-  type SiegeProgress,
-} from '@/game/siege/SiegeProgress';
+import type { SiegeProgress } from '@/game/siege/SiegeProgress';
 import type {
   SiegeDifficulty,
   SiegeDifficultyData,
@@ -74,13 +71,6 @@ export function SiegeLevelCarousel({
 
   return (
     <div className="game-siege-level-selection">
-      <p className="game-siege-difficulty-name">
-        {t(`game.siege.difficulty.${difficulty}`)}
-        {' · '}
-        {countSiegeClears(progress, difficulty, data.levels.map((level) => level.id))}
-        {' / '}
-        {data.levels.length}
-      </p>
       <Carousel
         opts={{
           align: 'center',

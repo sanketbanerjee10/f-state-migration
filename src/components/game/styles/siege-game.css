@@ -181,14 +181,6 @@
   width: 100%;
 }
 
-.game-siege-difficulty-name {
-  margin: 0 0 16px;
-  color: var(--ah-muted);
-  font: 700 11px var(--app-font-mono, monospace);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
 .game-siege-carousel {
   display: grid;
   width: 100%;
@@ -382,6 +374,7 @@
 
 .game-siege-touch-controls {
   z-index: 3;
+  display: block !important;
   pointer-events: none;
 }
 

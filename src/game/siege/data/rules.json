@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "difficulties": {
+    "easy": {
+      "startTroops": 20,
+      "wallRatio": {
+        "min": 0.55,
+        "max": 0.7
+      },
+      "allowedOps": ["add", "sub", "mul"],
+      "hazards": ["razor_wire"],
+      "maxDivisor": 0,
+      "gateSpawnIntervalSeconds": 2.5,
+      "gateScrollSpeedPerViewport": 0.32
+    },
+    "medium": {
+      "startTroops": 15,
+      "wallRatio": {
+        "min": 0.7,
+        "max": 0.85
+      },
+      "allowedOps": ["add", "sub", "mul", "div"],
+      "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
+      "maxDivisor": 2,
+      "gateSpawnIntervalSeconds": 2,
+      "gateScrollSpeedPerViewport": 0.32
+    },
+    "difficult": {
+      "startTroops": 10,
+      "wallRatio": {
+        "min": 0.85,
+        "max": 0.95
+      },
+      "allowedOps": ["add", "sub", "mul", "div"],
+      "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
+      "maxDivisor": 3,
+      "gateSpawnIntervalSeconds": 1.5,
+      "gateScrollSpeedPerViewport": 0.32
+    },
+    "impossible": {
+      "startTroops": 5,
+      "wallRatio": {
+        "min": 0.95,
+        "max": 1
+      },
+      "allowedOps": ["add", "sub", "mul", "div"],
+      "hazards": ["razor_wire", "toxic_puddle", "fuel_drum"],
+      "maxDivisor": 4,
+      "gateSpawnIntervalSeconds": 1.0625,
+      "gateScrollSpeedPerViewport": 0.32
+    }
+  }
+}

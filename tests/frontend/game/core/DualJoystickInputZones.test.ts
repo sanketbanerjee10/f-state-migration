@@ -42,7 +42,13 @@ function addPointerCapture(element: HTMLElement) {
   return capturedPointers;
 }
 
-function createHarness(settings: ControlSettings) {
+function createHarness(
+  settings: ControlSettings,
+  options: {
+    readonly pointerType?: 'touch' | 'any';
+    readonly movementAxis?: 'both' | 'horizontal';
+  } = {},
+) {
   const surface = document.createElement('div');
   const gameplaySurface = document.createElement('canvas');
   const movement = document.createElement('button');
@@ -66,6 +72,7 @@ function createHarness(settings: ControlSettings) {
     gameplaySurface,
     getZones: () => zones,
     settings,
+    ...options,
     positionStick,
   });
   input.setEnabled(true);
@@ -104,6 +111,39 @@ describe('DualJoystickInput zone ownership', () => {
     );
     expect(harness.onMovement).not.toHaveBeenCalled();
     expect(harness.positionStick).not.toHaveBeenCalled();
+    harness.input.detach();
+  });
+
+  it('can accept mouse input across the full movement zone and constrain it horizontally', () => {
+    const harness = createHarness(DEFAULT_CONTROL_SETTINGS, {
+      pointerType: 'any',
+      movementAxis: 'horizontal',
+    });
+    const fullSurfaceZones: ControlZones = {
+      ...harness.zones,
+      movement: {
+        left: 0,
+        top: 0,
+        width: 400,
+        height: 800,
+      },
+    };
+    harness.setZones(fullSurfaceZones);
+
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointerdown', 5, 350, 300, 'mouse'),
+    );
+    harness.gameplaySurface.dispatchEvent(
+      pointerEvent('pointermove', 5, 390, 600, 'mouse'),
+    );
+
+    expect(harness.onMovement.mock.lastCall?.[0].x).toBeGreaterThan(0);
+    expect(harness.onMovement.mock.lastCall?.[0].y).toBe(0);
+    expect(harness.positionStick).toHaveBeenCalledWith(
+      'movement',
+      expect.any(Object),
+      fullSurfaceZones,
+    );
     harness.input.detach();
   });
 

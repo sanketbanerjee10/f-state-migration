@@ -15,7 +15,6 @@ import {
 import {
   createDefaultSiegeProgress,
   getSiegeStars,
-  isSiegeDifficultyUnlocked,
   readSiegeProgress,
   recordSiegeLevelClear,
   saveSiegeProgress,
@@ -78,37 +77,10 @@ export function SiegeGame({ onExit }: SiegeGameProps) {
 
       const navigation = getSiegeNavigationState(window.location.search);
       if (navigation?.screen === 'levels') {
+        setSiegeNavigationState(navigation);
         setSelectedDifficulty(navigation.difficulty);
         setScreen('levels');
       }
-      const requestedLevelId = navigation?.screen === 'playing'
-        ? navigation.levelId
-        : import.meta.env.DEV
-          ? new URLSearchParams(window.location.search).get('siegeLevel')
-          : null;
-      if (!requestedLevelId) return;
-
-      const match = entries.flatMap(([difficulty, data]) =>
-        data.levels.map((level) => ({ difficulty, data, level })),
-      ).find(({ level }) => level.id === requestedLevelId);
-      if (!match) throw new Error(`Unknown Siege level "${requestedLevelId}".`);
-      if (
-        navigation?.screen === 'playing' &&
-        match.data.levels.indexOf(match.level) >
-          getCurrentSiegeLevelIndex(match.data, savedProgress, match.difficulty)
-      ) {
-        setSiegeNavigationState({
-          screen: 'levels',
-          difficulty: match.difficulty,
-        });
-        setSelectedDifficulty(match.difficulty);
-        setScreen('levels');
-        return;
-      }
-      setSelectedDifficulty(match.difficulty);
-      setActiveRun({ data: match.data, level: match.level });
-      setRunNonce((current) => current + 1);
-      setScreen('playing');
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : String(error));
     }
@@ -131,30 +103,7 @@ export function SiegeGame({ onExit }: SiegeGameProps) {
       if (navigation.screen === 'levels') {
         setActiveRun(null);
         setScreen('levels');
-        return;
       }
-      const data = difficultyData?.[navigation.difficulty];
-      const level = data?.levels.find((candidate) => candidate.id === navigation.levelId);
-      if (!data || !level) {
-        setLoadError(`Unknown Siege level "${navigation.levelId}".`);
-        return;
-      }
-      if (
-        data.levels.indexOf(level) >
-        getCurrentSiegeLevelIndex(data, progressRef.current, navigation.difficulty)
-      ) {
-        setSiegeNavigationState({
-          screen: 'levels',
-          difficulty: navigation.difficulty,
-        });
-        setActiveRun(null);
-        setScreen('levels');
-        return;
-      }
-      setLoadError(null);
-      setActiveRun({ data, level });
-      setRunNonce((current) => current + 1);
-      setScreen('playing');
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -177,27 +126,11 @@ export function SiegeGame({ onExit }: SiegeGameProps) {
   const startLevel = useCallback((difficulty: SiegeDifficulty, level: SiegeLevel) => {
     const data = difficultyData?.[difficulty];
     const levelIndex = data?.levels.indexOf(level) ?? -1;
-    const previousDifficulty = SIEGE_DIFFICULTIES[
-      SIEGE_DIFFICULTIES.indexOf(difficulty) - 1
-    ];
-    const knownPreviousLevelIds = previousDifficulty
-      ? difficultyData?.[previousDifficulty]?.levels.map((candidate) => candidate.id)
-      : undefined;
     if (
       !data ||
       levelIndex < 0 ||
-      levelIndex > getCurrentSiegeLevelIndex(data, progressRef.current, difficulty) ||
-      !isSiegeDifficultyUnlocked(
-        progressRef.current,
-        difficulty,
-        knownPreviousLevelIds,
-      )
+      levelIndex > getCurrentSiegeLevelIndex(data, progressRef.current, difficulty)
     ) return;
-    setSiegeNavigationState({
-      screen: 'playing',
-      difficulty,
-      levelId: level.id,
-    });
     setSelectedDifficulty(difficulty);
     setSaveError(null);
     setActiveRun({ data, level });

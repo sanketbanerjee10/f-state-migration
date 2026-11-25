@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_GAME_SETTINGS,
   loadGameSettings,
+  resolveTouchControlsInputMode,
   saveGameSettings,
 } from '@/game/core/GameSettings';
 
@@ -12,6 +13,14 @@ describe('game settings persistence', () => {
     expect(loadGameSettings({ getItem: () => null })).toEqual(
       DEFAULT_GAME_SETTINGS,
     );
+  });
+
+  it('selects one Siege input from the existing Touch Controls setting', () => {
+    expect(resolveTouchControlsInputMode('auto', 760, false)).toBe('touch');
+    expect(resolveTouchControlsInputMode('auto', 761, false)).toBe('keyboard');
+    expect(resolveTouchControlsInputMode('auto', 1200, true)).toBe('touch');
+    expect(resolveTouchControlsInputMode('always', 1200, false)).toBe('touch');
+    expect(resolveTouchControlsInputMode('never', 320, true)).toBe('keyboard');
   });
 
   it('round-trips validated presentation preferences', () => {

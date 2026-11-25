@@ -3,11 +3,14 @@ import {
   getSiegeDisplayedUnitCount,
   getSiegeBulletDamage,
   getSiegeCombatHordeCount,
+  getSiegeBackgroundScrollSpeed,
   getSiegeGateScrollSpeed,
+  getSiegeGateBounds,
   getSiegeGateSpacing,
   getSiegeGateWidth,
   getSiegeGateY,
   getSiegeTimedGateY,
+  getSiegeKeyboardMovementX,
   getSiegeHordeWins,
   getSiegeRemainingTroops,
   getSiegeVolleyDamage,
@@ -17,6 +20,16 @@ import {
 } from '../../../../src/game/siege/SiegeEngine';
 
 describe('Siege engine controls', () => {
+  it('only reads keyboard movement when keyboard input is selected', () => {
+    const leftKeys = new Set(['arrowleft', 'a', 'arrowup', 'w']);
+    const rightKeys = new Set(['arrowright', 'd', 'arrowdown', 's']);
+
+    expect(getSiegeKeyboardMovementX(leftKeys, false)).toBe(0);
+    expect(getSiegeKeyboardMovementX(rightKeys, false)).toBe(0);
+    expect(getSiegeKeyboardMovementX(leftKeys, true)).toBe(-1);
+    expect(getSiegeKeyboardMovementX(rightKeys, true)).toBe(1);
+  });
+
   it('tightens the distance between gates as difficulty increases', () => {
     const height = 600;
     const spacings = [
@@ -34,6 +47,20 @@ describe('Siege engine controls', () => {
   it('uses the entire column width for each gate', () => {
     expect(getSiegeGateWidth(1200, 3)).toBe(400);
     expect(getSiegeGateWidth(900, 3)).toBe(300);
+  });
+
+  it('sizes spanning gates across all covered columns and defaults span to one', () => {
+    expect(getSiegeGateBounds(1200, 3, {
+      lane: 0,
+      span: 2,
+      op: 'add',
+      value: 5,
+    })).toEqual({ left: 0, width: 800, center: 400 });
+    expect(getSiegeGateBounds(1200, 3, {
+      lane: 2,
+      op: 'add',
+      value: 5,
+    })).toEqual({ left: 800, width: 400, center: 1000 });
   });
 
   it('moves gate rows toward the tank while preserving their configured spacing', () => {
@@ -60,20 +87,42 @@ describe('Siege engine controls', () => {
     const height = 600;
     const gateTravel = getSiegeGateScrollSpeed(height);
     const fasterConfiguredGateTravel = getSiegeGateScrollSpeed(height, 0.5);
-    const playerTravel = moveSiegePlayer(100, 100, 1, 0, 1, 1000, height);
+    const playerTravel = moveSiegePlayer(100, 100, 1, 1, 1000, height);
 
     expect(gateTravel).toBe(192);
     expect(fasterConfiguredGateTravel).toBe(300);
-    expect(playerTravel.x - 100).toBe(400);
+    expect(playerTravel.x - 100).toBe(600);
     expect(gateTravel).toBeLessThan(playerTravel.x - 100);
   });
 
-  it('moves freely in two dimensions and keeps diagonal speed normalized', () => {
-    const horizontal = moveSiegePlayer(100, 100, 1, 0, 1, 1000, 1000);
-    const diagonal = moveSiegePlayer(100, 100, 1, 1, 1, 1000, 1000);
-    expect(horizontal.x).toBe(500);
-    expect(horizontal.y).toBe(100);
-    expect(Math.hypot(diagonal.x - 100, diagonal.y - 100)).toBeCloseTo(400);
+  it('keeps player movement fast on small screens and scales up on wide screens', () => {
+    const compact = moveSiegePlayer(100, 100, 1, 1, 800, 600);
+    const reference = moveSiegePlayer(100, 100, 1, 1, 1280, 600);
+    const wide = moveSiegePlayer(100, 100, 1, 1, 1920, 600);
+
+    expect(compact.x - 100).toBe(600);
+    expect(reference.x - 100).toBe(600);
+    expect(wide.x - 100).toBe(900);
+  });
+
+  it('scrolls the background with the gates at a slower parallax rate', () => {
+    const height = 600;
+    const gateTravel = getSiegeGateScrollSpeed(height, 0.5);
+    const backgroundTravel = getSiegeBackgroundScrollSpeed(height, 0.5);
+
+    expect(backgroundTravel).toBe(gateTravel * 0.4);
+    expect(backgroundTravel).toBeLessThan(gateTravel);
+    expect(getSiegeBackgroundScrollSpeed(height * 2, 0.5))
+      .toBe(backgroundTravel * 2);
+  });
+
+  it('moves only horizontally and preserves the player vertical position', () => {
+    const right = moveSiegePlayer(100, 100, 1, 1, 1000, 1000);
+    const left = moveSiegePlayer(100, 100, -1, 1, 1000, 1000);
+    const overdriven = moveSiegePlayer(100, 100, 2, 1, 1000, 1000);
+    expect(right).toEqual({ x: 700, y: 100 });
+    expect(left).toEqual({ x: 18, y: 100 });
+    expect(overdriven).toEqual({ x: 700, y: 100 });
   });
 
   it('caps the rendered player crowd while retaining the exact army count', () => {

@@ -1,0 +1,204 @@
+{
+  "id": "easy-06",
+  "name": "Quarry Run",
+  "theme": "industrial_complex",
+  "laneCount": 3,
+  "stars": {
+    "two": 891,
+    "three": 1425
+  },
+  "sections": [
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 10
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.5
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 11
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 1
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 13
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.5
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "runner",
+            "count": 110
+          },
+          {
+            "kind": "walker",
+            "count": 74
+          }
+        ]
+      }
+    },
+    {
+      "elements": [
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 10
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 1.5
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 11
+            },
+            {
+              "lane": 2,
+              "op": "sub",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "add",
+              "value": 15
+            },
+            {
+              "lane": 1,
+              "op": "mul",
+              "value": 2
+            },
+            {
+              "lane": 2,
+              "op": "add",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "type": "gateRow",
+          "gates": [
+            {
+              "lane": 0,
+              "op": "sub",
+              "value": 1
+            },
+            {
+              "lane": 1,
+              "op": "add",
+              "value": 13
+            },
+            {
+              "lane": 2,
+              "op": "mul",
+              "value": 1.5
+            }
+          ]
+        }
+      ],
+      "wall": {
+        "zombies": [
+          {
+            "kind": "runner",
+            "count": 110
+          },
+          {
+            "kind": "walker",
+            "count": 74
+          }
+        ]
+      }
+    }
+  ]
+}

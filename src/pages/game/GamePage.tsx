@@ -10,9 +10,7 @@ import {
 
 function hasSiegeRequest(): boolean {
   if (typeof window === 'undefined') return false;
-  return getSiegeNavigationState(window.location.search) !== null ||
-    (import.meta.env.DEV &&
-      new URLSearchParams(window.location.search).has('siegeLevel'));
+  return getSiegeNavigationState(window.location.search) !== null;
 }
 
 export function GamePage() {

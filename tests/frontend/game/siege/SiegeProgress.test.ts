@@ -19,30 +19,12 @@ function createStorage(initial: Record<string, string> = {}) {
 }
 
 describe('Siege progress', () => {
-  it('unlocks difficulties after ten unique clears of the previous difficulty', () => {
-    let progress = createDefaultSiegeProgress();
+  it('allows every difficulty before any levels have been cleared', () => {
+    const progress = createDefaultSiegeProgress();
     expect(isSiegeDifficultyUnlocked(progress, 'easy')).toBe(true);
-    expect(isSiegeDifficultyUnlocked(progress, 'medium')).toBe(false);
-
-    for (let index = 1; index <= 10; index += 1) {
-      progress = recordSiegeLevelClear(progress, 'easy', `easy-${index}`, 1, index);
-    }
-    expect(countSiegeClears(progress, 'easy')).toBe(10);
     expect(isSiegeDifficultyUnlocked(progress, 'medium')).toBe(true);
-    expect(isSiegeDifficultyUnlocked(progress, 'difficult')).toBe(false);
-  });
-
-  it('does not count removed or renamed levels toward unlocks', () => {
-    let progress = createDefaultSiegeProgress();
-    for (let index = 1; index <= 10; index += 1) {
-      progress = recordSiegeLevelClear(progress, 'easy', `old-${index}`, 1, index);
-    }
-
-    expect(isSiegeDifficultyUnlocked(
-      progress,
-      'medium',
-      ['easy-01', 'easy-02', 'easy-03'],
-    )).toBe(false);
+    expect(isSiegeDifficultyUnlocked(progress, 'difficult')).toBe(true);
+    expect(isSiegeDifficultyUnlocked(progress, 'impossible')).toBe(true);
   });
 
   it('retains the best stars and best troop count independently', () => {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DualJoystickInput } from '@/game/core/DualJoystickInput';
-import { supportsTouchControls } from '@/game/core/ControlSettings';
+import { resolveTouchControlsInputMode } from '@/game/core/GameSettings';
 import { computeZones, type ControlZones } from '@/game/core/TouchControlGeometry';
 import { getSiegeStars } from '@/game/siege/SiegeProgress';
 import { SiegeEngine, type SiegeRunResult, type SiegeRuntimeState } from '@/game/siege/SiegeEngine';
@@ -46,22 +46,33 @@ export function SiegePlaySession({
   const [pauseView, setPauseView] = useState<SiegePauseView>('menu');
   const [engineInstance, setEngineInstance] = useState<SiegeEngine | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
-  const [touchAvailable] = useState(() =>
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    supportsTouchControls(
-      window.matchMedia('(pointer: coarse)').matches,
-      window.navigator.maxTouchPoints,
-    ),
+  const [inputEnvironment, setInputEnvironment] = useState(() => ({
+    viewportWidth: window.innerWidth,
+    coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+  }));
+  const activeInputMode = resolveTouchControlsInputMode(
+    settings.touchControls,
+    inputEnvironment.viewportWidth,
+    inputEnvironment.coarsePointer,
   );
-  const [responsiveLayout] = useState(() =>
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(max-width: 760px), (pointer: coarse)').matches,
-  );
-  const shouldMountTouchControls = settings.touchControls === 'always' ||
-    (settings.touchControls === 'auto' && touchAvailable && responsiveLayout);
+  const shouldMountTouchControls = activeInputMode === 'touch';
   onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    const coarsePointerQuery = window.matchMedia('(pointer: coarse)');
+    const updateInputEnvironment = () => {
+      setInputEnvironment({
+        viewportWidth: window.innerWidth,
+        coarsePointer: coarsePointerQuery.matches,
+      });
+    };
+    window.addEventListener('resize', updateInputEnvironment);
+    coarsePointerQuery.addEventListener('change', updateInputEnvironment);
+    return () => {
+      window.removeEventListener('resize', updateInputEnvironment);
+      coarsePointerQuery.removeEventListener('change', updateInputEnvironment);
+    };
+  }, []);
 
   useEffect(() => {
     if (runtime.phase === 'paused') setPauseView('menu');
@@ -109,6 +120,10 @@ export function SiegePlaySession({
   }, [run]);
 
   useEffect(() => {
+    engineInstance?.setKeyboardMovementEnabled(activeInputMode === 'keyboard');
+  }, [activeInputMode, engineInstance]);
+
+  useEffect(() => {
     const engine = engineInstance;
     const canvas = canvasRef.current;
     const root = touchRootRef.current;
@@ -136,7 +151,7 @@ export function SiegePlaySession({
         const value = Number.parseFloat(styles.getPropertyValue(name));
         return Number.isFinite(value) ? value : 0;
       };
-      zones = computeZones(
+      const standardZones = computeZones(
         bounds,
         {
           top: inset('--touch-safe-top'),
@@ -147,6 +162,15 @@ export function SiegePlaySession({
         settings.touchControlSettings.layout,
         { size: settings.touchControlSettings.joystickSize },
       );
+      zones = {
+        ...standardZones,
+        movement: {
+          left: bounds.left + inset('--touch-safe-left'),
+          top: bounds.top + inset('--touch-safe-top'),
+          width: bounds.width - inset('--touch-safe-left') - inset('--touch-safe-right'),
+          height: bounds.height - inset('--touch-safe-top') - inset('--touch-safe-bottom'),
+        },
+      };
     };
     updateZones();
 
@@ -161,6 +185,8 @@ export function SiegePlaySession({
         gameplaySurface: canvas,
         getZones: () => zones,
         settings: settings.touchControlSettings,
+        pointerType: 'any',
+        movementAxis: 'horizontal',
         positionStick: (stick, point, currentZones) => {
           positionFloatingStick(
             root,
@@ -192,7 +218,7 @@ export function SiegePlaySession({
       window.removeEventListener('orientationchange', updateZones);
       window.visualViewport?.removeEventListener('resize', updateZones);
       joystick.detach();
-      engine.setMovementInput({ x: 0, y: 0 });
+      engine.setMovementInput({ x: 0 });
     };
   }, [
     engineInstance,

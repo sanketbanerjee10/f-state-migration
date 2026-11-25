@@ -7,6 +7,16 @@ import {
 export type TouchControlsSetting = 'auto' | 'always' | 'never';
 export type HudDensitySetting = 'compact' | 'standard';
 
+export function resolveTouchControlsInputMode(
+  setting: TouchControlsSetting,
+  viewportWidth: number,
+  coarsePointer: boolean,
+): 'touch' | 'keyboard' {
+  if (setting === 'always') return 'touch';
+  if (setting === 'never') return 'keyboard';
+  return viewportWidth <= 760 || coarsePointer ? 'touch' : 'keyboard';
+}
+
 export const GAME_KEY_BINDING_ACTIONS = {
   moveUp: 'Move up',
   moveDown: 'Move down',

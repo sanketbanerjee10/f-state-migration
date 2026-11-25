@@ -4,7 +4,6 @@ import {
 } from './SiegeRules';
 
 export const SIEGE_PROGRESS_STORAGE_KEY = 'siege.progress.v1';
-export const SIEGE_UNLOCK_CLEAR_COUNT = 10;
 
 export interface SiegeLevelRecord {
   readonly stars: number;
@@ -124,18 +123,10 @@ export function countSiegeClears(
 }
 
 export function isSiegeDifficultyUnlocked(
-  progress: SiegeProgress,
-  difficulty: SiegeDifficulty,
-  knownPreviousLevelIds?: readonly string[],
+  _progress: SiegeProgress,
+  _difficulty: SiegeDifficulty,
 ): boolean {
-  const difficultyIndex = SIEGE_DIFFICULTIES.indexOf(difficulty);
-  if (difficultyIndex === 0) return true;
-  const previousDifficulty = SIEGE_DIFFICULTIES[difficultyIndex - 1];
-  return countSiegeClears(
-    progress,
-    previousDifficulty,
-    knownPreviousLevelIds,
-  ) >= SIEGE_UNLOCK_CLEAR_COUNT;
+  return true;
 }
 
 export function getSiegeStars(finalTroops: number, thresholds: { two: number; three: number }): number {

@@ -1051,7 +1051,7 @@
             "wall": "The horde is closing in",
             "horde": "Horde",
             "survivors": "{{count}} troops remaining",
-            "lost": "The horde overran your army",
+            "lost": "Defeat",
             "won": "Level cleared",
             "stars": "{{count}} stars",
             "best": "Best: {{count}} troops",

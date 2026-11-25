@@ -2,12 +2,7 @@ import { SIEGE_DIFFICULTIES, type SiegeDifficulty } from './SiegeRules';
 
 export type SiegeNavigationState =
   | { readonly screen: 'difficulty' }
-  | { readonly screen: 'levels'; readonly difficulty: SiegeDifficulty }
-  | {
-      readonly screen: 'playing';
-      readonly difficulty: SiegeDifficulty;
-      readonly levelId: string;
-    };
+  | { readonly screen: 'levels'; readonly difficulty: SiegeDifficulty };
 
 const SIEGE_SCREEN_PARAM = 'siege';
 const SIEGE_DIFFICULTY_PARAM = 'siegeDifficulty';
@@ -34,11 +29,8 @@ export function getSiegeNavigationState(search: string): SiegeNavigationState | 
 
   const difficulty = params.get(SIEGE_DIFFICULTY_PARAM);
   if (!isSiegeDifficulty(difficulty)) return null;
-  if (screen === 'levels') return { screen, difficulty };
-
-  const levelId = params.get(SIEGE_LEVEL_PARAM);
-  if (screen === 'playing' && levelId) {
-    return { screen, difficulty, levelId };
+  if (screen === 'levels' || screen === 'playing') {
+    return { screen: 'levels', difficulty };
   }
   return null;
 }
@@ -51,15 +43,10 @@ export function setSiegeNavigationState(
   url.searchParams.set(SIEGE_SCREEN_PARAM, state.screen);
   if (state.screen === 'difficulty') {
     url.searchParams.delete(SIEGE_DIFFICULTY_PARAM);
-    url.searchParams.delete(SIEGE_LEVEL_PARAM);
   } else {
     url.searchParams.set(SIEGE_DIFFICULTY_PARAM, state.difficulty);
-    if (state.screen === 'playing') {
-      url.searchParams.set(SIEGE_LEVEL_PARAM, state.levelId);
-    } else {
-      url.searchParams.delete(SIEGE_LEVEL_PARAM);
-    }
   }
+  url.searchParams.delete(SIEGE_LEVEL_PARAM);
   writeUrl(url, replace);
 }
 

@@ -4,7 +4,7 @@ export interface Point {
 }
 
 export interface ShapeStyle {
-  fill?: string;
+  fill?: string | CanvasGradient | CanvasPattern;
   stroke?: string;
   lineWidth?: number;
 }

@@ -9,7 +9,7 @@ import {
 
 describe('Siege URL navigation', () => {
   beforeEach(() => {
-    window.history.replaceState({}, '', '/game?gameMenu=home#arena');
+    window.history.replaceState({}, '', '/game?gameMenu=home&siegeLevel=easy-01#arena');
   });
 
   it('reads the difficulty and level carousel states from the query string', () => {
@@ -23,9 +23,8 @@ describe('Siege URL navigation', () => {
     expect(getSiegeNavigationState(
       '?siege=playing&siegeDifficulty=easy&siegeLevel=easy-01',
     )).toEqual({
-      screen: 'playing',
+      screen: 'levels',
       difficulty: 'easy',
-      levelId: 'easy-01',
     });
     expect(getSiegeNavigationState('?siege=levels&siegeDifficulty=unknown')).toBeNull();
   });
@@ -37,17 +36,7 @@ describe('Siege URL navigation', () => {
       screen: 'levels',
       difficulty: 'difficult',
     });
-
-    setSiegeNavigationState({
-      screen: 'playing',
-      difficulty: 'difficult',
-      levelId: 'difficult-03',
-    });
-    expect(getSiegeNavigationState(window.location.search)).toEqual({
-      screen: 'playing',
-      difficulty: 'difficult',
-      levelId: 'difficult-03',
-    });
+    expect(new URLSearchParams(window.location.search).has('siegeLevel')).toBe(false);
 
     clearSiegeNavigationState();
     expect(window.location.search).toBe('?gameMenu=home');

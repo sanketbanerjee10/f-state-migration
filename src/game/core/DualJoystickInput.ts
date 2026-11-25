@@ -37,6 +37,8 @@ export interface ZoneInputOptions {
   readonly gameplaySurface: HTMLElement;
   readonly getZones: () => ControlZones | null;
   readonly settings: ControlSettings;
+  readonly pointerType?: 'touch' | 'any';
+  readonly movementAxis?: 'both' | 'horizontal';
   readonly positionStick: (
     stick: JoystickName,
     point: ControlPoint | null,
@@ -299,7 +301,12 @@ export class DualJoystickInput {
   private handleSurfacePointerDown(event: PointerEvent): void {
     const options = this.zoneOptions;
     const zones = options?.getZones();
-    if (!this.isEnabled || !options || !zones || event.pointerType !== 'touch') {
+    if (
+      !this.isEnabled ||
+      !options ||
+      !zones ||
+      (options.pointerType !== 'any' && event.pointerType !== 'touch')
+    ) {
       return;
     }
     const movementOwnsPoint = isPointInRect(
@@ -396,9 +403,12 @@ export class DualJoystickInput {
 
   private updateVector(name: JoystickName): void {
     const state = this.getState(name);
+    const options = this.zoneOptions;
     updateJoystickVector(
       state.pointerX - state.centerX,
-      state.pointerY - state.centerY,
+      name === 'movement' && options?.movementAxis === 'horizontal'
+        ? 0
+        : state.pointerY - state.centerY,
       state.radius,
       GAME_INPUT_CONFIG.joystickDeadZone,
       state.vector,
