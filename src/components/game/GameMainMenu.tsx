@@ -3,13 +3,9 @@ import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import Fade from 'embla-carousel-fade';
 import {
-  BookOpen,
   ChevronLeft,
-  CircleHelp,
-  Code2,
   Map,
   Play,
-  Settings,
   Shield,
   Trophy,
 } from 'lucide-react';
@@ -29,6 +25,7 @@ import {
   readLevelCampaignProgress,
 } from '@/game/core/LevelCampaign';
 import { GameFranchiseWordmark } from './GameFranchiseWordmark';
+import { GameMenuSecondaryNavigation } from './GameMenuSecondaryNavigation';
 import type { GameMenuView } from './GameMenuTypes';
 
 const LEVEL_AREAS = [
@@ -53,7 +50,6 @@ interface GameMainMenuProps {
   readonly view: 'home' | 'level-select';
   readonly onViewChange: (view: GameMenuView) => void;
   readonly onStart: (gameMode: GameMode, levelId?: number) => void;
-  readonly onStartTutorial: () => void;
   readonly onOpenSiege?: () => void;
 }
 
@@ -61,7 +57,6 @@ export function GameMainMenu({
   view,
   onViewChange,
   onStart,
-  onStartTutorial,
   onOpenSiege,
 }: GameMainMenuProps) {
   const [campaignProgress, setCampaignProgress] = useState(
@@ -297,100 +292,67 @@ export function GameMainMenu({
   }
 
   return (
-    <div className="game-menu-content">
-      <header className="game-menu-brand">
-        <p className="game-panel-eyebrow">{t('game.menu.presentedBy')}</p>
+    <div className="game-menu-layout">
+      <div className="game-menu-content">
+        <header className="game-menu-brand">
+          <p className="game-panel-eyebrow">{t('game.menu.presentedBy')}</p>
 
-        <h1 id="game-menu-title">
-          <GameFranchiseWordmark />
-        </h1>
+          <h1 id="game-menu-title">
+            <GameFranchiseWordmark />
+          </h1>
 
-        <p className="game-menu-tagline">
-          {t('game.menu.taglineLead')} <span>{t('game.menu.taglineEmphasis')}</span>
-        </p>
-      </header>
+          <p className="game-menu-tagline">
+            {t('game.menu.taglineLead')} <span>{t('game.menu.taglineEmphasis')}</span>
+          </p>
+        </header>
 
-      <nav className="game-menu-actions game-home-actions" aria-label={t('game.menu.mainMenu')}>
-        <button
-          className="game-menu-primary"
-          type="button"
-          onClick={() => onStart('survival')}
-          autoFocus
-        >
-          <Play className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.survival')}</span>
-          <span className="game-menu-button-arrow">›</span>
-        </button>
+        <div className="game-menu-options">
+          <nav className="game-menu-actions game-home-actions" aria-label={t('game.menu.mainMenu')}>
+            <button
+              className="game-menu-primary"
+              type="button"
+              onClick={() => onStart('survival')}
+              autoFocus
+            >
+              <Play className="game-menu-button-icon game-menu-button-icon-play" size={19} aria-hidden="true" />
+              <span className="game-menu-button-copy">
+                <strong>{t('game.menu.survival')}</strong>
+                <small>{t('game.menu.survivalDescription')}</small>
+              </span>
+              <span className="game-menu-button-arrow">›</span>
+            </button>
 
-        <button
-          className="game-menu-primary"
-          type="button"
-          onClick={openLevelSelection}
-        >
-          <Map className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.campaign')}</span>
-          <span className="game-menu-button-arrow">›</span>
-        </button>
+            <button
+              className="game-menu-primary"
+              type="button"
+              onClick={openLevelSelection}
+            >
+              <Map className="game-menu-button-icon" size={19} aria-hidden="true" />
+              <span className="game-menu-button-copy">
+                <strong>{t('game.menu.campaign')}</strong>
+                <small>{t('game.menu.campaignDescription')}</small>
+              </span>
+              <span className="game-menu-button-arrow">›</span>
+            </button>
 
-        {onOpenSiege && (
-          <button
-            className="game-menu-primary"
-            type="button"
-            onClick={onOpenSiege}
-          >
-            <Shield className="game-menu-button-icon" size={19} aria-hidden="true" />
-            <span>{t('game.menu.siege')}</span>
-            <span className="game-menu-button-arrow">›</span>
-          </button>
-        )}
-
-        {import.meta.env.DEV && (
-          <button
-            className="game-menu-secondary"
-            type="button"
-            onClick={() => onStart('dev')}
-          >
-            <Code2 className="game-menu-button-icon" size={19} aria-hidden="true" />
-            <span>{t('game.menu.devLevel')}</span>
-          </button>
-        )}
-
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={onStartTutorial}
-        >
-          <CircleHelp className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.howToPlay')}</span>
-        </button>
-
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={() => onViewChange('enemy-guide')}
-        >
-          <BookOpen className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.fieldGuides')}</span>
-        </button>
-
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={() => onViewChange('leaderboard')}
-        >
-          <Trophy className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.leaderboard')}</span>
-        </button>
-
-        <button
-          className="game-menu-secondary"
-          type="button"
-          onClick={() => onViewChange('settings')}
-        >
-          <Settings className="game-menu-button-icon" size={19} aria-hidden="true" />
-          <span>{t('game.menu.settings')}</span>
-        </button>
-      </nav>
+            {onOpenSiege && (
+              <button
+                className="game-menu-primary"
+                type="button"
+                onClick={onOpenSiege}
+              >
+                <Shield className="game-menu-button-icon" size={19} aria-hidden="true" />
+                <span className="game-menu-button-copy">
+                  <strong>{t('game.menu.siege')}</strong>
+                  <small>{t('game.menu.siegeDescription')}</small>
+                </span>
+                <span className="game-menu-button-arrow">›</span>
+              </button>
+            )}
+          </nav>
+          <GameMenuSecondaryNavigation onViewChange={onViewChange} />
+        </div>
+      </div>
 
       <footer className="game-menu-footer">
         <span className="game-menu-community-dot">●</span>

@@ -24,7 +24,16 @@ export function SiegeModal({
 }: SiegeModalProps) {
   return (
     <>
-      <div className="game-modal-backdrop game-siege-backdrop" aria-hidden="true" />
+      {onBack && backLabel ? (
+        <button
+          className="game-modal-backdrop game-pause-backdrop game-siege-backdrop"
+          type="button"
+          aria-label={backLabel}
+          onClick={onBack}
+        />
+      ) : (
+        <div className="game-modal-backdrop game-siege-backdrop" aria-hidden="true" />
+      )}
       <section
         className={`game-menu-overlay game-siege-menu${size === 'compact' ? ' game-siege-modal-compact' : ''}`}
         aria-labelledby="siege-modal-title"

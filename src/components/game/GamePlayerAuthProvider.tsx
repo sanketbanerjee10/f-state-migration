@@ -69,6 +69,7 @@ interface GamePlayerAuthContextValue {
 
 const GamePlayerAuthContext = createContext<GamePlayerAuthContextValue | null>(null);
 const PENDING_PROGRESS_KEY_PREFIX = 'state565.gameProgressPending.v1.';
+const LOCAL_PROGRESS_OWNER_KEY = 'state565.gameProgressOwner.v1';
 
 type PendingGamePlayerProgress = Partial<GamePlayerProgress>;
 
@@ -115,9 +116,13 @@ function readLocalPlayerProgress(): GamePlayerProgress {
 }
 
 function hasSavedPlayerProgress(progress: GamePlayerProgress): boolean {
-  return progress.campaign.completedLevelIds.length > 0
+  return progress.campaign.highestUnlockedLevel > 1
+    || progress.campaign.completedLevelIds.length > 0
+    || Object.keys(progress.campaign.bestTimes).length > 0
+    || Object.keys(progress.campaign.bestScores).length > 0
     || progress.campaign.statPoints > 0
     || progress.campaign.rarePoints > 0
+    || Object.values(progress.campaign.standardAttributeLevels).some((level) => level > 0)
     || Object.keys(progress.siege.levels).length > 0
     || progress.discoveries.enemies.length > 0
     || progress.discoveries.bosses.length > 0;
@@ -147,8 +152,27 @@ export function GamePlayerAuthProvider({ children }: { readonly children: ReactN
 
   const hydratePlayerProgress = useCallback(async (username: string, serverProgress: GamePlayerProgress) => {
     let resolvedProgress = serverProgress;
-    const localProgress = readLocalPlayerProgress();
-    const importedLegacyProgress = !hasSavedPlayerProgress(serverProgress)
+    let localProgress: GamePlayerProgress = {
+      campaign: createDefaultLevelCampaignProgress(),
+      siege: createDefaultSiegeProgress(),
+      discoveries: { enemies: [], bosses: [] },
+    };
+    try {
+      localProgress = readLocalPlayerProgress();
+    } catch (error) {
+      console.error('Unable to read local player progress before hydration.', error);
+    }
+    const normalizedUsername = username.trim().toLowerCase();
+    let localProgressOwner: string | null = null;
+    try {
+      localProgressOwner = localStorage.getItem(LOCAL_PROGRESS_OWNER_KEY);
+    } catch (error) {
+      console.error('Unable to read the local player-progress owner.', error);
+    }
+    const canImportLocalProgress = localProgressOwner === null
+      || localProgressOwner === normalizedUsername;
+    const importedLegacyProgress = canImportLocalProgress
+      && !hasSavedPlayerProgress(serverProgress)
       && hasSavedPlayerProgress(localProgress);
     if (importedLegacyProgress) resolvedProgress = localProgress;
 
@@ -162,6 +186,11 @@ export function GamePlayerAuthProvider({ children }: { readonly children: ReactN
       applyPlayerProgressLocally(resolvedProgress);
     } catch (error) {
       console.error('Unable to hydrate player progress into browser storage.', error);
+    }
+    try {
+      localStorage.setItem(LOCAL_PROGRESS_OWNER_KEY, normalizedUsername);
+    } catch (error) {
+      console.error('Unable to mark the local player-progress owner.', error);
     }
     setPlayerProgress(resolvedProgress);
 
@@ -211,7 +240,7 @@ export function GamePlayerAuthProvider({ children }: { readonly children: ReactN
 
   useEffect(() => {
     let active = true;
-    getGamePlayerSession().then((session) => {
+    getGamePlayerSession().then(async (session) => {
       if (!active) return;
       if (session.authenticated) {
         await hydratePlayerProgress(session.username, session.progress);
@@ -342,7 +371,7 @@ export function GamePlayerAuthProvider({ children }: { readonly children: ReactN
         saveLocalCampaignProgress(progress);
       } catch (error) {
         console.error('Unable to save campaign progress locally.', error);
-        throw error;
+        if (account.status !== 'authenticated') throw error;
       }
       const next = {
         ...(playerProgress ?? {
@@ -372,7 +401,7 @@ export function GamePlayerAuthProvider({ children }: { readonly children: ReactN
         saveLocalSiegeProgress(progress);
       } catch (error) {
         console.error('Unable to save Siege progress locally.', error);
-        throw error;
+        if (account.status !== 'authenticated') throw error;
       }
       const next = {
         ...(playerProgress ?? {

@@ -4688,10 +4688,18 @@ button.settings-key-row:hover {
   box-shadow: 0 2px 0 var(--ah-midnight), 0 0 12px rgb(var(--ah-blue-rgb) / 30%);
 }
 
-.game-player-profile-widget-actions button.is-primary:hover {
-  border-color: var(--ah-white);
-  background: rgb(var(--ah-pink-rgb) / 72%);
-  box-shadow: 0 2px 0 var(--ah-midnight), 0 0 18px rgb(var(--ah-blue-rgb) / 52%);
+.game-player-profile-widget-actions button.game-player-profile-widget-sign-in {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: none;
+}
+
+.game-player-profile-widget-actions button.game-player-profile-widget-sign-in:hover {
+  transform: none;
+  border-color: var(--ah-pink);
+  background: rgb(var(--ah-pink-rgb) / 58%);
+  box-shadow: 0 2px 0 var(--ah-midnight), 0 0 12px rgb(var(--ah-blue-rgb) / 30%);
 }
 
 .game-player-profile-widget.is-loading {
@@ -6612,25 +6620,36 @@ button.settings-key-row:hover {
 
 .game-settings-dialog:has(.game-settings-panel) .game-settings-panel,
 .game-leaderboard-dialog .game-leaderboard,
-.game-screen .game-guide-dialog .game-enemy-guide,
-.game-screen .game-main-menu-overlay .game-menu-content {
+.game-screen .game-guide-dialog .game-enemy-guide {
   position: relative;
   z-index: 1;
 }
 
-.game-screen .game-main-menu-overlay {
-  background:
-    radial-gradient(ellipse at 50% -12%, rgb(var(--ah-purple-rgb) / 24%), transparent 48%),
-    radial-gradient(ellipse at 100% 55%, rgb(var(--ah-pink-rgb) / 7%), transparent 42%),
-    radial-gradient(ellipse at 4% 92%, rgb(var(--ah-blue-rgb) / 18%), transparent 34%),
-    linear-gradient(
-      90deg,
-      rgb(var(--ah-midnight-rgb) / 42%) 0%,
-      rgb(var(--ah-midnight-rgb) / 18%) 35%,
-      transparent 68%
-    ),
-    var(--game-main-menu-background) center / cover no-repeat,
-    var(--ah-midnight);
+.game-screen .game-main-menu-overlay .game-menu-content {
+  z-index: 1;
+}
+
+.game-guide-tutorial-button {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgb(var(--ah-lavender-rgb) / 38%);
+  border-radius: 8px;
+  background: rgb(var(--ah-purple-rgb) / 20%);
+  color: var(--ah-lavender);
+  font: 700 11px var(--app-font-sans);
+  cursor: pointer;
+}
+
+.game-guide-tutorial-button:hover,
+.game-guide-tutorial-button:focus-visible {
+  border-color: var(--ah-blue);
+  background: rgb(var(--ah-purple-rgb) / 32%);
+  color: var(--ah-white);
+}
+
+.game-guide-tutorial-button:focus-visible {
+  outline: 2px solid var(--ah-blue);
+  outline-offset: 3px;
 }
 
 .game-screen .game-tutorial {

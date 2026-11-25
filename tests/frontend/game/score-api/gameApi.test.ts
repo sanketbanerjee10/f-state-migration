@@ -7,6 +7,9 @@ import {
   loginGamePlayer,
   logoutGamePlayer,
   registerGamePlayer,
+  saveGamePlayerCampaignProgress,
+  saveGamePlayerDiscoveries,
+  saveGamePlayerSiegeProgress,
   saveGamePlayerAvatar,
   submitGameScore,
 } from '@/lib/gameApi';
@@ -53,6 +56,26 @@ const bestScore = {
   zombiesKilled: score.zombiesKilled,
   survivalTime: score.survivalTime,
   createdAt: '2026-11-01T10:00:00.000Z',
+};
+
+const playerProgress = {
+  campaign: {
+    schemaVersion: 1,
+    highestUnlockedLevel: 1,
+    completedLevelIds: [],
+    bestTimes: {},
+    bestScores: {},
+    statPoints: 0,
+    rarePoints: 0,
+    standardAttributeLevels: {
+      damage: 0,
+      fireRate: 0,
+      maxHealth: 0,
+      movementSpeed: 0,
+    },
+  },
+  siege: { schemaVersion: 1, levels: {} },
+  discoveries: { enemies: [], bosses: [] },
 };
 
 describe('game API', () => {
@@ -388,7 +411,7 @@ describe('game API', () => {
 
   it('uses the cookie-backed account endpoints without attaching leadership bearer tokens', async () => {
     setAuthTokenGetter(() => 'leadership-session-token');
-    const session = { authenticated: true, username: 'Aster', avatar };
+    const session = { authenticated: true, username: 'Aster', avatar, progress: playerProgress };
     const fetch = vi.fn()
       .mockResolvedValueOnce(new Response(JSON.stringify(session), {
         status: 201,
@@ -409,6 +432,18 @@ describe('game API', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify({ authenticated: false }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
+      }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ saved: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ saved: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ saved: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
       }));
     vi.stubGlobal('fetch', fetch);
 
@@ -419,6 +454,9 @@ describe('game API', () => {
     await expect(getGamePlayerSession()).resolves.toEqual(session);
     await expect(saveGamePlayerAvatar(avatar)).resolves.toEqual(session);
     await expect(logoutGamePlayer()).resolves.toEqual({ authenticated: false });
+    await expect(saveGamePlayerCampaignProgress(playerProgress.campaign)).resolves.toBeUndefined();
+    await expect(saveGamePlayerSiegeProgress(playerProgress.siege)).resolves.toBeUndefined();
+    await expect(saveGamePlayerDiscoveries(playerProgress.discoveries)).resolves.toBeUndefined();
 
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([
       '/api/game/account/register',
@@ -426,6 +464,9 @@ describe('game API', () => {
       '/api/game/account/session',
       '/api/game/account/avatar',
       '/api/game/account/logout',
+      '/api/game/account/progress/campaign',
+      '/api/game/account/progress/siege',
+      '/api/game/account/progress/discoveries',
     ]);
     expect(fetch.mock.calls.every(([, options]) => options?.credentials === 'include')).toBe(true);
     expect(fetch.mock.calls.every(([, options]) =>

@@ -44,6 +44,13 @@ vi.mock('../../../../src/game/siege/SiegeEngine', () => ({
   },
 }));
 
+vi.mock('../../../../src/components/game/GamePlayerAuthProvider', () => ({
+  useGamePlayerAuth: () => ({
+    playerProgress: null,
+    saveSiegeProgress: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 (globalThis as typeof globalThis & { React?: typeof React }).React = React;
 
 vi.mock('react-i18next', () => ({
@@ -260,6 +267,41 @@ describe('Siege UI', () => {
       .toBe('levels');
     expect(new URLSearchParams(window.location.search).get('siegeDifficulty'))
       .toBe('difficult');
+  });
+
+  it('returns to difficulty selection when clicking outside the level selector', async () => {
+    await act(async () => {
+      root?.render(createElement(SiegeGame, { onExit: vi.fn() }));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+    await act(async () => {
+      (container?.querySelector(
+        '.game-siege-difficulty-card[data-difficulty="easy"]',
+      ) as HTMLButtonElement).click();
+    });
+
+    await act(async () => {
+      (container?.querySelector('.game-siege-backdrop') as HTMLButtonElement).click();
+    });
+
+    expect(container?.querySelector('.game-siege-screen')?.getAttribute('data-screen'))
+      .toBe('difficulty');
+    expect(new URLSearchParams(window.location.search).get('siege')).toBe('difficulty');
+    expect(new URLSearchParams(window.location.search).has('siegeDifficulty')).toBe(false);
+  });
+
+  it('exits Siege when clicking outside the difficulty selector', async () => {
+    const onExit = vi.fn();
+    await act(async () => {
+      root?.render(createElement(SiegeGame, { onExit }));
+      await new Promise((resolve) => window.setTimeout(resolve, 0));
+    });
+
+    await act(async () => {
+      (container?.querySelector('.game-siege-backdrop') as HTMLButtonElement).click();
+    });
+
+    expect(onExit).toHaveBeenCalledOnce();
   });
 
   it('offers the next level after a win and starts it directly', async () => {

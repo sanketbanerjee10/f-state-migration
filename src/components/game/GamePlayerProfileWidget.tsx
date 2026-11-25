@@ -54,11 +54,13 @@ export function GamePlayerProfileWidget({
       role="group"
       aria-label={t('game.account.title')}
     >
-      <span className="game-player-profile-widget-mark" aria-hidden="true">
-        <UserRound size={20} />
-      </span>
       <span className="game-player-profile-widget-actions">
-        <button className="is-primary" type="button" onClick={onSignIn}>
+        <button
+          className="is-primary game-player-profile-widget-sign-in"
+          type="button"
+          onClick={onSignIn}
+        >
+          <UserRound size={16} aria-hidden="true" />
           {t('game.account.signIn')}
         </button>
       </span>

@@ -24,6 +24,11 @@
   -webkit-backdrop-filter: blur(1px);
 }
 
+.game-siege-screen .game-siege-backdrop:focus-visible {
+  outline: 2px solid var(--ah-pink);
+  outline-offset: -4px;
+}
+
 .game-screen .game-siege-menu {
   z-index: 7;
   display: flex;

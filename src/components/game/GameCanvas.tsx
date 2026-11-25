@@ -779,6 +779,30 @@ export function GameCanvas({
   ) => {
     engineRef.current?.adjustRareUpgrade(upgradeId, adjustment);
     syncGameState();
+    if (currentRunGameModeRef.current !== 'level') return;
+
+    try {
+      const progress = readLevelCampaignProgress();
+      const rarePoints = engineRef.current?.getGameState()?.statistics.rareCurrency?.available;
+      if (rarePoints !== undefined) {
+        void syncCampaignProgress({
+          ...progress,
+          rarePoints,
+        }).catch((error: unknown) => {
+          toast.error(
+            error instanceof Error
+              ? t('game.notifications.campaignPointsSaveFailed', { error: error.message })
+              : t('game.notifications.campaignPointsSaveFailedSimple'),
+          );
+        });
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? t('game.notifications.campaignPointsSaveFailed', { error: error.message })
+          : t('game.notifications.campaignPointsSaveFailedSimple'),
+      );
+    }
   };
 
   const toggleDiagnostics = () => {
@@ -1070,7 +1094,8 @@ export function GameCanvas({
     gameState?.wave.phase === 'combat';
   const showFullscreenButton =
     menuMode === 'pause' ||
-    (isResponsiveLayout && (menuMode === 'main' || showPauseButton));
+    menuMode === 'main' ||
+    (isResponsiveLayout && showPauseButton);
 
   return (
     <div

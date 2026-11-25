@@ -11,6 +11,11 @@ import {
 import { simulateSiegeHordeEncounter } from '../../../../src/game/siege/SiegeCombat';
 
 describe('Siege rules', () => {
+  it('uses doubled incoming gate spacing in Impossible mode', async () => {
+    const data = await loadSiegeDifficultyData('impossible');
+    expect(data.rules.gateSpawnIntervalSeconds).toBe(2.125);
+  });
+
   it('applies all gate operators with integer troop counts', () => {
     expect(applySiegeGate(8, { lane: 0, op: 'add', value: 3 })).toBe(11);
     expect(applySiegeGate(8, { lane: 0, op: 'sub', value: 12 })).toBe(0);

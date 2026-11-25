@@ -130,6 +130,26 @@ const testAvatar = {
   backgroundColor: '18243b',
 };
 
+const testPlayerProgress = {
+  campaign: {
+    schemaVersion: 1,
+    highestUnlockedLevel: 1,
+    completedLevelIds: [],
+    bestTimes: {},
+    bestScores: {},
+    statPoints: 0,
+    rarePoints: 0,
+    standardAttributeLevels: {
+      damage: 0,
+      fireRate: 0,
+      maxHealth: 0,
+      movementSpeed: 0,
+    },
+  },
+  siege: { schemaVersion: 1, levels: {} },
+  discoveries: { enemies: [], bosses: [] },
+};
+
 vi.mock('@/game/core/GameEngine', () => {
   function makeSnapshot(gameMode = 'survival') {
     return {
@@ -471,15 +491,17 @@ describe('game UI scenarios', () => {
     expect(container?.textContent).not.toContain('PLAYER ACCOUNT');
     expect(container?.textContent).not.toContain('Create account');
     expect(container?.querySelectorAll('.game-player-profile-widget-actions button')).toHaveLength(1);
-    expect(container?.querySelector('.game-player-profile-widget-actions button')?.classList)
-      .toContain('is-primary');
+    const signInButton = container?.querySelector('.game-player-profile-widget-actions button');
+    expect(signInButton?.classList).toContain('is-primary');
+    expect(signInButton?.querySelector('svg.lucide-user-round')).not.toBeNull();
+    expect(signInButton?.textContent).toBe('Sign in');
     await clickButton('Sign in', container!);
     expect(onSignIn).toHaveBeenCalledOnce();
   });
 
   it('shows the signed-in username and avatar in the profile widget', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(
-      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar }),
+      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar, progress: testPlayerProgress }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )));
     const onOpenProfile = vi.fn();
@@ -499,6 +521,37 @@ describe('game UI scenarios', () => {
       .toContain('data:image/svg+xml');
     await clickButton('Signed in as Aster.', container!);
     expect(onOpenProfile).toHaveBeenCalledOnce();
+  });
+
+  it('hydrates account campaign progress into the local game store on session load', async () => {
+    const campaign = {
+      ...testPlayerProgress.campaign,
+      highestUnlockedLevel: 2,
+      completedLevelIds: [1],
+      bestTimes: { 1: 37 },
+      bestScores: { 1: 620 },
+      statPoints: 1,
+    };
+    vi.stubGlobal('fetch', vi.fn((url: string) => Promise.resolve(new Response(
+      JSON.stringify(url === '/api/game/account/best-score'
+        ? { bestScore: null }
+        : {
+          authenticated: true,
+          username: 'Aster',
+          avatar: testAvatar,
+          progress: { ...testPlayerProgress, campaign },
+        }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    ))));
+
+    await render(
+      <GamePlayerAuthProvider>
+        <div>Account data loaded</div>
+      </GamePlayerAuthProvider>,
+    );
+
+    expect(JSON.parse(window.localStorage.getItem('state565-level-campaign-v1') ?? '{}'))
+      .toMatchObject(campaign);
   });
 
   it('initializes the account panel on the requested sign-up tab', async () => {
@@ -523,7 +576,7 @@ describe('game UI scenarios', () => {
         ? { authenticated: false }
         : url === '/api/game/account/availability?username=Aster'
           ? { available: true }
-          : { authenticated: true, username: 'Aster', avatar: testAvatar }),
+          : { authenticated: true, username: 'Aster', avatar: testAvatar, progress: testPlayerProgress }),
       {
         status: url === '/api/game/account/register' ? 201 : 200,
         headers: { 'Content-Type': 'application/json' },
@@ -613,7 +666,7 @@ describe('game UI scenarios', () => {
 
   it('shows the saved avatar without a randomizer for signed-in players', async () => {
     const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(
-      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar }),
+      JSON.stringify({ authenticated: true, username: 'Aster', avatar: testAvatar, progress: testPlayerProgress }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )));
     vi.stubGlobal('fetch', fetchMock);
@@ -983,9 +1036,9 @@ describe('game UI scenarios', () => {
     expect(document.fullscreenElement).toBeNull();
   });
 
-  it('shows the fullscreen toggle in the desktop pause menu but not during desktop gameplay', async () => {
+  it('shows the fullscreen toggle on the desktop menu and pause menu, but not during desktop gameplay', async () => {
     await mountGame();
-    expect(container?.querySelector('.game-fullscreen-button')).toBeNull();
+    expect(container?.querySelector('.game-fullscreen-button')).not.toBeNull();
 
     await clickButton('Start survival');
     expect(container?.querySelector('.game-fullscreen-button')).toBeNull();

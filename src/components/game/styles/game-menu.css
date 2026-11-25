@@ -1,32 +1,26 @@
-/*
- * WARNING: This file should not accumulate duplicate menu rules.
- * Before adding a new selector, check whether an existing rule already covers it
- * and remove the older copy instead of duplicating the same styling.
- */
 .game-screen .game-main-menu-overlay {
   --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/PC%20Cozy%20Moonlit%20Zombie%20Campfire_scene.png?updatedAt=1793767502838');
 
   position: fixed;
   inset: 0;
   z-index: 6;
-  width: 100%;
+  box-sizing: border-box;
+  width: auto;
   max-width: none;
   max-height: none;
-  padding: clamp(24px, 5vw, 76px) clamp(24px, 6vw, 90px);
+  padding: clamp(24px, 4vw, 56px) clamp(20px, 3.2vw, 44px);
   overflow: hidden;
-  border: none;
+  border: 0;
   border-radius: 0;
   background:
-    radial-gradient(ellipse at 4% 92%, rgb(var(--ah-blue-rgb) / 18%), transparent 34%),
-    radial-gradient(ellipse at 96% 8%, rgb(var(--ah-blue-rgb) / 14%), transparent 32%),
     linear-gradient(
       90deg,
-      rgb(var(--ah-midnight-rgb) / 42%) 0%,
-      rgb(var(--ah-midnight-rgb) / 18%) 35%,
-      transparent 68%
+      rgb(31 18 113 / 42%) 0%,
+      rgb(31 18 113 / 22%) 35%,
+      rgb(31 18 113 / 8%) 68%
     ),
     var(--game-main-menu-background) center / cover no-repeat,
-    var(--ah-midnight);
+    #1F1271;
   box-shadow: none;
   color: var(--ah-cream);
   font-family: var(--app-font-sans);
@@ -34,26 +28,53 @@
   transform: none;
 }
 
+.game-canvas-frame:has(.game-main-menu-overlay) {
+  background: var(--ah-midnight);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-layout {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: start;
+}
+
 .game-screen .game-main-menu-overlay .game-menu-content {
-  width: min(340px, 38vw);
+  position: static;
+  grid-row: 1;
   display: flex;
+  width: clamp(240px, 34vw, 330px);
+  max-height: 100%;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  max-height: 100%;
+  align-self: center;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-options {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(4, auto);
+  gap: 8px;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-brand {
-  margin-bottom: 22px;
+  margin-bottom: clamp(14px, 2.4vh, 22px);
   text-shadow: 0 3px 12px rgb(var(--ah-shadow-rgb) / 80%);
 }
 
 .game-screen .game-main-menu-overlay .game-panel-eyebrow {
   margin: 0 0 5px;
-  color: #9bd3ff !important;
+  color: #E3C7EE !important;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-brand h1 {
@@ -127,134 +148,275 @@
 }
 
 .game-screen .game-main-menu-overlay .game-menu-tagline span {
-  color: var(--ah-green);
+  color: #E3C7EE;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
+  display: contents;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-actions button {
   position: relative;
+  box-sizing: border-box;
   display: flex;
+  min-height: 58px;
   align-items: center;
   justify-content: flex-start;
   gap: 13px;
   width: 100%;
-  min-height: 43px;
-  padding: 9px 15px;
-  border: 1px solid rgb(var(--ah-lavender-rgb) / 32%);
-  border-radius: 13px;
-  color: var(--ah-lavender);
+  padding: 8px 14px;
+  border: 1px solid #892DD3;
+  border-radius: 12px;
+  color: #E3C7EE;
   font-family: var(--app-font-sans);
   font-size: 13px;
   font-weight: 850;
   letter-spacing: 0.025em;
   text-align: left;
   cursor: pointer;
-  background: rgb(var(--ah-midnight-rgb) / 72%);
+  background: linear-gradient(110deg, #341B8F, #681BC2);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
-  box-shadow: 0 4px 0 rgb(var(--ah-shadow-rgb) / 70%), 0 5px 14px rgb(var(--ah-shadow-rgb) / 35%), inset 0 1px rgb(var(--ah-white-rgb) / 12%);
+  box-shadow:
+    0 0 12px rgb(137 45 211 / 28%),
+    inset 0 1px rgb(255 255 255 / 12%);
   transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-button-icon {
   display: block;
-  flex: 0 0 20px;
-  color: var(--ah-lavender);
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  color: #E3C7EE;
+  fill: none;
   stroke-width: 2.25;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-button-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 3px;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-button-copy strong {
+  color: var(--ah-white);
+  font-size: 14px;
+  line-height: 1.1;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-button-copy small {
+  color: #E3C7EE;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-button-arrow {
   margin-left: auto;
-  color: var(--ah-lavender);
-  font-size: 23px;
+  color: #E3C7EE;
+  font-size: 25px;
   line-height: 1;
-  opacity: 0;
-  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-actions button:hover {
-  transform: translateX(5px);
-  border-color: var(--ah-blue);
-  background: rgb(var(--ah-midnight-rgb) / 82%);
-  box-shadow: 0 5px 0 rgb(var(--ah-shadow-rgb) / 70%), 0 0 17px rgb(var(--ah-purple-rgb) / 25%);
-}
-
-.game-screen .game-main-menu-overlay .game-menu-actions button:hover .game-menu-button-arrow {
-  opacity: 1;
-  transform: translateX(3px);
+  transform: translateX(4px);
+  border-color: #B76AEC;
+  background: linear-gradient(110deg, #4420A0, #7627D0);
+  box-shadow: 0 0 16px rgb(137 45 211 / 42%);
 }
 
 .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
-  min-height: 51px;
-  border: 2px solid var(--ah-pink);
+  min-height: 69px;
+  border: 1px solid #892DD3 !important;
   color: var(--ah-white);
-  background: rgb(var(--ah-pink-rgb) / 68%);
-  box-shadow: 0 4px 0 var(--ah-midnight), 0 0 17px rgb(var(--ah-blue-rgb) / 55%), inset 0 1px rgb(var(--ah-white-rgb) / 40%);
+  background: linear-gradient(110deg, #341B8F, #681BC2);
+  box-shadow:
+    0 0 12px rgb(137 45 211 / 32%),
+    inset 0 1px rgb(255 255 255 / 14%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary .game-menu-button-icon {
+  width: 31px;
+  height: 31px;
+  flex-basis: 31px;
+  color: #E3C7EE;
+  stroke-width: 1.5;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary .game-menu-button-icon-play {
+  color: #E3C7EE;
+  fill: currentColor;
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary:first-child {
+  background: linear-gradient(
+    110deg,
+    rgb(52 27 143 / 72%),
+    rgb(104 27 194 / 72%)
+  );
+  box-shadow:
+    0 0 16px rgb(137 45 211 / 42%),
+    inset 0 1px rgb(255 255 255 / 18%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary:not(:first-child) {
+  border-color: rgb(227 199 238 / 38%) !important;
+  background: rgb(31 18 113 / 24%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 8%);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 
 .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary:hover {
-  border-color: var(--ah-white);
-  background: rgb(var(--ah-pink-rgb) / 78%);
-  box-shadow: 0 4px 0 var(--ah-midnight), 0 0 25px rgb(var(--ah-blue-rgb) / 80%);
+  border-color: #B76AEC !important;
+  background: linear-gradient(110deg, #4B22A8, #812ED8);
+  box-shadow: 0 0 19px rgb(137 45 211 / 52%);
 }
 
-.game-screen .game-main-menu-overlay .game-menu-actions button:focus-visible {
-  outline: 3px solid var(--ah-peach);
-  outline-offset: 4px;
+.game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary:not(:first-child):hover {
+  border-color: rgb(227 199 238 / 58%) !important;
+  background: rgb(68 32 160 / 38%);
+  box-shadow: 0 0 12px rgb(137 45 211 / 28%);
+}
+
+.game-screen .game-main-menu-overlay .game-menu-actions button:focus-visible,
+.game-screen .game-main-menu-overlay .game-secondary-navigation-item:focus-visible {
+  outline: 2px solid #E3C7EE;
+  outline-offset: 3px;
+}
+
+.game-screen .game-main-menu-overlay .game-secondary-navigation {
+  position: static;
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.game-screen .game-main-menu-overlay .game-secondary-navigation-item {
+  display: grid;
+  min-width: 0;
+  min-height: 72px;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 7px 3px;
+  border: 1px solid rgb(227 199 238 / 38%);
+  border-radius: 12px;
+  background: rgb(31 18 113 / 24%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 8%);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  color: #FFFFFF;
+  font-family: var(--app-font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.game-screen .game-main-menu-overlay .game-secondary-navigation-item svg {
+  width: 22px;
+  height: 22px;
+  color: #E3C7EE;
+  stroke-width: 2;
+}
+
+.game-screen .game-main-menu-overlay .game-secondary-navigation-item:hover {
+  border-color: rgb(227 199 238 / 58%);
+  background: rgb(68 32 160 / 38%);
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgb(137 45 211 / 28%);
 }
 
 .game-screen .game-main-menu-overlay .game-menu-footer {
+  position: static;
+  grid-row: 2;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 25px;
-  color: var(--ah-muted);
-  font-size: 10px;
+  gap: 7px;
+  margin: 0;
+  color: var(--ah-blue);
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.045em;
   text-shadow: 0 2px 5px var(--ah-midnight);
 }
 
 .game-screen .game-main-menu-overlay .game-menu-footer strong {
-  color: var(--ah-green);
+  color: #E3C7EE;
 }
 
 .game-screen .game-main-menu-overlay .game-menu-community-dot {
-  color: var(--ah-lavender);
-  font-size: 16px;
+  color: #E3C7EE;
+  font-size: 15px;
+}
+
+.game-canvas-frame:has(.game-main-menu-overlay) > .game-fullscreen-button {
+  top: max(
+    calc(env(safe-area-inset-top, 0px) + 8px),
+    calc(clamp(8px, 1.7vw, 16px) + 8px)
+  );
+  right: auto;
+  left: max(
+    calc(env(safe-area-inset-left, 0px) + 8px),
+    calc(clamp(8px, 1.7vw, 16px) + 8px)
+  );
+  opacity: 1;
+}
+
+.game-screen:has(.game-main-menu-overlay) .game-player-profile-widget {
+  top: max(
+    calc(env(safe-area-inset-top, 0px) + 8px),
+    calc(clamp(8px, 1.7vw, 16px) + 8px)
+  );
+  right: max(
+    calc(env(safe-area-inset-right, 0px) + 8px),
+    calc(clamp(8px, 1.7vw, 16px) + 8px)
+  );
+  min-height: 0;
+  border-color: rgb(var(--ah-lavender-rgb) / 38%);
+  border-radius: 11px;
+  background: rgb(var(--ah-purple-rgb) / 82%);
+  box-shadow:
+    0 4px 0 rgb(var(--ah-shadow-rgb) / 70%),
+    0 0 14px rgb(var(--ah-purple-rgb) / 34%),
+    inset 0 1px rgb(var(--ah-white-rgb) / 12%);
+}
+
+.game-screen:has(.game-main-menu-overlay) .game-player-profile-widget-guest {
+  gap: 0;
+  padding: 5px 12px;
+}
+
+.game-screen:has(.game-main-menu-overlay) .game-player-profile-widget-actions button.is-primary {
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ah-white);
+  font-size: 12px;
+  transition: none;
+}
+
+.game-screen:has(.game-main-menu-overlay) .game-player-profile-widget-actions button.game-player-profile-widget-sign-in:hover {
+  transform: none;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
   .game-screen .game-main-menu-overlay {
     --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/Tablet%20Moonlit%20Campfire%20at%20Watchtower%20565.png?updatedAt=1793767502872');
-
-    padding: 4vw;
-  }
-
-  .game-screen .game-main-menu-overlay .game-menu-content {
-    width: min(310px, 38vw);
-  }
-
-  .game-screen .game-main-menu-overlay .game-menu-brand h1 {
-    font-size: clamp(36px, 5vw, 52px);
-  }
-
-  .game-screen .game-main-menu-overlay .game-menu-actions {
-    gap: 7px;
-  }
-
-  .game-screen .game-main-menu-overlay .game-menu-actions button {
-    min-height: 41px;
-    font-size: 12px;
   }
 }
 
@@ -262,34 +424,48 @@
   .game-screen .game-main-menu-overlay {
     --game-main-menu-background: url('https://ik.imagekit.io/c1tiz3nte/Mobile%20Cozy%20Moonlit%20Campfire%20Night.png?updatedAt=1793767502741');
 
+    inset: 0;
+    padding: max(66px, calc(env(safe-area-inset-top, 0px) + 52px))
+      max(11px, env(safe-area-inset-right, 0px))
+      max(60px, calc(env(safe-area-inset-bottom, 0px) + 44px))
+      max(11px, env(safe-area-inset-left, 0px));
+    border-radius: 0;
     background:
       linear-gradient(
         180deg,
-        rgb(var(--ah-midnight-rgb) / 16%),
-        rgb(var(--ah-midnight-rgb) / 12%) 48%,
-        rgb(var(--ah-midnight-rgb) / 30%)
+        rgb(31 18 113 / 22%),
+        rgb(31 18 113 / 16%) 48%,
+        rgb(31 18 113 / 38%)
       ),
       var(--game-main-menu-background) center / cover no-repeat,
-      var(--ah-midnight);
-    padding: max(18px, env(safe-area-inset-top)) 18px max(12px, env(safe-area-inset-bottom));
+      #1F1271;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-layout {
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-items: center;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-content {
-    width: min(340px, 100%);
-    max-height: 100%;
+    position: static;
+    grid-row: 1;
+    width: min(100%, 340px);
+    max-height: none;
     align-items: center;
     justify-content: flex-start;
+    align-self: center;
+    margin: 0 auto;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand {
     width: 100%;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     text-align: center;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand h1 {
     justify-content: center;
-    font-size: clamp(35px, 10vw, 49px);
+    font-size: clamp(34px, 10vw, 48px);
   }
 
   .game-screen .game-main-menu-overlay .game-franchise-wordmark {
@@ -301,126 +477,194 @@
   }
 
   .game-screen .game-main-menu-overlay .game-menu-tagline {
-    margin-top: 9px;
-    font-size: 10px;
+    margin-top: 8px;
+    font-size: clamp(9px, 2.7vw, 11px);
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-actions {
-    width: min(290px, 90%);
-    gap: 7px;
+  .game-screen .game-main-menu-overlay .game-menu-options {
+    width: min(100%, 320px);
+    gap: 6px;
+    margin: 0 auto;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-actions button {
-    min-height: 39px;
-    padding: 7px 12px;
+    min-height: 52px;
+    gap: 10px;
+    padding: 7px 11px;
+    border-radius: 12px;
     font-size: 12px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
-    min-height: 44px;
+    min-height: 59px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-button-icon {
+    width: 22px;
+    height: 22px;
+    flex-basis: 22px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary .game-menu-button-icon {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-button-copy strong {
+    font-size: 13px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-button-copy small {
+    font-size: 10px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-button-arrow {
+    font-size: 22px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation {
+    position: static;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    justify-self: center;
+    gap: 5px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation-item {
+    min-height: 58px;
+    gap: 3px;
+    padding: 5px 2px;
+    border-radius: 10px;
+    font-size: clamp(8px, 2.4vw, 10px);
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation-item svg {
+    width: 18px;
+    height: 18px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-footer {
-    justify-content: center;
-    margin-top: 12px;
-    font-size: 9px;
+    position: static;
+    grid-row: 2;
+    align-self: end;
+    justify-self: start;
+    max-width: calc(100% - 220px);
+    gap: 4px;
+    margin: 0 0 0 10px;
+    font-size: 8px;
+    line-height: 1.15;
+  }
+
+  .game-canvas-frame:has(.game-main-menu-overlay) > .game-fullscreen-button {
+    top: max(9px, env(safe-area-inset-top, 0px));
+    left: max(9px, env(safe-area-inset-left, 0px));
+  }
+
+  .game-screen:has(.game-main-menu-overlay) .game-player-profile-widget {
+    top: max(9px, env(safe-area-inset-top, 0px));
+    right: max(9px, env(safe-area-inset-right, 0px));
+    padding: 4px 8px;
+  }
+
+  .game-screen:has(.game-main-menu-overlay) .game-player-profile-widget-actions button.is-primary {
+    min-height: 26px;
+    padding: 3px 6px;
+    font-size: 11px;
   }
 }
 
-@media (max-width: 380px), (max-height: 650px) {
+@media (max-width: 380px), (max-width: 600px) and (max-height: 650px) {
   .game-screen .game-main-menu-overlay {
-    padding-top: max(10px, env(safe-area-inset-top));
+    padding-top: max(58px, calc(env(safe-area-inset-top, 0px) + 44px));
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand {
-    margin-bottom: 9px;
+    margin-bottom: 8px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand h1 {
     font-size: clamp(30px, 9vw, 38px);
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-actions {
+  .game-screen .game-main-menu-overlay .game-menu-tagline {
+    margin-top: 6px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-menu-options {
     gap: 5px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-actions button {
-    min-height: 35px;
-    padding: 5px 10px;
+    min-height: 46px;
+    padding: 5px 9px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
-    min-height: 39px;
+    min-height: 52px;
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-footer {
-    margin-top: 8px;
+  .game-screen .game-main-menu-overlay .game-menu-button-copy small {
+    font-size: 9px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation {
+    min-height: 0;
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation-item {
+    min-height: 52px;
   }
 }
 
-@media (min-width: 601px) and (max-height: 450px) {
+@media (min-width: 601px) and (max-height: 520px) {
   .game-screen .game-main-menu-overlay {
-    padding: 12px 24px;
+    padding: 14px 22px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-content {
-    display: grid;
-    width: 100%;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    column-gap: 24px;
-    align-items: center;
+    width: min(43vw, 330px);
+    max-height: 100%;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand {
-    grid-column: 1;
-    grid-row: 1;
-    margin-bottom: 0;
+    margin-bottom: 8px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-brand h1 {
-    font-size: clamp(30px, 5vw, 42px);
+    font-size: clamp(30px, 4vw, 42px);
   }
 
   .game-screen .game-main-menu-overlay .game-menu-tagline {
     margin-top: 7px;
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-actions {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    align-content: center;
+  .game-screen .game-main-menu-overlay .game-menu-options {
+    gap: 5px;
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-actions button {
-    min-height: 36px;
-    gap: 9px;
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-
+  .game-screen .game-main-menu-overlay .game-menu-actions button,
   .game-screen .game-main-menu-overlay .game-menu-actions .game-menu-primary {
-    min-height: 39px;
+    min-height: 48px;
   }
 
-  .game-screen .game-main-menu-overlay .game-menu-button-icon {
-    flex-basis: 18px;
-    width: 18px;
-    height: 18px;
+  .game-screen .game-main-menu-overlay .game-secondary-navigation {
+    min-height: 62px;
+  }
+
+  .game-screen .game-main-menu-overlay .game-secondary-navigation-item {
+    min-height: 60px;
   }
 
   .game-screen .game-main-menu-overlay .game-menu-footer {
-    grid-column: 1;
-    grid-row: 2;
-    margin-top: 8px;
+    margin-top: 5px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .game-screen .game-main-menu-overlay .game-menu-actions button,
+  .game-screen .game-main-menu-overlay .game-secondary-navigation-item,
   .game-screen .game-main-menu-overlay .game-menu-button-arrow {
     transition: none;
   }

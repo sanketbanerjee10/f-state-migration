@@ -33,6 +33,7 @@ import { useGamePlayerAuth } from './GamePlayerAuthProvider';
 interface GameEnemyGuideProps {
   readonly onBack: () => void;
   readonly backLabel: string;
+  readonly onStartTutorial?: () => void;
 }
 
 const ARENA_GUIDE_ENTRIES = ARENA_THEME_CYCLE.map((theme, index) => {
@@ -335,7 +336,11 @@ function GuideSectionHeading({
   );
 }
 
-export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
+export function GameEnemyGuide({
+  onBack,
+  backLabel,
+  onStartTutorial,
+}: GameEnemyGuideProps) {
   const { t } = useTranslation();
   const { playerProgress } = useGamePlayerAuth();
   const backButtonRef = useRef<HTMLButtonElement>(null);
@@ -440,6 +445,15 @@ export function GameEnemyGuide({ onBack, backLabel }: GameEnemyGuideProps) {
             <p className="game-guide-hero-description">
               {t('game.guides.heroDescription')}
             </p>
+            {onStartTutorial && (
+              <button
+                className="game-guide-tutorial-button"
+                type="button"
+                onClick={onStartTutorial}
+              >
+                {t('game.menu.howToPlay')}
+              </button>
+            )}
           </div>
 
           <div

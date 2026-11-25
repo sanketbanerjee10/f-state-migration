@@ -188,7 +188,6 @@ export function GameMenuOverlay({
               view="home"
               onViewChange={navigateToView}
               onStart={onStart}
-              onStartTutorial={onStartTutorial}
               onOpenSiege={onOpenSiege}
             />
           )}
@@ -214,13 +213,13 @@ export function GameMenuOverlay({
           <GameEnemyGuide
             onBack={() => navigateToView('home')}
             backLabel={backLabel}
+            onStartTutorial={onStartTutorial}
           />
         ) : view === 'level-select' && !isMainMenu ? (
           <GameMainMenu
             view="level-select"
             onViewChange={navigateToView}
             onStart={onStart}
-            onStartTutorial={onStartTutorial}
             onOpenSiege={onOpenSiege}
           />
         ) : view === 'account' && !isMainMenu ? (
@@ -247,7 +246,6 @@ export function GameMenuOverlay({
                 view="level-select"
                 onViewChange={navigateToView}
                 onStart={onStart}
-                onStartTutorial={onStartTutorial}
                 onOpenSiege={onOpenSiege}
               />
             </section>
@@ -301,6 +299,7 @@ export function GameMenuOverlay({
             <GameEnemyGuide
               onBack={() => navigateToView('home')}
               backLabel={backLabel}
+              onStartTutorial={onStartTutorial}
             />
           </section>
         </>
